@@ -28,7 +28,6 @@ erDiagram
     uuid id PK
     uuid usuario_id FK
     string nombre
-    date fecha_nacimiento
     string url_imagen
   }
   MEDICAMENTO {
