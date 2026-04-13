@@ -29,7 +29,7 @@ erDiagram
     uuid usuario_id FK
     string nombre
     date fecha_nacimiento
-    string notas
+    string url_imagen
   }
   MEDICAMENTO {
     long id PK
@@ -42,6 +42,7 @@ erDiagram
     date fecha_fin
     string dias_semana
     string horas
+    string url_imagen
   }
   TOMA {
     uuid id PK
@@ -49,7 +50,6 @@ erDiagram
     timestamp fecha_hora_programada
     timestamp fecha_hora_real
     boolean administrada
-    string observaciones
   }
 
   USUARIO ||--o{ PERFIL : gestiona
