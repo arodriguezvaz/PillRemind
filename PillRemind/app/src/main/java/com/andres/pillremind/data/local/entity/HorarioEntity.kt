@@ -1,8 +1,10 @@
-package com.andres.pillremind.data.local.entity
+/*package com.andres.pillremind.data.local.entity
+
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.util.UUID
+
 @Entity(
     tableName = "horario",
     foreignKeys = [
@@ -14,10 +16,11 @@ import java.util.UUID
         )
     ]
 )
-data class Horario(
+data class HorarioEntity(
     @PrimaryKey
     val id: UUID = UUID.randomUUID(),
     val medicamentoId: UUID,
     val diaSemana: Int,
     val hora: String
 )
+*/

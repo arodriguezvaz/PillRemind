@@ -1,21 +1,23 @@
-package com.andres.pillremind.data.local.entity
+/*package com.andres.pillremind.data.local.entity
+
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 import java.util.UUID
+
 @Entity(
     tableName = "toma",
     foreignKeys = [
         ForeignKey(
-            entity = Horario::class,
+            entity = HorarioEntity::class,
             parentColumns = ["id"],
             childColumns = ["horarioId"],
             onDelete = ForeignKey.CASCADE
         )
     ]
 )
-data class Toma(
+data class TomaEntity(
     @PrimaryKey
     val id: UUID = UUID.randomUUID(),
     val horarioId: UUID,
@@ -25,3 +27,4 @@ data class Toma(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 )
+*/
