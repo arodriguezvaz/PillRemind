@@ -19,8 +19,9 @@ graph TD
 erDiagram
   USUARIO {
     uuid id PK
+    string supabase_uid
+    enum tipo_usuario
     string email
-    boolean es_premium
     timestamp fecha_premium
     boolean acepta_comunicaciones
     timestamp created_at
@@ -62,7 +63,7 @@ erDiagram
     uuid horario_id FK
     timestamp fecha_hora_programada
     timestamp fecha_hora_real
-    string estado
+    enum estado
     timestamp created_at
     timestamp updated_at
   }
