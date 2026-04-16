@@ -56,12 +56,30 @@
 
 ---
 
-### 7. Gestión de perfiles (clientes)
+### 7.1. Creación de perfil
 - **Actor:** Usuario premium
 - **Datos de entrada:** Nombre y datos del perfil (persona)
 - **Proceso:**  
-  El usuario premium puede crear, modificar o eliminar perfiles asociados (por ejemplo, familiares).
-- **Datos de salida:** Perfiles actualizados
+  El usuario premium crea un nuevo perfil asociado (por ejemplo, un familiar). La aplicación valida los datos y guarda el perfil en la base de datos.
+- **Datos de salida:** Perfil creado y vinculado a la cuenta
+
+---
+
+### 7.2. Modificación de perfil
+- **Actor:** Usuario premium
+- **Datos de entrada:** Nuevos datos del perfil
+- **Proceso:**  
+  El usuario premium selecciona un perfil existente y modifica sus datos. La aplicación valida los cambios y actualiza la información.
+- **Datos de salida:** Perfil actualizado
+
+---
+
+### 7.3. Eliminación de perfil
+- **Actor:** Usuario premium
+- **Datos de entrada:** Identificador del perfil
+- **Proceso:**  
+  El usuario premium selecciona un perfil y lo elimina. La aplicación lo borra de la base de datos, incluyendo todos los datos asociados.
+- **Datos de salida:** Perfil eliminado
 
 ---
 
@@ -69,7 +87,7 @@
 - **Actor:** Sistema
 - **Datos de entrada:** Hora y datos del medicamento
 - **Proceso:**  
-  El sistema comprueba los recordatorios programados y envía una notificación al usuario en el momento indicado.
+  El sistema comprueba los recordatorios programados y envía una notificación al usuario en el momento indicado. Es omportantne tener en cuenta las diferentes casusiticas de toma de medicación
 - **Datos de salida:** Notificación enviada
 
 ---
@@ -83,15 +101,22 @@
 
 ---
 
+### 10. Modificación de inventario
+- **Actor:** Sistema/Usuario
+- **Datos de entrada:** Confirmación de toma de medicación o notificación de compra de nueva caja
+- **Proceso:**  
+  El sistema actualiza automáticamente el inventario de medicamentos cuando el usuario confirma una toma o notifica la compra de nuevas dosis.
+- **Datos de salida:** Inventario actualizado
+
+---
+
 ## Tipos de usuarios
 
 | Usuario | Descripción | Acceso / Funcionalidades |
 |---------|-------------|--------------------------|
-| Anónimo / Invitado | Usuario que utiliza la aplicación sin registro. | Crear y gestionar recordatorios localmente en el dispositivo; consulta de información básica. Sin sincronización ni guardado en la nube. |
-| Registrado (gratis) | Usuario con cuenta gratuita. | Funcionalidades básicas: crear, editar y eliminar recordatorios; almacenamiento seguro asociado a la cuenta; migración opcional a premium. Sin sincronización en la nube. |
+| Anónimo / Invitado | Usuario que utiliza la aplicación sin registro. | Funcionalidades básicas: crear, editar y eliminar recordatorios. Sin sincronización en la nube.|
+| Registrado (gratis) | Usuario que registró su correo | Funcionalidades básicas: crear, editar y eliminar recordatorios. Sin sincronización en la nube. Es la puerta de entrada al modelopreimum, se le podría ofreer un descueto por los primeros meses |
 | Premium | Usuario con cuenta de pago. | Todas las funcionalidades gratuitas, gestión de múltiples perfiles, sincronización en la nube, historial y estadísticas. Cuenta obligatoria para asociar suscripción y recuperar datos. |
-| Bloqueado | Usuario al que se le ha restringido el acceso. | Acceso limitado o nulo según el motivo del bloqueo. |
-| Administrador | Usuario con permisos avanzados para gestión y supervisión. | Gestión de usuarios, supervisión del sistema, configuración global y gestión de contenido o integraciones externas. |
 
 ---
 
