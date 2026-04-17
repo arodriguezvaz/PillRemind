@@ -35,12 +35,12 @@ class CrearPerfilViewModel(private val repository: PerfilRepository) : ViewModel
     }
 }
 
-class PerfilViewModelFactory(
+class CrearPerfilViewModelFactory(
     private val repository: PerfilRepository
-): ViewModelProvider.Factory {
+) : ViewModelProvider.Factory {
 
-    override fun <T: ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(CrearPerfilViewModel::class.java)){
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        require(modelClass.isAssignableFrom(CrearPerfilViewModel::class.java)) {
             "Unknown ViewModel class: ${modelClass.name}"
         }
         return CrearPerfilViewModel(repository) as T

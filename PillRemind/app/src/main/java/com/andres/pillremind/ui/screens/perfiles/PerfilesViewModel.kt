@@ -20,43 +20,16 @@ class PerfilesViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
-
-
-    //PRUEBA esto debria de estar en el otro ViewModel
-    fun añadirPerfil(nombre: String, urlImagen: String? = null) {
-        val trimmedNombre = nombre.trim()
-        if (trimmedNombre.isNotEmpty()) {
-            viewModelScope.launch {
-                repository.insertPerfil(
-                    Perfil(
-                        nombre = trimmedNombre,
-                        urlImagen = urlImagen
-                    )
-                )
-            }
-        }
-    }
-
-    fun updatePerfil(perfil: Perfil) {
-        viewModelScope.launch {
-            repository.updatePerfil(perfil)
-        }
-    }
-
-    fun deletePerfil(perfil: Perfil) {
-        viewModelScope.launch {
-            repository.deletePerfil(perfil)
-        }
-    }
 }
+
 class PerfilesViewModelFactory(
     private val repository: PerfilRepository
-): ViewModelProvider.Factory {
+) : ViewModelProvider.Factory {
 
-    override fun <T: ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(CrearPerfilViewModel::class.java)){
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        require(modelClass.isAssignableFrom(PerfilesViewModel::class.java)) {
             "Unknown ViewModel class: ${modelClass.name}"
         }
-        return CrearPerfilViewModel(repository) as T
+        return PerfilesViewModel(repository) as T
     }
 }

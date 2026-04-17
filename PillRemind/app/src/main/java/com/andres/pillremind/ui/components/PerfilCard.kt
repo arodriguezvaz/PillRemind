@@ -1,6 +1,5 @@
 package com.andres.pillremind.ui.components
 
-import android.R.attr.onClick
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import com.andres.pillremind.domain.model.Perfil
 
 @Composable
-fun PersonCard(
+fun PerfilCard(
     perfil: Perfil,
-    onClickGestionar: () -> Unit,
+    gestionar: () -> Unit,
     modifier: Modifier = Modifier,
     buttonText: String = "Gestionar",
     buttonVariant: ButtonVariant = ButtonVariant.Primary,
@@ -65,7 +64,7 @@ fun PersonCard(
 
             AppButton(
                 text = buttonText,
-                onClick = onClick,
+                onClick = gestionar,
                 variant = buttonVariant,
                 size = ButtonSize.Small,
             )
@@ -85,8 +84,17 @@ private fun DefaultAvatar() {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun PersonCardPreview() {
-    PersonCard(Perfil(nombre = "Juan"))
+    val perfilFake = Perfil(
+        id = 1,
+        nombre = "Juan",
+        urlImagen = "" // o null si es nullable
+    )
+
+    PerfilCard(
+        perfil = perfilFake,
+        gestionar = {}
+    )
 }

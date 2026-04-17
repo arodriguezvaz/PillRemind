@@ -18,12 +18,12 @@ import androidx.compose.ui.unit.dp
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
-import com.andres.pillremind.ui.components.PersonCard
+import com.andres.pillremind.ui.components.PerfilCard
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
 @Composable
 fun MainScreen() {
-    var isLoading by remember { mutableStateOf(false) }
+    /*var isLoading by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -132,7 +132,7 @@ fun MainScreen() {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             }
         }
-    }
+    }*/
 }
 
 @Preview(
