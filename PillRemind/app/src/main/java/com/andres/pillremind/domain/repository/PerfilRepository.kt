@@ -7,5 +7,5 @@ interface PerfilRepository {
     suspend fun insertPerfil(perfil: Perfil)
     suspend fun deletePerfil(perfil: Perfil)
     suspend fun updatePerfil(perfil: Perfil)
-    suspend fun getPerfiles(): Flow<List<Perfil>>
+    fun getPerfiles(): Flow<List<Perfil>>
 }

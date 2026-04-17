@@ -22,8 +22,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
 
                 ) {
-                    val database =
-                        Room.databaseBuilder(this, AppDatabase::class.java, "app_database").build()
+
                 }
             }
         }

@@ -21,7 +21,7 @@ class PerfilRepositoryImpl(private val perfilDao: PerfilDao) : PerfilRepository 
         return perfilDao.updatePerfil(perfil.toEntity())
     }
 
-    override suspend fun getPerfiles(): Flow<List<Perfil>> {
+    override fun getPerfiles(): Flow<List<Perfil>> {
         return perfilDao.getPerfiles().map { list -> list.map { it.toDomain() } }
     }
 

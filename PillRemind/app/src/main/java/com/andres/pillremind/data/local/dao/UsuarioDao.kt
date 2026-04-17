@@ -26,6 +26,6 @@ interface UsuarioDao {
     suspend fun deleteUsuario(usuario: UsuarioEntity)
 
     @Query("SELECT * FROM usuarios LIMIT 1")
-    suspend fun getUsuario(): UsuarioEntity?
+    fun getUsuario(): UsuarioEntity?
 }
 

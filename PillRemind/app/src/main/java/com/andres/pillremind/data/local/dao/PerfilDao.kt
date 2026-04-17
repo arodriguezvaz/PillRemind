@@ -1,12 +1,13 @@
 package com.andres.pillremind.data.local.dao
 
+import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.andres.pillremind.data.local.entity.PerfilEntity
 import kotlinx.coroutines.flow.Flow
-
+@Dao
 interface PerfilDao {
     @Insert
     suspend fun insertPerfil(perfil: PerfilEntity)
