@@ -84,15 +84,6 @@
 
 ---
 
-### 10. Modificación de inventario
-- **Actor:** Sistema/Usuario
-- **Datos de entrada:** Confirmación de toma de medicación o notificación de compra dunha nova caixa
-- **Proceso:**  
-  El sistema actualiza automáticamente el inventario de medicamentos cuando el usuario confirma una toma o notifica la compra de nuevas dosis.
-- **Datos de salida:** Inventario actualizado
-
----
-
 ## Tipos de usuarios
 
 | Usuario | Descrición | Acceso / Funcionalidades |

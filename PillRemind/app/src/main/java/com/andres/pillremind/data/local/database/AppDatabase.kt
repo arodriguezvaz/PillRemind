@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.andres.pillremind.data.local.converters.Converters
-import com.andres.pillremind.data.local.dao.PerfilDao
+import com.andres.pillremind.data.local.dao.ProfileDao
 import com.andres.pillremind.data.local.dao.UsuarioDao
 import com.andres.pillremind.data.local.entity.UsuarioEntity
 import com.andres.pillremind.data.local.entity.PerfilEntity
@@ -20,12 +20,12 @@ import com.andres.pillremind.data.local.entity.PerfilEntity
 @TypeConverters(Converters::class)
 /**
  * Clase abstracta que representa la base de datos de la aplicación
- * @property usuarioDao DAO para acceder a los datos de los usuarios
+ * Expone los DAOs para acceder a las tablas locales.
  */
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun usuarioDao(): UsuarioDao
-    abstract fun perfilDao(): PerfilDao
+    abstract fun perfilDao(): ProfileDao
 
     companion object {
         //Crea una instancia única de la base de datos (Singleton)
@@ -38,7 +38,7 @@ abstract class AppDatabase : RoomDatabase() {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "pilremind.db",
+                    "pillremind.db",
                 )
                     .fallbackToDestructiveMigration(dropAllTables = true)
                     .build()

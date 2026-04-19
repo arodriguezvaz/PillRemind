@@ -4,6 +4,9 @@ import androidx.room.TypeConverter
 import com.andres.pillremind.domain.model.TipoUsuario
 import java.time.LocalDateTime
 
+/**
+ *Clase que contiene los converters para convertir tipos de datos no soportados por Room
+ */
 class Converters {
 
     // -------- LocalDateTime --------

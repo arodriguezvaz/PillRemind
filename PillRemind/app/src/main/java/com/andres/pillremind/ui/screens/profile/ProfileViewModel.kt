@@ -1,4 +1,4 @@
-package com.andres.pillremind.ui.screens.crearperfil
+package com.andres.pillremind.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -7,8 +7,12 @@ import com.andres.pillremind.domain.model.Perfil
 import com.andres.pillremind.domain.repository.PerfilRepository
 import kotlinx.coroutines.launch
 
-class CrearPerfilViewModel(private val repository: PerfilRepository) : ViewModel() {
-    fun añadirPerfil(nombre: String, urlImagen: String? = null) {
+/**
+ * ViewModel para la creación de perfiles
+ * @property repository Repositorio de perfiles
+ */
+class ProfileViewModel(private val repository: PerfilRepository) : ViewModel() {
+    fun addProfile(nombre: String, urlImagen: String? = null) {
         val trimmedNombre = nombre.trim()
         if (trimmedNombre.isNotEmpty()) {
             viewModelScope.launch {
@@ -22,27 +26,27 @@ class CrearPerfilViewModel(private val repository: PerfilRepository) : ViewModel
         }
     }
 
-    fun updatePerfil(perfil: Perfil) {
+    fun updateProfile(perfil: Perfil) {
         viewModelScope.launch {
             repository.updatePerfil(perfil)
         }
     }
 
-    fun deletePerfil(perfil: Perfil) {
+    fun deleteProfile(perfil: Perfil) {
         viewModelScope.launch {
             repository.deletePerfil(perfil)
         }
     }
 }
 
-class CrearPerfilViewModelFactory(
+class ProfileViewModelFactory(
     private val repository: PerfilRepository
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(CrearPerfilViewModel::class.java)) {
+        require(modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
             "Unknown ViewModel class: ${modelClass.name}"
         }
-        return CrearPerfilViewModel(repository) as T
+        return ProfileViewModel(repository) as T
     }
 }

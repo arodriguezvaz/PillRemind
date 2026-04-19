@@ -17,6 +17,10 @@ import java.util.UUID
         )
     ]
 )*/
+/**
+ * Clase que representa un perfil de la aplicación en la BD
+ *
+ */
 @Entity(tableName = "perfiles")
 data class PerfilEntity(
     @PrimaryKey(autoGenerate = true)

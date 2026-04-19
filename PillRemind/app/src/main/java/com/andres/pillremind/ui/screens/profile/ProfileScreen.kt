@@ -1,4 +1,4 @@
-package com.andres.pillremind.ui.screens.crearperfil
+package com.andres.pillremind.ui.screens.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,25 +12,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.andres.pillremind.data.local.database.AppDatabase
 import com.andres.pillremind.data.repository.PerfilRepositoryImpl
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.ButtonSize
 
+sealed class ProfileMode {
+    object Create : ProfileMode()
+    object View : ProfileMode()
+    object Edit : ProfileMode()
+}
+
+/**
+ * Vista de creación de perfiles
+ * @param viewModel ViewModel para la creación de perfiles
+ * @param navController Controlador de navegación
+ * @param modifier Modificador para personalizar la vista
+ */
 @Composable
-fun CrearPerfilScreen(
-    viewModel: CrearPerfilViewModel,
-    navController: NavController,
+fun ProfileScreen(
+    viewModel: ProfileViewModel,
+    onSaveClicked: () -> Unit = {},
+    profileId: Int? = null,
+    profileMode: ProfileMode = ProfileMode.Create,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val crearPerfilFactory = remember {
         val db = AppDatabase.getInstance(context.applicationContext)
-        CrearPerfilViewModelFactory(PerfilRepositoryImpl(db.perfilDao()))
+        ProfileViewModelFactory(PerfilRepositoryImpl(db.perfilDao()))
     }
     val nombre = remember { mutableStateOf("") }
     val urlImagen = remember { mutableStateOf("") }
@@ -61,10 +72,11 @@ fun CrearPerfilScreen(
         AppButton(
             text = "Guardar",
             onClick = {
-                viewModel.añadirPerfil(
+                viewModel.addProfile(
                     nombre = nombre.value,
                     urlImagen = urlImagen.value.ifEmpty { null }
                 )
+                onSaveClicked()
             },
             size = ButtonSize.Large,
             enabled = nombre.value.isNotBlank()
