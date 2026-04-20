@@ -1,162 +1,178 @@
-# Análise: Requisitos do sistema
+# Análisis: Requisitos del sistema
 
 ## Funcionalidades
 
 ### 1. Alta de medicamento
-- **Actor:** Usuario (invitado ou rexistrado)  
-- **Datos de entrada:** Nome do medicamento, dose, frecuencia, hora(s)  
+- **Actor:** Usuario (invitado o registrado)
+- **Datos de entrada:** Nombre del medicamento, dosis, frecuencia, hora(s)
 - **Proceso:**  
-  O usuario introduce os datos do medicamento. A aplicación valida os campos e garda a información na base de datos local.  
-- **Datos de saída:** Medicamento rexistrado no sistema  
+  El usuario introduce los datos del medicamento. La aplicación valida los campos y guarda la información en la base de datos local.
+- **Datos de salida:** Medicamento registrado en el sistema
 
 ---
 
 ### 2. Modificación de medicamento
-- **Actor:** Usuario (invitado ou rexistrado)  
-- **Datos de entrada:** Novos datos do medicamento  
+- **Actor:** Usuario (invitado o registrado)
+- **Datos de entrada:** Nuevos datos del medicamento
 - **Proceso:**  
-  O usuario selecciona un medicamento existente e modifica os seus datos. A aplicación valida os cambios e actualiza a información.  
-- **Datos de saída:** Medicamento actualizado  
+  El usuario selecciona un medicamento existente y modifica sus datos. La aplicación valida los cambios y actualiza la información.
+- **Datos de salida:** Medicamento actualizado
 
 ---
 
-### 3. Baixa de medicamento
-- **Actor:** Usuario (invitado ou rexistrado)  
-- **Datos de entrada:** Identificador do medicamento  
+### 3. Baja de medicamento
+- **Actor:** Usuario (invitado o registrado)
+- **Datos de entrada:** Identificador del medicamento
 - **Proceso:**  
-  O usuario selecciona un medicamento e elimínao. A aplicación bórrano da base de datos local.  
-- **Datos de saída:** Medicamento eliminado  
+  El usuario selecciona un medicamento y lo elimina. La aplicación lo borra de la base de datos local.
+- **Datos de salida:** Medicamento eliminado
 
 ---
 
-### 4. Rexistro de usuario premium
-- **Actor:** Usuario  
-- **Datos de entrada:** Correo electrónico, contrasinal, datos de pago  
+### 4. Registro de usuario premium
+- **Actor:** Usuario
+- **Datos de entrada:** Correo electrónico, contraseña, datos de pago
 - **Proceso:**  
-  O usuario crea unha conta e realiza o pago da subscrición. A aplicación valida os datos e crea o usuario na base de datos en liña.  
-- **Datos de saída:** Conta premium creada  
+  El usuario crea una cuenta y realiza el pago de la suscripción. La aplicación valida los datos y crea el usuario en la base de datos en línea.
+- **Datos de salida:** Cuenta premium creada
 
 ---
 
-### 5. Migración de datos a conta premium
-- **Actor:** Sistema  
-- **Datos de entrada:** Datos locais do usuario  
+### 5. Migración de datos a cuenta premium
+- **Actor:** Sistema
+- **Datos de entrada:** Datos locales del usuario
 - **Proceso:**  
-  A aplicación recolle os datos almacenados no dispositivo e envíaos á base de datos na nube, asociándoos á conta do usuario.  
-- **Datos de saída:** Datos sincronizados na nube  
+  La aplicación recoge los datos almacenados en el dispositivo y los envía a la base de datos en la nube, asociándolos a la cuenta del usuario.
+- **Datos de salida:** Datos sincronizados en la nube
 
 ---
 
-### 6. Sincronización na nube
-- **Actor:** Sistema  
-- **Datos de entrada:** Datos locais e datos almacenados na nube  
+### 6. Sincronización en la nube
+- **Actor:** Sistema
+- **Datos de entrada:** Datos locales y datos almacenados en la nube
 - **Proceso:**  
-  A aplicación compara os datos locais cos da nube e actualízaos para manter a consistencia entre dispositivos.  
-- **Datos de saída:** Datos sincronizados  
+  La aplicación compara los datos locales con los de la nube y los actualiza para mantener la consistencia entre dispositivos.
+- **Datos de salida:** Datos sincronizados
 
 ---
-
-### 7. Xestión de perfís (clientes)
-- **Actor:** Usuario premium  
-- **Datos de entrada:** Nome e datos do perfil (persoa)  
+### 7 Gestión de perfiles
+#### 7.1. Creación de perfil
+- **Actor:** Usuario premium
+- **Datos de entrada:** Nombre y datos del perfil (persona)
 - **Proceso:**  
-  O usuario premium pode crear, modificar ou eliminar perfís asociados (por exemplo, familiares).  
-- **Datos de saída:** Perfís actualizados  
+  El usuario premium crea un nuevo perfil asociado (por ejemplo, un familiar). La aplicación valida los datos y guarda el perfil en la base de datos.
+- **Datos de salida:** Perfil creado y vinculado a la cuenta
+
+
+
+#### 7.2. Modificación de perfil
+- **Actor:** Usuario premium
+- **Datos de entrada:** Nuevos datos del perfil
+- **Proceso:**  
+  El usuario premium selecciona un perfil existente y modifica sus datos. La aplicación valida los cambios y actualiza la información.
+- **Datos de salida:** Perfil actualizado
+
+
+
+#### 7.3. Eliminación de perfil
+- **Actor:** Usuario premium
+- **Datos de entrada:** Identificador del perfil
+- **Proceso:**  
+  El usuario premium selecciona un perfil y lo elimina. La aplicación lo borra de la base de datos, incluyendo todos los datos asociados.
+- **Datos de salida:** Perfil eliminado
 
 ---
 
 ### 8. Notificación de medicación
-- **Actor:** Sistema  
-- **Datos de entrada:** Hora e datos do medicamento  
+- **Actor:** Sistema
+- **Datos de entrada:** Hora y datos del medicamento
 - **Proceso:**  
-  O sistema comproba os recordatorios programados e envía unha notificación ao usuario no momento indicado.  
-- **Datos de saída:** Notificación enviada  
-
+  El sistema comprueba los recordatorios programados y envía una notificación al usuario en el momento indicado. Es omportantne tener en cuenta las diferentes casusiticas de toma de medicación
+- **Datos de salida:** Notificación enviada
 
 ---
 
-### 9. Confirmación da toma de medicación
-- **Actor:** Usuario  
-- **Datos de entrada:** Acción de confirmación  
+### 9. Confirmación de toma de medicación
+- **Actor:** Usuario
+- **Datos de entrada:** Acción de confirmación
 - **Proceso:**  
-  O usuario indica que tomou a medicación e a aplicación garda o rexistro.  
-- **Datos de saída:** Rexistro de toma almacenado  
+  El usuario indica que ha tomado la medicación y la aplicación guarda el registro.
+- **Datos de salida:** Registro de toma almacenado
+
+---
+
+### 10. Modificación de inventario
+- **Actor:** Sistema/Usuario
+- **Datos de entrada:** Confirmación de toma de medicación o notificación de compra de nueva caja
+- **Proceso:**  
+  El sistema actualiza automáticamente el inventario de medicamentos cuando el usuario confirma una toma o notifica la compra de nuevas dosis.
+- **Datos de salida:** Inventario actualizado
 
 ---
 
 ## Tipos de usuarios
 
-| Usuario | Descrición | Acceso / Funcionalidades |
-|---------|------------|--------------------------|
-| Anónimo / Invitado | Usuario que utiliza a aplicación sen rexistro. | Crear e xestionar recordatorios localmente no dispositivo; consulta de información básica. Sen sincronización nin gardado na nube. |
-| Rexistrado (gratis) | Usuario con conta gratuíta. | Funcionalidades básicas: crear, editar e eliminar recordatorios; almacenamento seguro asociado á conta; migración opcional a premium. Sen sincronización na nube. |
-| Premium | Usuario con conta de pago. | Todas as funcionalidades gratuítas, xestión de múltiples perfís, sincronización na nube, historial e estatísticas. Conta obrigatoria para asociar a subscrición e recuperar datos. |
-| Bloqueado | Usuario ao que se lle restrinxiu o acceso. | Acceso limitado ou nulo segundo o motivo do bloqueo. |
-| Administrador | Usuario con permisos avanzados para xestión e supervisión. | Xestión de usuarios, supervisión do sistema, configuración global e xestión de contido ou integracións externas. |
-
+| Usuario | Descripción | Acceso / Funcionalidades |
+|---------|-------------|--------------------------|
+| Anónimo / Invitado | Usuario que utiliza la aplicación sin registro. | Funcionalidades básicas: crear, editar y eliminar recordatorios. Sin sincronización en la nube.|
+| Registrado (gratis) | Usuario que registró su correo | Funcionalidades básicas: crear, editar y eliminar recordatorios. Sin sincronización en la nube. Es la puerta de entrada al modelopreimum, se le podría ofreer un descueto por los primeros meses |
+| Premium | Usuario con cuenta de pago. | Todas las funcionalidades gratuitas, gestión de múltiples perfiles, sincronización en la nube, historial y estadísticas. Cuenta obligatoria para asociar suscripción y recuperar datos. |
 
 ---
 
 ## Normativa
 
-A aplicación xestiona datos relacionados coa saúde dos usuarios, o que a sitúa baixo un marco normativo estrito tanto a nivel europeo como español. A continuación detállanse as principais normas aplicables.
+La aplicación gestiona datos relacionados con la salud de los usuarios, lo que la sitúa bajo un marco normativo estricto tanto a nivel europeo como español. A continuación se detallan las principales normas aplicables.
 
-### 1. Protección de datos persoais
+### 1. Protección de datos personales
 
-#### RGPD — Regulamento (UE) 2016/679  
-O **Regulamento Xeral de Protección de Datos**, en vigor desde o 25 de maio de 2018, é a norma europea de referencia para o tratamento de datos persoais. Os datos sobre medicación e saúde están clasificados como **datos de categoría especial** (art. 9 RGPD), o que esixe un nivel de protección reforzado. Entre as obrigas principais atópanse:
+#### RGPD — Reglamento (UE) 2016/679
+El **Reglamento General de Protección de Datos**, en vigor desde el 25 de mayo de 2018, es la norma europea de referencia para el tratamiento de datos personales. Los datos sobre medicación y salud están clasificados como **datos de categoría especial** (art. 9 RGPD), lo que exige un nivel de protección reforzado. Entre las obligaciones principales se encuentran:
 
-- Obter o **consentimento explícito** do usuario antes de tratar os seus datos de saúde  
-- Aplicar o principio de **privacidade desde o deseño** (*privacy by design*) e **por defecto** (*privacy by default*)  
-- Informar ao usuario de forma clara sobre a finalidade do tratamento, os destinatarios dos datos e os seus dereitos  
-- Garantir os dereitos de acceso, rectificación, supresión, portabilidade e oposición  
-- Notificar as brechas de seguridade á AEPD nun prazo máximo de 72 horas  
+- Obtener el **consentimiento explícito** del usuario antes de tratar sus datos de salud.
+- Aplicar el principio de **privacidad desde el diseño** (*privacy by design*) y **por defecto** (*privacy by default*).
+- Informar al usuario de forma clara sobre la finalidad del tratamiento, los destinatarios de los datos y sus derechos.
+- Garantizar los derechos de acceso, rectificación, supresión, portabilidad y oposición.
+- Notificar las brechas de seguridad a la AEPD en un plazo máximo de 72 horas.
 
-#### LOPDGDD — Lei Orgánica 3/2018  
-A **Lei Orgánica de Protección de Datos Persoais e Garantía dos Dereitos Dixitais** adapta o RGPD ao ordenamento xurídico español. Complementa o RGPD con disposicións específicas sobre o tratamento de datos no ámbito nacional, o réxime sancionador e os dereitos dixitais da cidadanía.  
-
----
-
-### 2. Comercio electrónico e subscricións
-
-#### LSSI-CE — Lei 34/2002  
-A **Lei de Servizos da Sociedade da Información e de Comercio Electrónico** regula as actividades comerciais realizadas a través de medios electrónicos. Ao ofrecer unha subscrición de pago (conta premium), a aplicación queda suxeita a esta lei, que esixe:
-
-- Informar de forma clara sobre a identidade do prestador do servizo, prezos e condicións de contratación  
-- Obter o consentimento previo do usuario antes de proceder á contratación  
-- Facilitar ao usuario o acceso aos termos e condicións antes da compra  
-- Proporcionar confirmación da transacción realizada  
-
-Actualizada mediante o **Real Decreto Lexislativo 9/2024** para adaptarse ao Regulamento europeo de Servizos Dixitais (DSA).  
-
-#### Directiva (UE) sobre pagos dixitais — PSD2  
-Aplicable ás transaccións de pago realizadas para activar a subscrición premium. Esixe a implementación de **autenticación reforzada de clientes** (SCA) e prohibe cargos adicionais sobre pagos con tarxeta de crédito ou débito.  
+#### LOPDGDD — Ley Orgánica 3/2018
+La **Ley Orgánica de Protección de Datos Personales y Garantía de los Derechos Digitales** adapta el RGPD al ordenamiento jurídico español. Complementa el RGPD con disposiciones específicas sobre el tratamiento de datos en el ámbito nacional, el régimen sancionador y los derechos digitales de los ciudadanos.
 
 ---
 
-### 3. Normativa sanitaria e de saúde dixital
+### 2. Comercio electrónico y suscripciones
 
-#### Regulamento (UE) 2025/327 — Espazo Europeo de Datos de Saúde (EHDS)  
-Aprobado o 11 de febreiro de 2025, establece o marco europeo para o uso e a interoperabilidade dos datos de saúde electrónicos. Aínda que está orientado principalmente a sistemas de historia clínica electrónica (HCE), senta as bases para as aplicacións de saúde dixital en canto a:
+#### LSSI-CE — Ley 34/2002
+La **Ley de Servicios de la Sociedad de la Información y de Comercio Electrónico** regula las actividades comerciales realizadas a través de medios electrónicos. Al ofrecer una suscripción de pago (cuenta premium), la aplicación queda sujeta a esta ley, que exige:
 
-- Dereitos da cidadanía a acceder e xestionar os seus propios datos de saúde  
-- Requisitos de interoperabilidade e seguridade para aplicacións que manexen datos sanitarios  
-- Obriga de distinguir claramente entre datos introducidos polo propio usuario e os rexistrados por profesionais sanitarios  
+- Informar de forma clara sobre la identidad del prestador del servicio, precios y condiciones de contratación.
+- Obtener el consentimiento previo del usuario antes de proceder a la contratación.
+- Facilitar al usuario el acceso a los términos y condiciones antes de la compra.
+- Proporcionar confirmación de la transacción realizada.
 
-#### Anteproxecto de Lei de Saúde Dixital (España, 2025)  
-O Ministerio de Sanidade iniciou a elaboración desta lei para adaptar o ordenamento español ao Regulamento EHDS. Afectará ás **aplicacións móbiles de saúde**, establecendo requisitos de interoperabilidade, seguridade para os pacientes e acceso equitativo á innovación dixital. As aplicacións de recordatorio de medicación poderían quedar suxeitas ás súas disposicións unha vez aprobada.  
+Actualizada mediante el **Real Decreto Legislativo 9/2024** para adaptarse al Reglamento europeo de Servicios Digitales (DSA).
 
----
-
-### 5. Protección do consumidor
-
-#### Real Decreto Lexislativo 1/2007 — Lei Xeral para a Defensa dos Consumidores e Usuarios  
-Aplicable aos usuarios que contraten a subscrición premium. Regula o dereito de desistimento en compras en liña (14 días naturais), a obriga de informar sobre prezos e condicións, e a resolución de reclamacións.  
+#### Directiva (UE) sobre pagos digitales — PSD2
+Aplicable a las transacciones de pago realizadas para activar la suscripción premium. Exige la implementación de **autenticación reforzada de clientes** (SCA) y prohíbe cargos adicionales sobre pagos con tarjeta de crédito o débito.
 
 ---
 
-### Resumo da normativa aplicable
+### 3. Normativa sanitaria y de salud digital
 
-| Normativa | Ámbito | Relevancia para a app |
-|-----------|--------|------------------------|
-| RGPD (UE) 2016/679 | Protección de datos | Alta — datos de saúde |
+#### Reglamento (UE) 2025/327 — Espacio Europeo de Datos de Salud (EHDS)
+Aprobado el 11 de febrero de 2025, establece el marco europeo para el uso y la interoperabilidad de los datos de salud electrónicos. Aunque está orientado principalmente a sistemas de historia clínica electrónica (HCE), sienta las bases para las aplicaciones de salud digital en cuanto a:
+
+- Derechos de los ciudadanos a acceder y gestionar sus propios datos de salud.
+- Requisitos de interoperabilidad y seguridad para aplicaciones que manejen datos sanitarios.
+- Obligación de distinguir claramente entre datos introducidos por el propio usuario y los registrados por profesionales sanitarios.
+
+#### Anteproyecto de Ley de Salud Digital (España, 2025)
+El Ministerio de Sanidad ha iniciado la elaboración de esta ley para adaptar el ordenamiento español al Reglamento EHDS. Afectará a las **aplicaciones móviles de salud**, estableciendo requisitos de interoperabilidad, seguridad para los pacientes y acceso equitativo a la innovación digital. Las aplicaciones de recordatorio de medicación podrían quedar sujetas a sus disposiciones una vez aprobada.
+
+---
+
+### 5. Protección del consumidor
+
+#### Real Decreto Legislativo 1/2007 — Ley General para la Defensa de los Consumidores y Usuarios
+Aplicable a los usuarios que contraten la suscripción premium. Regula el derecho de desistimiento en compras online (14 días naturales), la obligación de informar sobre precios y condiciones, y la resolución de reclamaciones.
+

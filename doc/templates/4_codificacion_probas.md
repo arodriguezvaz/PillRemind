@@ -21,4 +21,5 @@ Para la instalación del entorno de desarrollo solo es necesario tener Android S
     - Implementación de Room en Compose manteniendo los conceptos de Clean Architecture
     - Implementación de DataStore para almacenar el id del perfil seleccionado
 
-
+- [Vídeo do prototipo](https://drive.google.com/file/d/142_gD4ye7jSW4_KM_gCqqgqEX95Fz5Hn/view?usp=sharing)
+- [Ubicación da Apk](doc/apks)
