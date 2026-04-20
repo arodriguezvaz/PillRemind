@@ -11,10 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.andres.pillremind.data.local.database.AppDatabase
-import com.andres.pillremind.data.repository.PerfilRepositoryImpl
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.ButtonSize
 
@@ -38,11 +35,6 @@ fun ProfileScreen(
     profileMode: ProfileMode = ProfileMode.Create,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val crearPerfilFactory = remember {
-        val db = AppDatabase.getInstance(context.applicationContext)
-        ProfileViewModelFactory(PerfilRepositoryImpl(db.perfilDao()))
-    }
     val nombre = remember { mutableStateOf("") }
     val urlImagen = remember { mutableStateOf("") }
     //var editorState by remember { mutableStateOf<EditorState>(EditorState.Closed) }

@@ -4,13 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.domain.model.Perfil
-import com.andres.pillremind.domain.repository.PerfilRepository
+import com.andres.pillremind.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
 class ProfilesViewModel(
-    private val repository: PerfilRepository
+    private val repository: ProfileRepository
 ) : ViewModel() {
     val perfiles: StateFlow<List<Perfil>> = repository.getPerfiles()
         .stateIn(
@@ -21,7 +21,7 @@ class ProfilesViewModel(
 }
 
 class ProfilesViewModelFactory(
-    private val repository: PerfilRepository
+    private val repository: ProfileRepository
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

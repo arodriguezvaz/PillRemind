@@ -2,15 +2,18 @@ package com.andres.pillremind.ui.screens.home
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.andres.pillremind.data.repository.PerfilRepositoryImpl
-import com.andres.pillremind.ui.session.SessionViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 @Composable
 fun HomeScreen(
-    profileId: Int,
-    sessionViewModel: SessionViewModel,
-    perfilRepository: PerfilRepositoryImpl
+    homeViewModel: HomeViewModel,
 ) {
-    //val nombrePerfil = perfilRepository.getPerfil(1)
-    Text(text = "Hola {$profileId}")
+    val perfil = homeViewModel.perfil.collectAsState().value
+
+    if (perfil != null) {
+        Text(text = "Hola ${perfil.nombre}")
+    } else {
+        Text(text = "Cargando...")
+    }
 }

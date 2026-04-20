@@ -3,7 +3,6 @@ package com.andres.pillremind.ui.screens.main
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -16,8 +15,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.andres.pillremind.data.repository.PerfilRepositoryImpl
-import com.andres.pillremind.navigation.HomeNavigationGraph
+import com.andres.pillremind.data.repository.ProfileRepositoryImpl
+import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.ui.screens.BottomBarScreen
 import com.andres.pillremind.ui.session.SessionViewModel
 
@@ -26,12 +25,12 @@ import com.andres.pillremind.ui.session.SessionViewModel
 fun MainScreen(
     navController: NavHostController = rememberNavController(),
     sessionViewModel: SessionViewModel,
-    perfilRepository: PerfilRepositoryImpl
+    perfilRepository: ProfileRepositoryImpl
 ) {
     Scaffold(
         bottomBar = { BottomBar(navController = navController) }
     ) {
-        HomeNavigationGraph(navController = navController, sessionViewModel, perfilRepository)
+        MainNavigationGraph(navController = navController, sessionViewModel, perfilRepository)
     }
 }
 

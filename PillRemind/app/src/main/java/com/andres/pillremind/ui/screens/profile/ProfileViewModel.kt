@@ -4,14 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.domain.model.Perfil
-import com.andres.pillremind.domain.repository.PerfilRepository
+import com.andres.pillremind.domain.repository.ProfileRepository
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel para la creación de perfiles
  * @property repository Repositorio de perfiles
  */
-class ProfileViewModel(private val repository: PerfilRepository) : ViewModel() {
+class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() {
     fun addProfile(nombre: String, urlImagen: String? = null) {
         val trimmedNombre = nombre.trim()
         if (trimmedNombre.isNotEmpty()) {
@@ -40,7 +40,7 @@ class ProfileViewModel(private val repository: PerfilRepository) : ViewModel() {
 }
 
 class ProfileViewModelFactory(
-    private val repository: PerfilRepository
+    private val repository: ProfileRepository
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

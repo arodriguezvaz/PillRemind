@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.andres.pillremind.data.local.database.AppDatabase
 import com.andres.pillremind.data.local.session.SessionManager
-import com.andres.pillremind.data.repository.PerfilRepositoryImpl
+import com.andres.pillremind.data.repository.ProfileRepositoryImpl
 import com.andres.pillremind.ui.screens.main.MainScreen
 import com.andres.pillremind.ui.session.SessionViewModel
 import com.andres.pillremind.ui.session.SessionViewModelFactory
@@ -26,7 +26,7 @@ fun RootNavigationGraph(navController: NavHostController) {
     }
     //Instancias de los repositorios
     val perfilRepository = remember {
-        PerfilRepositoryImpl(db.perfilDao())
+        ProfileRepositoryImpl(db.perfilDao())
     }
     //Instancia del SessionManager donde se almacen el id del perfil selecionado
     val sessionManager = remember { SessionManager(context) }

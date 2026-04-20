@@ -4,14 +4,14 @@ import com.andres.pillremind.data.local.dao.ProfileDao;
 import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Perfil
-import com.andres.pillremind.domain.repository.PerfilRepository
+import com.andres.pillremind.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
- * Clase que implementa la interfaz PerfilRepository
+ * Clase que implementa la interfaz ProfileRepository
  */
-class PerfilRepositoryImpl(private val perfilDao: ProfileDao) : PerfilRepository {
+class ProfileRepositoryImpl(private val perfilDao: ProfileDao) : ProfileRepository {
     override suspend fun insertPerfil(perfil: Perfil) {
         return perfilDao.insertPerfil(perfil.toEntity())
     }
@@ -24,8 +24,8 @@ class PerfilRepositoryImpl(private val perfilDao: ProfileDao) : PerfilRepository
         return perfilDao.updatePerfil(perfil.toEntity())
     }
 
-    override fun getPerfil(id: Int): Perfil {
-        return perfilDao.getPerfil(id).toDomain()
+    override fun getPerfil(id: Int): Flow<Perfil> {
+        return perfilDao.getPerfil(id).map { it.toDomain() }
     }
 
     override fun getPerfiles(): Flow<List<Perfil>> {

@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.andres.pillremind.data.repository.PerfilRepositoryImpl
+import com.andres.pillremind.data.repository.ProfileRepositoryImpl
 import com.andres.pillremind.ui.screens.profile.ProfileViewModelFactory
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
@@ -18,7 +18,7 @@ import com.andres.pillremind.ui.session.SessionViewModel
 fun NavGraphBuilder.profileSelectionGraph(
     navController: NavHostController,
     sessionViewModel: SessionViewModel,
-    repo: PerfilRepositoryImpl
+    repo: ProfileRepositoryImpl
 ) {
     navigation(
         route = Graph.PROFILE_SELECTION,

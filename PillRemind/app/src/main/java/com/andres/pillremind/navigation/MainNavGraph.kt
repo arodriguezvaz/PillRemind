@@ -12,10 +12,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.andres.pillremind.data.repository.PerfilRepositoryImpl
+import com.andres.pillremind.data.repository.ProfileRepositoryImpl
 import com.andres.pillremind.ui.screens.BottomBarScreen
 import com.andres.pillremind.ui.screens.home.HomeScreen
-import com.andres.pillremind.ui.screens.main.MainScreen
+import com.andres.pillremind.ui.screens.home.HomeViewModel
+import com.andres.pillremind.ui.screens.home.HomeViewModelFactory
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
 import com.andres.pillremind.ui.screens.profile.ProfileViewModel
@@ -23,10 +24,10 @@ import com.andres.pillremind.ui.screens.profile.ProfileViewModelFactory
 import com.andres.pillremind.ui.session.SessionViewModel
 
 @Composable
-fun HomeNavigationGraph(
+fun MainNavigationGraph(
     navController: NavHostController,
     sessionViewModel: SessionViewModel,
-    repo: PerfilRepositoryImpl
+    repo: ProfileRepositoryImpl
 ) {
     NavHost(
         navController = navController,
@@ -42,11 +43,11 @@ fun HomeNavigationGraph(
                 }
                 return@composable
             }
-
+            val vm = viewModel<HomeViewModel>(
+                factory = HomeViewModelFactory(repo, profileId!!),
+            )
             HomeScreen(
-                profileId = profileId!!,
-                sessionViewModel = sessionViewModel,
-                perfilRepository = repo
+                homeViewModel = vm
             )
         }
 
