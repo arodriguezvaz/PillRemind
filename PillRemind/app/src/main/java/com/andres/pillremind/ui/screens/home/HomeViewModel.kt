@@ -3,9 +3,8 @@ package com.andres.pillremind.ui.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.andres.pillremind.domain.model.Perfil
+import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.ProfileRepository
-import com.andres.pillremind.ui.screens.profile.ProfileViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -16,7 +15,7 @@ class HomeViewModel(
 ) : ViewModel() {
 
 
-    val perfil: StateFlow<Perfil?> =
+    val profile: StateFlow<Profile?> =
         try {
             profileRepository.getPerfil(profileId)
                 .stateIn(

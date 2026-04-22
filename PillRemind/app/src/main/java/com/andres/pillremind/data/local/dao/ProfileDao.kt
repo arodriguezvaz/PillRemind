@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.andres.pillremind.data.local.entity.PerfilEntity
+import com.andres.pillremind.data.local.entity.ProfileEntity
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -14,35 +14,35 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ProfileDao {
     /**
-     * Inserta un perfil en la base de datos
-     * @param perfil Perfil a insertar
+     * Inserta un profile en la base de datos
+     * @param perfil Profile a insertar
      */
     @Insert
-    suspend fun insertPerfil(perfil: PerfilEntity)
+    suspend fun insertProfile(perfil: ProfileEntity)
 
     /**
-     * Actualiza un perfil en la base de datos
-     * @param perfil Perfil a actualizar
+     * Actualiza un profile en la base de datos
+     * @param perfil Profile a actualizar
      */
     @Update
-    suspend fun updatePerfil(perfil: PerfilEntity)
+    suspend fun updateProfile(perfil: ProfileEntity)
 
     /**
-     * Elimina un perfil de la base de datos
-     * @param perfil Perfil a eliminar
+     * Elimina un profile de la base de datos
+     * @param perfil Profile a eliminar
      */
     @Delete
-    suspend fun deletePerfil(perfil: PerfilEntity)
+    suspend fun deleteProfile(perfil: ProfileEntity)
 
     /**
      * Obtiene todos los perfiles usando Flow, ordenados por fecha de creación descendente
      */
     @Query("SELECT * FROM perfiles ORDER BY createdAt DESC")
-    fun getPerfiles(): Flow<List<PerfilEntity>>
+    fun getProfiles(): Flow<List<ProfileEntity>>
 
     /**
-     * Obtiene un perfil por su ID
+     * Obtiene un profile por su ID
      */
     @Query("SELECT * FROM perfiles WHERE id = :id")
-    fun getPerfil(id: Int): Flow<PerfilEntity>
+    fun getProfile(id: Int?): Flow<ProfileEntity>
 }

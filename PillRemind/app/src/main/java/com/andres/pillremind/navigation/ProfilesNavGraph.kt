@@ -37,19 +37,19 @@ fun NavGraphBuilder.profileSelectionGraph(
 
                 onProfileSelected = { perfil ->
                     sessionViewModel.setActiveProfile(perfil.id)
-                    navController.navigate(Graph.HOME)
+                    navController.navigate(Graph.ROOT)
                 }
             )
         }
 
         composable(ProfilesScreen.ProfileCreateScreen.route) {
             val vm = viewModel<ProfileViewModel>(
-                factory = ProfileViewModelFactory(repo)
+                factory = ProfileViewModelFactory(repo, null)
             )
 
             ProfileScreen(
                 profileMode = ProfileMode.Create,
-                viewModel = vm,
+                profileViewModel = vm,
                 onSaveClicked = {
                     navController.navigate(ProfilesScreen.ProfileSelectionScreen.route) {
                         popUpTo(ProfilesScreen.ProfileSelectionScreen.route) { inclusive = true }

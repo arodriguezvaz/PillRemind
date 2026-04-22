@@ -31,7 +31,7 @@ fun MainNavigationGraph(
 ) {
     NavHost(
         navController = navController,
-        route = Graph.HOME,
+        route = Graph.ROOT,
         startDestination = BottomBarScreen.Home.route
     ) {
         composable(BottomBarScreen.Home.route) {
@@ -56,12 +56,11 @@ fun MainNavigationGraph(
             val profileId by sessionViewModel.activeProfileId.collectAsState()
 
             val vm = viewModel<ProfileViewModel>(
-                factory = ProfileViewModelFactory(repo)
+                factory = ProfileViewModelFactory(repo, profileId)
             )
 
             ProfileScreen(
-                profileId = profileId!!,
-                viewModel = vm,
+                profileViewModel = vm,
                 profileMode = ProfileMode.View
             )
         }

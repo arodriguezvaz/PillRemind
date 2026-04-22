@@ -21,10 +21,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import com.andres.pillremind.domain.model.Perfil
+import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.ui.components.PerfilCard
-import com.andres.pillremind.ui.session.SessionViewModel
 
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
@@ -33,7 +31,7 @@ import com.andres.pillremind.ui.theme.PillRemindTheme
 fun ProfilesScreen(
     viewModel: ProfilesViewModel,
     onAddClicked: () -> Unit,
-    onProfileSelected: (Perfil) -> Unit,
+    onProfileSelected: (Profile) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val perfiles by viewModel.perfiles.collectAsStateWithLifecycle()
@@ -58,7 +56,7 @@ fun ProfilesScreen(
                     key = { it.id }
                 ) { perfil ->
                     PerfilCard(
-                        perfil = perfil,
+                        profile = perfil,
                         gestionar = {
                             onProfileSelected(perfil)
                         }
@@ -78,7 +76,7 @@ fun ProfilesScreen(
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_menu_add),
-                contentDescription = "Agregar perfil",
+                contentDescription = "Agregar profile",
             )
         }
 

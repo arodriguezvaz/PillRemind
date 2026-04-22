@@ -28,7 +28,7 @@ fun RootNavigationGraph(navController: NavHostController) {
     val perfilRepository = remember {
         ProfileRepositoryImpl(db.perfilDao())
     }
-    //Instancia del SessionManager donde se almacen el id del perfil selecionado
+    //Instancia del SessionManager donde se almacen el id del profile selecionado
     val sessionManager = remember { SessionManager(context) }
     val sessionViewModel = viewModel<SessionViewModel>(
         factory = SessionViewModelFactory(sessionManager)
@@ -40,7 +40,7 @@ fun RootNavigationGraph(navController: NavHostController) {
     ) {
 
         profileSelectionGraph(navController, sessionViewModel, perfilRepository)
-        composable(route = Graph.HOME) {
+        composable(route = Graph.MAIN) {
             MainScreen(sessionViewModel = sessionViewModel, perfilRepository = perfilRepository)
         }
 
@@ -51,6 +51,6 @@ fun RootNavigationGraph(navController: NavHostController) {
 object Graph {
     const val ROOT = "root_graph"
     const val PROFILE_SELECTION = "profile_selection_graph"
-    const val HOME = "home_graph"
+    const val MAIN = "main_graph"
     const val PROFILE = "profile_graph"
 }

@@ -9,7 +9,7 @@ import java.util.UUID
     tableName = "horario",
     foreignKeys = [
         ForeignKey(
-            entity = Medicamento::class,
+            entity = Medication::class,
             parentColumns = ["id"],
             childColumns = ["medicamentoId"],
             onDelete = ForeignKey.CASCADE

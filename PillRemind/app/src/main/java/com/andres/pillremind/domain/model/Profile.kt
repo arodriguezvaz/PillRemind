@@ -1,11 +1,10 @@
 package com.andres.pillremind.domain.model
 
-import java.util.UUID
 import java.time.LocalDateTime
 
-data class Perfil(
+data class Profile(
     val id: Int = 0,
-    val nombre: String,
+    val name: String,
     val urlImagen: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()

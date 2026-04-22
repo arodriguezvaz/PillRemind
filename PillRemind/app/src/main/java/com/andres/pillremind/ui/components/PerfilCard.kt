@@ -18,11 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.andres.pillremind.domain.model.Perfil
+import com.andres.pillremind.domain.model.Profile
 
 @Composable
 fun PerfilCard(
-    perfil: Perfil,
+    profile: Profile,
     gestionar: () -> Unit,
     modifier: Modifier = Modifier,
     buttonText: String = "Gestionar",
@@ -52,11 +52,11 @@ fun PerfilCard(
                         .size(64.dp)
                         .clip(RoundedCornerShape(14.dp)),
                 ) {
-                    perfil.urlImagen
+                    profile.urlImagen
                 }
 
                 Text(
-                    text = perfil.nombre,
+                    text = profile.name,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -87,14 +87,14 @@ private fun DefaultAvatar() {
 @Preview(showBackground = true)
 @Composable
 private fun PersonCardPreview() {
-    val perfilFake = Perfil(
+    val profileFake = Profile(
         id = 1,
-        nombre = "Juan",
+        name = "Juan",
         urlImagen = "" // o null si es nullable
     )
 
     PerfilCard(
-        perfil = perfilFake,
+        profile = profileFake,
         gestionar = {}
     )
 }

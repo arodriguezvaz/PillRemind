@@ -9,11 +9,11 @@ import com.andres.pillremind.data.local.converters.Converters
 import com.andres.pillremind.data.local.dao.ProfileDao
 import com.andres.pillremind.data.local.dao.UsuarioDao
 import com.andres.pillremind.data.local.entity.UsuarioEntity
-import com.andres.pillremind.data.local.entity.PerfilEntity
+import com.andres.pillremind.data.local.entity.ProfileEntity
 
 @Database(
     entities = [UsuarioEntity::class,
-        PerfilEntity::class],
+        ProfileEntity::class],
     version = 1,
     exportSchema = false
 )
