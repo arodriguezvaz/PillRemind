@@ -44,6 +44,7 @@ fun MainNavigationGraph(
                 return@composable
             }
             val vm = viewModel<HomeViewModel>(
+                key = "profile_${profileId}",
                 factory = HomeViewModelFactory(repo, profileId!!),
             )
             HomeScreen(

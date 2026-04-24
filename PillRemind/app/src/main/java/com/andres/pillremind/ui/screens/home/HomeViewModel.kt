@@ -5,24 +5,29 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.ProfileRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
 class HomeViewModel(
     private val profileRepository: ProfileRepository,
-    profileId: Int,
+    profileId: Int? = null,
 ) : ViewModel() {
 
 
     val profile: StateFlow<Profile?> =
         try {
-            profileRepository.getPerfil(profileId)
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(5000),
-                    initialValue = null
-                )
+            if (profileId == null) {
+                MutableStateFlow(null)
+            } else {
+                profileRepository.getPerfil(profileId)
+                    .stateIn(
+                        scope = viewModelScope,
+                        started = SharingStarted.WhileSubscribed(5000),
+                        initialValue = null
+                    )
+            }
         } catch (error: Exception) {
             throw error
         }
