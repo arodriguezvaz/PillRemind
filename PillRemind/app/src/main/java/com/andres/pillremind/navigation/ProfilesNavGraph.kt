@@ -37,7 +37,7 @@ fun NavGraphBuilder.profileSelectionGraph(
 
                 onProfileSelected = { perfil ->
                     sessionViewModel.setActiveProfile(perfil.id)
-                    navController.navigate(Graph.ROOT)
+                    navController.navigate(Graph.MAIN)
                 }
             )
         }

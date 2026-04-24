@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.ProfileRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -12,7 +13,8 @@ import kotlinx.coroutines.launch
 
 /**
  * ViewModel para la creación de perfiles
- * @property repository Repositorio de perfiles
+ * @param profileRepository Repositorio de perfiles
+ * @param profileId Id del perfil a editar
  */
 class ProfileViewModel(
     private val profileRepository: ProfileRepository,
@@ -46,12 +48,16 @@ class ProfileViewModel(
 
     val profile: StateFlow<Profile?> =
         try {
-            profileRepository.getPerfil(profileId)
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(5000),
-                    initialValue = null
-                )
+            if (profileId == null) {
+                MutableStateFlow(null)
+            } else {
+                profileRepository.getPerfil(profileId)
+                    .stateIn(
+                        scope = viewModelScope,
+                        started = SharingStarted.WhileSubscribed(5000),
+                        initialValue = null
+                    )
+            }
         } catch (error: Exception) {
             throw error
         }
