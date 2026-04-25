@@ -9,7 +9,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.andres.pillremind.data.local.database.AppDatabase
 import com.andres.pillremind.data.local.session.SessionManager
+import com.andres.pillremind.data.repository.MedicationRepositoryImpl
 import com.andres.pillremind.data.repository.ProfileRepositoryImpl
+import com.andres.pillremind.domain.model.Medication
+import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.ui.screens.main.MainScreen
 import com.andres.pillremind.ui.session.SessionViewModel
 import com.andres.pillremind.ui.session.SessionViewModelFactory
@@ -28,6 +31,9 @@ fun RootNavigationGraph(navController: NavHostController) {
     val perfilRepository = remember {
         ProfileRepositoryImpl(db.perfilDao())
     }
+    val medicationRepository = remember {
+        MedicationRepositoryImpl(db.medicationDao())
+    }
     //Instancia del SessionManager donde se almacen el id del profile selecionado
     val sessionManager = remember { SessionManager(context) }
     val sessionViewModel = viewModel<SessionViewModel>(
@@ -41,7 +47,11 @@ fun RootNavigationGraph(navController: NavHostController) {
 
         profileSelectionGraph(navController, sessionViewModel, perfilRepository)
         composable(route = Graph.MAIN) {
-            MainScreen(sessionViewModel = sessionViewModel, perfilRepository = perfilRepository)
+            MainScreen(
+                sessionViewModel = sessionViewModel,
+                perfilRepository = perfilRepository,
+                medicationRepository = medicationRepository
+            )
         }
 
     }
@@ -52,5 +62,5 @@ object Graph {
     const val ROOT = "root_graph"
     const val PROFILE_SELECTION = "profile_selection_graph"
     const val MAIN = "main_graph"
-    const val PROFILE = "profile_graph"
+    const val MEDICATION = "medication_graph"
 }

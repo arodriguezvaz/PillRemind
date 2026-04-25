@@ -20,6 +20,11 @@ class ProfileViewModel(
     private val profileRepository: ProfileRepository,
     private val profileId: Int? = null
 ) : ViewModel() {
+    /**
+     * Agrega un nuevo perfil usando la función del repositorio
+     * @param nombre Nombre del perfil
+     * @param urlImagen URL de la imagen del perfil
+     */
     fun addProfile(nombre: String, urlImagen: String? = null) {
         val trimmedNombre = nombre.trim()
         if (trimmedNombre.isNotEmpty()) {
@@ -46,21 +51,22 @@ class ProfileViewModel(
         }
     }
 
+    /**
+     * Obtiene el perfil actual en el ViewModel que p
+     */
     val profile: StateFlow<Profile?> =
-        try {
-            if (profileId == null) {
-                MutableStateFlow(null)
-            } else {
-                profileRepository.getPerfil(profileId)
-                    .stateIn(
-                        scope = viewModelScope,
-                        started = SharingStarted.WhileSubscribed(5000),
-                        initialValue = null
-                    )
-            }
-        } catch (error: Exception) {
-            throw error
+
+        if (profileId == null) {
+            MutableStateFlow(null)
+        } else {
+            profileRepository.getPerfil(profileId)
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5000),
+                    initialValue = null
+                )
         }
+  
 }
 
 class ProfileViewModelFactory(

@@ -1,11 +1,10 @@
 package com.andres.pillremind.domain.repository
 
 import com.andres.pillremind.domain.model.Medication
-import com.andres.pillremind.domain.model.Profile
 import kotlinx.coroutines.flow.Flow
 
 /**
- *
+ * Interfaz que define los métodos para interactuar con la base de datos de perfiles
  */
 interface MedicationRepository {
     suspend fun insertMedication(medication: Medication)

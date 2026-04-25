@@ -28,9 +28,10 @@ sealed class ProfileMode {
 
 /**
  * Vista de creación de perfiles
- * @param viewModel ViewModel para la creación de perfiles
- * @param navController Controlador de navegación
+ * @param profileViewModel ViewModel para la creación de perfiles
  * @param modifier Modificador para personalizar la vista
+ * @param onSaveClicked Función a ejecutar al hacer clic en el botón de guardar
+ * @param profileMode Modo de perfil (crear, ver o editar)
  */
 @Composable
 fun ProfileScreen(

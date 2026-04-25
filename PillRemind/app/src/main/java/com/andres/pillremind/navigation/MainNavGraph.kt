@@ -9,14 +9,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navigation
 import com.andres.pillremind.data.repository.ProfileRepositoryImpl
+import com.andres.pillremind.domain.repository.MedicationRepository
+import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.ui.screens.BottomBarScreen
 import com.andres.pillremind.ui.screens.home.HomeScreen
 import com.andres.pillremind.ui.screens.home.HomeViewModel
 import com.andres.pillremind.ui.screens.home.HomeViewModelFactory
+import com.andres.pillremind.ui.screens.medication.MedicationMode
+import com.andres.pillremind.ui.screens.medication.MedicationScreen
+import com.andres.pillremind.ui.screens.medication.MedicationViewModel
+import com.andres.pillremind.ui.screens.medication.MedicationViewModelFactory
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
 import com.andres.pillremind.ui.screens.profile.ProfileViewModel
@@ -27,7 +35,8 @@ import com.andres.pillremind.ui.session.SessionViewModel
 fun MainNavigationGraph(
     navController: NavHostController,
     sessionViewModel: SessionViewModel,
-    repo: ProfileRepositoryImpl
+    profileRepository: ProfileRepository,
+    medicationRepository: MedicationRepository,
 ) {
     NavHost(
         navController = navController,
@@ -45,10 +54,17 @@ fun MainNavigationGraph(
             }
             val vm = viewModel<HomeViewModel>(
                 key = "profile_${profileId}",
-                factory = HomeViewModelFactory(repo, profileId!!),
+                factory = HomeViewModelFactory(
+                    profileRepository,
+                    medicationRepository,
+                    profileId!!
+                ),
             )
             HomeScreen(
-                homeViewModel = vm
+                homeViewModel = vm,
+                onAddClicked = {
+                    navController.navigate(MedicationScreens.MedicationCreateScreen.route)
+                }
             )
         }
 
@@ -57,7 +73,7 @@ fun MainNavigationGraph(
             val profileId by sessionViewModel.activeProfileId.collectAsState()
 
             val vm = viewModel<ProfileViewModel>(
-                factory = ProfileViewModelFactory(repo, profileId)
+                factory = ProfileViewModelFactory(profileRepository, profileId)
             )
 
             ProfileScreen(
@@ -65,6 +81,48 @@ fun MainNavigationGraph(
                 profileMode = ProfileMode.View
             )
         }
+
+        medicationNavGraph(navController, sessionViewModel, medicationRepository)
     }
 }
 
+fun NavGraphBuilder.medicationNavGraph(
+    navController: NavHostController,
+    sessionViewModel: SessionViewModel,
+    medicationRepository: MedicationRepository
+) {
+    navigation(
+        route = Graph.MEDICATION,
+        startDestination = MedicationScreens.SeeMedicationScreen.route
+    ) {
+        /*composable(route = MedicationScreen.SeeMedicationScreen.route) {
+            MedicationScreen() {
+                //navController.navigate(MedicationScreen.MedicationCreateScreen.route)
+            }
+        }*/
+        composable(route = MedicationScreens.MedicationCreateScreen.route) {
+            val profileId by sessionViewModel.activeProfileId.collectAsState()
+
+            val vm = viewModel<MedicationViewModel>(
+                factory = MedicationViewModelFactory(medicationRepository, profileId!!)
+            )
+            MedicationScreen(
+                medicationViewModel = viewModel(),
+                onSaveClicked = { navController.popBackStack() },
+                medicationMode = MedicationMode.Create
+            )
+        }
+    }
+}
+
+sealed class MedicationScreens(val route: String) {
+    object SeeMedicationScreen : MedicationScreens("medication/see/{medicationId}") {
+        fun createRoute(medicationId: Int) = "medication/see/$medicationId"
+    }
+
+    object MedicationEditScreen : MedicationScreens("medication/edit/{medicationId}") {
+        fun createRoute(medicationId: Int) = "medication/edit/$medicationId"
+    }
+
+    object MedicationCreateScreen : MedicationScreens("medication/create")
+}
