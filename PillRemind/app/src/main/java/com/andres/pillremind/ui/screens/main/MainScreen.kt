@@ -3,8 +3,10 @@ package com.andres.pillremind.ui.screens.main
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +17,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.andres.pillremind.data.repository.MedicationRepositoryImpl
 import com.andres.pillremind.data.repository.ProfileRepositoryImpl
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.ui.screens.BottomBarScreen
@@ -25,12 +28,18 @@ import com.andres.pillremind.ui.session.SessionViewModel
 fun MainScreen(
     navController: NavHostController = rememberNavController(),
     sessionViewModel: SessionViewModel,
-    perfilRepository: ProfileRepositoryImpl
+    perfilRepository: ProfileRepositoryImpl,
+    medicationRepository: MedicationRepositoryImpl
 ) {
     Scaffold(
         bottomBar = { BottomBar(navController = navController) }
     ) {
-        MainNavigationGraph(navController = navController, sessionViewModel, perfilRepository)
+        MainNavigationGraph(
+            navController = navController,
+            sessionViewModel,
+            perfilRepository,
+            medicationRepository
+        )
     }
 }
 
@@ -49,8 +58,9 @@ fun BottomBar(navController: NavHostController) {
                 AddItem(
                     screen = screen,
                     currentDestination = currentDestination,
-                    navController = navController
-                )
+                    navController = navController,
+
+                    )
             }
         }
     }
@@ -81,7 +91,14 @@ fun RowScope.AddItem(
                 popUpTo(navController.graph.findStartDestination().id)
                 launchSingleTop = true
             }
-        }
+        },
+        colors = NavigationBarItemDefaults.colors(
+            selectedIconColor = MaterialTheme.colorScheme.primary,
+            selectedTextColor = MaterialTheme.colorScheme.primary,
+            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+        )
     )
 
 }
