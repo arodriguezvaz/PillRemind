@@ -25,6 +25,9 @@ import com.andres.pillremind.ui.screens.medication.MedicationMode
 import com.andres.pillremind.ui.screens.medication.MedicationScreen
 import com.andres.pillremind.ui.screens.medication.MedicationViewModel
 import com.andres.pillremind.ui.screens.medication.MedicationViewModelFactory
+import com.andres.pillremind.ui.screens.medications.MedicationsScreen
+import com.andres.pillremind.ui.screens.medications.MedicationsViewModel
+import com.andres.pillremind.ui.screens.medications.MedicationsViewModelFactory
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
 import com.andres.pillremind.ui.screens.profile.ProfileViewModel
@@ -67,7 +70,23 @@ fun MainNavigationGraph(
                 }
             )
         }
-
+        composable(BottomBarScreen.Medications.route) {
+            val profileId by sessionViewModel.activeProfileId.collectAsState()
+            val vm = viewModel<MedicationsViewModel>(
+                key = "profile_${profileId}",
+                factory = MedicationsViewModelFactory(
+                    profileRepository,
+                    medicationRepository,
+                    profileId!!
+                ),
+            )
+            MedicationsScreen(
+                medicationsViewModel = vm,
+                onAddClicked = {
+                    //TODO
+                }
+            )
+        }
 
         composable("profile/see") {
             val profileId by sessionViewModel.activeProfileId.collectAsState()

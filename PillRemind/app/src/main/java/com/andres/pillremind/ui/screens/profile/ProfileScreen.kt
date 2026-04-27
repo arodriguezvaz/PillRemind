@@ -13,9 +13,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppButton
+import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
+import com.andres.pillremind.ui.components.FormField
 
 /**
  * Clase sellada que representa el modo de profile
@@ -52,23 +56,24 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TextField(
-                    value = nombre.value,
-                    onValueChange = { nombre.value = it },
-                    label = { Text("Nombre") },
-                    modifier = Modifier
-                        .padding(bottom = 16.dp)
-                )
-
-                OutlinedTextField(
-                    value = urlImagen.value,
-                    onValueChange = { urlImagen.value = it },
-                    label = { Text("URL de imagen") },
-                    modifier = Modifier
-                        .padding(bottom = 24.dp),
-
+                FormField(label = stringResource(R.string.nombre)) {
+                    AppTextField(
+                        value = nombre.value,
+                        onValueChange = { nombre.value = it },
+                        placeholder = "Nombre del perfil",
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
+                }
 
+                //TODO selector de imagen de perfil
+                FormField(label = stringResource(R.string.url_imagen)) {
+                    AppTextField(
+                        value = urlImagen.value,
+                        onValueChange = { urlImagen.value = it },
+                        placeholder = "URL de la imagen",
+                        modifier = Modifier.padding(bottom = 24.dp),
+                    )
+                }
                 AppButton(
                     text = "Guardar",
                     onClick = {
@@ -92,12 +97,12 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TextField(
+
+                AppTextField(
                     value = nombre.value,
                     onValueChange = { nombre.value = it },
-                    label = { Text("Nombre") },
-                    modifier = Modifier
-                        .padding(bottom = 16.dp)
+                    placeholder = "Escribe algo...",
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
 
                 OutlinedTextField(

@@ -2,6 +2,9 @@ package com.andres.pillremind.ui.screens.main
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -20,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.andres.pillremind.data.repository.MedicationRepositoryImpl
 import com.andres.pillremind.data.repository.ProfileRepositoryImpl
 import com.andres.pillremind.navigation.MainNavigationGraph
+import com.andres.pillremind.navigation.MedicationScreens
 import com.andres.pillremind.ui.screens.BottomBarScreen
 import com.andres.pillremind.ui.session.SessionViewModel
 
@@ -31,8 +35,23 @@ fun MainScreen(
     perfilRepository: ProfileRepositoryImpl,
     medicationRepository: MedicationRepositoryImpl
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val showFab =
+        currentRoute == BottomBarScreen.Home.route || currentRoute == BottomBarScreen.Medications.route
     Scaffold(
-        bottomBar = { BottomBar(navController = navController) }
+        bottomBar = { BottomBar(navController = navController) },
+        //TODO revisar la navegación de este FAB
+        floatingActionButton = {
+            if (showFab) {
+                FloatingActionButton(
+                    onClick = { navController.navigate(MedicationScreens.MedicationCreateScreen) },
+                ) {
+                    Icon(Icons.Rounded.Add, contentDescription = null)
+                }
+            }
+        }
+
     ) {
         MainNavigationGraph(
             navController = navController,
@@ -40,6 +59,7 @@ fun MainScreen(
             perfilRepository,
             medicationRepository
         )
+
     }
 }
 
@@ -47,7 +67,8 @@ fun MainScreen(
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
         BottomBarScreen.Home,
-        BottomBarScreen.Profile,
+        BottomBarScreen.Medications,
+        BottomBarScreen.Profile
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">PillRemind</string>
+    <string name="nombre">Nombre</string>
+    <string name="url_imagen">Url de la imagen</string>
+    <string name="fecha_inicio">Fecha inicio:</string>
+    <string name="unidad">Unidad:</string>
+    <string name="dosis">Dosis:</string>
+    <string name="fecha_fin">Fecha fin:</string>
+    <string name="ver">Ver</string>
 </resources>

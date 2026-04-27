@@ -25,16 +25,12 @@ class MedicationViewModel(
         imageUrl: String? = null,
         dose: Double,
         unit: String,
-        startDate: String,
-        endDate: String? = null
+        startDate: LocalDate,
+        endDate: LocalDate? = null
     ) {
         val trimmedName = nombre.trim()
         val normalizedUnit = unit.trim()
-        val parsedStartDate = runCatching { LocalDate.parse(startDate) }
-            .getOrElse { LocalDate.now() }
 
-        val parsedEndDate = endDate
-            ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
         if (trimmedName.isBlank()) {
             showMessage("El nombre no puede estar vacío")
             return
@@ -45,7 +41,7 @@ class MedicationViewModel(
             return
         }
 
-        if (parsedEndDate != null && parsedEndDate.isBefore(parsedStartDate)) {
+        if (endDate != null && endDate.isBefore(startDate)) {
             showMessage("La fecha de fin no puede ser anterior a la de inicio")
             return
         }
@@ -58,8 +54,8 @@ class MedicationViewModel(
                     imageUrl = imageUrl,
                     dose = dose,
                     unit = normalizedUnit,
-                    startDate = parsedStartDate,
-                    endDate = parsedEndDate
+                    startDate = startDate,
+                    endDate = endDate
                 )
             )
         }

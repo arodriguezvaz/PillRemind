@@ -9,13 +9,22 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppButton
+import com.andres.pillremind.ui.components.AppDatePickerField
+import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
+import com.andres.pillremind.ui.components.FormField
+import java.time.LocalDate
 
 /**
  * Clase sellada que representa el modo de medication
@@ -48,9 +57,10 @@ fun MedicationScreen(
     val dosis = remember { mutableStateOf("") }
     val unidad = remember { mutableStateOf("") }
 
-    val startDate = remember { mutableStateOf("") }
-    val endDate = remember { mutableStateOf("") }
+    val startDate = remember { mutableStateOf<LocalDate?>(null) }
+    val endDate = remember { mutableStateOf<LocalDate?>(null) }
     //val medication = medicationViewModel.medication.collectAsState().value
+    val snackbarMessage by medicationViewModel.snackbarMessage.collectAsState()
     when (medicationMode) {
         MedicationMode.Create -> {
             Column(
@@ -60,49 +70,53 @@ fun MedicationScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                FormField(label = stringResource(R.string.nombre)) {
+                    AppTextField(
+                        value = nombre.value,
+                        onValueChange = { nombre.value = it },
+                        placeholder = "Nombre del medicamento",
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                FormField(label = stringResource(R.string.url_imagen)) {
+                    AppTextField(
+                        value = urlImagen.value,
+                        onValueChange = { urlImagen.value = it },
+                        placeholder = "hhtps",
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
 
-                TextField(
-                    value = nombre.value,
-                    onValueChange = { nombre.value = it },
-                    label = { Text("Nombre") },
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                OutlinedTextField(
-                    value = urlImagen.value,
-                    onValueChange = { urlImagen.value = it },
-                    label = { Text("URL de imagen") },
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                TextField(
-                    value = dosis.value,
-                    onValueChange = { dosis.value = it },
-                    label = { Text("Dosis") },
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                TextField(
-                    value = unidad.value,
-                    onValueChange = { unidad.value = it },
-                    label = { Text("Unidad (mg, ml...)") },
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                TextField(
-                    value = startDate.value,
-                    onValueChange = { startDate.value = it },
-                    label = { Text("Fecha inicio (YYYY-MM-DD)") },
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                TextField(
-                    value = endDate.value,
-                    onValueChange = { endDate.value = it },
-                    label = { Text("Fecha fin (opcional)") },
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
-
+                FormField(label = stringResource(R.string.dosis)) {
+                    AppTextField(
+                        value = dosis.value,
+                        onValueChange = { dosis.value = it },
+                        placeholder = "Escribe algo...",
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                FormField(label = stringResource(R.string.unidad)) {
+                    AppTextField(
+                        value = unidad.value,
+                        onValueChange = { unidad.value = it },
+                        placeholder = "Escribe algo...",
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                FormField(label = stringResource(R.string.fecha_inicio)) {
+                    AppDatePickerField(
+                        value = startDate.value,
+                        onDateSelected = { startDate.value = it },
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                FormField(label = stringResource(R.string.fecha_fin)) {
+                    AppDatePickerField(
+                        value = endDate.value,
+                        onDateSelected = { endDate.value = it },
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
                 AppButton(
                     text = "Guardar",
                     onClick = {
@@ -111,8 +125,8 @@ fun MedicationScreen(
                             imageUrl = urlImagen.value.ifEmpty { null },
                             dose = dosis.value.toDoubleOrNull() ?: 0.0,
                             unit = unidad.value,
-                            startDate = startDate.value,
-                            endDate = endDate.value.ifBlank { null }
+                            startDate = startDate.value!!,
+                            endDate = endDate.value
                         )
 
                         onSaveClicked()
@@ -120,6 +134,12 @@ fun MedicationScreen(
                     size = ButtonSize.Large,
                     enabled = nombre.value.isNotBlank()
                 )
+            }
+            LaunchedEffect(snackbarMessage) {
+                snackbarMessage?.let {
+                    // aquí muestras snackbar
+                    medicationViewModel.clearMessage()
+                }
             }
         }
 
