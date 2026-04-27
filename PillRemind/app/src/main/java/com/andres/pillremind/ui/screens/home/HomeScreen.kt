@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.MedicationCard
 
 
@@ -37,24 +38,21 @@ fun HomeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
     ) {
-        if (perfil != null) {
-            Text(text = "Hola ${perfil.name}")
-        } else {
-            Text(text = "Cargando...")
-        }
+
         if (medications.isEmpty()) {
             Box(
+                modifier = Modifier
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("no hay perfiles aun")
+                BlankCard("No hay medicamentos aún")
             }
         } else {
             LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                modifier = Modifier.fillMaxSize(), // importante
+                contentPadding = PaddingValues(vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(
@@ -64,26 +62,11 @@ fun HomeScreen(
                     MedicationCard(
                         medication = medication,
                         tomar = {
-                            //TODO
+                            // TODO
                         }
                     )
                 }
             }
-
-        }
-        FloatingActionButton(
-            onClick = { onAddClicked() },
-            elevation = FloatingActionButtonDefaults.elevation(
-                defaultElevation = 4.dp,
-                pressedElevation = 6.dp,
-            ),
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_menu_add),
-                contentDescription = "Agregar profile",
-            )
         }
     }
 }

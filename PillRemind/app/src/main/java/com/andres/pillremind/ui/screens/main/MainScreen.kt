@@ -41,11 +41,10 @@ fun MainScreen(
         currentRoute == BottomBarScreen.Home.route || currentRoute == BottomBarScreen.Medications.route
     Scaffold(
         bottomBar = { BottomBar(navController = navController) },
-        //TODO revisar la navegación de este FAB
         floatingActionButton = {
             if (showFab) {
                 FloatingActionButton(
-                    onClick = { navController.navigate(MedicationScreens.MedicationCreateScreen) },
+                    onClick = { navController.navigate(MedicationScreens.MedicationCreateScreen.route) },
                 ) {
                     Icon(Icons.Rounded.Add, contentDescription = null)
                 }

@@ -2,8 +2,12 @@ package com.andres.pillremind.ui.screens.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -19,6 +23,7 @@ import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
+import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.FormField
 
 /**
@@ -138,7 +143,27 @@ fun ProfileScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text("Hola ${perfil?.name}")
+                Row(modifier.fillMaxWidth()) {
+                    AppButton(
+                        onClick = {},
+                        text = "Eliminar",
+                        size = ButtonSize.Medium,
+                        variant = ButtonVariant.Danger,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    AppButton(
+                        onClick = {},
+                        text = "Editar",
+                        size = ButtonSize.Medium,
+                        variant = ButtonVariant.Primary,
+                        modifier = Modifier.weight(1f)
+
+                    )
+                }
             }
+
+
         }
     }
 }

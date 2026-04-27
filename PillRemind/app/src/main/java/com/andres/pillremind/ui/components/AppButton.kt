@@ -25,20 +25,20 @@ fun AppButton(
     isLoading: Boolean = false,
 ) {
     val (containerColor, contentColor) = when (variant) {
-        ButtonVariant.Primary   -> MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary
+        ButtonVariant.Primary -> MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary
         ButtonVariant.Secondary -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
-        ButtonVariant.Ghost     -> Color.Transparent to MaterialTheme.colorScheme.primary
-        ButtonVariant.Danger    -> MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError
+        ButtonVariant.Ghost -> Color.Transparent to MaterialTheme.colorScheme.primary
+        ButtonVariant.Danger -> MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError
     }
     val widthFraction = when (size) {
-        ButtonSize.Small  -> 0.5f
-        ButtonSize.Medium -> 0.8f
-        ButtonSize.Large  -> 1f
+        ButtonSize.Small -> 0.5f
+        ButtonSize.Medium -> 0.5f
+        ButtonSize.Large -> 1f
     }
     val (horizontalPadding, verticalPadding, textStyle) = when (size) {
-        ButtonSize.Small  -> Triple(12.dp, 6.dp,  MaterialTheme.typography.labelMedium)
+        ButtonSize.Small -> Triple(12.dp, 6.dp, MaterialTheme.typography.labelMedium)
         ButtonSize.Medium -> Triple(20.dp, 12.dp, MaterialTheme.typography.labelLarge)
-        ButtonSize.Large  -> Triple(28.dp, 16.dp, MaterialTheme.typography.titleSmall)
+        ButtonSize.Large -> Triple(28.dp, 16.dp, MaterialTheme.typography.titleSmall)
     }
 
     Button(
@@ -48,18 +48,18 @@ fun AppButton(
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
-            contentColor   = contentColor,
+            contentColor = contentColor,
         ),
         contentPadding = PaddingValues(
             horizontal = horizontalPadding,
-            vertical   = verticalPadding,
+            vertical = verticalPadding,
         ),
     ) {
         //Si el cambio de esatdo esta cargando se muestra un símbolo de carga
         if (isLoading) {
             CircularProgressIndicator(
-                modifier  = Modifier.size(16.dp),
-                color     = contentColor,
+                modifier = Modifier.size(16.dp),
+                color = contentColor,
                 strokeWidth = 2.dp,
             )
         } else {
@@ -69,4 +69,4 @@ fun AppButton(
 }
 
 enum class ButtonVariant { Primary, Secondary, Ghost, Danger }
-enum class ButtonSize    { Small, Medium, Large }
+enum class ButtonSize { Small, Medium, Large }

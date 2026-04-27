@@ -88,7 +88,7 @@ fun MainNavigationGraph(
             )
         }
 
-        composable("profile/see") {
+        composable(BottomBarScreen.Profile.route) {
             val profileId by sessionViewModel.activeProfileId.collectAsState()
 
             val vm = viewModel<ProfileViewModel>(
