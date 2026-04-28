@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.andres.pillremind.data.repository.ProfileRepositoryImpl
-import com.andres.pillremind.ui.screens.profile.ProfileViewModelFactory
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
 import com.andres.pillremind.ui.screens.profile.ProfileViewModel
@@ -43,13 +42,8 @@ fun NavGraphBuilder.profileSelectionGraph(
         }
 
         composable(ProfilesScreen.ProfileCreateScreen.route) {
-            val vm = viewModel<ProfileViewModel>(
-                factory = ProfileViewModelFactory(repo, null)
-            )
-
             ProfileScreen(
                 profileMode = ProfileMode.Create,
-                profileViewModel = vm,
                 onSaveClicked = {
                     navController.navigate(ProfilesScreen.ProfileSelectionScreen.route) {
                         popUpTo(ProfilesScreen.ProfileSelectionScreen.route) { inclusive = true }

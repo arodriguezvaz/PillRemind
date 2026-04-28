@@ -3,11 +3,16 @@ package com.andres.pillremind.ui.screens.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.ProfileRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -16,9 +21,10 @@ import kotlinx.coroutines.launch
  * @param profileRepository Repositorio de perfiles
  * @param profileId Id del perfil a editar
  */
-class ProfileViewModel(
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
-    private val profileId: Int? = null
+    private val sessionManager: SessionManager
 ) : ViewModel() {
     /**
      * Agrega un nuevo perfil usando la función del repositorio
@@ -39,6 +45,7 @@ class ProfileViewModel(
         }
     }
 
+    val profileId = sessionManager.activeProfileId
     fun updateProfile(profile: Profile) {
         viewModelScope.launch {
             profileRepository.updatePerfil(profile)
@@ -55,29 +62,15 @@ class ProfileViewModel(
      * Obtiene el perfil actual en el ViewModel que p
      */
     val profile: StateFlow<Profile?> =
+        sessionManager.activeProfileId
+            .filterNotNull()
+            .flatMapLatest { id ->
+                profileRepository.getPerfil(id)
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = null
+            )
 
-        if (profileId == null) {
-            MutableStateFlow(null)
-        } else {
-            profileRepository.getPerfil(profileId)
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(5000),
-                    initialValue = null
-                )
-        }
-  
-}
-
-class ProfileViewModelFactory(
-    private val repository: ProfileRepository,
-    private val profileId: Int?,
-) : ViewModelProvider.Factory {
-
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
-            "Unknown ViewModel class: ${modelClass.name}"
-        }
-        return ProfileViewModel(repository, profileId) as T
-    }
 }

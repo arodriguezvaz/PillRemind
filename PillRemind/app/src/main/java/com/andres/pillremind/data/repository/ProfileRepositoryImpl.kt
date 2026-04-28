@@ -7,11 +7,13 @@ import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 /**
  * Clase que implementa la interfaz ProfileRepository
  */
-class ProfileRepositoryImpl(private val perfilDao: ProfileDao) : ProfileRepository {
+class ProfileRepositoryImpl @Inject constructor(private val perfilDao: ProfileDao) :
+    ProfileRepository {
     override suspend fun insertPerfil(profile: Profile) {
         return perfilDao.insertProfile(profile.toEntity())
     }
