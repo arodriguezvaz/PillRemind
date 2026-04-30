@@ -21,17 +21,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.MedicationCard
 import com.andres.pillremind.ui.screens.home.HomeViewModel
+import com.andres.pillremind.ui.screens.profile.ProfileViewModel
 
 @Composable
 fun MedicationsScreen(
-    medicationsViewModel: MedicationsViewModel,
     modifier: Modifier = Modifier,
-    onAddClicked: () -> Unit,
 ) {
+    val medicationsViewModel: MedicationsViewModel = hiltViewModel()
+
     val medications by medicationsViewModel.medications.collectAsStateWithLifecycle()
 
     Column(

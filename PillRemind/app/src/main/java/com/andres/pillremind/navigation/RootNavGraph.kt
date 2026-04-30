@@ -23,17 +23,6 @@ import com.andres.pillremind.ui.session.SessionViewModelFactory
 @Composable
 fun RootNavigationGraph(navController: NavHostController) {
     val context = LocalContext.current
-    //Instancia de la BD
-    val db = remember {
-        AppDatabase.getInstance(context.applicationContext)
-    }
-    //Instancias de los repositorios
-    val perfilRepository = remember {
-        ProfileRepositoryImpl(db.perfilDao())
-    }
-    val medicationRepository = remember {
-        MedicationRepositoryImpl(db.medicationDao())
-    }
     //Instancia del SessionManager donde se almacen el id del profile selecionado
     val sessionManager = remember { SessionManager(context) }
     val sessionViewModel = viewModel<SessionViewModel>(
@@ -45,13 +34,9 @@ fun RootNavigationGraph(navController: NavHostController) {
         startDestination = Graph.PROFILE_SELECTION
     ) {
 
-        profileSelectionGraph(navController, sessionViewModel, perfilRepository)
+        profileSelectionGraph(navController, sessionViewModel)
         composable(route = Graph.MAIN) {
-            MainScreen(
-                sessionViewModel = sessionViewModel,
-                perfilRepository = perfilRepository,
-                medicationRepository = medicationRepository
-            )
+            MainScreen()
         }
 
     }

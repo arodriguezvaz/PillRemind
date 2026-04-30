@@ -24,21 +24,18 @@ import com.andres.pillremind.data.repository.MedicationRepositoryImpl
 import com.andres.pillremind.data.repository.ProfileRepositoryImpl
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
-import com.andres.pillremind.ui.screens.BottomBarScreen
+import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.ui.session.SessionViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(
-    navController: NavHostController = rememberNavController(),
-    sessionViewModel: SessionViewModel,
-    perfilRepository: ProfileRepositoryImpl,
-    medicationRepository: MedicationRepositoryImpl
+    navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val showFab =
-        currentRoute == BottomBarScreen.Home.route || currentRoute == BottomBarScreen.Medications.route
+        currentRoute == BottomBarScreens.Home.route || currentRoute == BottomBarScreens.Medications.route
     Scaffold(
         bottomBar = { BottomBar(navController = navController) },
         floatingActionButton = {
@@ -54,9 +51,6 @@ fun MainScreen(
     ) {
         MainNavigationGraph(
             navController = navController,
-            sessionViewModel,
-            perfilRepository,
-            medicationRepository
         )
 
     }
@@ -65,9 +59,9 @@ fun MainScreen(
 @Composable
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
-        BottomBarScreen.Home,
-        BottomBarScreen.Medications,
-        BottomBarScreen.Profile
+        BottomBarScreens.Home,
+        BottomBarScreens.Medications,
+        BottomBarScreens.Profile
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -89,7 +83,7 @@ fun BottomBar(navController: NavHostController) {
 
 @Composable
 fun RowScope.AddItem(
-    screen: BottomBarScreen,
+    screen: BottomBarScreens,
     currentDestination: NavDestination?,
     navController: NavHostController
 ) {

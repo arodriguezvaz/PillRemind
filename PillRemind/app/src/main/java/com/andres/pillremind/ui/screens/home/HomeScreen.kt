@@ -21,17 +21,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.MedicationCard
 
 
 @Composable
 fun HomeScreen(
-    homeViewModel: HomeViewModel,
     modifier: Modifier = Modifier,
-    onAddClicked: () -> Unit,
 ) {
+    val homeViewModel: HomeViewModel = hiltViewModel()
     val perfil = homeViewModel.profile.collectAsState().value
     val medications by homeViewModel.medications.collectAsStateWithLifecycle()
 

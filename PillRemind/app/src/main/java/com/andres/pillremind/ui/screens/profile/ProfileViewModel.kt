@@ -59,7 +59,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     /**
-     * Obtiene el perfil actual en el ViewModel que p
+     * Obtiene el perfil actual en el ViewModel que se muestra en la pantalla
      */
     val profile: StateFlow<Profile?> =
         sessionManager.activeProfileId

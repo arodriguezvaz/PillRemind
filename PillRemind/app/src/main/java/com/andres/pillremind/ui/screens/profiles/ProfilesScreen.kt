@@ -22,22 +22,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.PerfilCard
+import com.andres.pillremind.ui.screens.profile.ProfileViewModel
 
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
 
 @Composable
 fun ProfilesScreen(
-    viewModel: ProfilesViewModel,
     onAddClicked: () -> Unit,
     onProfileSelected: (Profile) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val perfiles by viewModel.perfiles.collectAsStateWithLifecycle()
+    val profilesViewModel: ProfilesViewModel = hiltViewModel()
+    val perfiles by profilesViewModel.perfiles.collectAsStateWithLifecycle()
     Scaffold(
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {

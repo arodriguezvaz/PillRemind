@@ -14,93 +14,42 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.andres.pillremind.data.repository.ProfileRepositoryImpl
-import com.andres.pillremind.domain.repository.MedicationRepository
-import com.andres.pillremind.domain.repository.ProfileRepository
-import com.andres.pillremind.ui.screens.BottomBarScreen
 import com.andres.pillremind.ui.screens.home.HomeScreen
-import com.andres.pillremind.ui.screens.home.HomeViewModel
-import com.andres.pillremind.ui.screens.home.HomeViewModelFactory
 import com.andres.pillremind.ui.screens.medication.MedicationMode
 import com.andres.pillremind.ui.screens.medication.MedicationScreen
-import com.andres.pillremind.ui.screens.medication.MedicationViewModel
-import com.andres.pillremind.ui.screens.medication.MedicationViewModelFactory
 import com.andres.pillremind.ui.screens.medications.MedicationsScreen
-import com.andres.pillremind.ui.screens.medications.MedicationsViewModel
-import com.andres.pillremind.ui.screens.medications.MedicationsViewModelFactory
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
-import com.andres.pillremind.ui.screens.profile.ProfileViewModel
-import com.andres.pillremind.ui.session.SessionViewModel
+
 
 @Composable
 fun MainNavigationGraph(
-    navController: NavHostController,
-    sessionViewModel: SessionViewModel,
-    profileRepository: ProfileRepository,
-    medicationRepository: MedicationRepository,
+    navController: NavHostController
 ) {
     NavHost(
         navController = navController,
         route = Graph.ROOT,
-        startDestination = BottomBarScreen.Home.route
+        startDestination = BottomBarScreens.Home.route
     ) {
-        composable(BottomBarScreen.Home.route) {
-            val profileId by sessionViewModel.activeProfileId.collectAsState()
-            //TODO revisar esto
-            if (profileId == null) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-                return@composable
-            }
-            val vm = viewModel<HomeViewModel>(
-                key = "profile_${profileId}",
-                factory = HomeViewModelFactory(
-                    profileRepository,
-                    medicationRepository,
-                    profileId!!
-                ),
-            )
-            HomeScreen(
-                homeViewModel = vm,
-                onAddClicked = {
-                    navController.navigate(MedicationScreens.MedicationCreateScreen.route)
-                }
-            )
+        composable(BottomBarScreens.Home.route) {
+            HomeScreen()
         }
-        composable(BottomBarScreen.Medications.route) {
-            val profileId by sessionViewModel.activeProfileId.collectAsState()
-            val vm = viewModel<MedicationsViewModel>(
-                key = "profile_${profileId}",
-                factory = MedicationsViewModelFactory(
-                    profileRepository,
-                    medicationRepository,
-                    profileId!!
-                ),
-            )
-            MedicationsScreen(
-                medicationsViewModel = vm,
-                onAddClicked = {
-                    //TODO
-                }
-            )
+        composable(BottomBarScreens.Medications.route) {
+            MedicationsScreen()
         }
 
-        composable(BottomBarScreen.Profile.route) {
+        composable(BottomBarScreens.Profile.route) {
             ProfileScreen(
                 profileMode = ProfileMode.View
             )
         }
 
-        medicationNavGraph(navController, sessionViewModel, medicationRepository)
+        medicationNavGraph(navController)
     }
 }
 
 fun NavGraphBuilder.medicationNavGraph(
-    navController: NavHostController,
-    sessionViewModel: SessionViewModel,
-    medicationRepository: MedicationRepository
+    navController: NavHostController
 ) {
     navigation(
         route = Graph.MEDICATION,
@@ -112,13 +61,7 @@ fun NavGraphBuilder.medicationNavGraph(
             }
         }*/
         composable(route = MedicationScreens.MedicationCreateScreen.route) {
-            val profileId by sessionViewModel.activeProfileId.collectAsState()
-
-            val vm = viewModel<MedicationViewModel>(
-                factory = MedicationViewModelFactory(medicationRepository, profileId!!)
-            )
             MedicationScreen(
-                medicationViewModel = viewModel(),
                 onSaveClicked = { navController.popBackStack() },
                 medicationMode = MedicationMode.Create
             )
