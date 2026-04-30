@@ -4,18 +4,25 @@ package com.andres.pillremind.ui.screens.medication
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.repository.MedicationRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-
-class MedicationViewModel(
+@HiltViewModel
+class MedicationViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
-    private val profileId: Int
+    private val sessionManager: SessionManager
 ) : ViewModel() {
+    val profileId = sessionManager.activeProfileId
     private val _snackbarMessage = MutableStateFlow<String?>(null)
     val snackbarMessage = _snackbarMessage.asStateFlow()
 
@@ -28,6 +35,7 @@ class MedicationViewModel(
         startDate: LocalDate,
         endDate: LocalDate? = null
     ) {
+
         val trimmedName = nombre.trim()
         val normalizedUnit = unit.trim()
 
@@ -47,17 +55,22 @@ class MedicationViewModel(
         }
 
         viewModelScope.launch {
-            medicationRepository.insertMedication(
-                Medication(
-                    name = trimmedName,
-                    profileId = profileId,
-                    imageUrl = imageUrl,
-                    dose = dose,
-                    unit = normalizedUnit,
-                    startDate = startDate,
-                    endDate = endDate
+            val profileId = profileId.firstOrNull()
+            if (profileId != null) {
+                medicationRepository.insertMedication(
+                    Medication(
+                        name = trimmedName,
+                        profileId = profileId,
+                        imageUrl = imageUrl,
+                        dose = dose,
+                        unit = normalizedUnit,
+                        startDate = startDate,
+                        endDate = endDate
+                    )
                 )
-            )
+            } else {
+                showMessage("No hay perfil activo")
+            }
         }
     }
 
@@ -70,14 +83,3 @@ class MedicationViewModel(
     }
 }
 
-class MedicationViewModelFactory(
-    private val medicationRepository: MedicationRepository,
-    private val profileId: Int,
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(MedicationViewModel::class.java)) {
-            "Unknown ViewModel class: ${modelClass.name}"
-        }
-        return MedicationViewModel(medicationRepository, profileId) as T
-    }
-}

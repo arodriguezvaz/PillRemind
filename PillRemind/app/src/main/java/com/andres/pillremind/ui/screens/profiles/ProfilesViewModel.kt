@@ -5,11 +5,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.ProfileRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
-class ProfilesViewModel(
+@HiltViewModel
+class ProfilesViewModel @Inject constructor(
     private val repository: ProfileRepository
 ) : ViewModel() {
     val perfiles: StateFlow<List<Profile>> = repository.getPerfiles()
@@ -20,14 +23,3 @@ class ProfilesViewModel(
         )
 }
 
-class ProfilesViewModelFactory(
-    private val repository: ProfileRepository
-) : ViewModelProvider.Factory {
-
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(ProfilesViewModel::class.java)) {
-            "Unknown ViewModel class: ${modelClass.name}"
-        }
-        return ProfilesViewModel(repository) as T
-    }
-}

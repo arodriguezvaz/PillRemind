@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
@@ -43,11 +44,12 @@ sealed class MedicationMode {
  */
 @Composable
 fun MedicationScreen(
-    medicationViewModel: MedicationViewModel,
     modifier: Modifier = Modifier,
     onSaveClicked: () -> Unit = {},
     medicationMode: MedicationMode = MedicationMode.Create,
 ) {
+    val medicationViewModel: MedicationViewModel = hiltViewModel()
+
     /**
      * Variables con estado mutable para los campos de texto
      */

@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppTextField
@@ -44,11 +45,11 @@ sealed class ProfileMode {
  */
 @Composable
 fun ProfileScreen(
-    profileViewModel: ProfileViewModel,
     modifier: Modifier = Modifier,
     onSaveClicked: () -> Unit = {},
     profileMode: ProfileMode = ProfileMode.Create,
 ) {
+    val profileViewModel: ProfileViewModel = hiltViewModel()
     val nombre = remember { mutableStateOf("") }
     val urlImagen = remember { mutableStateOf("") }
     val perfil = profileViewModel.profile.collectAsState().value

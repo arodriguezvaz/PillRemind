@@ -5,13 +5,15 @@ import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.repository.MedicationRepository
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
  * Clase que implemnta la interfaz  MedicamentoRepository
  */
-class MedicationRepositoryImpl(private val medicationDao: MedicationDao) : MedicationRepository {
+class MedicationRepositoryImpl @Inject constructor(private val medicationDao: MedicationDao) :
+    MedicationRepository {
 
     override suspend fun insertMedication(medication: Medication) {
         medicationDao.insertMedication(medication.toEntity())
