@@ -1,19 +1,12 @@
 package com.andres.pillremind.ui.screens.medications
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
-import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.repository.MedicationRepository
-import com.andres.pillremind.domain.repository.ProfileRepository
-import com.andres.pillremind.ui.screens.home.HomeViewModel
-import com.andres.pillremind.ui.screens.medication.MedicationViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -21,7 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 @HiltViewModel
 class MedicationsViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
-    private val sessionManager: SessionManager
+    sessionManager: SessionManager
 ) : ViewModel() {
     val profileId = sessionManager.activeProfileId
 

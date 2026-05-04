@@ -18,7 +18,7 @@ interface MedicationDao {
      * @param medication Medication a insertar
      */
     @Insert
-    suspend fun insertMedication(medication: MedicationEntity)
+    suspend fun insertMedication(medication: MedicationEntity): Long
 
     /**
      * Actualiza un medication en la base de datos

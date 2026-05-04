@@ -7,4 +7,22 @@
     <string name="dosis">Dosis:</string>
     <string name="fecha_fin">Fecha fin:</string>
     <string name="ver">Ver</string>
+    <string name="editar">Editar</string>
+    <string name="eliminar">Eliminar</string>
+    <string name="lunes">Lunes</string>
+    <string name="martes">Martes</string>
+    <string name="miercoles">Miércoles</string>
+    <string name="jueves">Jueves</string>
+    <string name="viernes">Viernes</string>
+    <string name="sabado">Sábado</string>
+    <string name="domingo">Domingo</string>
+    <string name="periocidad">Periocidad:</string>
+    <string name="lunesShort">L</string>
+    <string name="martesShort">Ma</string>
+    <string name="miercolesShort">Mi</string>
+    <string name="juevesShort">J</string>
+    <string name="viernesShort">V</string>
+    <string name="sabadoShort">S</string>
+    <string name="domingoShort">D</string>
+    <string name="horario">Horario:</string>
 </resources>

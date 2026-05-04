@@ -5,13 +5,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -20,12 +21,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.andres.pillremind.R
+import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.FormField
+import com.andres.pillremind.ui.components.WeekDayChipGroup
+import com.andres.pillremind.ui.components.timeeditor.TimeListEditor
 import java.time.LocalDate
+import java.time.LocalTime
+import com.andres.pillremind.ui.components.timeeditor.TimeListMode
 
 /**
  * Clase sellada que representa el modo de medication
@@ -61,14 +67,20 @@ fun MedicationScreen(
 
     val startDate = remember { mutableStateOf<LocalDate?>(null) }
     val endDate = remember { mutableStateOf<LocalDate?>(null) }
-    //val medication = medicationViewModel.medication.collectAsState().value
+
+    val weekDays = remember { mutableStateOf(setOf<WeekDay>()) }
+
+    val times = remember { mutableStateListOf<LocalTime>() }
+
     val snackbarMessage by medicationViewModel.snackbarMessage.collectAsState()
+    val scrollState = rememberScrollState()
     when (medicationMode) {
         MedicationMode.Create -> {
             Column(
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -119,6 +131,23 @@ fun MedicationScreen(
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                 }
+                FormField(stringResource(R.string.periocidad)) {
+                    WeekDayChipGroup(
+                        selectedDays = weekDays.value,
+                        onSelectionChange = { weekDays.value = it })
+                }
+                FormField(stringResource(R.string.horario)) {
+                    TimeListEditor(
+                        times = times,
+                        mode = TimeListMode.EDIT,
+                        onAddClick = {
+                            times.add(LocalTime.now()) // aquí luego meterás TimePicker
+                        },
+                        onRemoveTime = { time ->
+                            times.remove(time)
+                        }
+                    )
+                }
                 AppButton(
                     text = "Guardar",
                     onClick = {
@@ -128,7 +157,9 @@ fun MedicationScreen(
                             dose = dosis.value.toDoubleOrNull() ?: 0.0,
                             unit = unidad.value,
                             startDate = startDate.value!!,
-                            endDate = endDate.value
+                            endDate = endDate.value,
+                            weekDays = weekDays.value,
+                            times = times
                         )
 
                         onSaveClicked()

@@ -2,8 +2,10 @@ package com.andres.pillremind.di
 
 import com.andres.pillremind.data.repository.MedicationRepositoryImpl
 import com.andres.pillremind.data.repository.ProfileRepositoryImpl
+import com.andres.pillremind.data.repository.ScheduleRepositoryImpl
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
+import com.andres.pillremind.domain.repository.ScheduleRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,4 +19,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindMedicationRepository(impl: MedicationRepositoryImpl): MedicationRepository
+
+    @Binds
+    abstract fun bindScheduleRepository(impl: ScheduleRepositoryImpl): ScheduleRepository
 }

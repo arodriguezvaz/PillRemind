@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.map
 class MedicationRepositoryImpl @Inject constructor(private val medicationDao: MedicationDao) :
     MedicationRepository {
 
-    override suspend fun insertMedication(medication: Medication) {
-        medicationDao.insertMedication(medication.toEntity())
+    override suspend fun insertMedication(medication: Medication): Long {
+        return medicationDao.insertMedication(medication.toEntity())
     }
 
     override suspend fun deleteMedication(medication: Medication) {

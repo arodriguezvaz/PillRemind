@@ -6,7 +6,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.Medication
+import com.andres.pillremind.domain.model.Schedule
+import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.repository.MedicationRepository
+import com.andres.pillremind.domain.repository.ScheduleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,11 +19,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalTime
 
 @HiltViewModel
 class MedicationViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
-    private val sessionManager: SessionManager
+    private val scheduleRepository: ScheduleRepository,
+    sessionManager: SessionManager
 ) : ViewModel() {
     val profileId = sessionManager.activeProfileId
     private val _snackbarMessage = MutableStateFlow<String?>(null)
@@ -33,7 +38,9 @@ class MedicationViewModel @Inject constructor(
         dose: Double,
         unit: String,
         startDate: LocalDate,
-        endDate: LocalDate? = null
+        endDate: LocalDate? = null,
+        weekDays: Set<WeekDay>,
+        times: List<LocalTime>
     ) {
 
         val trimmedName = nombre.trim()
@@ -57,7 +64,7 @@ class MedicationViewModel @Inject constructor(
         viewModelScope.launch {
             val profileId = profileId.firstOrNull()
             if (profileId != null) {
-                medicationRepository.insertMedication(
+                val medicationId = medicationRepository.insertMedication(
                     Medication(
                         name = trimmedName,
                         profileId = profileId,
@@ -68,6 +75,18 @@ class MedicationViewModel @Inject constructor(
                         endDate = endDate
                     )
                 )
+
+                for (day in weekDays) {
+                    for (time in times) {
+                        scheduleRepository.insertSchedule(
+                            Schedule(
+                                medicationId = medicationId.toInt(),
+                                weekDay = day,
+                                time = time,
+                            )
+                        )
+                    }
+                }
             } else {
                 showMessage("No hay perfil activo")
             }

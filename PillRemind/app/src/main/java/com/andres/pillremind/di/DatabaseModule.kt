@@ -36,4 +36,7 @@ object DatabaseModule {
 
     @Provides
     fun provideUsuarioDao(db: AppDatabase) = db.usuarioDao()
+
+    @Provides
+    fun provideScheduleDao(db: AppDatabase) = db.scheduleDao()
 }

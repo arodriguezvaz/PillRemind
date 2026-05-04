@@ -10,9 +10,10 @@ import java.util.UUID
     tableName = "toma",
     foreignKeys = [
         ForeignKey(
-            entity = HorarioEntity::class,
+            entity = ScheduleEntity::class,
             parentColumns = ["id"],
-            childColumns = ["horarioId"],
+            childColumns = ["
+            horarioId"],
             onDelete = ForeignKey.CASCADE
         )
     ]

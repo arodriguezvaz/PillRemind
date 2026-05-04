@@ -12,25 +12,11 @@ import kotlinx.coroutines.launch
 class SessionViewModel(
     private val sessionManager: SessionManager
 ) : ViewModel() {
-    
 
-    // StateFlow para que la UI reaccione automáticamente
-    val activeProfileId: StateFlow<Int?> = sessionManager.activeProfileId
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = null
-        )
 
     fun setActiveProfile(id: Int) {
         viewModelScope.launch {
             sessionManager.setActiveProfile(id)
-        }
-    }
-
-    fun clearActiveProfile() {
-        viewModelScope.launch {
-            sessionManager.clearActiveProfile()
         }
     }
 }

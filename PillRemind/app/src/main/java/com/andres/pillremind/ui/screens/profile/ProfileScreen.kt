@@ -147,7 +147,7 @@ fun ProfileScreen(
                 Row(modifier.fillMaxWidth()) {
                     AppButton(
                         onClick = {},
-                        text = "Eliminar",
+                        text = stringResource(R.string.eliminar),
                         size = ButtonSize.Medium,
                         variant = ButtonVariant.Danger,
                         modifier = Modifier.weight(1f)
@@ -155,7 +155,7 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     AppButton(
                         onClick = {},
-                        text = "Editar",
+                        text = stringResource(R.string.editar),
                         size = ButtonSize.Medium,
                         variant = ButtonVariant.Primary,
                         modifier = Modifier.weight(1f)
