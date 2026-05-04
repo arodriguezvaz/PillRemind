@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import kotlin.collections.emptyList
 
 @HiltViewModel
 class MedicationsViewModel @Inject constructor(
@@ -23,7 +24,7 @@ class MedicationsViewModel @Inject constructor(
      */
     val medications = profileId.flatMapLatest { id ->
         if (id != null) {
-            medicationRepository.getMedication(id)
+            medicationRepository.getMedications(id)
         } else {
             flowOf(emptyList())
         }

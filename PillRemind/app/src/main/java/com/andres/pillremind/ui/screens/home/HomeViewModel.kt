@@ -10,6 +10,7 @@ import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -27,11 +28,12 @@ class HomeViewModel @Inject constructor(
 
     val profileId = sessionManager.activeProfileId
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val profile: StateFlow<Profile?> =
         sessionManager.activeProfileId
             .filterNotNull()
             .flatMapLatest { id ->
-                profileRepository.getPerfil(id)
+                profileRepository.getPerfilById(id)
             }
             .stateIn(
                 scope = viewModelScope,
@@ -40,9 +42,10 @@ class HomeViewModel @Inject constructor(
             )
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val medications = profileId.flatMapLatest { id ->
         if (id != null) {
-            medicationRepository.getMedication(id)
+            medicationRepository.getMedications(id)
         } else {
             flowOf(emptyList())
         }

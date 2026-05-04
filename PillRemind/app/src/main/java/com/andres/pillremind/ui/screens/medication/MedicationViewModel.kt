@@ -1,8 +1,8 @@
 package com.andres.pillremind.ui.screens.medication
 
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.Medication
@@ -13,16 +13,19 @@ import com.andres.pillremind.domain.repository.ScheduleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 
 @HiltViewModel
 class MedicationViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val medicationRepository: MedicationRepository,
     private val scheduleRepository: ScheduleRepository,
     sessionManager: SessionManager
@@ -31,6 +34,31 @@ class MedicationViewModel @Inject constructor(
     private val _snackbarMessage = MutableStateFlow<String?>(null)
     val snackbarMessage = _snackbarMessage.asStateFlow()
 
+
+    val medication: StateFlow<Medication?> = savedStateHandle.get<Int>("medicationId")?.let { id ->
+        medicationRepository.getMedicationById(id)
+    }?.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        null
+    ) ?: MutableStateFlow(null)
+
+    val schedules: StateFlow<List<Schedule>> =
+        savedStateHandle.get<Int>("medicationId")?.let { id ->
+            scheduleRepository.getSchedules(id)
+        }?.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList()
+        ) ?: MutableStateFlow(emptyList())
+
+    val weekDays: StateFlow<Set<WeekDay>> = schedules
+        .map { list -> list.map { it.weekDay }.toSet() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
+
+    val times: StateFlow<List<LocalTime>> = schedules
+        .map { list -> list.map { it.time }.distinct() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun addMedication(
         nombre: String,
@@ -92,6 +120,7 @@ class MedicationViewModel @Inject constructor(
             }
         }
     }
+
 
     private fun showMessage(message: String) {
         _snackbarMessage.value = message

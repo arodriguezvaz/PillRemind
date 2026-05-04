@@ -35,8 +35,14 @@ interface MedicationDao {
     suspend fun deleteMedication(medication: MedicationEntity)
 
     /**
+     * Obtiene un medication por su ID
+     */
+    @Query("SELECT * FROM medications WHERE id = :id")
+    fun getMedicationById(id: Int?): Flow<MedicationEntity>
+
+    /**
      * Obtiene todos los medication de la base de datos
      */
     @Query("SELECT * FROM medications WHERE profileId = :profileId")
-    fun getMedication(profileId: Int): Flow<List<MedicationEntity>>
+    fun getMedications(profileId: Int): Flow<List<MedicationEntity>>
 }

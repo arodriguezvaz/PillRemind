@@ -1,18 +1,12 @@
 package com.andres.pillremind.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.andres.pillremind.ui.screens.home.HomeScreen
 import com.andres.pillremind.ui.screens.medication.MedicationMode
@@ -35,7 +29,13 @@ fun MainNavigationGraph(
             HomeScreen()
         }
         composable(BottomBarScreens.Medications.route) {
-            MedicationsScreen()
+            MedicationsScreen(
+                onMedicationClick = { id ->
+                    navController.navigate(
+                        MedicationScreens.MedicationSeeScreen.createRoute(id)
+                    )
+                }
+            )
         }
 
         composable(BottomBarScreens.Profile.route) {
@@ -53,13 +53,27 @@ fun NavGraphBuilder.medicationNavGraph(
 ) {
     navigation(
         route = Graph.MEDICATION,
-        startDestination = MedicationScreens.SeeMedicationScreen.route
+        startDestination = MedicationScreens.MedicationCreateScreen.route
     ) {
-        /*composable(route = MedicationScreen.SeeMedicationScreen.route) {
-            MedicationScreen() {
-                //navController.navigate(MedicationScreen.MedicationCreateScreen.route)
-            }
-        }*/
+        composable(
+            route = MedicationScreens.MedicationSeeScreen.route,
+            arguments = listOf(navArgument("medicationId") {
+                type = NavType.IntType
+            })
+        ) { backStackEntry ->
+
+            val medicationId = backStackEntry.arguments?.getInt("medicationId")
+
+            MedicationScreen(
+                medicationId = medicationId,
+                medicationMode = MedicationMode.View,
+                onEditClicked = {
+                    navController.navigate(
+                        MedicationScreens.MedicationEditScreen.createRoute(medicationId!!)
+                    )
+                }
+            )
+        }
         composable(route = MedicationScreens.MedicationCreateScreen.route) {
             MedicationScreen(
                 onSaveClicked = { navController.popBackStack() },
@@ -70,7 +84,7 @@ fun NavGraphBuilder.medicationNavGraph(
 }
 
 sealed class MedicationScreens(val route: String) {
-    object SeeMedicationScreen : MedicationScreens("medication/see/{medicationId}") {
+    object MedicationSeeScreen : MedicationScreens("medication/see/{medicationId}") {
         fun createRoute(medicationId: Int) = "medication/see/$medicationId"
     }
 

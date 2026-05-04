@@ -7,6 +7,7 @@ import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.repository.MedicationRepository
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
 /**
@@ -27,8 +28,11 @@ class MedicationRepositoryImpl @Inject constructor(private val medicationDao: Me
         medicationDao.updateMedication(medication.toEntity())
     }
 
+    override fun getMedicationById(medicationId: Int): Flow<Medication> {
+        return medicationDao.getMedicationById(medicationId).map { it.toDomain() }
+    }
 
-    override fun getMedication(profileId: Int): Flow<List<Medication>> {
-        return medicationDao.getMedication(profileId).map { list -> list.map { it.toDomain() } }
+    override fun getMedications(profileId: Int): Flow<List<Medication>> {
+        return medicationDao.getMedications(profileId).map { list -> list.map { it.toDomain() } }
     }
 }

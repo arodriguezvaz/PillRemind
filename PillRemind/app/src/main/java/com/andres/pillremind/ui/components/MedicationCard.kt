@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Medication
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,12 +25,21 @@ import androidx.compose.ui.unit.dp
 import com.andres.pillremind.domain.model.Medication
 import java.time.LocalDate
 
+/**
+ * Card que muestra la información principal de un medicamento.
+ *
+ * @param medication objeto con los datos del medicamento a mostrar.
+ * @param accion acción que se ejecuta al pulsar el botón principal.
+ * @param modifier modificador opcional para personalizar el layout.
+ * @param buttonText texto del botón de acción.
+ * @param buttonVariant variante visual del botón.
+ */
 @Composable
 fun MedicationCard(
     medication: Medication,
-    tomar: () -> Unit,
+    accion: () -> Unit,
     modifier: Modifier = Modifier,
-    buttonText: String = "Tomar",
+    buttonText: String,
     buttonVariant: ButtonVariant = ButtonVariant.Primary,
 ) {
     Card(
@@ -53,7 +66,11 @@ fun MedicationCard(
                         .size(64.dp)
                         .clip(RoundedCornerShape(14.dp)),
                 ) {
-                    medication.imageUrl
+                    if (medication.imageUrl == null) {
+
+                    } else {
+                        medication.imageUrl
+                    }
                 }
 
                 Text(
@@ -65,7 +82,7 @@ fun MedicationCard(
 
             AppButton(
                 text = buttonText,
-                onClick = tomar,
+                onClick = accion,
                 variant = buttonVariant,
                 size = ButtonSize.Small,
             )
@@ -73,6 +90,9 @@ fun MedicationCard(
     }
 }
 
+/**
+ * Muestra un avatar por defecto cuando el medicamento no tiene imagen.
+ */
 @Composable
 private fun DefaultAvatar() {
     Box(
@@ -82,8 +102,14 @@ private fun DefaultAvatar() {
                 color = MaterialTheme.colorScheme.primaryContainer,
                 shape = RoundedCornerShape(14.dp),
             ),
-    )
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Medication,
+            contentDescription = "Default avatar",
+        )
+    }
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -91,7 +117,6 @@ private fun MedicationPreview() {
     val medicationFake = Medication(
         id = 1,
         name = "Dalsy",
-        imageUrl = "",
         profileId = 1,
         dose = 1.0,
         unit = "mg",
@@ -100,6 +125,7 @@ private fun MedicationPreview() {
 
     MedicationCard(
         medication = medicationFake,
-        tomar = {}
+        accion = {},
+        buttonText = ""
     )
 }

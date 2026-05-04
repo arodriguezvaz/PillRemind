@@ -25,4 +25,7 @@
     <string name="sabadoShort">S</string>
     <string name="domingoShort">D</string>
     <string name="horario">Horario:</string>
+    <string name="guardar">Guardar</string>
+    <string name="sleccionar_hora">Seleccionar hora</string>
+    <string name="tomar">Tomar</string>">
 </resources>

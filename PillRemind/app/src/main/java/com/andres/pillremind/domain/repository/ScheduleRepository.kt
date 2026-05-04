@@ -1,6 +1,7 @@
 package com.andres.pillremind.domain.repository
 
 import com.andres.pillremind.domain.model.Schedule
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Repositorio que define las operaciones relacionadas con los horarios de medicación
@@ -21,4 +22,9 @@ interface ScheduleRepository {
      * Elimina un horario
      */
     suspend fun deleteSchedule(schedule: Schedule)
+
+    /**
+     * Obtiene todos los horarios de una medicación
+     */
+    fun getSchedules(medicationId: Int): Flow<List<Schedule>>
 }

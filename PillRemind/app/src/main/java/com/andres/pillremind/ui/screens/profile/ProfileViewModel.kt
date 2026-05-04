@@ -65,7 +65,7 @@ class ProfileViewModel @Inject constructor(
         sessionManager.activeProfileId
             .filterNotNull()
             .flatMapLatest { id ->
-                profileRepository.getPerfil(id)
+                profileRepository.getPerfilById(id)
             }
             .stateIn(
                 scope = viewModelScope,

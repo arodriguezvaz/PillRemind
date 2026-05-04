@@ -20,7 +20,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun WeekDayChipGroup(
     selectedDays: Set<WeekDay>,
-    onSelectionChange: (Set<WeekDay>) -> Unit
+    onSelectionChange: (Set<WeekDay>) -> Unit,
+    enabled: Boolean = true
 ) {
     val allDays = WeekDay.entries
 

@@ -9,16 +9,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 
 @Composable
 fun TimeItem(
     time: LocalTime,
-    mode: TimeListMode,
+    enabled: Boolean = true,
     onRemove: () -> Unit
 ) {
     Card(
@@ -28,16 +30,18 @@ fun TimeItem(
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp),
+                .padding(16.dp)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = time.toString())
+            Text(text = time.truncatedTo(ChronoUnit.MINUTES).toString())
 
-            if (mode == TimeListMode.EDIT) {
+            if (enabled) {
                 Icon(
                     imageVector = Icons.Rounded.DeleteOutline,
                     contentDescription = "Eliminar",
-                    modifier = Modifier.clickable { onRemove() }
+                    modifier = Modifier.clickable { onRemove() },
+                    tint = MaterialTheme.colorScheme.error
                 )
             }
         }
