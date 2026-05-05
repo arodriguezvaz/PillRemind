@@ -72,8 +72,8 @@ fun MedicationScreen(
     val name = remember { mutableStateOf("") }
     val urlImagen = remember { mutableStateOf("") }
 
-    val dosis = remember { mutableStateOf("") }
-    val unidad = remember { mutableStateOf("") }
+    val dose = remember { mutableStateOf("") }
+    val unit = remember { mutableStateOf("") }
 
     val startDate = remember { mutableStateOf<LocalDate?>(null) }
     val endDate = remember { mutableStateOf<LocalDate?>(null) }
@@ -87,8 +87,8 @@ fun MedicationScreen(
         medication?.let {
             name.value = it.name
             urlImagen.value = it.imageUrl ?: ""
-            dosis.value = it.dose.toString()
-            unidad.value = it.unit
+            dose.value = it.dose.toString()
+            unit.value = it.unit
             startDate.value = it.startDate
             endDate.value = it.endDate
         }
@@ -98,7 +98,7 @@ fun MedicationScreen(
     //Varibale que especifica el modo en el que está la screen
     var currentMode by remember { mutableStateOf(medicationMode) }
 
-    //Si está en la vista deeditar y se pulsa el botón de back se vuelve a la vista de ver
+    //Si está en la vista de editar y se pulsa el botón de back se vuelve a la vista de ver
     BackHandler(enabled = currentMode == MedicationMode.Edit) {
         currentMode = MedicationMode.View
     }
@@ -135,16 +135,16 @@ fun MedicationScreen(
 
                 FormField(label = stringResource(R.string.dosis)) {
                     AppTextField(
-                        value = dosis.value,
-                        onValueChange = { dosis.value = it },
+                        value = dose.value,
+                        onValueChange = { dose.value = it },
                         placeholder = "Escribe algo...",
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                 }
                 FormField(label = stringResource(R.string.unidad)) {
                     AppTextField(
-                        value = unidad.value,
-                        onValueChange = { unidad.value = it },
+                        value = unit.value,
+                        onValueChange = { unit.value = it },
                         placeholder = "Escribe algo...",
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
@@ -186,8 +186,8 @@ fun MedicationScreen(
                         medicationViewModel.addMedication(
                             nombre = name.value,
                             imageUrl = urlImagen.value.ifEmpty { null },
-                            dose = dosis.value.toDoubleOrNull() ?: 0.0,
-                            unit = unidad.value,
+                            dose = dose.value.toDoubleOrNull() ?: 0.0,
+                            unit = unit.value,
                             startDate = startDate.value!!,
                             endDate = endDate.value,
                             weekDays = weekDays.value,
@@ -238,7 +238,7 @@ fun MedicationScreen(
                     }
                     FormField(label = stringResource(R.string.url_imagen)) {
                         AppTextField(
-                            value = currentMedication.imageUrl.toString(),
+                            value = urlImagen.value,
                             onValueChange = { urlImagen.value = it },
                             placeholder = "hhtps",
                             modifier = Modifier.padding(bottom = 16.dp),
@@ -247,44 +247,44 @@ fun MedicationScreen(
 
                     FormField(label = stringResource(R.string.dosis)) {
                         AppTextField(
-                            value = currentMedication.dose.toString(),
-                            onValueChange = { dosis.value = it },
+                            value = dose.value,
+                            onValueChange = { dose.value = it },
                             placeholder = "Escribe algo...",
                             modifier = Modifier.padding(bottom = 16.dp),
                         )
                     }
                     FormField(label = stringResource(R.string.unidad)) {
                         AppTextField(
-                            value = currentMedication.toString(),
-                            onValueChange = { unidad.value = it },
+                            value = unit.value,
+                            onValueChange = { unit.value = it },
                             placeholder = "Escribe algo...",
                             modifier = Modifier.padding(bottom = 16.dp),
                         )
                     }
                     FormField(label = stringResource(R.string.fecha_inicio)) {
                         AppDatePickerField(
-                            value = currentMedication.startDate,
+                            value = startDate.value,
                             onDateSelected = { startDate.value = it },
                             modifier = Modifier.padding(bottom = 16.dp),
                         )
                     }
                     FormField(label = stringResource(R.string.fecha_fin)) {
                         AppDatePickerField(
-                            value = currentMedication.endDate,
+                            value = endDate.value,
                             onDateSelected = { endDate.value = it },
                             modifier = Modifier.padding(bottom = 16.dp),
                         )
                     }
-                    //TODO
+
                     FormField(stringResource(R.string.periocidad)) {
                         WeekDayChipGroup(
-                            selectedDays = medicationWeekDays,
+                            selectedDays = weekDays.value,
                             onSelectionChange = { weekDays.value = it },
                         )
                     }
                     FormField(stringResource(R.string.horario)) {
                         TimeListEditor(
-                            times = medicationTimes,
+                            times = times,
                             onAddClick = {
                                 times.add(LocalTime.now())
                             },
@@ -309,8 +309,8 @@ fun MedicationScreen(
                                 medicationViewModel.updateMedication(
                                     name = name.value,
                                     imageUrl = urlImagen.value.ifEmpty { null },
-                                    dose = dosis.value.toDoubleOrNull() ?: 0.0,
-                                    unit = unidad.value,
+                                    dose = dose.value.toDoubleOrNull() ?: 0.0,
+                                    unit = unit.value,
                                     startDate = startDate.value!!,
                                     endDate = endDate.value,
                                     weekDays = weekDays.value,
@@ -332,113 +332,104 @@ fun MedicationScreen(
 
             val currentMedication = medication
 
-            val medicationWeekDays by medicationViewModel.weekDays.collectAsState()
-            val medicationTimes by medicationViewModel.times.collectAsState()
-            // Muestra loading mientras llega el dato
-            if (currentMedication == null) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                FormField(label = stringResource(R.string.nombre)) {
+                    AppTextField(
+                        value = name.value,
+                        onValueChange = { name.value = it },
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        enabled = false
+                    )
                 }
-            } else {
-                Column(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                        .verticalScroll(scrollState),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    FormField(label = stringResource(R.string.nombre)) {
-                        AppTextField(
-                            value = currentMedication.name,
-                            onValueChange = { name.value = it },
-                            modifier = Modifier.padding(bottom = 16.dp),
-                            enabled = false
-                        )
-                    }
-                    FormField(label = stringResource(R.string.url_imagen)) {
-                        AppTextField(
-                            value = currentMedication.imageUrl.toString(),
-                            onValueChange = { urlImagen.value = it },
-                            placeholder = "hhtps",
-                            modifier = Modifier.padding(bottom = 16.dp),
-                            enabled = false
-                        )
-                    }
+                FormField(label = stringResource(R.string.url_imagen)) {
+                    AppTextField(
+                        value = urlImagen.value,
+                        onValueChange = { urlImagen.value = it },
+                        placeholder = "hhtps",
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        enabled = false
+                    )
+                }
 
-                    FormField(label = stringResource(R.string.dosis)) {
-                        AppTextField(
-                            value = currentMedication.dose.toString(),
-                            onValueChange = { dosis.value = it },
-                            placeholder = "Escribe algo...",
-                            modifier = Modifier.padding(bottom = 16.dp),
-                            enabled = false
-                        )
-                    }
-                    FormField(label = stringResource(R.string.unidad)) {
-                        AppTextField(
-                            value = currentMedication.toString(),
-                            onValueChange = { unidad.value = it },
-                            placeholder = "Escribe algo...",
-                            modifier = Modifier.padding(bottom = 16.dp),
-                            enabled = false
-                        )
-                    }
-                    FormField(label = stringResource(R.string.fecha_inicio)) {
-                        AppDatePickerField(
-                            value = currentMedication.startDate,
-                            onDateSelected = { startDate.value = it },
-                            modifier = Modifier.padding(bottom = 16.dp),
-                            enabled = false
-                        )
-                    }
-                    FormField(label = stringResource(R.string.fecha_fin)) {
-                        AppDatePickerField(
-                            value = currentMedication.endDate,
-                            onDateSelected = { endDate.value = it },
-                            modifier = Modifier.padding(bottom = 16.dp),
-                            enabled = false
-                        )
-                    }
-                    //TODO
-                    FormField(stringResource(R.string.periocidad)) {
-                        WeekDayChipGroup(
-                            selectedDays = medicationWeekDays,
-                            onSelectionChange = { weekDays.value = it },
-                            enabled = false
-                        )
-                    }
-                    FormField(stringResource(R.string.horario)) {
-                        TimeListEditor(
-                            times = medicationTimes,
-                            enabled = false,
-                            onAddClick = {
-                                times.add(LocalTime.now())
-                            },
-                            onRemoveTime = { time ->
-                                times.remove(time)
-                            }
-                        )
-                    }
-                    Row(modifier.fillMaxWidth()) {
-                        AppButton(
-                            onClick = {},
-                            text = stringResource(R.string.eliminar),
-                            size = ButtonSize.Medium,
-                            variant = ButtonVariant.Danger,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        //EDITAR
-                        AppButton(
-                            onClick = { currentMode = MedicationMode.Edit },
-                            text = stringResource(R.string.editar),
-                            size = ButtonSize.Medium,
-                            variant = ButtonVariant.Primary,
-                            modifier = Modifier.weight(1f)
+                FormField(label = stringResource(R.string.dosis)) {
+                    AppTextField(
+                        value = dose.value,
+                        onValueChange = { dose.value = it },
+                        placeholder = "Escribe algo...",
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        enabled = false
+                    )
+                }
+                FormField(label = stringResource(R.string.unidad)) {
+                    AppTextField(
+                        value = unit.value,
+                        onValueChange = { unit.value = it },
+                        placeholder = "Escribe algo...",
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        enabled = false
+                    )
+                }
+                FormField(label = stringResource(R.string.fecha_inicio)) {
+                    AppDatePickerField(
+                        value = startDate.value,
+                        onDateSelected = { startDate.value = it },
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        enabled = false
+                    )
+                }
+                FormField(label = stringResource(R.string.fecha_fin)) {
+                    AppDatePickerField(
+                        value = endDate.value,
+                        onDateSelected = { endDate.value = it },
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        enabled = false
+                    )
+                }
+                //TODO
+                FormField(stringResource(R.string.periocidad)) {
+                    WeekDayChipGroup(
+                        selectedDays = weekDays.value,
+                        onSelectionChange = { weekDays.value = it },
+                        enabled = false
+                    )
+                }
+                FormField(stringResource(R.string.horario)) {
+                    TimeListEditor(
+                        times = times,
+                        enabled = false,
+                        onAddClick = {
+                            times.add(LocalTime.now())
+                        },
+                        onRemoveTime = { time ->
+                            times.remove(time)
+                        }
+                    )
+                }
+                Row(modifier.fillMaxWidth()) {
+                    AppButton(
+                        onClick = {},
+                        text = stringResource(R.string.eliminar),
+                        size = ButtonSize.Medium,
+                        variant = ButtonVariant.Danger,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    //EDITAR
+                    AppButton(
+                        onClick = { currentMode = MedicationMode.Edit },
+                        text = stringResource(R.string.editar),
+                        size = ButtonSize.Medium,
+                        variant = ButtonVariant.Primary,
+                        modifier = Modifier.weight(1f)
 
-                        )
-                    }
+                    )
                 }
             }
             LaunchedEffect(snackbarMessage) {
