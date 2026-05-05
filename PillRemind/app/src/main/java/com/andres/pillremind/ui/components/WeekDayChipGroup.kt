@@ -45,6 +45,7 @@ fun WeekDayChipGroup(
 
                     onSelectionChange(newSelection)
                 },
+                enabled = enabled,
                 label = {
                     Text(text = stringResource(id = day.shortName))
                 }

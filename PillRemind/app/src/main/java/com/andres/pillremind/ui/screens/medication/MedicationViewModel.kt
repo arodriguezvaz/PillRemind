@@ -10,6 +10,8 @@ import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
+import com.andres.pillremind.notifications.AlarmScheduler
+import com.andres.pillremind.notifications.nextTriggerMillis
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +30,7 @@ class MedicationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val medicationRepository: MedicationRepository,
     private val scheduleRepository: ScheduleRepository,
+    private val alarmScheduler: AlarmScheduler,
     sessionManager: SessionManager
 ) : ViewModel() {
     //Recupera el profileId del sessionManager
@@ -110,13 +113,15 @@ class MedicationViewModel @Inject constructor(
 
                 for (day in weekDays) {
                     for (time in times) {
-                        scheduleRepository.insertSchedule(
+                        val scheduleId = scheduleRepository.insertSchedule(
                             Schedule(
                                 medicationId = medicationId.toInt(),
                                 weekDay = day,
                                 time = time,
                             )
-                        )
+                        ).toInt()
+                        val millis = nextTriggerMillis(day, time)
+                        alarmScheduler.schedule(scheduleId, millis)
                     }
                 }
             } else {

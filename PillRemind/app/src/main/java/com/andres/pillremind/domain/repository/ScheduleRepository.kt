@@ -11,7 +11,7 @@ interface ScheduleRepository {
     /**
      * Inserta un nuevo horario
      */
-    suspend fun insertSchedule(schedule: Schedule)
+    suspend fun insertSchedule(schedule: Schedule): Long
 
     /**
      * Actualiza un horario existente
@@ -32,4 +32,9 @@ interface ScheduleRepository {
      * Obtiene todos los horarios de una medicación
      */
     fun getSchedules(medicationId: Int): Flow<List<Schedule>>
+
+    /**
+     * Obtiene un horario por su ID
+     */
+    suspend fun getScheduleById(scheduleId: Int): Schedule
 }

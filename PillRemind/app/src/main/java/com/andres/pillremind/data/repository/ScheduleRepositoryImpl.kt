@@ -14,8 +14,8 @@ class ScheduleRepositoryImpl @Inject constructor(
     private val scheduleDao: ScheduleDao
 ) : ScheduleRepository {
 
-    override suspend fun insertSchedule(schedule: Schedule) {
-        scheduleDao.insertSchedule(schedule.toEntity())
+    override suspend fun insertSchedule(schedule: Schedule): Long {
+        return scheduleDao.insertSchedule(schedule.toEntity())
     }
 
     override suspend fun updateSchedule(schedule: Schedule) {
@@ -33,5 +33,9 @@ class ScheduleRepositoryImpl @Inject constructor(
 
     override fun getSchedules(medicationId: Int): Flow<List<Schedule>> {
         return scheduleDao.getSchedules(medicationId).map { list -> list.map { it.toDomain() } }
+    }
+
+    override suspend fun getScheduleById(scheduleId: Int): Schedule {
+        return scheduleDao.getScheduleById(scheduleId).toDomain()
     }
 }

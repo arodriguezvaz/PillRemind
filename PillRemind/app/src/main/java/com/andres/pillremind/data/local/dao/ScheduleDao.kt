@@ -18,7 +18,7 @@ interface ScheduleDao {
      * Inserta un schedule en la base de datos
      */
     @Insert
-    suspend fun insertSchedule(scheduleEntity: ScheduleEntity)
+    suspend fun insertSchedule(scheduleEntity: ScheduleEntity): Long
 
     /**
      * Actualiza un schedule en la base de datos
@@ -44,4 +44,10 @@ interface ScheduleDao {
      */
     @Query("SELECT * FROM schedule WHERE medicationId = :medicationId")
     fun getSchedules(medicationId: Int): Flow<List<ScheduleEntity>>
+
+    /**
+     * Obtiene un schedule a a partir de su id
+     */
+    @Query("SELECT * FROM schedule WHERE id = :scheduleId")
+    suspend fun getScheduleById(scheduleId: Int): ScheduleEntity
 }
