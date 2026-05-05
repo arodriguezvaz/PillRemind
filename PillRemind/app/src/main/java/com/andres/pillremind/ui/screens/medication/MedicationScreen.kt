@@ -66,7 +66,8 @@ fun MedicationScreen(
     ) {
     val medicationViewModel: MedicationViewModel = hiltViewModel()
     val medication by medicationViewModel.medication.collectAsState()
-
+    val medicationWeekDays by medicationViewModel.weekDays.collectAsState()
+    val medicationTimes by medicationViewModel.times.collectAsState()
 
     //Variables con estado mutable para los campos del formulario
     val name = remember { mutableStateOf("") }
@@ -83,7 +84,7 @@ fun MedicationScreen(
     val times = remember { mutableStateListOf<LocalTime>() }
 
     //Si medication no es null actualiza las variables con los valores de medication
-    LaunchedEffect(medication) {
+    LaunchedEffect(medication, weekDays, times) {
         medication?.let {
             name.value = it.name
             urlImagen.value = it.imageUrl ?: ""
@@ -91,6 +92,9 @@ fun MedicationScreen(
             unit.value = it.unit
             startDate.value = it.startDate
             endDate.value = it.endDate
+            weekDays.value = medicationWeekDays
+            times.clear()
+            times.addAll(medicationTimes)
         }
     }
 
@@ -172,8 +176,8 @@ fun MedicationScreen(
                     TimeListEditor(
                         times = times,
                         enabled = true,
-                        onAddClick = {
-                            times.add(LocalTime.now()) // aquí luego meterás TimePicker
+                        onAddClick = { time ->
+                            times.add(time)
                         },
                         onRemoveTime = { time ->
                             times.remove(time)
@@ -212,8 +216,7 @@ fun MedicationScreen(
 
             val currentMedication = medication
 
-            val medicationWeekDays by medicationViewModel.weekDays.collectAsState()
-            val medicationTimes by medicationViewModel.times.collectAsState()
+
             if (currentMedication == null) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -285,8 +288,8 @@ fun MedicationScreen(
                     FormField(stringResource(R.string.horario)) {
                         TimeListEditor(
                             times = times,
-                            onAddClick = {
-                                times.add(LocalTime.now())
+                            onAddClick = { time ->
+                                times.add(time)
                             },
                             onRemoveTime = { time ->
                                 times.remove(time)
@@ -404,8 +407,8 @@ fun MedicationScreen(
                     TimeListEditor(
                         times = times,
                         enabled = false,
-                        onAddClick = {
-                            times.add(LocalTime.now())
+                        onAddClick = { time ->
+                            times.add(time)
                         },
                         onRemoveTime = { time ->
                             times.remove(time)
