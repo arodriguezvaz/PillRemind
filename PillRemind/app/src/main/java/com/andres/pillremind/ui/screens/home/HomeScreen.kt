@@ -27,7 +27,6 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
 ) {
     val homeViewModel: HomeViewModel = hiltViewModel()
-    val perfil = homeViewModel.profile.collectAsState().value
     val medications by homeViewModel.medications.collectAsStateWithLifecycle()
 
     Column(
