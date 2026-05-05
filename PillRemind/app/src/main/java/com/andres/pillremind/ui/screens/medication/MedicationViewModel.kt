@@ -30,12 +30,16 @@ class MedicationViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     sessionManager: SessionManager
 ) : ViewModel() {
+    //Recupera el profileId del sessionManager
     val profileId = sessionManager.activeProfileId
     private val _snackbarMessage = MutableStateFlow<String?>(null)
     val snackbarMessage = _snackbarMessage.asStateFlow()
 
+    //Recupera el id del medicamento
+    val medicationId = savedStateHandle.get<Int>("medicationId")
 
-    val medication: StateFlow<Medication?> = savedStateHandle.get<Int>("medicationId")?.let { id ->
+    //Si el id no es null recupera la información del medicamento
+    val medication: StateFlow<Medication?> = medicationId?.let { id ->
         medicationRepository.getMedicationById(id)
     }?.stateIn(
         viewModelScope,
@@ -121,6 +125,55 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
+    fun updateMedication(
+        name: String,
+        imageUrl: String? = null,
+        dose: Double,
+        unit: String,
+        startDate: LocalDate,
+        endDate: LocalDate? = null,
+        weekDays: Set<WeekDay>,
+        times: List<LocalTime>
+    ) {
+        val trimmedName = name.trim()
+        val normalizedUnit = unit.trim()
+        viewModelScope.launch {
+            val profileId = profileId.firstOrNull()
+
+            if (profileId != null && medicationId != null) {
+
+                val updatedMedication = Medication(
+                    id = medicationId,
+                    name = trimmedName,
+                    profileId = profileId,
+                    imageUrl = imageUrl,
+                    dose = dose,
+                    unit = normalizedUnit,
+                    startDate = startDate,
+                    endDate = endDate
+                )
+
+                medicationRepository.updateMedication(updatedMedication)
+
+                scheduleRepository.deleteByMedicationId(medicationId.toInt())
+
+                for (day in weekDays) {
+                    for (time in times) {
+                        scheduleRepository.insertSchedule(
+                            Schedule(
+                                medicationId = medicationId.toInt(),
+                                weekDay = day,
+                                time = time
+                            )
+                        )
+                    }
+                }
+
+            } else {
+                showMessage("No hay perfil activo")
+            }
+        }
+    }
 
     private fun showMessage(message: String) {
         _snackbarMessage.value = message

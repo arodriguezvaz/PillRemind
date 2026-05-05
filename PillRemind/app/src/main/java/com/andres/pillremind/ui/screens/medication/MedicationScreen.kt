@@ -1,6 +1,7 @@
 package com.andres.pillremind.ui.screens.medication
 
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -61,15 +62,14 @@ fun MedicationScreen(
     onSaveClicked: () -> Unit = {},
     medicationMode: MedicationMode = MedicationMode.Create,
     onEditClicked: () -> Unit = {},
-    medicationId: Int? = null
-) {
+
+    ) {
     val medicationViewModel: MedicationViewModel = hiltViewModel()
     val medication by medicationViewModel.medication.collectAsState()
 
-    /**
-     * Variables con estado mutable para los campos de texto
-     */
-    val nombre = remember { mutableStateOf("") }
+
+    //Variables con estado mutable para los campos del formulario
+    val name = remember { mutableStateOf("") }
     val urlImagen = remember { mutableStateOf("") }
 
     val dosis = remember { mutableStateOf("") }
@@ -82,9 +82,30 @@ fun MedicationScreen(
 
     val times = remember { mutableStateListOf<LocalTime>() }
 
+    //Si medication no es null actualiza las variables con los valores de medication
+    LaunchedEffect(medication) {
+        medication?.let {
+            name.value = it.name
+            urlImagen.value = it.imageUrl ?: ""
+            dosis.value = it.dose.toString()
+            unidad.value = it.unit
+            startDate.value = it.startDate
+            endDate.value = it.endDate
+        }
+    }
+
+
+    //Varibale que especifica el modo en el que está la screen
+    var currentMode by remember { mutableStateOf(medicationMode) }
+
+    //Si está en la vista deeditar y se pulsa el botón de back se vuelve a la vista de ver
+    BackHandler(enabled = currentMode == MedicationMode.Edit) {
+        currentMode = MedicationMode.View
+    }
+    //TODO
     val snackbarMessage by medicationViewModel.snackbarMessage.collectAsState()
     val scrollState = rememberScrollState()
-    when (medicationMode) {
+    when (currentMode) {
         //---------CREATE---------
         MedicationMode.Create -> {
             Column(
@@ -97,8 +118,8 @@ fun MedicationScreen(
             ) {
                 FormField(label = stringResource(R.string.nombre)) {
                     AppTextField(
-                        value = nombre.value,
-                        onValueChange = { nombre.value = it },
+                        value = name.value,
+                        onValueChange = { name.value = it },
                         placeholder = "Nombre del medicamento",
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
@@ -163,7 +184,7 @@ fun MedicationScreen(
                     text = stringResource(R.string.guardar),
                     onClick = {
                         medicationViewModel.addMedication(
-                            nombre = nombre.value,
+                            nombre = name.value,
                             imageUrl = urlImagen.value.ifEmpty { null },
                             dose = dosis.value.toDoubleOrNull() ?: 0.0,
                             unit = unidad.value,
@@ -176,7 +197,7 @@ fun MedicationScreen(
                         onSaveClicked()
                     },
                     size = ButtonSize.Large,
-                    enabled = nombre.value.isNotBlank()
+                    enabled = name.value.isNotBlank()
                 )
             }
             LaunchedEffect(snackbarMessage) {
@@ -188,14 +209,122 @@ fun MedicationScreen(
         //----------EDIT-----------
         MedicationMode.Edit -> {
 
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                //TODO
+
+            val currentMedication = medication
+
+            val medicationWeekDays by medicationViewModel.weekDays.collectAsState()
+            val medicationTimes by medicationViewModel.times.collectAsState()
+            if (currentMedication == null) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+
+
+                Column(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    FormField(label = stringResource(R.string.nombre)) {
+                        AppTextField(
+                            value = name.value,
+                            onValueChange = { name.value = it },
+                            modifier = Modifier.padding(bottom = 16.dp),
+                        )
+                    }
+                    FormField(label = stringResource(R.string.url_imagen)) {
+                        AppTextField(
+                            value = currentMedication.imageUrl.toString(),
+                            onValueChange = { urlImagen.value = it },
+                            placeholder = "hhtps",
+                            modifier = Modifier.padding(bottom = 16.dp),
+                        )
+                    }
+
+                    FormField(label = stringResource(R.string.dosis)) {
+                        AppTextField(
+                            value = currentMedication.dose.toString(),
+                            onValueChange = { dosis.value = it },
+                            placeholder = "Escribe algo...",
+                            modifier = Modifier.padding(bottom = 16.dp),
+                        )
+                    }
+                    FormField(label = stringResource(R.string.unidad)) {
+                        AppTextField(
+                            value = currentMedication.toString(),
+                            onValueChange = { unidad.value = it },
+                            placeholder = "Escribe algo...",
+                            modifier = Modifier.padding(bottom = 16.dp),
+                        )
+                    }
+                    FormField(label = stringResource(R.string.fecha_inicio)) {
+                        AppDatePickerField(
+                            value = currentMedication.startDate,
+                            onDateSelected = { startDate.value = it },
+                            modifier = Modifier.padding(bottom = 16.dp),
+                        )
+                    }
+                    FormField(label = stringResource(R.string.fecha_fin)) {
+                        AppDatePickerField(
+                            value = currentMedication.endDate,
+                            onDateSelected = { endDate.value = it },
+                            modifier = Modifier.padding(bottom = 16.dp),
+                        )
+                    }
+                    //TODO
+                    FormField(stringResource(R.string.periocidad)) {
+                        WeekDayChipGroup(
+                            selectedDays = medicationWeekDays,
+                            onSelectionChange = { weekDays.value = it },
+                        )
+                    }
+                    FormField(stringResource(R.string.horario)) {
+                        TimeListEditor(
+                            times = medicationTimes,
+                            onAddClick = {
+                                times.add(LocalTime.now())
+                            },
+                            onRemoveTime = { time ->
+                                times.remove(time)
+                            }
+                        )
+                    }
+                    Row(modifier.fillMaxWidth()) {
+                        AppButton(
+                            onClick = {},
+                            text = stringResource(R.string.eliminar),
+                            size = ButtonSize.Medium,
+                            variant = ButtonVariant.Danger,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        //GUARDAR -- ACTUALIZAR
+                        AppButton(
+                            text = stringResource(R.string.guardar),
+                            onClick = {
+                                medicationViewModel.updateMedication(
+                                    name = name.value,
+                                    imageUrl = urlImagen.value.ifEmpty { null },
+                                    dose = dosis.value.toDoubleOrNull() ?: 0.0,
+                                    unit = unidad.value,
+                                    startDate = startDate.value!!,
+                                    endDate = endDate.value,
+                                    weekDays = weekDays.value,
+                                    times = times
+                                )
+
+                                currentMode = MedicationMode.View
+                            },
+                            size = ButtonSize.Medium,
+                            modifier = Modifier.weight(1f),
+                            enabled = name.value.isNotBlank()
+                        )
+                    }
+                }
             }
         }
         //-------------SEE---------------
@@ -205,9 +334,8 @@ fun MedicationScreen(
 
             val medicationWeekDays by medicationViewModel.weekDays.collectAsState()
             val medicationTimes by medicationViewModel.times.collectAsState()
-
+            // Muestra loading mientras llega el dato
             if (currentMedication == null) {
-                // Muestra loading mientras llega el dato
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -223,7 +351,7 @@ fun MedicationScreen(
                     FormField(label = stringResource(R.string.nombre)) {
                         AppTextField(
                             value = currentMedication.name,
-                            onValueChange = { nombre.value = it },
+                            onValueChange = { name.value = it },
                             modifier = Modifier.padding(bottom = 16.dp),
                             enabled = false
                         )
@@ -301,8 +429,9 @@ fun MedicationScreen(
                             modifier = Modifier.weight(1f)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
+                        //EDITAR
                         AppButton(
-                            onClick = {},
+                            onClick = { currentMode = MedicationMode.Edit },
                             text = stringResource(R.string.editar),
                             size = ButtonSize.Medium,
                             variant = ButtonVariant.Primary,

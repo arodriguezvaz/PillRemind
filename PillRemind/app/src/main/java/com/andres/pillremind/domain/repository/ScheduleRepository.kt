@@ -24,6 +24,11 @@ interface ScheduleRepository {
     suspend fun deleteSchedule(schedule: Schedule)
 
     /**
+     * Elimina todos los horarios asociados a una medicación
+     */
+    suspend fun deleteByMedicationId(medicationId: Int)
+
+    /**
      * Obtiene todos los horarios de una medicación
      */
     fun getSchedules(medicationId: Int): Flow<List<Schedule>>

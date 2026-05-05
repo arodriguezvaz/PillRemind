@@ -34,6 +34,12 @@ interface ScheduleDao {
     suspend fun deleteSchedule(scheduleEntity: ScheduleEntity)
 
     /**
+     * Elimina todos los schedules de un medication de la base de datos
+     */
+    @Query("DELETE FROM schedule WHERE medicationId = :medicationId")
+    suspend fun deleteByMedicationId(medicationId: Int)
+
+    /**
      * Obtiene todos los schedules de un medication de la base de datos
      */
     @Query("SELECT * FROM schedule WHERE medicationId = :medicationId")

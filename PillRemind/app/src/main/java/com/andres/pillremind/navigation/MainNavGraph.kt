@@ -65,7 +65,6 @@ fun NavGraphBuilder.medicationNavGraph(
             val medicationId = backStackEntry.arguments?.getInt("medicationId")
 
             MedicationScreen(
-                medicationId = medicationId,
                 medicationMode = MedicationMode.View,
                 onEditClicked = {
                     navController.navigate(

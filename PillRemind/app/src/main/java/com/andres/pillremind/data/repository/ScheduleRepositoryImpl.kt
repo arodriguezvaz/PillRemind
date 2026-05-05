@@ -26,6 +26,11 @@ class ScheduleRepositoryImpl @Inject constructor(
         scheduleDao.deleteSchedule(schedule.toEntity())
     }
 
+    override suspend fun deleteByMedicationId(medicationId: Int) {
+        scheduleDao.deleteByMedicationId(medicationId)
+    }
+
+
     override fun getSchedules(medicationId: Int): Flow<List<Schedule>> {
         return scheduleDao.getSchedules(medicationId).map { list -> list.map { it.toDomain() } }
     }
