@@ -23,3 +23,23 @@ Para la instalación del entorno de desarrollo solo es necesario tener Android S
 
 - [Vídeo do prototipo](https://drive.google.com/file/d/142_gD4ye7jSW4_KM_gCqqgqEX95Fz5Hn/view?usp=sharing)
 - [Ubicación da Apk](doc/apks)
+
+### Prototipo 2
+- Fecha de entrega: 6/5/26
+- Funcionalidades implementadas:
+    - Creación de medicamentos
+    - Ver medicamentos
+    - Editar medicamentos
+    - Vistas de home y medicamentos con listas de medicamentos (al iniciar la app desde 0 parece que home no muestra los medicamentos)
+    - Implementación de Hilt para facilitar la inyección de dependencias
+    - Recuperar el perfil a partir del id almacenado en DataStore ahora con Hilt
+    - Mejoras en la UI generales (fuente, colores, formularios, fab de añadir medicamento)
+- Observaciones: la implementación de Hilt facilitó mucho la creación de nuevas entidades de la base de datos. Como son todas tecnologías nuevas me está llevando más tiempo del que esperaba implementarlas.
+- Innovación:
+    - Implementación de Bind
+    - AlarmManager y solicitud de permisos
+    - Creación y edición de medicamentos con sus correspondientes horarios
+
+- [Vídeo do prototipo](https://drive.google.com/file/d/1_-ZXcwopkIS8GfKErutMvkEQoCRwyhbK/view?usp=sharing)
+- [Ubicación da Apk](doc/apks)
+
