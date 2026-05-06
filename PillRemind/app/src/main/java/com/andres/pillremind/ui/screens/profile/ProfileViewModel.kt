@@ -45,6 +45,13 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun deleteProfile(profile: Profile) {
+        viewModelScope.launch {
+            profileRepository.deletePerfil(profile)
+            sessionManager.clearActiveProfile()
+        }
+    }
+
     val profileId = sessionManager.activeProfileId
     fun updateProfile(profile: Profile) {
         viewModelScope.launch {
@@ -52,11 +59,6 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun deleteProfile(profile: Profile) {
-        viewModelScope.launch {
-            profileRepository.deletePerfil(profile)
-        }
-    }
 
     /**
      * Obtiene el perfil actual en el ViewModel que se muestra en la pantalla

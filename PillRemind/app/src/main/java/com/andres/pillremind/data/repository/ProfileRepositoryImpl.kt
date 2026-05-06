@@ -26,8 +26,8 @@ class ProfileRepositoryImpl @Inject constructor(private val perfilDao: ProfileDa
         return perfilDao.updateProfile(profile.toEntity())
     }
 
-    override fun getPerfilById(id: Int?): Flow<Profile> {
-        return perfilDao.getProfileById(id).map { it.toDomain() }
+    override fun getPerfilById(id: Int?): Flow<Profile?> {
+        return perfilDao.getProfileById(id).map { it?.toDomain() }
     }
 
     override fun getPerfiles(): Flow<List<Profile>> {

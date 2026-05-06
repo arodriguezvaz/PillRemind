@@ -1,5 +1,6 @@
 package com.andres.pillremind.navigation
 
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -13,7 +14,6 @@ import com.andres.pillremind.ui.session.SessionViewModel
 
 fun NavGraphBuilder.profileSelectionGraph(
     navController: NavHostController,
-    sessionViewModel: SessionViewModel
 ) {
     navigation(
         route = Graph.PROFILE_SELECTION,
@@ -21,6 +21,7 @@ fun NavGraphBuilder.profileSelectionGraph(
     ) {
 
         composable(ProfilesScreen.ProfileSelectionScreen.route) {
+            val sessionViewModel: SessionViewModel = hiltViewModel()
             ProfilesScreen(
                 onAddClicked = {
                     navController.navigate(ProfilesScreen.ProfileCreateScreen.route)

@@ -48,6 +48,7 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     onSaveClicked: () -> Unit = {},
     profileMode: ProfileMode = ProfileMode.Create,
+    onDeletedClicked: () -> Unit = {}
 ) {
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val nombre = remember { mutableStateOf("") }
@@ -145,14 +146,21 @@ fun ProfileScreen(
             ) {
                 Text("Hola ${perfil?.name}")
                 Row(modifier.fillMaxWidth()) {
+                    //ELIMINAR
                     AppButton(
-                        onClick = {},
+                        onClick = {
+                            perfil?.let {
+                                profileViewModel.deleteProfile(it)
+                                onDeletedClicked()
+                            }
+                        },
                         text = stringResource(R.string.eliminar),
                         size = ButtonSize.Medium,
                         variant = ButtonVariant.Danger,
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
+                    //EDITAR
                     AppButton(
                         onClick = {},
                         text = stringResource(R.string.editar),

@@ -61,7 +61,7 @@ fun MedicationScreen(
     modifier: Modifier = Modifier,
     onSaveClicked: () -> Unit = {},
     medicationMode: MedicationMode = MedicationMode.Create,
-    onEditClicked: () -> Unit = {},
+    onDeleteClicked: () -> Unit = {},
 
     ) {
     val medicationViewModel: MedicationViewModel = hiltViewModel()
@@ -84,7 +84,7 @@ fun MedicationScreen(
     val times = remember { mutableStateListOf<LocalTime>() }
 
     //Si medication no es null actualiza las variables con los valores de medication
-    LaunchedEffect(medication, weekDays, times) {
+    LaunchedEffect(medication) {
         medication?.let {
             name.value = it.name
             urlImagen.value = it.imageUrl ?: ""
@@ -92,9 +92,18 @@ fun MedicationScreen(
             unit.value = it.unit
             startDate.value = it.startDate
             endDate.value = it.endDate
+        }
+    }
+    LaunchedEffect(medicationWeekDays) {
+        if (weekDays.value.isEmpty()) {
             weekDays.value = medicationWeekDays
-            times.clear()
+        }
+    }
+
+    LaunchedEffect(medicationTimes) {
+        if (times.isEmpty()) {
             times.addAll(medicationTimes)
+
         }
     }
 
@@ -297,8 +306,12 @@ fun MedicationScreen(
                         )
                     }
                     Row(modifier.fillMaxWidth()) {
+                        //ELIMINAR
                         AppButton(
-                            onClick = {},
+                            onClick = {
+                                medicationViewModel.deleteMedication(currentMedication)
+                                onDeleteClicked()
+                            },
                             text = stringResource(R.string.eliminar),
                             size = ButtonSize.Medium,
                             variant = ButtonVariant.Danger,
@@ -416,8 +429,12 @@ fun MedicationScreen(
                     )
                 }
                 Row(modifier.fillMaxWidth()) {
+                    //ELIMINAR
                     AppButton(
-                        onClick = {},
+                        onClick = {
+                            medicationViewModel.deleteMedication(currentMedication!!)
+                            onDeleteClicked()
+                        },
                         text = stringResource(R.string.eliminar),
                         size = ButtonSize.Medium,
                         variant = ButtonVariant.Danger,

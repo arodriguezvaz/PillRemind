@@ -28,8 +28,8 @@ class MedicationRepositoryImpl @Inject constructor(private val medicationDao: Me
         medicationDao.updateMedication(medication.toEntity())
     }
 
-    override fun getMedicationById(medicationId: Int): Flow<Medication> {
-        return medicationDao.getMedicationById(medicationId).map { it.toDomain() }
+    override fun getMedicationById(medicationId: Int): Flow<Medication?> {
+        return medicationDao.getMedicationById(medicationId).map { it?.toDomain() }
     }
 
     override fun getMedications(profileId: Int): Flow<List<Medication>> {

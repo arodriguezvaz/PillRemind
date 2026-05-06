@@ -44,5 +44,5 @@ interface ProfileDao {
      * Obtiene un profile por su ID
      */
     @Query("SELECT * FROM perfiles WHERE id = :id")
-    fun getProfileById(id: Int?): Flow<ProfileEntity>
+    fun getProfileById(id: Int?): Flow<ProfileEntity?>
 }

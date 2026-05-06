@@ -180,6 +180,16 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
+    fun deleteMedication(medication: Medication) {
+        for (schedule in schedules.value) {
+            alarmScheduler.cancel(schedule.id)
+        }
+        viewModelScope.launch {
+            medicationRepository.deleteMedication(medication)
+        }
+
+    }
+
     private fun showMessage(message: String) {
         _snackbarMessage.value = message
     }

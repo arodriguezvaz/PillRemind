@@ -36,18 +36,18 @@ interface ScheduleDao {
     /**
      * Elimina todos los schedules de un medication de la base de datos
      */
-    @Query("DELETE FROM schedule WHERE medicationId = :medicationId")
+    @Query("DELETE FROM schedules WHERE medicationId = :medicationId")
     suspend fun deleteByMedicationId(medicationId: Int)
 
     /**
      * Obtiene todos los schedules de un medication de la base de datos
      */
-    @Query("SELECT * FROM schedule WHERE medicationId = :medicationId")
+    @Query("SELECT * FROM schedules WHERE medicationId = :medicationId")
     fun getSchedules(medicationId: Int): Flow<List<ScheduleEntity>>
 
     /**
      * Obtiene un schedule a a partir de su id
      */
-    @Query("SELECT * FROM schedule WHERE id = :scheduleId")
+    @Query("SELECT * FROM schedules WHERE id = :scheduleId")
     suspend fun getScheduleById(scheduleId: Int): ScheduleEntity
 }

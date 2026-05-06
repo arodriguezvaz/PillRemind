@@ -18,11 +18,12 @@ import com.andres.pillremind.ui.screens.profile.ProfileScreen
 
 @Composable
 fun MainNavigationGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    rootNavController: NavHostController
 ) {
     NavHost(
         navController = navController,
-        route = Graph.ROOT,
+        route = Graph.MAIN,
         startDestination = BottomBarScreens.Home.route
     ) {
         composable(BottomBarScreens.Home.route) {
@@ -40,7 +41,14 @@ fun MainNavigationGraph(
 
         composable(BottomBarScreens.Profile.route) {
             ProfileScreen(
-                profileMode = ProfileMode.View
+                profileMode = ProfileMode.View,
+                onDeletedClicked = {
+                    rootNavController.navigate(ProfilesScreen.ProfileSelectionScreen.route) {
+                        popUpTo(Graph.ROOT) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
 
@@ -62,14 +70,11 @@ fun NavGraphBuilder.medicationNavGraph(
             })
         ) { backStackEntry ->
 
-            val medicationId = backStackEntry.arguments?.getInt("medicationId")
-
+            backStackEntry.arguments?.getInt("medicationId")
             MedicationScreen(
                 medicationMode = MedicationMode.View,
-                onEditClicked = {
-                    navController.navigate(
-                        MedicationScreens.MedicationEditScreen.createRoute(medicationId!!)
-                    )
+                onDeleteClicked = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -87,9 +92,6 @@ sealed class MedicationScreens(val route: String) {
         fun createRoute(medicationId: Int) = "medication/see/$medicationId"
     }
 
-    object MedicationEditScreen : MedicationScreens("medication/edit/{medicationId}") {
-        fun createRoute(medicationId: Int) = "medication/edit/$medicationId"
-    }
 
     object MedicationCreateScreen : MedicationScreens("medication/create")
 }

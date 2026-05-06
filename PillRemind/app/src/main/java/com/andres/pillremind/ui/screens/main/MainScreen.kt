@@ -30,7 +30,8 @@ import com.andres.pillremind.ui.session.SessionViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    rootNavController: NavHostController
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -51,6 +52,7 @@ fun MainScreen(
     ) {
         MainNavigationGraph(
             navController = navController,
+            rootNavController = rootNavController
         )
 
     }

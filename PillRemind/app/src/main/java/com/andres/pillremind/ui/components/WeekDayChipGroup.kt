@@ -1,11 +1,14 @@
 package com.andres.pillremind.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.FilterChip
 import androidx.compose.runtime.Composable
 import com.andres.pillremind.domain.model.WeekDay
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +35,8 @@ fun WeekDayChipGroup(
             val isSelected = selectedDays.contains(day)
 
             FilterChip(
-                modifier = Modifier.padding(end = 8.dp),
+                modifier = Modifier
+                    .padding(end = 8.dp),
                 selected = isSelected,
                 onClick = {
                     val newSelection = selectedDays.toMutableSet()
@@ -45,10 +49,16 @@ fun WeekDayChipGroup(
 
                     onSelectionChange(newSelection)
                 },
-                enabled = enabled,
                 label = {
                     Text(text = stringResource(id = day.shortName))
-                }
+                },
+                enabled = enabled,
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledSelectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
             )
         }
     }

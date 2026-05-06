@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -23,6 +24,7 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
  *
  * @property context Contexto necesario para acceder a DataStore.
  */
+@Singleton
 class SessionManager @Inject constructor(@ApplicationContext private val context: Context) {
 
     /**

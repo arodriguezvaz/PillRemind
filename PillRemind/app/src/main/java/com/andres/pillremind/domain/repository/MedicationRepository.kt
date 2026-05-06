@@ -26,7 +26,7 @@ interface MedicationRepository {
     /**
      * Obtiene un medicamento de la base de datos
      */
-    fun getMedicationById(medicationId: Int): Flow<Medication>
+    fun getMedicationById(medicationId: Int): Flow<Medication?>
 
     /**
      * Obtiene todos los medicamentos de un perfil de la base de datos

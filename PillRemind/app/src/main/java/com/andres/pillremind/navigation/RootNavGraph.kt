@@ -22,21 +22,16 @@ import com.andres.pillremind.ui.session.SessionViewModelFactory
  */
 @Composable
 fun RootNavigationGraph(navController: NavHostController) {
-    val context = LocalContext.current
-    //Instancia del SessionManager donde se almacen el id del profile selecionado
-    val sessionManager = remember { SessionManager(context) }
-    val sessionViewModel = viewModel<SessionViewModel>(
-        factory = SessionViewModelFactory(sessionManager)
-    )
     NavHost(
         navController = navController,
         route = Graph.ROOT,
         startDestination = Graph.PROFILE_SELECTION
+
     ) {
 
-        profileSelectionGraph(navController, sessionViewModel)
+        profileSelectionGraph(navController)
         composable(route = Graph.MAIN) {
-            MainScreen()
+            MainScreen(rootNavController = navController)
         }
 
     }

@@ -30,5 +30,5 @@ interface ProfileRepository {
     /**
      * Obtiene un perfil de la base de datos
      */
-    fun getPerfilById(id: Int?): Flow<Profile>
+    fun getPerfilById(id: Int?): Flow<Profile?>
 }

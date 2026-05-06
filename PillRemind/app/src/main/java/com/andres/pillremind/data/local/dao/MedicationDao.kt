@@ -38,7 +38,7 @@ interface MedicationDao {
      * Obtiene un medication por su ID
      */
     @Query("SELECT * FROM medications WHERE id = :id")
-    fun getMedicationById(id: Int?): Flow<MedicationEntity>
+    fun getMedicationById(id: Int?): Flow<MedicationEntity?>
 
     /**
      * Obtiene todos los medication de la base de datos
