@@ -11,6 +11,9 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
+//Módulo de Hilt encargado de enlazar las interfaces de los repositorios con sus implementaciones.
+// Esto permite desacoplar la capa de dominio de la capa de datos, aplicando principios de arquitectura limpia
+// y facilitando la escalabilidad y las pruebas de la aplicación.
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {

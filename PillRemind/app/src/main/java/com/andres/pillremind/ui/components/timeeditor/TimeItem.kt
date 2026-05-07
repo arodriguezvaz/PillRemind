@@ -17,6 +17,13 @@ import androidx.compose.ui.unit.dp
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
+/**
+ * Item que muestra una hora y una acción de eliminación opcional.
+ *
+ * @param time Hora mostrada (se trunca a minutos para visualización).
+ * @param enabled Si es true se muestra el icono de eliminar.
+ * @param onRemove Callback ejecutado cuando se solicita eliminar este tiempo.
+ */
 @Composable
 fun TimeItem(
     time: LocalTime,

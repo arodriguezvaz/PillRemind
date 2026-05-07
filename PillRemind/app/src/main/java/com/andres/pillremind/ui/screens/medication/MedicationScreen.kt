@@ -42,7 +42,10 @@ import java.time.LocalTime
 
 
 /**
- * Clase sellada que representa el modo de medication
+ * Modos en los que puede estar la pantalla de medicamento.
+ * - `Create`: crear nueva medicación.
+ * - `View`: ver detalles.
+ * - `Edit`: editar existente.
  */
 sealed class MedicationMode {
     object Create : MedicationMode()
@@ -51,10 +54,12 @@ sealed class MedicationMode {
 }
 
 /**
- * Vista de creación de medicamentos
- * @param viewModel ViewModel para la creación de perfiles
- * @param navController Controlador de navegación
- * @param modifier Modificador para personalizar la vista
+ * Pantalla para crear, ver o editar una medicación.
+ *
+ * @param modifier Modificador opcional para la pantalla.
+ * @param onSaveClicked Callback llamado tras guardar la medicación.
+ * @param medicationMode Modo inicial de la pantalla (por defecto `Create`).
+ * @param onDeleteClicked Callback llamado tras eliminar la medicación.
  */
 @Composable
 fun MedicationScreen(

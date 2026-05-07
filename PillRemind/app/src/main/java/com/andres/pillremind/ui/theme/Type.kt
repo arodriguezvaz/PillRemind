@@ -6,6 +6,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+/**
+ * Tipografía base de la aplicación.
+ *
+ * Define los estilos de texto que se reutilizan en la UI con la familia Lexend.
+ */
 val Typography = Typography(
     headlineMedium = TextStyle(
         fontFamily = Lexend,

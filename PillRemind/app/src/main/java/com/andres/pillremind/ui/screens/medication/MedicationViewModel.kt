@@ -25,6 +25,18 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 
+/**
+ * ViewModel para la pantalla de medicación.
+ *
+ * Maneja la creación, actualización y eliminación de `Medication` y sus `Schedule`s,
+ * además de programar/cancelar alarmas mediante [AlarmScheduler].
+ *
+ * @param savedStateHandle Handle para recuperar parámetros de navegación (por ejemplo `medicationId`).
+ * @param medicationRepository Repositorio para operaciones CRUD sobre medicaciones.
+ * @param scheduleRepository Repositorio para los horarios asociados a medicamentos.
+ * @param alarmScheduler Programador de alarmas para notificaciones.
+ * @param sessionManager Gestor de sesión que expone el perfil activo.
+ */
 @HiltViewModel
 class MedicationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -67,6 +79,12 @@ class MedicationViewModel @Inject constructor(
         .map { list -> list.map { it.time }.distinct() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    /**
+     * Crea un nuevo medicamento con sus horarios y programa las alarmas.
+     *
+     * Valida campos básicos y, si existe un perfil activo, inserta la medicación,
+     * crea los schedules y programa las alarmas correspondientes.
+     */
     fun addMedication(
         nombre: String,
         imageUrl: String? = null,
@@ -130,6 +148,9 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Actualiza un medicamento existente y reemplaza sus horarios.
+     */
     fun updateMedication(
         name: String,
         imageUrl: String? = null,
@@ -160,13 +181,13 @@ class MedicationViewModel @Inject constructor(
 
                 medicationRepository.updateMedication(updatedMedication)
 
-                scheduleRepository.deleteByMedicationId(medicationId.toInt())
+                scheduleRepository.deleteByMedicationId(medicationId)
 
                 for (day in weekDays) {
                     for (time in times) {
                         scheduleRepository.insertSchedule(
                             Schedule(
-                                medicationId = medicationId.toInt(),
+                                medicationId = medicationId,
                                 weekDay = day,
                                 time = time
                             )
@@ -180,6 +201,9 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Elimina el medicamento y cancela las alarmas asociadas.
+     */
     fun deleteMedication(medication: Medication) {
         for (schedule in schedules.value) {
             alarmScheduler.cancel(schedule.id)
@@ -194,8 +218,10 @@ class MedicationViewModel @Inject constructor(
         _snackbarMessage.value = message
     }
 
+    /**
+     * Limpia el mensaje actual del snackbar.
+     */
     fun clearMessage() {
         _snackbarMessage.value = null
     }
 }
-

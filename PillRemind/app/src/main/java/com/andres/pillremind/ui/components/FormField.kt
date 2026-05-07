@@ -12,9 +12,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 /**
- * Composable que representa un campo de formulario.
+ * Composable que representa un campo de formulario con una etiqueta y contenido
+ * (por ejemplo un TextField).
+ *
  * @param label Etiqueta del campo de formulario.
- * @param content Contenido del campo de formulario.
+ * @param content Composable que representa el contenido del campo (p. ej. TextField).
  */
 @Composable
 fun FormField(

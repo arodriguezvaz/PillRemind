@@ -13,6 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * Card genérica para mostrar un estado vacío o mensaje centrado.
+ *
+ * Se usa en pantallas donde no hay contenido y se desea mostrar un mensaje
+ * informativo al usuario.
+ *
+ * @param text Texto a mostrar centrado en la card.
+ * @param modifier Modificador opcional para personalizar la vista.
+ */
 @Composable
 fun BlankCard(
     text: String,

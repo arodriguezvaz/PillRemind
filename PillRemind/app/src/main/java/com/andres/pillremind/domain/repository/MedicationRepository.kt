@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * Interfaz que define los métodos para interactuar con la base de datos de perfiles
+ * Interfaz que define las operaciones de acceso a datos relacionadas con medicamentos
  */
 interface MedicationRepository {
     /**
@@ -14,7 +14,7 @@ interface MedicationRepository {
     suspend fun insertMedication(medication: Medication): Long
 
     /**
-     * Actualiza un medicamento en la base de datos
+     * Elimina un medicamento de la base de datos.
      */
     suspend fun deleteMedication(medication: Medication)
 

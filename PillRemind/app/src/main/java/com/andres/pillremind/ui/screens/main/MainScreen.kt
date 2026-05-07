@@ -20,13 +20,19 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.andres.pillremind.data.repository.MedicationRepositoryImpl
-import com.andres.pillremind.data.repository.ProfileRepositoryImpl
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
 import com.andres.pillremind.navigation.BottomBarScreens
-import com.andres.pillremind.ui.session.SessionViewModel
 
+/**
+ * Pantalla principal de la aplicación.
+ *
+ * Contiene la navegación inferior, el `Scaffold` general y el botón flotante
+ * para crear una nueva medicación cuando la ruta lo permite.
+ *
+ * @param navController Controlador de navegación interno de la barra inferior.
+ * @param rootNavController Controlador de navegación raíz usado por el grafo principal.
+ */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(
@@ -58,6 +64,11 @@ fun MainScreen(
     }
 }
 
+/**
+ * Barra de navegación inferior reutilizable para `MainScreen`.
+ *
+ * @param navController Controlador de navegación que se usa al pulsar cada item.
+ */
 @Composable
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
@@ -82,7 +93,13 @@ fun BottomBar(navController: NavHostController) {
     }
 }
 
-
+/**
+ * Item individual de la barra inferior.
+ *
+ * @param screen Elemento de navegación a representar.
+ * @param currentDestination Destino actual para marcar selección.
+ * @param navController Controlador de navegación.
+ */
 @Composable
 fun RowScope.AddItem(
     screen: BottomBarScreens,

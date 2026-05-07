@@ -1,14 +1,12 @@
 package com.andres.pillremind.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -17,9 +15,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel para la creación de perfiles
- * @param profileRepository Repositorio de perfiles
- * @param profileId Id del perfil a editar
+ * ViewModel para la gestión de perfiles.
+ *
+ * Permite crear, actualizar, eliminar y observar el perfil activo usando
+ * [ProfileRepository] y [SessionManager].
+ *
+ * @property profileRepository Repositorio de perfiles.
+ * @property sessionManager Gestor de sesión con el perfil activo.
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -27,15 +29,16 @@ class ProfileViewModel @Inject constructor(
     private val sessionManager: SessionManager
 ) : ViewModel() {
     /**
-     * Agrega un nuevo perfil usando la función del repositorio
-     * @param nombre Nombre del perfil
-     * @param urlImagen URL de la imagen del perfil
+     * Agrega un nuevo perfil usando el repositorio.
+     *
+     * @param nombre Nombre del perfil.
+     * @param urlImagen URL opcional de la imagen del perfil.
      */
     fun addProfile(nombre: String, urlImagen: String? = null) {
         val trimmedNombre = nombre.trim()
         if (trimmedNombre.isNotEmpty()) {
             viewModelScope.launch {
-                profileRepository.insertPerfil(
+                profileRepository.insertProfile(
                     Profile(
                         name = trimmedNombre,
                         urlImagen = urlImagen
@@ -45,29 +48,40 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Elimina un perfil y limpia la sesión activa si corresponde.
+     *
+     * @param profile Perfil que se desea eliminar.
+     */
     fun deleteProfile(profile: Profile) {
         viewModelScope.launch {
-            profileRepository.deletePerfil(profile)
+            profileRepository.deleteProfile(profile)
             sessionManager.clearActiveProfile()
         }
     }
 
     val profileId = sessionManager.activeProfileId
+
+    /**
+     * Actualiza un perfil existente.
+     *
+     * @param profile Perfil con los valores actualizados.
+     */
     fun updateProfile(profile: Profile) {
         viewModelScope.launch {
-            profileRepository.updatePerfil(profile)
+            profileRepository.updateProfile(profile)
         }
     }
 
 
     /**
-     * Obtiene el perfil actual en el ViewModel que se muestra en la pantalla
+     * Flujo con el perfil activo observado desde la sesión.
      */
     val profile: StateFlow<Profile?> =
         sessionManager.activeProfileId
             .filterNotNull()
             .flatMapLatest { id ->
-                profileRepository.getPerfilById(id)
+                profileRepository.getProfileById(id)
             }
             .stateIn(
                 scope = viewModelScope,

@@ -1,4 +1,4 @@
-package com.andres.pillremind.data.repository;
+package com.andres.pillremind.data.repository
 
 import com.andres.pillremind.data.local.dao.ProfileDao;
 import com.andres.pillremind.data.mapper.toDomain
@@ -10,29 +10,31 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
- * Clase que implementa la interfaz ProfileRepository
+ * Implementación del repositorio de perfiles.
+ * Gestiona el acceso a datos relacionados con perfiles.
  */
-class ProfileRepositoryImpl @Inject constructor(private val perfilDao: ProfileDao) :
-    ProfileRepository {
-    override suspend fun insertPerfil(profile: Profile) {
-        return perfilDao.insertProfile(profile.toEntity())
+class ProfileRepositoryImpl @Inject constructor(
+    private val profileDao: ProfileDao
+) : ProfileRepository {
+
+    override suspend fun insertProfile(profile: Profile) {
+        profileDao.insertProfile(profile.toEntity())
     }
 
-    override suspend fun deletePerfil(profile: Profile) {
-        return perfilDao.deleteProfile(profile.toEntity())
+    override suspend fun deleteProfile(profile: Profile) {
+        profileDao.deleteProfile(profile.toEntity())
     }
 
-    override suspend fun updatePerfil(profile: Profile) {
-        return perfilDao.updateProfile(profile.toEntity())
+    override suspend fun updateProfile(profile: Profile) {
+        profileDao.updateProfile(profile.toEntity())
     }
 
-    override fun getPerfilById(id: Int?): Flow<Profile?> {
-        return perfilDao.getProfileById(id).map { it?.toDomain() }
+    override fun getProfileById(id: Int): Flow<Profile?> {
+        return profileDao.getProfileById(id).map { it?.toDomain() }
     }
 
-    override fun getPerfiles(): Flow<List<Profile>> {
-        return perfilDao.getProfiles().map { list -> list.map { it.toDomain() } }
+    override fun getProfiles(): Flow<List<Profile>> {
+        return profileDao.getProfiles()
+            .map { list -> list.map { it.toDomain() } }
     }
-
 }
-

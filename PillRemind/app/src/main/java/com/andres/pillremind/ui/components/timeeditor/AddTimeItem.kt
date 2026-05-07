@@ -1,3 +1,5 @@
+package com.andres.pillremind.ui.components.timeeditor
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * Composable que representa una card "Añadir" para añadir una nueva hora.
+ *
+ * Al pulsarla se ejecuta la lambda [onClick] que normalmente abrirá un TimePickerDialog.
+ *
+ * @param onClick Lambda ejecutada al pulsar la card.
+ */
 @Composable
 fun AddTimeItem(
     onClick: () -> Unit

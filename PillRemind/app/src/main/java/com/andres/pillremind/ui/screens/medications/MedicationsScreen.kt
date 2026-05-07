@@ -20,6 +20,12 @@ import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.MedicationCard
 
+/**
+ * Pantalla que muestra la lista de medicamentos del perfil activo.
+ *
+ * @param modifier Modificador opcional para la pantalla.
+ * @param onMedicationClick Callback que recibe el id del medicamento seleccionado.
+ */
 @Composable
 fun MedicationsScreen(
     modifier: Modifier = Modifier,

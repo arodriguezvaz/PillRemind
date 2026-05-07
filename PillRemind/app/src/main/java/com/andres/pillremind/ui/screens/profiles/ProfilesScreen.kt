@@ -31,7 +31,13 @@ import com.andres.pillremind.ui.screens.profile.ProfileViewModel
 
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
-
+/**
+ * Pantalla que muestra la lista de perfiles guardados.
+ *
+ * @param onAddClicked Callback que se ejecuta al pulsar el botón de añadir.
+ * @param onProfileSelected Callback que recibe el perfil seleccionado.
+ * @param modifier Modificador opcional para la pantalla.
+ */
 @Composable
 fun ProfilesScreen(
     onAddClicked: () -> Unit,
@@ -93,4 +99,3 @@ fun ProfilesScreen(
         }
     }
 }
-

@@ -10,25 +10,25 @@ interface ProfileRepository {
     /**
      * Inserta un perfil en la base de datos
      */
-    suspend fun insertPerfil(profile: Profile)
+    suspend fun insertProfile(profile: Profile)
 
     /**
      * Actualiza un perfil en la base de datos
      */
-    suspend fun deletePerfil(profile: Profile)
+    suspend fun deleteProfile(profile: Profile)
 
     /**
      * Actualiza un perfil en la base de datos
      */
-    suspend fun updatePerfil(profile: Profile)
+    suspend fun updateProfile(profile: Profile)
 
     /**
      * Obtiene un perfil de la base de datos
      */
-    fun getPerfiles(): Flow<List<Profile>>
+    fun getProfiles(): Flow<List<Profile>>
 
     /**
      * Obtiene un perfil de la base de datos
      */
-    fun getPerfilById(id: Int?): Flow<Profile?>
+    fun getProfileById(id: Int): Flow<Profile?>
 }

@@ -5,16 +5,38 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/**
+ * Campo de selección de fecha que muestra la fecha formateada y abre un dialogo
+ * con un DatePicker para seleccionar una nueva fecha.
+ *
+ * @param value Fecha actualmente seleccionada (puede ser null).
+ * @param onDateSelected Lambda llamada con la fecha elegida.
+ * @param modifier Modificador opcional para personalizar la vista.
+ * @param placeholder Texto mostrado cuando no hay fecha seleccionada.
+ * @param enabled Indica si el campo está habilitado para interactuar.
+ * @param isError Marca visual de error en el campo.
+ */
 @Composable
 fun AppDatePickerField(
     value: LocalDate?,

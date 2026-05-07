@@ -19,7 +19,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-
+/**
+ * Grupo horizontal de chips para seleccionar días de la semana.
+ *
+ * @param selectedDays Conjunto de días actualmente seleccionados.
+ * @param onSelectionChange Lambda que recibe el nuevo conjunto de días al cambiar la selección.
+ * @param enabled Indica si los chips están habilitados para interacción.
+ */
 @Composable
 fun WeekDayChipGroup(
     selectedDays: Set<WeekDay>,

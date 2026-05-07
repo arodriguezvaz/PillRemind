@@ -14,6 +14,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+/**
+ * Botón reutilizable con variantes y tamaños configurables.
+ *
+ * Este composable normaliza estilos de botones usados en la app y añade
+ * soporte para estados de carga.
+ *
+ * @param text Texto que se mostrará dentro del botón.
+ * @param onClick Lambda ejecutada al pulsar el botón.
+ * @param modifier Modificador para personalizar el layout del botón.
+ * @param variant Variante visual del botón (Primary, Secondary, Ghost, Danger).
+ * @param size Tamaño visual del botón (Small, Medium, Large).
+ * @param enabled Indica si el botón está habilitado.
+ * @param isLoading Si es true se muestra un indicador de progreso en lugar del texto.
+ */
 @Composable
 fun AppButton(
     text: String,
@@ -68,5 +82,12 @@ fun AppButton(
     }
 }
 
+/**
+ * Variantes visuales para [AppButton].
+ */
 enum class ButtonVariant { Primary, Secondary, Ghost, Danger }
+
+/**
+ * Tamaños predefinidos para [AppButton].
+ */
 enum class ButtonSize { Small, Medium, Large }

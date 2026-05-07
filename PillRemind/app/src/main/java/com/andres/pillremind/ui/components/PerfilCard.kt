@@ -20,6 +20,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.andres.pillremind.domain.model.Profile
 
+/**
+ * Card que representa un perfil de usuario con un botón de gestión.
+ *
+ * @param profile Datos del perfil a mostrar.
+ * @param gestionar Lambda ejecutada al pulsar el botón de gestión.
+ * @param modifier Modificador opcional para personalizar el layout.
+ * @param buttonText Texto del botón (por defecto "Gestionar").
+ * @param buttonVariant Variante visual del botón.
+ */
 @Composable
 fun PerfilCard(
     profile: Profile,

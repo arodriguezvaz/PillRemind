@@ -16,6 +16,16 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 
+/**
+ * ViewModel de la pantalla principal (`HomeScreen`).
+ *
+ * Expone el perfil activo y la lista de medicamentos del perfil usando flows
+ * convertidos a `StateFlow` para su observación en la UI.
+ *
+ * @param profileRepository Repositorio para obtener datos de perfil.
+ * @param medicationRepository Repositorio para obtener medicamentos.
+ * @param sessionManager Gestor de sesión que expone el perfil activo.
+ */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
@@ -30,7 +40,7 @@ class HomeViewModel @Inject constructor(
         sessionManager.activeProfileId
             .filterNotNull()
             .flatMapLatest { id ->
-                profileRepository.getPerfilById(id)
+                profileRepository.getProfileById(id)
             }
             .stateIn(
                 scope = viewModelScope,

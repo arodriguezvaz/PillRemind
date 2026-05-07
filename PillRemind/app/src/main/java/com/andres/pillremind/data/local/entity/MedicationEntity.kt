@@ -17,7 +17,7 @@ import java.time.LocalDateTime
  * @property startDate Fecha de inicio del medicamento
  * @property endDate Fecha de fin del medicamento
  * @property imageUrl URL de la imagen del medicamento
- * @property leafletUrl URL del letrero del medicamento
+ * @property leafletUrl URL del prospecto del medicamento
  * @property createdAt Fecha de creación del medicamento
  * @property updatedAt Fecha de última actualización del medicamento
  */

@@ -2,6 +2,13 @@ package com.andres.pillremind.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+/**
+ * Definición de la paleta de colores de la aplicación (light/dark).
+ *
+ * Estos valores son usados por `PillRemindTheme` para construir los
+ * `ColorScheme` de Material3.
+ */
+
 // Brand colors - son los colores pincipales de la aplicaciṕn
 val BrandPurple = Color(0xFF32138D)   // Botones primarios, títulos, iconos activos
 val ActionOrange = Color(0xFFFF6F00)   // Botón "Tomar" pendiente (urgente)

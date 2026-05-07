@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
 /**
- * Clase que implemnta la interfaz  MedicamentoRepository
+ * Implementación del repositorio de medicamentos.
+ * Gestiona el acceso a datos relacionados con medicamentos.
  */
 class MedicationRepositoryImpl @Inject constructor(private val medicationDao: MedicationDao) :
     MedicationRepository {

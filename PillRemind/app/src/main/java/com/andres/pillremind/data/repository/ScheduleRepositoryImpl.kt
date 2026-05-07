@@ -10,6 +10,10 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+/**
+ * Implementación del repositorio de schedules
+ * Gestiona el acceso a datos relacionados con los horarios de los medicamentos
+ */
 class ScheduleRepositoryImpl @Inject constructor(
     private val scheduleDao: ScheduleDao
 ) : ScheduleRepository {

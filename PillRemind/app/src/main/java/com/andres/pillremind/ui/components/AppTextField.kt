@@ -30,8 +30,8 @@ import com.andres.pillremind.ui.theme.PillRemindTheme
  * @param enabled Indica si el campo de texto está habilitado.
  * @param isError Indica si el campo de texto está en un estado de error.
  * @param singleLine Indica si el campo de texto está limitado a una sola línea.
- * @param visualTransformation Transformación visual de la contraseña.
- * @param trailingIcon Icono al final del campo de texto.
+ * @param visualTransformation Transformación visual aplicada al texto (contraseñas).
+ * @param trailingIcon Composable opcional mostrado al final del campo.
  */
 @Composable
 fun AppTextField(
@@ -91,4 +91,3 @@ fun AppTextFieldPreview() {
         }
     }
 }
-

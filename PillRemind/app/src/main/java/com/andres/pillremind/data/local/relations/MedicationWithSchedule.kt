@@ -5,11 +5,15 @@ import androidx.room.Relation
 import com.andres.pillremind.data.local.entity.MedicationEntity
 import com.andres.pillremind.data.local.entity.ScheduleEntity
 
+/**
+ * Relación entre un medicamento y sus horarios programados.
+ * Permite obtener todos los schedules asociados a un medicamento.
+ */
 data class MedicationWithSchedule(
     @Embedded val medication: MedicationEntity,
     @Relation(
         parentColumn = "id",
-        entityColumn = "medicamentoId"
+        entityColumn = "medicationId"
     )
     val schedules: List<ScheduleEntity>
 )

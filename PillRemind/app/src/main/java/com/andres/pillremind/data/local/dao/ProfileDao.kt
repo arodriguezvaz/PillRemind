@@ -37,12 +37,12 @@ interface ProfileDao {
     /**
      * Obtiene todos los perfiles usando Flow, ordenados por fecha de creación descendente
      */
-    @Query("SELECT * FROM perfiles ORDER BY createdAt DESC")
+    @Query("SELECT * FROM profiles ORDER BY createdAt DESC")
     fun getProfiles(): Flow<List<ProfileEntity>>
 
     /**
      * Obtiene un profile por su ID
      */
-    @Query("SELECT * FROM perfiles WHERE id = :id")
+    @Query("SELECT * FROM profiles WHERE id = :id")
     fun getProfileById(id: Int?): Flow<ProfileEntity?>
 }

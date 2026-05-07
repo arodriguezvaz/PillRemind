@@ -12,6 +12,15 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlin.collections.emptyList
 
+/**
+ * ViewModel que expone la lista de medicamentos del perfil activo.
+ *
+ * Observa el perfil actual desde [SessionManager] y carga los medicamentos
+ * correspondientes usando [MedicationRepository].
+ *
+ * @property medicationRepository Repositorio para leer los medicamentos.
+ * @property sessionManager Gestor de sesión que expone el perfil activo.
+ */
 @HiltViewModel
 class MedicationsViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
@@ -20,7 +29,7 @@ class MedicationsViewModel @Inject constructor(
     val profileId = sessionManager.activeProfileId
 
     /**
-     * Obtiene la lista de medicamentos asociados al perfil actual si el id del perfil no es nulo
+     * Obtiene la lista de medicamentos asociados al perfil actual.
      */
     val medications = profileId.flatMapLatest { id ->
         if (id != null) {

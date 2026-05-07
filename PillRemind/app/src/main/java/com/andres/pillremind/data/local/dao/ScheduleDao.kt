@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.andres.pillremind.data.local.entity.ScheduleEntity
-import com.andres.pillremind.domain.model.Schedule
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -22,7 +21,7 @@ interface ScheduleDao {
 
     /**
      * Actualiza un schedule en la base de datos
-     * @param schedule Schedule a actualizar
+     * @param scheduleEntity ScheduleEntity a actualizar
      */
     @Update
     suspend fun updateSchedule(scheduleEntity: ScheduleEntity)

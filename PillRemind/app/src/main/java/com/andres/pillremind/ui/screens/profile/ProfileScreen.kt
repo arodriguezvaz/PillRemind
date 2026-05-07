@@ -28,7 +28,10 @@ import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.FormField
 
 /**
- * Clase sellada que representa el modo de profile
+ * Modos en los que puede estar la pantalla de perfil.
+ * - `Create`: crear un perfil nuevo.
+ * - `View`: ver el perfil actual.
+ * - `Edit`: editar un perfil existente.
  */
 sealed class ProfileMode {
     object Create : ProfileMode()
@@ -37,11 +40,12 @@ sealed class ProfileMode {
 }
 
 /**
- * Vista de creación de perfiles
- * @param profileViewModel ViewModel para la creación de perfiles
- * @param modifier Modificador para personalizar la vista
- * @param onSaveClicked Función a ejecutar al hacer clic en el botón de guardar
- * @param profileMode Modo de perfil (crear, ver o editar)
+ * Pantalla para crear, ver o editar un perfil.
+ *
+ * @param modifier Modificador opcional para la pantalla.
+ * @param onSaveClicked Callback llamado tras guardar el perfil.
+ * @param profileMode Modo inicial de la pantalla.
+ * @param onDeletedClicked Callback llamado tras eliminar el perfil.
  */
 @Composable
 fun ProfileScreen(

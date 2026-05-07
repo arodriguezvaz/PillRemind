@@ -3,9 +3,14 @@ package com.andres.pillremind
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.os.Build
 import dagger.hilt.android.HiltAndroidApp
 
+/**
+ * Clase Application de la app.
+ *
+ * Inicializa Hilt y crea el canal de notificaciones necesario
+ * para los recordatorios de medicación.
+ */
 @HiltAndroidApp
 class PillRemindApp : Application() {
     override fun onCreate() {
@@ -13,6 +18,10 @@ class PillRemindApp : Application() {
         createNotificationChannel()
     }
 
+    /**
+     * Crea el canal de notificaciones para los recordatorios de medicamentos.
+     * Requerido para mostrar notificaciones en Android 8+.
+     */
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             "pill_remind_channel",
