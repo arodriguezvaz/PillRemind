@@ -28,4 +28,5 @@
     <string name="guardar">Guardar</string>
     <string name="sleccionar_hora">Seleccionar hora</string>
     <string name="tomar">Tomar</string>">
+    <string name="tomado">Tomado</string>">
 </resources>

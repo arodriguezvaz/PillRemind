@@ -1,19 +1,19 @@
 package com.andres.pillremind.data.local.database
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.andres.pillremind.data.local.converters.Converters
+import com.andres.pillremind.data.local.dao.IntakeDao
 import com.andres.pillremind.data.local.dao.MedicationDao
 import com.andres.pillremind.data.local.dao.ProfileDao
 import com.andres.pillremind.data.local.dao.ScheduleDao
 import com.andres.pillremind.data.local.dao.UsuarioDao
+import com.andres.pillremind.data.local.entity.IntakeEntity
 import com.andres.pillremind.data.local.entity.MedicationEntity
-import com.andres.pillremind.data.local.entity.UsuarioEntity
 import com.andres.pillremind.data.local.entity.ProfileEntity
 import com.andres.pillremind.data.local.entity.ScheduleEntity
+import com.andres.pillremind.data.local.entity.UsuarioEntity
 
 /**
  * Clase que representa la base de datos de la aplicación
@@ -23,7 +23,8 @@ import com.andres.pillremind.data.local.entity.ScheduleEntity
         UsuarioEntity::class,
         ProfileEntity::class,
         MedicationEntity::class,
-        ScheduleEntity::class
+        ScheduleEntity::class,
+        IntakeEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -41,4 +42,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     //Dao para acceder a los datos de los horarios
     abstract fun scheduleDao(): ScheduleDao
+
+    //Dao para acceder a los datos de las tomas
+    abstract fun intakeDao(): IntakeDao
 }

@@ -1,6 +1,5 @@
 package com.andres.pillremind.domain.model
 
-import java.util.UUID
 import java.time.LocalDateTime
 
 /**
@@ -9,19 +8,17 @@ import java.time.LocalDateTime
  * así como el estado de la toma.
  *
  * @property id Identificador único de la toma
- * @property horarioId Identificador del horario asociado
- * @property fechaHoraProgramada Fecha y hora programada de la toma
- * @property fechaHoraReal Fecha y hora real en la que se realizó la toma (opcional)
- * @property estado Estado de la toma (por ejemplo: pendiente, tomada, omitida)
+ * @property scheduleId Identificador del horario asociado
+ * @property scheduledAt Fecha y hora programada de la toma
+ * @property takenAt Fecha y hora real en la que se realizó la toma (opcional)
  * @property createdAt Fecha de creación del registro
  * @property updatedAt Fecha de última actualización del registro
  */
-data class Toma(
-    val id: UUID = UUID.randomUUID(),
-    val horarioId: UUID,
-    val fechaHoraProgramada: LocalDateTime,
-    val fechaHoraReal: LocalDateTime? = null,
-    val estado: String,
+data class Intake(
+    val id: Int = 0,
+    val scheduleId: Int,
+    val scheduledAt: LocalDateTime,
+    val takenAt: LocalDateTime? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 )

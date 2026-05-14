@@ -30,3 +30,16 @@ fun WeekDay.toDayOfWeek(): DayOfWeek = when (this) {
     WeekDay.SATURDAY -> DayOfWeek.SATURDAY
     WeekDay.SUNDAY -> DayOfWeek.SUNDAY
 }
+
+/**
+ * Convierte el DayOfWeek al equivalente de WeekDay.
+ */
+fun DayOfWeek.toWeekDay(): WeekDay = when (this) {
+    DayOfWeek.MONDAY -> WeekDay.MONDAY
+    DayOfWeek.TUESDAY -> WeekDay.TUESDAY
+    DayOfWeek.WEDNESDAY -> WeekDay.WEDNESDAY
+    DayOfWeek.THURSDAY -> WeekDay.THURSDAY
+    DayOfWeek.FRIDAY -> WeekDay.FRIDAY
+    DayOfWeek.SATURDAY -> WeekDay.SATURDAY
+    DayOfWeek.SUNDAY -> WeekDay.SUNDAY
+}

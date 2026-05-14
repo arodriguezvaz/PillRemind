@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 /**
@@ -176,7 +177,8 @@ class MedicationViewModel @Inject constructor(
                     dose = dose,
                     unit = normalizedUnit,
                     startDate = startDate,
-                    endDate = endDate
+                    endDate = endDate,
+                    updatedAt = LocalDateTime.now(),
                 )
 
                 medicationRepository.updateMedication(updatedMedication)

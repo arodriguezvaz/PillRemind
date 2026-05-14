@@ -1,6 +1,6 @@
 package com.andres.pillremind.data.repository
 
-import com.andres.pillremind.data.local.dao.ProfileDao;
+import com.andres.pillremind.data.local.dao.ProfileDao
 import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Profile
@@ -17,8 +17,8 @@ class ProfileRepositoryImpl @Inject constructor(
     private val profileDao: ProfileDao
 ) : ProfileRepository {
 
-    override suspend fun insertProfile(profile: Profile) {
-        profileDao.insertProfile(profile.toEntity())
+    override suspend fun insertProfile(profile: Profile): Long {
+        return profileDao.insertProfile(profile.toEntity())
     }
 
     override suspend fun deleteProfile(profile: Profile) {
