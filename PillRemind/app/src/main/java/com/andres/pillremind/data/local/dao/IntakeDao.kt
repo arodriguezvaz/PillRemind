@@ -3,6 +3,7 @@ package com.andres.pillremind.data.local.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.andres.pillremind.data.local.entity.IntakeEntity
@@ -21,7 +22,20 @@ interface IntakeDao {
     @Insert
     suspend fun insertIntake(intake: IntakeEntity): Long
 
-    @Insert
+    /**
+     * Inserta una lista de tomas en la base de datos.
+     *
+     * Si ya existe una toma con el mismo `scheduleId` y `scheduledAt`,
+     * la inserción de esa toma se ignora automáticamente debido a la
+     * restricción UNIQUE definida en la entidad.
+     *
+     *
+     * @param intakes Lista de tomas a insertar.
+     *
+     * @return Lista con los IDs generados para las tomas insertadas.
+     * Las tomas ignoradas por conflicto devuelven `-1`.
+     */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIntakes(intakes: List<IntakeEntity>): List<Long>
 
     /**

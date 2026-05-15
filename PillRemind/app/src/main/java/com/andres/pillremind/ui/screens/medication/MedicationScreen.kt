@@ -67,8 +67,8 @@ fun MedicationScreen(
     onSaveClicked: () -> Unit = {},
     medicationMode: MedicationMode = MedicationMode.Create,
     onDeleteClicked: () -> Unit = {},
-
-    ) {
+    onTitleChange: (String) -> Unit = {}
+) {
     val medicationViewModel: MedicationViewModel = hiltViewModel()
     val medication by medicationViewModel.medication.collectAsState()
     val medicationWeekDays by medicationViewModel.weekDays.collectAsState()
@@ -87,6 +87,7 @@ fun MedicationScreen(
     val weekDays = remember { mutableStateOf(setOf<WeekDay>()) }
 
     val times = remember { mutableStateListOf<LocalTime>() }
+
 
     //Si medication no es null actualiza las variables con los valores de medication
     LaunchedEffect(medication) {
@@ -115,7 +116,16 @@ fun MedicationScreen(
 
     //Varibale que especifica el modo en el que está la screen
     var currentMode by remember { mutableStateOf(medicationMode) }
-
+    //Si cambia el modo actualiza el título en la topbar de MainScreen
+    LaunchedEffect(currentMode) {
+        onTitleChange(
+            when (currentMode) {
+                MedicationMode.Create -> "Añadir medicamento"
+                MedicationMode.View -> "Ver medicamento"
+                MedicationMode.Edit -> "Editar medicamento"
+            }
+        )
+    }
     //Si está en la vista de editar y se pulsa el botón de back se vuelve a la vista de ver
     BackHandler(enabled = currentMode == MedicationMode.Edit) {
         currentMode = MedicationMode.View

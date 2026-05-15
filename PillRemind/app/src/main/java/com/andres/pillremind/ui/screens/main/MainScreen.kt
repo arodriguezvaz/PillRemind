@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -12,17 +13,21 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
-import com.andres.pillremind.navigation.BottomBarScreens
 
 /**
  * Pantalla principal de la aplicación.
@@ -43,7 +48,13 @@ fun MainScreen(
     val currentRoute = navBackStackEntry?.destination?.route
     val showFab =
         currentRoute == BottomBarScreens.Home.route || currentRoute == BottomBarScreens.Medications.route
+    var topBarTitle by remember {
+        mutableStateOf("")
+    }
     Scaffold(
+        topBar = {
+            MainTopBar(title = topBarTitle)
+        },
         bottomBar = { BottomBar(navController = navController) },
         floatingActionButton = {
             if (showFab) {
@@ -55,10 +66,12 @@ fun MainScreen(
             }
         }
 
-    ) {
+    ) { paddingValues ->
         MainNavigationGraph(
             navController = navController,
-            rootNavController = rootNavController
+            rootNavController = rootNavController,
+            paddingValues = paddingValues,
+            onTitleChange = { topBarTitle = it }
         )
 
     }
@@ -134,4 +147,17 @@ fun RowScope.AddItem(
         )
     )
 
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainTopBar(title: String) {
+
+
+    TopAppBar(
+        title = {
+            Text(text = title)
+        }
+    )
 }

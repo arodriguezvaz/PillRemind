@@ -1,6 +1,9 @@
 package com.andres.pillremind.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -19,12 +22,15 @@ import com.andres.pillremind.ui.screens.profile.ProfileScreen
 @Composable
 fun MainNavigationGraph(
     navController: NavHostController,
-    rootNavController: NavHostController
+    rootNavController: NavHostController,
+    paddingValues: PaddingValues,
+    onTitleChange: (String) -> Unit
 ) {
     NavHost(
         navController = navController,
         route = Graph.MAIN,
-        startDestination = BottomBarScreens.Home.route
+        startDestination = BottomBarScreens.Home.route,
+        modifier = Modifier.padding(paddingValues)
     ) {
         composable(BottomBarScreens.Home.route) {
             HomeScreen()
@@ -35,7 +41,7 @@ fun MainNavigationGraph(
                     navController.navigate(
                         MedicationScreens.MedicationSeeScreen.createRoute(id)
                     )
-                }
+                },
             )
         }
 
@@ -52,12 +58,13 @@ fun MainNavigationGraph(
             )
         }
 
-        medicationNavGraph(navController)
+        medicationNavGraph(navController, onTitleChange)
     }
 }
 
 fun NavGraphBuilder.medicationNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    onTitleChange: (String) -> Unit
 ) {
     navigation(
         route = Graph.MEDICATION,
@@ -75,13 +82,15 @@ fun NavGraphBuilder.medicationNavGraph(
                 medicationMode = MedicationMode.View,
                 onDeleteClicked = {
                     navController.popBackStack()
-                }
+                },
+                onTitleChange = onTitleChange,
             )
         }
         composable(route = MedicationScreens.MedicationCreateScreen.route) {
             MedicationScreen(
                 onSaveClicked = { navController.popBackStack() },
-                medicationMode = MedicationMode.Create
+                medicationMode = MedicationMode.Create,
+                onTitleChange = onTitleChange,
             )
         }
     }
