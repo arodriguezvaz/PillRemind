@@ -76,7 +76,6 @@ fun MainScreen(
             paddingValues = paddingValues,
             onTopBarChange = { topBarState = it }
         )
-
     }
 }
 
@@ -151,6 +150,7 @@ fun RowScope.AddItem(
     )
 
 }
+
 
 /**
  * Representa el estado de la barra superior.

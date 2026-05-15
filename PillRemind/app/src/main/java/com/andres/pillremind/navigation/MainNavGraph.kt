@@ -44,7 +44,8 @@ fun MainNavigationGraph(
                     )
                 },
                 onTopBarChange = onTopBarChange,
-            )
+
+                )
         }
 
         composable(BottomBarScreens.Profile.route) {
@@ -60,7 +61,6 @@ fun MainNavigationGraph(
                 onTopBarChange = onTopBarChange,
             )
         }
-
         medicationNavGraph(navController, onTopBarChange)
     }
 }
