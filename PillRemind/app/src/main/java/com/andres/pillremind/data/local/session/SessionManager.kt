@@ -5,12 +5,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.LocalDate
 
 // Extensión de Context para crear una única instancia de DataStore.
 // Se usa para almacenar preferencias relacionadas con la sesión.
@@ -33,6 +35,7 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
     private object Keys {
         // Clave para almacenar el ID del profile activo
         val ACTIVE_PROFILE_ID = intPreferencesKey("active_profile_id")
+        val LAST_GENERATED_DATE = stringPreferencesKey("ultima_generacion") // 👈 añadir
     }
 
     /**
@@ -60,6 +63,17 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
     suspend fun clearActiveProfile() {
         context.dataStore.edit { preferences ->
             preferences.remove(Keys.ACTIVE_PROFILE_ID)
+        }
+    }
+
+    val lastGeneratedDate: Flow<LocalDate?> = context.dataStore.data
+        .map { preferences ->
+            preferences[Keys.LAST_GENERATED_DATE]?.let { LocalDate.parse(it) }
+        }
+
+    suspend fun saveLastGeneratedDate(fecha: LocalDate) {
+        context.dataStore.edit { preferences ->
+            preferences[Keys.LAST_GENERATED_DATE] = fecha.toString()
         }
     }
 }

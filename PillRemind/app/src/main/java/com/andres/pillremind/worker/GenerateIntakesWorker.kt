@@ -33,7 +33,6 @@ class GenerateIntakesWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = try {
         // Obtiene la última fecha para la que se generaron tomas.
-
         val desde = intakeRepository.getLastGeneratedDate()
         val hasta = LocalDate.now().plusDays(1)
 
@@ -41,8 +40,10 @@ class GenerateIntakesWorker @AssistedInject constructor(
         intakeRepository.saveLastGeneratedDate(LocalDate.now())
 
         Result.success()
+        //Si el error es de sql reeintrntar
     } catch (e: SQLiteException) {
         Result.retry()
+        //Si no lanzar error
     } catch (e: Exception) {
         Result.failure()
     }

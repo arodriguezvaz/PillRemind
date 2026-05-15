@@ -1,11 +1,10 @@
 package com.andres.pillremind.data.repository
 
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.andres.pillremind.data.local.dao.IntakeDao
 import com.andres.pillremind.data.local.dao.MedicationDao
 import com.andres.pillremind.data.local.dao.ScheduleDao
 import com.andres.pillremind.data.local.projections.IntakeWithMedication
+import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Intake
@@ -22,7 +21,7 @@ class IntakeRepositoryImpl @Inject constructor(
     private val intakeDao: IntakeDao,
     private val scheduleDao: ScheduleDao,
     private val medicationDao: MedicationDao,
-    private val prefs: SharedPreferences,
+    private val sessionManager: SessionManager,
 ) :
     IntakeRepository {
     override suspend fun createIntakes(desde: LocalDate, hasta: LocalDate): List<Intake> {
@@ -78,12 +77,12 @@ class IntakeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getLastGeneratedDate(): LocalDate {
-        val guardado = prefs.getString("ultima_generacion", null)
-        return guardado?.let { LocalDate.parse(it) } ?: LocalDate.now().minusDays(30)
+        return sessionManager.lastGeneratedDate.first()
+            ?: LocalDate.now().minusDays(30)
     }
 
     override suspend fun saveLastGeneratedDate(fecha: LocalDate) {
-        prefs.edit { putString("ultima_generacion", fecha.toString()) }
+        sessionManager.saveLastGeneratedDate(fecha)
     }
 
 }
