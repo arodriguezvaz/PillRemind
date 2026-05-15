@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +26,7 @@ import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.FormField
+import com.andres.pillremind.ui.screens.main.TopBarState
 
 /**
  * Modos en los que puede estar la pantalla de perfil.
@@ -52,8 +53,12 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     onSaveClicked: () -> Unit = {},
     profileMode: ProfileMode = ProfileMode.Create,
-    onDeletedClicked: () -> Unit = {}
+    onDeletedClicked: () -> Unit = {},
+    onTopBarChange: (TopBarState) -> Unit = {}
 ) {
+    LaunchedEffect(Unit) {
+        onTopBarChange(TopBarState(title = "Ver Perfil"))
+    }
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val nombre = remember { mutableStateOf("") }
     val urlImagen = remember { mutableStateOf("") }

@@ -1,6 +1,9 @@
 package com.andres.pillremind.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -9,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.andres.pillremind.ui.screens.home.HomeScreen
+import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.screens.medication.MedicationMode
 import com.andres.pillremind.ui.screens.medication.MedicationScreen
 import com.andres.pillremind.ui.screens.medications.MedicationsScreen
@@ -19,15 +23,18 @@ import com.andres.pillremind.ui.screens.profile.ProfileScreen
 @Composable
 fun MainNavigationGraph(
     navController: NavHostController,
-    rootNavController: NavHostController
+    rootNavController: NavHostController,
+    paddingValues: PaddingValues,
+    onTopBarChange: (TopBarState) -> Unit
 ) {
     NavHost(
         navController = navController,
         route = Graph.MAIN,
-        startDestination = BottomBarScreens.Home.route
+        startDestination = BottomBarScreens.Home.route,
+        modifier = Modifier.padding(paddingValues)
     ) {
         composable(BottomBarScreens.Home.route) {
-            HomeScreen()
+            HomeScreen(onTopBarChange = onTopBarChange)
         }
         composable(BottomBarScreens.Medications.route) {
             MedicationsScreen(
@@ -35,7 +42,8 @@ fun MainNavigationGraph(
                     navController.navigate(
                         MedicationScreens.MedicationSeeScreen.createRoute(id)
                     )
-                }
+                },
+                onTopBarChange = onTopBarChange,
             )
         }
 
@@ -48,16 +56,18 @@ fun MainNavigationGraph(
                             inclusive = true
                         }
                     }
-                }
+                },
+                onTopBarChange = onTopBarChange,
             )
         }
 
-        medicationNavGraph(navController)
+        medicationNavGraph(navController, onTopBarChange)
     }
 }
 
 fun NavGraphBuilder.medicationNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    onTopBarChange: (TopBarState) -> Unit
 ) {
     navigation(
         route = Graph.MEDICATION,
@@ -75,13 +85,15 @@ fun NavGraphBuilder.medicationNavGraph(
                 medicationMode = MedicationMode.View,
                 onDeleteClicked = {
                     navController.popBackStack()
-                }
+                },
+                onTopBarChange = onTopBarChange
             )
         }
         composable(route = MedicationScreens.MedicationCreateScreen.route) {
             MedicationScreen(
                 onSaveClicked = { navController.popBackStack() },
-                medicationMode = MedicationMode.Create
+                medicationMode = MedicationMode.Create,
+                onTopBarChange = onTopBarChange,
             )
         }
     }

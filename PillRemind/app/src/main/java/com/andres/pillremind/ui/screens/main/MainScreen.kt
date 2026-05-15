@@ -1,28 +1,36 @@
 package com.andres.pillremind.ui.screens.main
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
-import com.andres.pillremind.navigation.BottomBarScreens
 
 /**
  * Pantalla principal de la aplicación.
@@ -43,7 +51,13 @@ fun MainScreen(
     val currentRoute = navBackStackEntry?.destination?.route
     val showFab =
         currentRoute == BottomBarScreens.Home.route || currentRoute == BottomBarScreens.Medications.route
+    var topBarState by remember {
+        mutableStateOf(TopBarState(""))
+    }
     Scaffold(
+        topBar = {
+            MainTopBar(state = topBarState, rootNavController)
+        },
         bottomBar = { BottomBar(navController = navController) },
         floatingActionButton = {
             if (showFab) {
@@ -55,10 +69,12 @@ fun MainScreen(
             }
         }
 
-    ) {
+    ) { paddingValues ->
         MainNavigationGraph(
             navController = navController,
-            rootNavController = rootNavController
+            rootNavController = rootNavController,
+            paddingValues = paddingValues,
+            onTopBarChange = { topBarState = it }
         )
 
     }
@@ -134,4 +150,44 @@ fun RowScope.AddItem(
         )
     )
 
+}
+
+/**
+ * Representa el estado de la barra superior.
+ *
+ * @property title Título que se mostrará en la topbar.
+ * @property showLogo Si es true, se mostrará el logo de la app encima del título.
+ * @property canGoBack Si es true , se muestra la flecha de retroceso
+ */
+data class TopBarState(
+    val title: String,
+    val showLogo: Boolean = false,
+)
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainTopBar(
+    state: TopBarState,
+    navController: NavHostController
+) {
+    val canGoBack = navController.previousBackStackEntry != null
+
+    TopAppBar(
+        navigationIcon = {
+            if (canGoBack) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                }
+            }
+        },
+        title = {
+            Column {
+                if (state.showLogo) {
+                    Text("PillRemind", style = MaterialTheme.typography.labelMedium)
+                }
+                Text(state.title)
+            }
+        }
+    )
 }
