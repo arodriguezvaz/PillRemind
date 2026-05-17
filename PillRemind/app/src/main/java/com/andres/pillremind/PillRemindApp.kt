@@ -3,19 +3,7 @@ package com.andres.pillremind
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import com.andres.pillremind.worker.GenerateIntakesWorker
 import dagger.hilt.android.HiltAndroidApp
-import java.time.LocalTime
-import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 /**
  * Clase Application de la app.
@@ -24,22 +12,7 @@ import javax.inject.Inject
  * para los recordatorios de medicación.
  */
 @HiltAndroidApp
-class PillRemindApp : Application(), Configuration.Provider {
-
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-
-    /**
-     * Configuración personalizada de WorkManager.
-     *
-     * Se utiliza para indicar a WorkManager que debe usar `HiltWorkerFactory`
-     * al crear los Workers de la aplicación. Esto permite que los Workers
-     * puedan recibir dependencias mediante inyección con Hilt.
-     */
-    override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+class PillRemindApp : Application() {
 
     /**
      * Método llamado al iniciar la aplicación.
@@ -68,27 +41,4 @@ class PillRemindApp : Application(), Configuration.Provider {
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)
     }
-
-    fun registrarWorkerDiario(context: Context) {
-        val ahora = LocalTime.now()
-        val objetivo = LocalTime.of(6, 0)
-        val minutosHasta6am = if (ahora.isBefore(objetivo))
-            ChronoUnit.MINUTES.between(ahora, objetivo)
-        else
-            ChronoUnit.MINUTES.between(ahora, objetivo.plusHours(24))
-
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "generar-tomas",
-            ExistingPeriodicWorkPolicy.KEEP,  // no sobreescribe si ya existe
-            PeriodicWorkRequestBuilder<GenerateIntakesWorker>(1, TimeUnit.DAYS)
-                .setInitialDelay(minutosHasta6am, TimeUnit.MINUTES)
-                .setConstraints(
-                    Constraints.Builder()
-                        .setRequiresBatteryNotLow(true)
-                        .build()
-                )
-                .build()
-        )
-    }
-
 }

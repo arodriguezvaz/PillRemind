@@ -65,7 +65,7 @@ class IntakeRepositoryImpl @Inject constructor(
         return intakeDao.getIntakeById(intakeId).toDomain()
     }
 
-    override suspend fun getIntakesForToday(
+    override fun getIntakesForToday(
         today: LocalDate,
         profileId: Int
     ): Flow<List<IntakeWithMedication>> {

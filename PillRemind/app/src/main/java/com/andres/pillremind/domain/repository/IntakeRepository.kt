@@ -32,7 +32,7 @@ interface IntakeRepository {
     /**
      * Obtiene todas las tomas de un perfil para hoy
      */
-    suspend fun getIntakesForToday(
+    fun getIntakesForToday(
         today: LocalDate,
         profileId: Int
     ): Flow<List<IntakeWithMedication>>

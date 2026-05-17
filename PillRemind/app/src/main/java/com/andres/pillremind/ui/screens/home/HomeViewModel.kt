@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -42,7 +41,9 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val desde = intakeRepository.getLastGeneratedDate()
-            intakeRepository.createIntakes(desde, LocalDate.now())
+            val ahora = LocalDate.now()
+            intakeRepository.createIntakes(desde, ahora)
+            intakeRepository.saveLastGeneratedDate(ahora)
         }
     }
 
@@ -57,20 +58,20 @@ class HomeViewModel @Inject constructor(
             }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
+                started = SharingStarted.Eagerly,
                 initialValue = null
             )
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val todayIntakes: StateFlow<List<IntakeWithMedication>> = profileId
+        .filterNotNull()
         .flatMapLatest { id ->
-            if (id != null) intakeRepository.getIntakesForToday(LocalDate.now(), id)
-            else flowOf(emptyList())
+            intakeRepository.getIntakesForToday(LocalDate.now(), id)
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Eagerly,
             initialValue = emptyList()
         )
 
