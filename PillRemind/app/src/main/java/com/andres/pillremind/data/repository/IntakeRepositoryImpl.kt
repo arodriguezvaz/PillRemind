@@ -84,5 +84,4 @@ class IntakeRepositoryImpl @Inject constructor(
     override suspend fun saveLastGeneratedDate(fecha: LocalDate) {
         sessionManager.saveLastGeneratedDate(fecha)
     }
-
 }

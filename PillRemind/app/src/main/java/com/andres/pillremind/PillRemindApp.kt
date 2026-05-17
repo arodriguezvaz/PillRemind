@@ -29,11 +29,25 @@ class PillRemindApp : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
+    /**
+     * Configuración personalizada de WorkManager.
+     *
+     * Se utiliza para indicar a WorkManager que debe usar `HiltWorkerFactory`
+     * al crear los Workers de la aplicación. Esto permite que los Workers
+     * puedan recibir dependencias mediante inyección con Hilt.
+     */
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
 
+    /**
+     * Método llamado al iniciar la aplicación.
+     *
+     * Aquí se realizan inicializaciones globales necesarias antes de que
+     * el usuario interactúe con la app, como la creación del canal de
+     * notificaciones utilizado por los recordatorios de medicación.
+     */
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
