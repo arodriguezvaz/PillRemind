@@ -3,19 +3,7 @@ package com.andres.pillremind
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import com.andres.pillremind.worker.GenerateIntakesWorker
 import dagger.hilt.android.HiltAndroidApp
-import java.time.LocalTime
-import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 /**
  * Clase Application de la app.
@@ -24,15 +12,7 @@ import javax.inject.Inject
  * para los recordatorios de medicación.
  */
 @HiltAndroidApp
-class PillRemindApp : Application(), Configuration.Provider {
-
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-
-    override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+class PillRemindApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
@@ -55,26 +35,5 @@ class PillRemindApp : Application(), Configuration.Provider {
         manager.createNotificationChannel(channel)
     }
 
-    fun registrarWorkerDiario(context: Context) {
-        val ahora = LocalTime.now()
-        val objetivo = LocalTime.of(6, 0)
-        val minutosHasta6am = if (ahora.isBefore(objetivo))
-            ChronoUnit.MINUTES.between(ahora, objetivo)
-        else
-            ChronoUnit.MINUTES.between(ahora, objetivo.plusHours(24))
-
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "generar-tomas",
-            ExistingPeriodicWorkPolicy.KEEP,  // no sobreescribe si ya existe
-            PeriodicWorkRequestBuilder<GenerateIntakesWorker>(1, TimeUnit.DAYS)
-                .setInitialDelay(minutosHasta6am, TimeUnit.MINUTES)
-                .setConstraints(
-                    Constraints.Builder()
-                        .setRequiresBatteryNotLow(true)
-                        .build()
-                )
-                .build()
-        )
-    }
 
 }
