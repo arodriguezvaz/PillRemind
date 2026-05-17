@@ -8,13 +8,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -63,6 +69,11 @@ fun ProfileScreen(
     val nombre = remember { mutableStateOf("") }
     val urlImagen = remember { mutableStateOf("") }
     val perfil = profileViewModel.profile.collectAsState().value
+
+    //Variable que si es true muestra el diálogo de eliminación
+    var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
     when (profileMode) {
         ProfileMode.Create -> {
             Column(
@@ -159,8 +170,7 @@ fun ProfileScreen(
                     AppButton(
                         onClick = {
                             perfil?.let {
-                                profileViewModel.deleteProfile(it)
-                                onDeletedClicked()
+                                showDeleteDialog = true
                             }
                         },
                         text = stringResource(R.string.eliminar),
@@ -180,8 +190,42 @@ fun ProfileScreen(
                     )
                 }
             }
-
-
         }
+    }
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteDialog = false
+            },
+            title = {
+                Text("Eliminar medicamento")
+            },
+            text = {
+                Text("¿Seguro que quieres eliminar este medicamento?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        profileViewModel.deleteProfile(perfil!!)
+                        showDeleteDialog = false
+                        onDeletedClicked()
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 }
