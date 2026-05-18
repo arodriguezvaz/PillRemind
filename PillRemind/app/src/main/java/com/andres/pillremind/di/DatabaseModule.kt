@@ -49,4 +49,7 @@ object DatabaseModule {
 
     @Provides
     fun provideScheduleDao(db: AppDatabase) = db.scheduleDao()
+
+    @Provides
+    fun provideIntakeDao(db: AppDatabase) = db.intakeDao()
 }

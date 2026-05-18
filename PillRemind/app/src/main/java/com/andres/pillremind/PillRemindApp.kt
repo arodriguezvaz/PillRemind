@@ -13,6 +13,7 @@ import dagger.hilt.android.HiltAndroidApp
  */
 @HiltAndroidApp
 class PillRemindApp : Application() {
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
@@ -33,4 +34,6 @@ class PillRemindApp : Application() {
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)
     }
+
+
 }

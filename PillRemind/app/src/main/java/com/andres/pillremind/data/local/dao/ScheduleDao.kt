@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.andres.pillremind.data.local.entity.ScheduleEntity
+import com.andres.pillremind.domain.model.WeekDay
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -49,4 +50,10 @@ interface ScheduleDao {
      */
     @Query("SELECT * FROM schedules WHERE id = :scheduleId")
     suspend fun getScheduleById(scheduleId: Int): ScheduleEntity
+
+    /**
+     * Obtiene todos los schedules de un medication de un día concreto de la semana
+     */
+    @Query("SELECT * FROM schedules WHERE WeekDay = :day")
+    fun getSchedulesByDay(day: WeekDay): Flow<List<ScheduleEntity>>
 }

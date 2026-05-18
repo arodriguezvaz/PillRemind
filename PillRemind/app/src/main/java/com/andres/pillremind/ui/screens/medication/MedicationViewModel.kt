@@ -8,6 +8,7 @@ import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.WeekDay
+import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
 import com.andres.pillremind.notifications.AlarmScheduler
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 /**
@@ -43,6 +45,7 @@ class MedicationViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
     private val scheduleRepository: ScheduleRepository,
     private val alarmScheduler: AlarmScheduler,
+    private val intakeRepository: IntakeRepository,
     sessionManager: SessionManager
 ) : ViewModel() {
     //Recupera el profileId del sessionManager
@@ -142,6 +145,8 @@ class MedicationViewModel @Inject constructor(
                         alarmScheduler.schedule(scheduleId, millis)
                     }
                 }
+                val desde = intakeRepository.getLastGeneratedDate()
+                intakeRepository.createIntakes(desde, LocalDate.now())
             } else {
                 showMessage("No hay perfil activo")
             }
@@ -176,7 +181,8 @@ class MedicationViewModel @Inject constructor(
                     dose = dose,
                     unit = normalizedUnit,
                     startDate = startDate,
-                    endDate = endDate
+                    endDate = endDate,
+                    updatedAt = LocalDateTime.now(),
                 )
 
                 medicationRepository.updateMedication(updatedMedication)
@@ -194,6 +200,8 @@ class MedicationViewModel @Inject constructor(
                         )
                     }
                 }
+                val desde = intakeRepository.getLastGeneratedDate()
+                intakeRepository.createIntakes(desde, LocalDate.now())
 
             } else {
                 showMessage("No hay perfil activo")

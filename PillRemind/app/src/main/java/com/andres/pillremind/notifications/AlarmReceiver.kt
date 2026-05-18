@@ -7,24 +7,24 @@ import android.content.Intent
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
 import dagger.hilt.android.AndroidEntryPoint
-import com.andres.pillremind.R
-import com.andres.pillremind.domain.model.WeekDay
-import com.andres.pillremind.domain.model.toDayOfWeek
 import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.temporal.TemporalAdjusters
 
-
+/**
+ * BroadcastReceiver encargado de recibir las alarmas programadas
+ * y mostrar las notificaciones de recordatorio de medicación.
+ *
+ * Tras mostrar la notificación, la alarma se vuelve a programar
+ * para la siguiente ocurrencia del horario.
+ */
 @AndroidEntryPoint
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -41,6 +41,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val scheduleId = intent.getIntExtra("schedule_id", -1)
         if (scheduleId == -1) return
 
+        // Ejecuta operaciones asíncronas para evitar bloquear el BroadcastReceiver
         val pendingResult = goAsync()
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -48,7 +49,7 @@ class AlarmReceiver : BroadcastReceiver() {
                 val schedule: Schedule = scheduleRepository.getScheduleById(scheduleId)
                 val medication = medicationRepository.getMedicationById(schedule.medicationId)
                     .firstOrNull() ?: return@launch
-                
+
                 showNotification(context, medication.name, schedule)
 
                 // Reprogramar para la próxima semana (misma hora, mismo día)
@@ -60,7 +61,9 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
-
+    /**
+     * Muestra una notificación de recordatorio para la toma de medicación.
+     */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun showNotification(context: Context, medicationName: String, schedule: Schedule) {
         val notification = NotificationCompat.Builder(context, "pill_remind_channel")

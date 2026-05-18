@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.MedicationCard
+import com.andres.pillremind.ui.screens.main.TopBarState
 
 /**
  * Pantalla que muestra la lista de medicamentos del perfil activo.
@@ -30,11 +32,15 @@ import com.andres.pillremind.ui.components.MedicationCard
 fun MedicationsScreen(
     modifier: Modifier = Modifier,
     onMedicationClick: (medicationId: Int) -> Unit,
+    onTopBarChange: (TopBarState) -> Unit = {}
 ) {
     val medicationsViewModel: MedicationsViewModel = hiltViewModel()
 
     val medications by medicationsViewModel.medications.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        onTopBarChange(TopBarState(title = "Medicamentos"))
+    }
     Column(
         modifier = modifier
             .fillMaxSize()

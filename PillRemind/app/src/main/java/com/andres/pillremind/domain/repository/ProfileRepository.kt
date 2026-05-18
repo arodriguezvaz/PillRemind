@@ -10,7 +10,7 @@ interface ProfileRepository {
     /**
      * Inserta un perfil en la base de datos
      */
-    suspend fun insertProfile(profile: Profile)
+    suspend fun insertProfile(profile: Profile): Long
 
     /**
      * Actualiza un perfil en la base de datos

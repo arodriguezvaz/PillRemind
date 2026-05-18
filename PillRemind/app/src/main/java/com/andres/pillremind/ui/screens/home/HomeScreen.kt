@@ -9,16 +9,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.andres.pillremind.R
+import com.andres.pillremind.data.local.projections.visualState
 import com.andres.pillremind.ui.components.BlankCard
-import com.andres.pillremind.ui.components.MedicationCard
+import com.andres.pillremind.ui.components.IntakeCard
+import com.andres.pillremind.ui.screens.main.TopBarState
 
 /**
  * Pantalla principal que muestra la lista de medicamentos del perfil activo.
@@ -30,23 +31,31 @@ import com.andres.pillremind.ui.components.MedicationCard
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    onTopBarChange: (TopBarState) -> Unit = {}
 ) {
     val homeViewModel: HomeViewModel = hiltViewModel()
-    val medications by homeViewModel.medications.collectAsStateWithLifecycle()
-
+    val todayIntakes by homeViewModel.todayIntakes.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        onTopBarChange(
+            TopBarState(
+                title = "Medicamentos",
+                showLogo = true
+            )
+        )
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
 
-        if (medications.isEmpty()) {
+        if (todayIntakes.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                BlankCard("No hay medicamentos aún")
+                BlankCard("No hay medicamentos para tomar hoy")
             }
         } else {
             LazyColumn(
@@ -55,14 +64,14 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(
-                    items = medications,
-                    key = { it.id }
-                ) { medication ->
-                    MedicationCard(
-                        medication = medication,
-                        buttonText = stringResource(R.string.tomar),
-                        accion = {
-                            // TODO
+                    items = todayIntakes,
+                    key = { it.intakeId }
+                ) { intake ->
+                    IntakeCard(
+                        intake = intake,
+                        visualState = intake.visualState(),
+                        onTake = {
+                            homeViewModel.tomarIntake(intake)
                         }
                     )
                 }

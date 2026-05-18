@@ -18,7 +18,7 @@ interface ProfileDao {
      * @param perfil Profile a insertar
      */
     @Insert
-    suspend fun insertProfile(perfil: ProfileEntity)
+    suspend fun insertProfile(perfil: ProfileEntity): Long
 
     /**
      * Actualiza un profile en la base de datos
