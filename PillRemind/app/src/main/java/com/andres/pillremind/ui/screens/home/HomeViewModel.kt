@@ -47,6 +47,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+
     val profileId = sessionManager.activeProfileId
 
     @OptIn(ExperimentalCoroutinesApi::class)
