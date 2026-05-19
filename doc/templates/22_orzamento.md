@@ -17,7 +17,8 @@ que la que se pretende constituir. Para ello se solicita en el Registro Mercanti
 Este certificado caduca a los 2 meses, pudiéndose renovar hasta 15 meses teniendo esta
 renovación un coste de 6,00€.
 
-||Año 1|Año 2|Año 3|
+
+|Concepto|Año 1|Año 2|Año 3|
 |---|---|---|---|
 |Certificación negativa de denominación social|13.52€|0.00€|0.00€|
 ---
@@ -28,12 +29,37 @@ se solicitará la patente de la marca a partir del segundo año que es cuando la
 empezar a tener más reconocimiento, para ello hay que acudir a la OEPM. El trámite tiene un
 coste de unos 127€ si se realiza de forma telemática. (Anexos 9.4 y 9.5)
 
-||Año 1|Año 2|Año 3|
+|Concpeto|Año 1|Año 2|Año 3|
 |---|---|---|---|
 |Registro de marca|127,00 €|0.00€|0.00€|
 ---
 
-### 
+### 2.3 Depósito del capital en la entidad financiera
+El banco elegido para hacer el depósito del capital en la entidad financiera será el Banco
+Sabadell. La elección de este banco se debe a sus ventajas económicas y estabilidad, entre las
+que destacan:
+- 0 € de comisiones de administración y mantenimiento en ambas cuentas, así como en
+tarjetas de débito y crédito, transferencias online y en ingresos y retiradas de efectivo
+en cajeros.
+- Rentabilidad: 200 € por abrir la cuenta online para autónomos + 200 € por activar la
+cuenta online para finanzas personales.
+- +120 € de devolución anual por domiciliar la cuota de autónomos.
+- +1 % TAE, lo que implica que, cuanto mayor sea el capital depositado en la entidad,
+mayores serán los beneficios obtenidos, con un máximo de 20.000 €.
+
+#### Beneficios cuenta Banco Sabadell
+|Concepto|Año 1|Año 2|Año 3|
+|---|---|---|---|
+|Activación de las dos cuentas|400,00 €|0.00€|0.00€|
+|Domiciliación de cuota de autónomos|120,00 €|120,00 €|120,00 €|
+|TAE|1% capital depositado \* | 1% capital depositado \* |1% capital depositado *|
+---
+
+\* hasta un máximo de capital depositado en la entidad: 20.000 €
+
+#### Inversión Capital
+
+
 | Concepto | Importe (Ano 1) | Xustificación |
 |---|---|---|
 | Capital Social | 3.000,00 € | Depósito mínimo esixido para constituír unha S.L.U. |
