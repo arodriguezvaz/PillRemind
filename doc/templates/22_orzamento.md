@@ -29,7 +29,7 @@ se solicitará la patente de la marca a partir del segundo año que es cuando la
 empezar a tener más reconocimiento, para ello hay que acudir a la OEPM. El trámite tiene un
 coste de unos 127€ si se realiza de forma telemática. (Anexos 9.4 y 9.5)
 
-|Concpeto|Año 1|Año 2|Año 3|
+|Concepto|Año 1|Año 2|Año 3|
 |---|---|---|---|
 |Registro de marca|127,00 €|0.00€|0.00€|
 ---
