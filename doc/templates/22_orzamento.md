@@ -126,38 +126,107 @@ A aplicación segue un modelo **freemium**: a versión gratuíta ofrece funciona
 
 ### 3.2. Gastos
 
-#### Gastos de persoal
+#### 3.2.1 Gastos de persoal
+
+El organigrama de la empresa está compuesto por:
+
+- El socio fundador de la empresa, Andrés Rodríguez Vázquez, se encargará de repartir las
+tareas de mantenimiento del sistema, así como las labores comerciales. Al ser socio
+trabajador, percibiría un salario de 1.221,00 € mensual en 14 pagas al año. Al ser una
+S.L. unipersonal, tiene la obligación de cotizar en el RETA; el primer año se acogería a la
+tarifa plana, pues cumple las condiciones para ello, y posteriormente cotizaría en
+función del salario del trabajador. Las condiciones para acogerse a la tarifa plana son:
+20
+    - No haber estado de alta en los 2 años inmediatamente anteriores a la fecha de
+efecto de la nueva alta, o bien 3 años, en caso de haber disfrutado previamente
+de esta deducción.
+    - No ser autónomo colaborador.
+    - No tener deudas pendientes con la Seguridad Social y Hacienda.
+
+Esta tarifa plana es prorrogable durante 12 meses más si el salario está por debajo del
+mínimo interprofesional. Como se prevé que este aumente y que el salario del
+trabajador se mantenga igual, sería posible solicitarla.
+A partir del tercer año la cotización considerada es de 3.000€ suponiendo que el salario
+del trabajador aumente 100€ debido a la inflación.
 
 | Concepto | Ano 1 | Ano 2 | Ano 3 | Xustificación |
 |---|---|---|---|---|
-| Salario do socio fundador | 17.094,00 € | 17.094,00 € | ___________ € | 1.221 €/mes × 14 pagas |
-| RETA (tarifa plana ano 1) | 960,00 € | 960,00 € | ___________ € | Tarifa plana primeiros 12 meses |
-| **Total persoal** | **18.054,00 €** | **18.054,00 €** | **___________ €** | |
+| Salario do socio fundador | 17.094,00 € | 17.094,00 € | 18.494,00 € € | 1.221 €/mes × 14 pagas |
+| RETA (tarifa plana ano 1) | 960,00 € | 960,00 € | 3.000,00 € | Tarifa plana primeiros 12 meses |
+| **Total persoal** | **18.054,00 €** | **18.054,00 €** | **21.494,00 €** |
 
-#### Gastos de funcionamento e mantemento do servizo
+#### 3.2.2 Gastos de funcionamento e mantemento do servizo
 
-| Concepto | Ano 1 | Ano 2 | Ano 3 | Xustificación |
-|---|---|---|---|---|
-| Firebase (Authentication + Cloud Firestore – usuarios premium) | ___________ € | ___________ € | ___________ € | Depende do volume de usuarios |
-| Distribución app (Play Store) | 25,00 € | 0,00 € | 0,00 € | Pago único |
-| Distribución app (App Store) | 99,00 € | 99,00 € | 99,00 € | Pago anual |
-| Auditoría protección de datos – contratación | 800,00 € | 0,00 € | 0,00 € | |
-| Auditoría protección de datos – mantemento anual | 1.800,00 € | 1.800,00 € | 1.800,00 € | Inclúe figura DPD obrigatoria |
-| **Total funcionamento** | **___________ €** | **___________ €** | **___________ €** | |
-
-#### Xestoría e seguros
+- Costes relacionados con la aplicación.
+Para almacenar la información y gestionar las notificaciones a los usuarios se utilizaría el servicio
+de base de datos de Supabase cuyo coste es de 25 € al mes. Esta base de datos permite una
+escalabilidad más económica y sostenible a largo plazo.
+Para la distribución de la aplicación que utilizan los clientes se recurriría a la Play Store de
+Android y a la App Store de iOS. La primera tiene un coste único de 25 €, mientras que la segunda
+supone un pago anual de 99 €.
+- Subcontratas.
+Para garantizar que la empresa cumple con la normativa de protección de datos, es necesario
+consultar con una auditoría que asegure que se cumple con la legislación. Para ello, se recurriría
+a la auditoría de iData Protection, cuyos costos son de 800 € por la contratación del servicio y
+de 1.800 € al año. Estos incluyen el mantenimiento y el servicio del Delegado de Protección de
+Datos, una figura obligatoria establecida por la Ley de Protección de Datos, que supervisa el
+cumplimiento de la normativa, asesora sobre buenas prácticas, gestiona incidencias de
+seguridad y actúa como enlace con la autoridad de control.
+Por otro lado, es necesario añadir los costes de la asesoría. La escogida será Ameijeiras Lois
+Asesores, seleccionada por contactos personales y por tener sede en la ciudad donde se
+emprende. El precio de esta asesoría será de 1.800 € anuales.
+-  Seguro de responsabilidad civil.
+Se opta por contratar un seguro de responsabilidad civil debido a la sensibilidad de los datos con
+los que trabaja la empresa, junto a la necesidad de acceder a equipos informáticos ajenos para
+la instalación del programa. El coste de este seguro rondará los 500 € anuales. La aseguradora
+seleccionada es Hiscox Seguros Especializados debido a su experiencia en el sector informático.
+-  Impuesto de sociedades.
+Puesto que es una entidad de nueva creación impuesto de sociedades será del 15 % en el primer
+período impositivo en que la base resuelte positiva y en el siguiente. Este tipo se aplicará en los
+dos años siguientes.
 
 | Concepto | Ano 1 | Ano 2 | Ano 3 |
 |---|---|---|---|
-| Asesoría | 1.800,00 € | 1.800,00 € | 1.800,00 € |
-| Seguro de responsabilidade civil | 500,00 € | 500,00 € | 500,00 € |
+| Base de datos | 300 € | 300 € | 300 € |
+| Distribución app (Play Store) | 25,00 € | 0,00 € | 0,00 € |
+| Distribución app (App Store) | 99,00 € | 99,00 € | 99,00 € | 
+| Auditoría protección de datos – contratación | 800,00 € | 0,00 € | 0,00 € |
+| Auditoría protección de datos – mantemento anual | 1.800,00 € | 1.800,00 € | 1.800,00 € |
+| Seguro de responsabilidad civil | 500,00 € | 500,00€ | 500,00€ |
+| **Total funcionamento** | **3.524,00 €** | **2.699,00 €** | **2.699,00 €** | 
 
-#### Gastos de marketing
+#### 3.2.3 Gestoría
+Para la realización de los trámites se opta por contratar los servicios de una asesoría.
+| Concepto | Ano 1 | Ano 2 | Ano 3 |
+|---|---|---|---|
+| Asesoría | 1.800,00 € | 1.800,00 € | 1.800,00 € |
+
+#### 3.2.4 Gastos de marketing
+
+- Tener una página web es casi imprescindible para cualquier empresa, y más para un proyecto
+digital como este. Contar con una web aporta visibilidad y alcance; permite que personas a las
+que quizá no se ha podido llegar físicamente conozcan el servicio y se interesen.
+Asimismo, brinda credibilidad y confianza: una página web estructurada y que transmite
+seguridad demuestra que la empresa es legítima y organizada. También se puede utilizar como
+puente de comunicación con los usuarios, ya que desde ella se pueden incluir formularios de
+contacto, comunicar novedades y, en un futuro, implementar una estrategia de marketing
+digital.
+
+    Para alojar la web es necesario contar con un dominio reconocible. Para comenzar, el elegido es
+farmaplus.gal. La otra opción más viable sería farmaplus.com pero este tiene un coste más
+elevado y, como la empresa iniciará su actividad empresarial en Galicia, no representa un
+problema de marca significativo.
+
+    Además del dominio, también es necesario contar con un host que aloje la web en sus
+servidores. Actualmente, existe una amplia oferta de servicios de hosting que, además, incluyen
+certificado SSL, que garantiza que la web es segura, y direcciones de correo con el dominio. En
+este caso, utilizaremos el hosting de Hostinger, que permite una dirección de correo, así como
+13 copias de seguridad semanales, migración gratuita y una oferta que permite pagar 4 años juntos.
 
 | Concepto | Ano 1 | Ano 2 | Ano 3 | Xustificación |
 |---|---|---|---|---|
-| Dominio web | ___________ € | ___________ € | ___________ € | |
-| Hosting web | ___________ € | ___________ € | ___________ € | |
+| Dominio web | 15,72 € | 45,86 € | 45,86 € | |
+| Hosting web | 71,52 € | 0,00 € | 0,00 € | |
 | Campañas de captación de usuarios | ___________ € | ___________ € | ___________ € | |
 | **Total marketing** | **___________ €** | **___________ €** | **___________ €** | |
 
