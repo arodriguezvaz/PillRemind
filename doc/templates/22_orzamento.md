@@ -25,8 +25,7 @@ renovación un coste de 6,00€.
 
 ### 2.2 Registro de marca
 Para poder operar en España con la marca FarmaPlus y garantizar su uso sin problemas legales,
-se solicitará la patente de la marca a partir del segundo año que es cuando la empresa puede
-empezar a tener más reconocimiento, para ello hay que acudir a la OEPM. El trámite tiene un
+se solicitará la patente de la marca, para ello hay que acudir a la OEPM. El trámite tiene un
 coste de unos 127€ si se realiza de forma telemática. (Anexos 9.4 y 9.5)
 
 |Concepto|Año 1|Año 2|Año 3|
@@ -57,18 +56,45 @@ mayores serán los beneficios obtenidos, con un máximo de 20.000 €.
 
 \* hasta un máximo de capital depositado en la entidad: 20.000 €
 
-#### Inversión Capital
+##### Inversión Capital
+| Concepto | Año1 | Año 2 | Año3 |
+|---|---|---|---|
+|Depósito capital inicial | 3000,00€ | 0,00€ | 0,00€ |
 
+### 2.4 Elaboración de estatutos 
 
-| Concepto | Importe (Ano 1) | Xustificación |
-|---|---|---|
-| Capital Social | 3.000,00 € | Depósito mínimo esixido para constituír unha S.L.U. |
-| Certificación negativa de denominación social | 13,52 € | Rexistro Mercantil |
-| Notaría – escritura de constitución | 300,00 € | Acto público de constitución da sociedade |
-| Inscrición no Rexistro Mercantil (inclúe libros) | 585,00 € | Inscrición + legalización de libros de contabilidade |
-| Rexistro da marca | 127,00 € | OEPM, trámite telemático |
-| Equipo informático | 500,00 € | Necesario para o desenvolvemento e xestión da aplicación |
-| **Total Inversión Inicial** | **4.531,52 €** | |
+La creación de los Estatutos es parte del acto público de constitución de la sociedad, realizado
+por el notario, y corresponde al acuerdo de constitución firmado por los socios fundadores
+frente al fedatario público.
+
+| Concepto | Año1 | Año 2 | Año3 |
+|---|---|---|---|
+|Notario | 300,00€ | 0,00€ | 0,00€ |
+
+### 2.5 Inscripción en el Registro Mercantil Provincial
+
+La inscripción en el Registro Mercantil provincial es el paso final para que la empresa adquiera
+personalidad jurídica. Este trámite debe efectuarse en el plazo de dos meses desde la fecha de
+la escritura pública. La obligación legal de realizarlo la tiene el empresario pero es común que
+16
+sea el notario quien realice el trámite pasando la información al Registro Mercantil. Es en este
+Registro también se solicita la legalización de los libros de contabilidad.
+
+| Concepto | Año1 | Año 2 | Año3 |
+|---|---|---|---|
+| Inscripción en el Registro Mercantil Provincial | 550,00€ | 0,00€ | 0,00€|
+| Libros de contabilidad | 35,00€ | 0,00€| 0,00€ |
+
+### Resumen total
+| Concepto | Año 1 | Año 2 | Año 3 |
+|---|---|---|---|
+| Capital Social | 3.000,00 € | 0,00 € | 0,00 € |
+| Certificación negativa de denominación social | 13,52 € | 0,00 € | 0,00 € |
+| Notaría – escritura de constitución | 300,00 € | 0,00 € | 0,00 € |
+| Inscripción en el Registro Mercantil (incluye libros) | 585,00 € | 0,00 € | 0,00 € |
+| Registro de marca | 127,00 € | 0,00 € | 0,00 € |
+| Equipo informático | 500,00 € | 0,00 € | 0,00 € |
+| **Total Inversión** | **4.525,52 €** | **0,00 €** | **0,00 €** |
 ---
 
 
