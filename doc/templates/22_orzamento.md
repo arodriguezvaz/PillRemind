@@ -153,6 +153,9 @@ Puesto que es una entidad de nueva creación, el impuesto de sociedades será de
 |Seguro de responsabilidad civil|500,00 €|500,00 €|500,00 €|
 |**Total funcionamiento**|**3.524,00 €**|**2.699,00 €**|**2.699,00 €**|
 
+- [Precio distribución de las apps](https://cfeapps.com/cuanto-cuesta-publicar-una-app-en-2025-guia-completa-espana/)
+- [Auditoría de protección de datos](https://idataprotection.es/tarifas)
+- [Seguro de responsabilidad civil](https://www.hiscox.es/seguros/responsabilidad-civil-profesional/tic)
 ---
 
 #### 3.2.3 Gestoría
@@ -172,20 +175,22 @@ Para alojar la web es necesario contar con un dominio reconocible. Para comenzar
 
 Además del dominio, también es necesario contar con un host que aloje la web en sus servidores. Actualmente, existe una amplia oferta de servicios de hosting que, además, incluyen certificado SSL, que garantiza que la web es segura, y direcciones de correo con el dominio. En este caso, se utilizará el hosting de Hostinger, que permite una dirección de correo, así como 13 copias de seguridad semanales, migración gratuita y una oferta que permite pagar 4 años juntos.
 
-A mayores también se ralizará la captación de usuarios a través de la impresión de panfletos para ello se detinaron 1200€ que permitirián la impresión de alrededor de 9000 panfletos [1](#ref-1).
+A mayores también se ralizará la captación de usuarios a través de la impresión de panfletos para ello se detinaron 1200€ que permitirián la impresión de alrededor de 9000 panfletos. 
 
 
 
 
-|Concepto|Año 1|Año 2|Año 3|Justificación|
-|---|---|---|---|---|
+|Concepto|Año 1|Año 2|Año 3|
+|---|---|---|---|
 |Dominio web|15,72 €|45,86 €|45,86 €|
 |Hosting web|71,52 €|0,00 €|0,00 €|
 |Impresión del folleto|1.200,00 €|600,00 €|600,00 €|
 |Anuncios en Facebook|2.300,00 €|1.400,00 €|1.400,00€|
 |**Total marketing**|**3.587,24 €**|**2.045,86 €**|**2.045,86 €**|
 
-
+- [Precios de los panfletos](https://www.areagraficadigital.es/productos/impresion-pequeno-formato/folletos/productos-en-linea/102/301/flyers-y-folletos-cuadrados.html)
+- [Hosting web Hostinger](https://cart.hostinger.com/pay/f66bc418-dfc5-43a3-aad0-0af8d1bc969b?_ga=GA1.1.588562788.1770144310&_ga_73N1QWLEMH=GS2.1.s1770)
+- [Dominio .gal](https://www.inwx.es/es/domain/check?domain=pillremind.es&region=DEFAULT&avail=true)
 ---
 
 ### 3.3. Resumen: Cuenta de Resultados Previsional
@@ -206,10 +211,3 @@ A mayores también se ralizará la captación de usuarios a través de la impres
 |**Beneficio antes de impuestos**|**___________ €**|**___________ €**|**___________ €**|
 |Impuesto de sociedades (15% años 1-2; 20% año 3)|___________ €|___________ €|___________ €|
 |**Beneficio neto**|**___________ €**|**___________ €**|**___________ €**|
-
-
-## 4 Webgrafía
-
-- <a id="ref-1"></a>[1]Precio dos panfletos: https://www.areagraficadigital.es/productos/impresion-pequeno-formato/folletos/productos-en-linea/102/301/flyers-y-folletos-cuadrados.html]
-
-
