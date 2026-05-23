@@ -17,15 +17,17 @@ El primer paso en la creación de la empresa consiste en obtener la certificaci�
 |---|---|---|---|
 |Certificación negativa de denominación social|13,52 €|0,00 €|0,00 €|
 
+- [Precio de obtención negativa de denominación social](https://cincodias.elpais.com/cincodias/2015/10/28/autonomos/1446050905_665428.html#:~:text=Al%20margen%20de%20la%20v%C3%ADa,52%20euros%20m%C3%A1s%20el%20IVA.&text=Para%20renovar%20la%20certificaci%C3%B3n%20de,cuando%20hay%20un%20error%20material)
 ---
 
 ### 2.2 Registro de marca
-Para poder operar en España con la marca FarmaPlus y garantizar su uso sin problemas legales, se solicitará la patente de la marca; para ello hay que acudir a la Oficina Española de Patentes y Marcas. El trámite tiene un coste de unos 127 € si se realiza de forma telemática.
+Para poder operar en España con la marca PillRemind y garantizar su uso sin problemas legales, se solicitará la patente de la marca; para ello hay que acudir a la Oficina Española de Patentes y Marcas. El trámite tiene un coste de unos 127 € si se realiza de forma telemática.
 
 |Concepto|Año 1|Año 2|Año 3|
 |---|---|---|---|
 |Registro de marca|127,00 €|0,00 €|0,00 €|
 
+- [Costes del registro de marca](https://cincodias.elpais.com/cincodias/2015/10/28/autonomos/1446050905_665428.html#:~:text=Al%20margen%20de%20la%20v%C3%ADa,52%20euros%20m%C3%A1s%20el%20IVA.&text=Para%20renovar%20la%20certificaci%C3%B3n%20de,cuando%20hay%20un%20error%20material)
 ---
 
 ### 2.3 Depósito del capital en la entidad financiera
@@ -49,6 +51,8 @@ El banco elegido para hacer el depósito del capital en la entidad financiera se
 |---|---|---|---|
 |Depósito capital inicial|3.000,00 €|0,00 €|0,00 €|
 
+- [Información de la cuenta sabadell](https://www.bancsabadell.com/cuenta-online-autonomos/#scan)
+
 ---
 
 ### 2.4 Elaboración de estatutos
@@ -67,6 +71,7 @@ La inscripción en el Registro Mercantil provincial es el paso final para que la
 |---|---|---|---|
 |Inscripción en el Registro Mercantil Provincial|550,00 €|0,00 €|0,00 €|
 |Libros de contabilidad|35,00 €|0,00 €|0,00 €|
+
 
 ---
 
@@ -91,20 +96,18 @@ La aplicación sigue un modelo freemium: la versión gratuita ofrece funcionalid
 
 **Estimación de usuarios:**
 
-|Concepto|Dato|
-|---|---|
-|Número de descargas estimadas (Año 1)|___________|
-|% de conversión a premium estimado|___________ %|
-|Usuarios premium estimados (Año 1)|___________|
-|Precio de la suscripción premium (mensual / anual)|___________ €|
+| Concepto                                                  | 1º semestre | 2º semestre | Año 2      | Año 3      |
+|-----------------------------------------------------------|-------------|-------------|------------|------------|
+| Número de descargas estimadas                             | 3.000       | 4.000       | 20.000     | 40.000     |
+| Número acumulado de descargas estimadas                   | 3.000       | 7.000       | 27.000     | 67.000     |
+| % de conversión a premium                                 | 90%         | 5%          | 7%         | 7%         |
+| Nuevos usuarios premium del período                       | 2.700       | 200         | 1.400      | 2.800      |
+| Usuarios premium activos acumulados al final del período  | 405 (*)        | 605         | 2.005      | 4.805      |
+| Precio suscripción del período                            | - €         | 6,00 €      | 12,00 €    | 12,00 €    |
+| Importe cuotas clientes premium                           | - €         | 3.630,00 €  | 24.060,00 €| 57.660,00 €|
+| Total de ventas                                           | - €         | 3.630,00 €  | 24.060,00 €| 57.672,00 €|
 
-**Ingresos por suscripción premium:**
-
-|Concepto|Año 1|Año 2|Año 3|
-|---|---|---|---|
-|Usuarios premium|___________|___________|___________|
-|Precio suscripción (anual por usuario)|___________ €|___________ €|___________ €|
-|**Total ingresos**|**___________ €**|**___________ €**|**___________ €**|
+(*) se estima que permanecerán activos el 15% de usarios premium después de un periodo gratuito de 6 meses del plan premium
 
 ---
 
@@ -127,6 +130,7 @@ Esta tarifa plana es prorrogable durante 12 meses más si el salario está por d
 |RETA (tarifa plana año 1)|960,00 €|960,00 €|3.000,00 €||
 |**Total personal**|**18.054,00 €**|**18.054,00 €**|**21.494,00 €**||
 
+-[Tarifa plama RETA](https://portal.seg-social.gob.es/wps/portal/importass/importass/Colectivos/Trabajo+Autonomo/guia)
 ---
 
 #### 3.2.2 Gastos de funcionamiento y mantenimiento del servicio
@@ -170,14 +174,9 @@ Para la realización de los trámites se opta por contratar los servicios de una
 #### 3.2.4 Gastos de marketing
 
 Tener una página web es casi imprescindible para cualquier empresa, y más para un proyecto digital como este. Contar con una web aporta visibilidad y alcance; permite que personas a las que quizá no se ha podido llegar físicamente conozcan el servicio y se interesen. Asimismo, brinda credibilidad y confianza: una página web estructurada y que transmite seguridad demuestra que la empresa es legítima y organizada. También se puede utilizar como puente de comunicación con los usuarios, ya que desde ella se pueden incluir formularios de contacto, comunicar novedades y, en un futuro, implementar una estrategia de marketing digital.
-
 Para alojar la web es necesario contar con un dominio reconocible. Para comenzar, el elegido es farmaplus.gal. La otra opción más viable sería farmaplus.com, pero este tiene un coste más elevado y, como la empresa iniciará su actividad empresarial en Galicia, no representa un problema de marca significativo.
-
-Además del dominio, también es necesario contar con un host que aloje la web en sus servidores. Actualmente, existe una amplia oferta de servicios de hosting que, además, incluyen certificado SSL, que garantiza que la web es segura, y direcciones de correo con el dominio. En este caso, se utilizará el hosting de Hostinger, que permite una dirección de correo, así como 13 copias de seguridad semanales, migración gratuita y una oferta que permite pagar 4 años juntos.
-
-A mayores también se ralizará la captación de usuarios a través de la impresión de panfletos para ello se detinaron 1200€ que permitirián la impresión de alrededor de 9000 panfletos. 
-
-
+Además del dominio, también es necesario contar con un servicio de hosting que aloje la web en sus servidores. Actualmente, existe una amplia oferta de servicios de hosting que, además, incluyen certificado SSL, que garantiza que la web es segura, y direcciones de correo con el dominio. En este caso, se utilizará el hosting de Hostinger, que permite una dirección de correo, así como 13 copias de seguridad semanales, migración gratuita y una oferta que permite pagar cuatro años juntos.
+Adicionalmente, se realizará la captación de usuarios a través de la impresión de folletos, para lo cual se destinaron 1.200 €, lo que permitiría la impresión de alrededor de 9.000 folletos. Asimismo, se invertirá en anuncios en Facebook para captar nuevos usuarios, idealmente dentro del rango de los 40-50 años, que son los más propensos a utilizar la aplicación para sí mismos o para familiares.
 
 
 |Concepto|Año 1|Año 2|Año 3|
