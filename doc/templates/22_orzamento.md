@@ -100,26 +100,26 @@ La encuesta realizada por el proyecto aporta una validación directa de la deman
 
 ## 3.2. Estimación de usuarios
 
-| Concepto | 1º semestre | 2º semestre | Año 2 | Año 3 |
-|---|---:|---:|---:|---:|
-| Número de descargas estimadas | 3.000 | 4.000 | 20.000 | 40.000 |
-| Número acumulado de descargas estimadas | 3.000 | 7.000 | 27.000 | 67.000 |
-| % de conversión a premium | 20% | 8% | 7% | 7% |
-| Nuevos usuarios premium del período | 600 | 320 | 1.400 | 2.800 |
-| Usuarios premium activos acumulados al final del período | 90 (*) | 410 | 1.810 | 4.610 |
-| Precio suscripción del período | - € | 6,00 € | 12,00 € | 12,00 € |
-| Importe cuotas clientes premium | - € | 2.460,00 € | 21.720,00 € | 55.320,00 € |
-| Total de ventas | - € | 2.460,00 € | 21.720,00 € | 55.320,00 € |
+| Concepto                                                  | 1º semestre | 2º semestre | Año 2      | Año 3      |
+|-----------------------------------------------------------|-------------|-------------|------------|------------|
+| Número de descargas estimadas                             | 3.000       | 4.000       | 20.000     | 40.000     |
+| Número acumulado de descargas estimadas                   | 3.000       | 7.000       | 27.000     | 67.000     |
+| % de conversión a premium                                 | 90%         | 5%          | 7%         | 7%         |
+| Nuevos usuarios premium del período                       | 2.700       | 200         | 1.400      | 2.800      |
+| Usuarios premium activos acumulados al final del período (*) | 405         | 605         | 2.005      | 4.805      |
+| Precio suscripción del período                            | - €         | 6,00 €      | 12,00 €    | 12,00 €    |
+| Importe cuotas clientes premium                           | - €         | 3.630,00 €  | 24.060,00 €| 57.660,00 €|
+| Total de ventas                                           | - €         | 3.630,00 €  | 24.060,00 €| 57.672,00 €|
 
 (*) Se estima que permanecerá activo el 15% de los usuarios premium tras el periodo gratuito de 6 meses.
 
 ## 3.3. Justificación de la tabla
 
-Las cifras de descargas previstas para el primer año responden a una fase inicial de lanzamiento, en la que la aplicación todavía está construyendo visibilidad, posicionamiento en tiendas y base de usuarios. El crecimiento posterior se apoya en el incremento de notoriedad, el boca a boca y la progresiva consolidación del producto en un segmento con necesidad real de seguimiento de medicación [web:34][web:38].
+Las cifras de descargas previstas para el primer año responden a una fase inicial de lanzamiento, en la que la aplicación todavía está construyendo visibilidad, posicionamiento en tiendas y base de usuarios. El crecimiento posterior se apoya en el incremento de notoriedad, el boca a boca y la progresiva consolidación del producto en un segmento con necesidad real de seguimiento de medicación.
 
-La conversión a premium del primer semestre se justifica porque coincide con una promoción de 6 meses gratuitos, por lo que una parte importante de los usuarios prueba la versión avanzada antes de pagar. A partir del segundo semestre, la conversión baja a porcentajes más estables y realistas, en línea con el comportamiento habitual de las aplicaciones por suscripción, donde la retención depende del valor percibido y del uso continuado del servicio [web:21][web:27].
+La conversión a premium del primer semestre se justifica porque coincide con una promoción de 6 meses gratuitos, por lo que una parte importante de los usuarios prueba la versión avanzada antes de pagar. A partir del segundo semestre, la conversión baja a porcentajes más estables y realistas, en línea con el comportamiento habitual de las aplicaciones por suscripción, donde la retención depende del valor percibido y del uso continuado del servicio.
 
-El precio de suscripción y la evolución de ingresos se justifican por la estrategia de introducir primero una tarifa reducida para facilitar la adopción y después una tarifa estándar cuando la app ya está consolidada. Esta lógica es coherente con el modelo de monetización de apps de salud y suscripción, donde el periodo de prueba y la progresión del precio forman parte de la estrategia comercial [web:21][web:22][web:27].
+El precio de suscripción y la evolución de ingresos se justifican por la estrategia de introducir primero una tarifa reducida para facilitar la adopción y después una tarifa estándar cuando la app ya está consolidada. Esta lógica es coherente con el modelo de monetización de apps de salud y suscripción, donde el periodo de prueba y la progresión del precio forman parte de la estrategia comercial .
 
 ## 3.4. Referencias
 
@@ -214,19 +214,13 @@ Adicionalmente, se realizará la captación de usuarios a través de la impresi�
 
 ### 3.3. Resumen: Cuenta de Resultados Previsional
 
-|Concepto|Año 1|Año 2|Año 3|
-|---|---|---|---|
-|**Ingresos totales**|**___________ €**|**___________ €**|**___________ €**|
-|Costes de personal|18.054,00 €|18.054,00 €|___________ €|
-|Costes de funcionamiento|___________ €|___________ €|___________ €|
-|Gestoría|1.800,00 €|1.800,00 €|1.800,00 €|
-|Marketing|___________ €|___________ €|___________ €|
-|Seguros y tributos|500,00 €|500,00 €|500,00 €|
-|Amortizaciones (equipo informático 25%/año)|125,00 €|125,00 €|125,00 €|
-|Gastos iniciales de puesta en marcha|1.045,04 €|0,00 €|0,00 €|
-|**Total costes**|**___________ €**|**___________ €**|**___________ €**|
-|**Resultado bruto**|**___________ €**|**___________ €**|**___________ €**|
-|Ingresos financieros|___________ €|___________ €|___________ €|
-|**Beneficio antes de impuestos**|**___________ €**|**___________ €**|**___________ €**|
-|Impuesto de sociedades (15% años 1-2; 20% año 3)|___________ €|___________ €|___________ €|
-|**Beneficio neto**|**___________ €**|**___________ €**|**___________ €**|
+| Concepto                                                  | 1º semestre | 2º semestre | Año 2      | Año 3      |
+|-----------------------------------------------------------|-------------|-------------|------------|------------|
+| Número de descargas estimadas                             | 3.000       | 4.000       | 20.000     | 40.000     |
+| Número acumulado de descargas estimadas                   | 3.000       | 7.000       | 27.000     | 67.000     |
+| % de conversión a premium                                 | 90%         | 5%          | 7%         | 7%         |
+| Nuevos usuarios premium del período                       | 2.700       | 200         | 1.400      | 2.800      |
+| Usuarios premium activos acumulados al final del período (*) | 405         | 605         | 2.005      | 4.805      |
+| Precio suscripción del período                            | - €         | 6,00 €      | 12,00 €    | 12,00 €    |
+| Importe cuotas clientes premium                           | - €         | 3.630,00 €  | 24.060,00 €| 57.660,00 €|
+| Total de ventas                                           | - €         | 3.630,00 €  | 24.060,00 €| 57.672,00 €|
