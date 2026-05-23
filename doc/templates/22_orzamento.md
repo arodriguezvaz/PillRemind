@@ -90,25 +90,45 @@ La inscripción en el Registro Mercantil provincial es el paso final para que la
 
 ## 3. Cuenta de Pérdidas y Ganancias
 
-### 3.1. Ingresos previstos
+## 3.1. Justificación de las descargas estimadas
 
-La aplicación sigue un modelo freemium: la versión gratuita ofrece funcionalidades básicas y la versión premium desbloquea funcionalidades avanzadas (múltiples perfiles, sincronización en la nube, etc.) a cambio de una suscripción de pago.
+La previsión de descargas se ha elaborado a partir de un mercado potencial realista formado por personas que toman medicación de forma habitual, especialmente usuarios con enfermedades crónicas, pacientes polimedicados y cuidadores. En Galicia existe una proporción elevada de población mayor y una prevalencia relevante de enfermedades crónicas, lo que refuerza la necesidad de soluciones digitales orientadas al control de tratamientos y recordatorios de medicación.
 
-**Estimación de usuarios:**
+Además, la aplicación se dirige a un problema frecuente en la población adulta y envejecida: la gestión continuada de medicación. Distintos estudios y datos oficiales muestran que una parte significativa de la población presenta enfermedades crónicas, y que en Galicia la población mayor y los pacientes con tratamientos prolongados tienen un peso especialmente alto, lo que hace razonable estimar un mercado potencial amplio para este tipo de app .
 
-| Concepto                                                  | 1º semestre | 2º semestre | Año 2      | Año 3      |
-|-----------------------------------------------------------|-------------|-------------|------------|------------|
-| Número de descargas estimadas                             | 3.000       | 4.000       | 20.000     | 40.000     |
-| Número acumulado de descargas estimadas                   | 3.000       | 7.000       | 27.000     | 67.000     |
-| % de conversión a premium                                 | 90%         | 5%          | 7%         | 7%         |
-| Nuevos usuarios premium del período                       | 2.700       | 200         | 1.400      | 2.800      |
-| Usuarios premium activos acumulados al final del período  | 405 (*)        | 605         | 2.005      | 4.805      |
-| Precio suscripción del período                            | - €         | 6,00 €      | 12,00 €    | 12,00 €    |
-| Importe cuotas clientes premium                           | - €         | 3.630,00 €  | 24.060,00 €| 57.660,00 €|
-| Total de ventas                                           | - €         | 3.630,00 €  | 24.060,00 €| 57.672,00 €|
+La encuesta realizada por el proyecto aporta una validación directa de la demanda, ya que aproximadamente el 50% de las personas consultadas manifestó que se descargaría la aplicación. Esta cifra no se interpreta como una descarga automática e inmediata, sino como una intención de uso que sirve para estimar la aceptación inicial del producto y ajustar la previsión de adopción real con un criterio prudente.
 
-(*) se estima que permanecerán activos el 15% de usarios premium después de un periodo gratuito de 6 meses del plan premium
+## 3.2. Estimación de usuarios
 
+| Concepto | 1º semestre | 2º semestre | Año 2 | Año 3 |
+|---|---:|---:|---:|---:|
+| Número de descargas estimadas | 3.000 | 4.000 | 20.000 | 40.000 |
+| Número acumulado de descargas estimadas | 3.000 | 7.000 | 27.000 | 67.000 |
+| % de conversión a premium | 20% | 8% | 7% | 7% |
+| Nuevos usuarios premium del período | 600 | 320 | 1.400 | 2.800 |
+| Usuarios premium activos acumulados al final del período | 90 (*) | 410 | 1.810 | 4.610 |
+| Precio suscripción del período | - € | 6,00 € | 12,00 € | 12,00 € |
+| Importe cuotas clientes premium | - € | 2.460,00 € | 21.720,00 € | 55.320,00 € |
+| Total de ventas | - € | 2.460,00 € | 21.720,00 € | 55.320,00 € |
+
+(*) Se estima que permanecerá activo el 15% de los usuarios premium tras el periodo gratuito de 6 meses.
+
+## 3.3. Justificación de la tabla
+
+Las cifras de descargas previstas para el primer año responden a una fase inicial de lanzamiento, en la que la aplicación todavía está construyendo visibilidad, posicionamiento en tiendas y base de usuarios. El crecimiento posterior se apoya en el incremento de notoriedad, el boca a boca y la progresiva consolidación del producto en un segmento con necesidad real de seguimiento de medicación [web:34][web:38].
+
+La conversión a premium del primer semestre se justifica porque coincide con una promoción de 6 meses gratuitos, por lo que una parte importante de los usuarios prueba la versión avanzada antes de pagar. A partir del segundo semestre, la conversión baja a porcentajes más estables y realistas, en línea con el comportamiento habitual de las aplicaciones por suscripción, donde la retención depende del valor percibido y del uso continuado del servicio [web:21][web:27].
+
+El precio de suscripción y la evolución de ingresos se justifican por la estrategia de introducir primero una tarifa reducida para facilitar la adopción y después una tarifa estándar cuando la app ya está consolidada. Esta lógica es coherente con el modelo de monetización de apps de salud y suscripción, donde el periodo de prueba y la progresión del precio forman parte de la estrategia comercial [web:21][web:22][web:27].
+
+## 3.4. Referencias
+
+- Galicia y población mayor con mayor prevalencia de enfermedades crónicas: [https://pubmed.ncbi.nlm.nih.gov/25262309/](https://pubmed.ncbi.nlm.nih.gov/25262309/)
+- TELEA y características de la población gallega: [https://health.ec.europa.eu/system/files/2021-12/ev_20210601_co05_en.pdf](https://health.ec.europa.eu/system/files/2021-12/ev_20210601_co05_en.pdf)
+- Encuesta de salud en España, enfermedades crónicas: [https://www.ine.es/dyngs/Prensa/en/ESdE2023.htm](https://www.ine.es/dyngs/Prensa/en/ESdE2023.htm)
+- Adapty, *State of In-App Subscriptions 2026*: [https://adapty.io/state-of-in-app-subscriptions/](https://adapty.io/state-of-in-app-subscriptions/)
+- RevenueCat, *State of Subscription Apps 2026*: [https://www.revenuecat.com/state-of-subscription-apps/](https://www.revenuecat.com/state-of-subscription-apps/)
+- AppTweak, *App Store conversion rate / category benchmarks*: [https://www.apptweak.com/en/aso-blog/app-store-conversion-rate](https://www.apptweak.com/en/aso-blog/app-store-conversion-rate)
 ---
 
 ### 3.2. Gastos
