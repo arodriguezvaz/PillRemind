@@ -115,16 +115,17 @@ La encuesta realizada por el proyecto aporta una validación directa de la deman
 
 ## 3.3. Justificación de la tabla
 
-Las cifras de descargas previstas para el primer año responden a una fase inicial de lanzamiento, en la que la aplicación todavía está construyendo visibilidad, posicionamiento en tiendas y base de usuarios. El crecimiento posterior se apoya en el incremento de notoriedad, el boca a boca y la progresiva consolidación del producto en un segmento con necesidad real de seguimiento de medicación.
+La previsión de descargas del primer año responde a una fase inicial de lanzamiento en la que la aplicación está construyendo visibilidad y posicionamiento en tiendas. Los 3.000 downloads del primer semestre se consideran una estimación conservadora, coherente con el alcance geográfico limitado a Galicia y con un presupuesto de marketing de 3.587,24 € destinado a folletos y anuncios en Facebook.
 
-La conversión a premium del primer semestre se justifica porque coincide con una promoción de 6 meses gratuitos, por lo que una parte importante de los usuarios prueba la versión avanzada antes de pagar. A partir del segundo semestre, la conversión baja a porcentajes más estables y realistas, en línea con el comportamiento habitual de las aplicaciones por suscripción, donde la retención depende del valor percibido y del uso continuado del servicio.
+El crecimiento hasta las 20.000 descargas en el segundo año se apoya en la consolidación del producto, el efecto de las recomendaciones entre usuarios y el aumento del gasto en publicidad digital, que históricamente es el principal canal de captación en apps de salud dirigidas al segmento de 40-65 años.
 
-El precio de suscripción y la evolución de ingresos se justifican por la estrategia de introducir primero una tarifa reducida para facilitar la adopción y después una tarifa estándar cuando la app ya está consolidada. Esta lógica es coherente con el modelo de monetización de apps de salud y suscripción, donde el periodo de prueba y la progresión del precio forman parte de la estrategia comercial .
+La conversión a premium del 90 % en el primer semestre se explica porque coincide con la promoción de 6 meses gratuitos: el usuario accede a la versión premium sin coste, por lo que la barrera de adopción es mínima. A partir del segundo semestre, la conversión cae al 5-7 %, porcentaje habitual en aplicaciones de suscripción una vez eliminado el incentivo de prueba gratuita. La retención estimada del 15 % de usuarios premium activos al final de cada periodo es un criterio prudente, establecido para no sobreestimar los ingresos recurrentes.
+
+El precio de 6 €/mes en el segundo semestre actúa como tarifa de entrada para facilitar la primera conversión de pago. El paso a 12 €/mes en el año 2 se produce cuando la app ya cuenta con una base consolidada de usuarios y tiene un posicionamiento más definido, estrategia habitual en apps de salud y bienestar por suscripción.
 
 ## 3.4. Referencias
 
-- Galicia y población mayor con mayor prevalencia de enfermedades crónicas: [https://pubmed.ncbi.nlm.nih.gov/25262309/](https://pubmed.ncbi.nlm.nih.gov/25262309/)
-- TELEA y características de la población gallega: [https://health.ec.europa.eu/system/files/2021-12/ev_20210601_co05_en.pdf](https://health.ec.europa.eu/system/files/2021-12/ev_20210601_co05_en.pdf)
+- [Datos do INE sobre recetas e usuarios de tarxetas santiarias]
 - Encuesta de salud en España, enfermedades crónicas: [https://www.ine.es/dyngs/Prensa/en/ESdE2023.htm](https://www.ine.es/dyngs/Prensa/en/ESdE2023.htm)
 - Adapty, *State of In-App Subscriptions 2026*: [https://adapty.io/state-of-in-app-subscriptions/](https://adapty.io/state-of-in-app-subscriptions/)
 - RevenueCat, *State of Subscription Apps 2026*: [https://www.revenuecat.com/state-of-subscription-apps/](https://www.revenuecat.com/state-of-subscription-apps/)
