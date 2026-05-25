@@ -117,6 +117,8 @@ Esta cifra no se interpreta como una descarga automática e inmediata, sino como
 
 ## 3.2. Estimación de usuarios
 
+Hacer un cálculo exacto de los usarios de la apliación es imposible pero com ya hemos dicho antes existe un número elevado de personas interesadas y mediante herramientas de marketing se aseguro un alcance progresivo para coneguir más descargas y lograr usuarios premium.
+
 | Concepto                                                  | 1º semestre | 2º semestre | Año 2      | Año 3      |
 |-----------------------------------------------------------|-------------|-------------|------------|------------|
 | Número de descargas estimadas                             | 3.000       | 4.000       | 20.000     | 40.000     |
@@ -132,8 +134,7 @@ Esta cifra no se interpreta como una descarga automática e inmediata, sino como
 
 ## 3.3. Justificación de la tabla
 
-La previsión de descargas del primer año responde a una fase inicial de lanzamiento en la que la aplicación está construyendo visibilidad y posicionamiento en tiendas. Las 3.000 descargas del primer semestre se consideran una estimación conservadora, coherente con el alcance geográfico limitado a Galicia y con un presupuesto de marketing de 3.587,24 € destinado a folletos y anuncios en Facebook.
-De esta forma, con una inversión en publicidad de 2.300 € en Facebook Ads y 1.200 € en folletos, y considerando un Coste por Instalación (CPI) medio de 1 a 5 € en campañas de Facebook Ads para aplicaciones móviles, se estima una captación directa de entre 700 y 2.000 usuarios. A estas descargas pagadas se suman las orgánicas derivadas de recomendaciones entre usuarios, visibilidad en tiendas de aplicaciones y presencia en centros sanitarios, justificando así una previsión total de 3.000 descargas en el primer semestre y 7.000 acumuladas al finalizar el año. Esta estimación se considera prudente frente al mercado potencial gallego de más de 160.000 personas interesadas en gestión de medicación.
+La previsión de descargas del primer año responde a una fase inicial de lanzamiento en la que la aplicación está construyendo visibilidad y posicionamiento en tiendas. De esta forma, con una inversión en publicidad de 2.300 € en Facebook Ads y 1.200 € en folletos, y considerando un Coste por Instalación (CPI) medio de 1 a 5 € en campañas de Facebook Ads para aplicaciones móviles, se estima una captación directa de unos 2.000 usuarios. A estas descargas pagadas se suman las orgánicas derivadas de recomendaciones entre usuarios, visibilidad en tiendas de aplicaciones y presencia en centros sanitarios, justificando así una previsión total de 3.000 descargas en el primer semestre y 7.000 acumuladas al finalizar el año. Esta estimación se considera prudente frente al mercado potencial gallego de más de 160.000 personas interesadas en gestión de medicación.
 
 
 El crecimiento hasta las 20.000 descargas en el segundo año se apoya en la consolidación del producto, el efecto de las recomendaciones entre usuarios y el aumento del gasto en publicidad digital, que históricamente es el principal canal de captación en apps de salud dirigidas al segmento de 40-65 años.
@@ -145,9 +146,7 @@ El precio de 6 €/mes en el segundo semestre actúa como tarifa de entrada para
 ## 3.4. Referencias
 
 - [Datos do INE sobre recetas e usuarios de tarxetas santiarias](https://www.ige.gal/igebdt/selector.jsp?idioma=es&COD=8291&API=true)
-- Adapty, *State of In-App Subscriptions 2026*: [https://adapty.io/state-of-in-app-subscriptions/](https://adapty.io/state-of-in-app-subscriptions/)
-- RevenueCat, *State of Subscription Apps 2026*: [https://www.revenuecat.com/state-of-subscription-apps/](https://www.revenuecat.com/state-of-subscription-apps/)
-- AppTweak, *App Store conversion rate / category benchmarks*: [https://www.apptweak.com/en/aso-blog/app-store-conversion-rate](https://www.apptweak.com/en/aso-blog/app-store-conversion-rate)
+- [Datos de conversión de Facebook Ads](https://www.wask.co/facebook-advertising-costs/cpi-cost-per-install/?utm_source=chatgpt.com)
 ---
 
 ### 3.2. Gastos
