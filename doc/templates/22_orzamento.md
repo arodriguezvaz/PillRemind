@@ -2,7 +2,7 @@
 
 ## 1. Financiamiento
 
-Para financiar el proyecto se solicitará un **préstamo familiar**, por importe de **€**. Este importe se utilizará para acometer los gastos de constitución y prácticamente todos los del primer año. Este tipo de préstamo requiere la formalización mediante un contrato firmado, y no genera ningún gasto de notaría ni impuestos. Solo es necesario realizar, en el plazo de 1 mes desde la realización del contrato, la presentación en la Agencia Tributaria de Galicia, del Impuesto de Transmisiones Patrimoniales (Modelo 600), cuyo tipo impositivo para este supuesto es 0 %.
+Para financiar el proyecto se solicitará un **préstamo familiar**, por importe de **32.000€**. Este importe se utilizará para acometer los gastos de constitución y los del primer año. Este tipo de préstamo requiere la formalización mediante un contrato firmado, y no genera ningún gasto de notaría ni impuestos. Solo es necesario realizar, en el plazo de 1 mes desde la realización del contrato, la presentación en la Agencia Tributaria de Galicia, del Impuesto de Transmisiones Patrimoniales (Modelo 600), cuyo tipo impositivo para este supuesto es 0 %. A partir del tercer año, que es cuando se perciben beneficios, se empezará la devolución del mismo.
 
 ---
 
@@ -151,7 +151,8 @@ Esta tarifa plana es prorrogable durante 12 meses más si el salario está por d
 |RETA (tarifa plana año 1)|960,00 €|960,00 €|3.000,00 €||
 |**Total personal**|**18.054,00 €**|**18.054,00 €**|**21.494,00 €**||
 
--[Tarifa plama RETA](https://portal.seg-social.gob.es/wps/portal/importass/importass/Colectivos/Trabajo+Autonomo/guia)
+-[Tarifa plana RETA](https://portal.seg-social.gob.es/wps/portal/importass/importass/Colectivos/Trabajo+Autonomo/guia)
+
 ---
 
 #### 3.2.2 Gastos de funcionamiento y mantenimiento del servicio
