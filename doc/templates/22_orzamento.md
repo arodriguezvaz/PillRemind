@@ -132,7 +132,9 @@ Esta cifra no se interpreta como una descarga automática e inmediata, sino como
 
 ## 3.3. Justificación de la tabla
 
-La previsión de descargas del primer año responde a una fase inicial de lanzamiento en la que la aplicación está construyendo visibilidad y posicionamiento en tiendas. Los 3.000 downloads del primer semestre se consideran una estimación conservadora, coherente con el alcance geográfico limitado a Galicia y con un presupuesto de marketing de 3.587,24 € destinado a folletos y anuncios en Facebook.
+La previsión de descargas del primer año responde a una fase inicial de lanzamiento en la que la aplicación está construyendo visibilidad y posicionamiento en tiendas. Las 3.000 descargas del primer semestre se consideran una estimación conservadora, coherente con el alcance geográfico limitado a Galicia y con un presupuesto de marketing de 3.587,24 € destinado a folletos y anuncios en Facebook.
+De esta forma, con una inversión en publicidad de 2.300 € en Facebook Ads y 1.200 € en folletos, y considerando un Coste por Instalación (CPI) medio de 1 a 5 € en campañas de Facebook Ads para aplicaciones móviles, se estima una captación directa de entre 700 y 2.000 usuarios. A estas descargas pagadas se suman las orgánicas derivadas de recomendaciones entre usuarios, visibilidad en tiendas de aplicaciones y presencia en centros sanitarios, justificando así una previsión total de 3.000 descargas en el primer semestre y 7.000 acumuladas al finalizar el año. Esta estimación se considera prudente frente al mercado potencial gallego de más de 160.000 personas interesadas en gestión de medicación.
+
 
 El crecimiento hasta las 20.000 descargas en el segundo año se apoya en la consolidación del producto, el efecto de las recomendaciones entre usuarios y el aumento del gasto en publicidad digital, que históricamente es el principal canal de captación en apps de salud dirigidas al segmento de 40-65 años.
 
