@@ -92,11 +92,28 @@ La inscripción en el Registro Mercantil provincial es el paso final para que la
 
 ## 3.1. Justificación de las descargas estimadas
 
-La previsión de descargas se ha elaborado a partir de un mercado potencial realista formado por personas que toman medicación de forma habitual, especialmente usuarios con enfermedades crónicas, pacientes polimedicados y cuidadores. En Galicia existe una proporción elevada de población mayor y una prevalencia relevante de enfermedades crónicas, lo que refuerza la necesidad de soluciones digitales orientadas al control de tratamientos y recordatorios de medicación.
+La previsión de descargas se ha elaborado a partir de un mercado potencial en el ambiente gallego. Según los datos del Intituto de Estadísitca de Galicia se puede apreciar que son los adultos trabajadores de entre 40-64 años los que más recetas por usuario tiene en promedio. Según una encueta realizada un 33,3% de lso encuestados están muy interesados en una aplicación que les permita gestionar su medicación lo que significa que habría 164.322 personas de entre 40 y 64 años interesadas en la aplicación
 
-Además, la aplicación se dirige a un problema frecuente en la población adulta y envejecida: la gestión continuada de medicación. Distintos estudios y datos oficiales muestran que una parte significativa de la población presenta enfermedades crónicas, y que en Galicia la población mayor y los pacientes con tratamientos prolongados tienen un peso especialmente alto, lo que hace razonable estimar un mercado potencial amplio para este tipo de app .
+Esta cifra no se interpreta como una descarga automática e inmediata, sino como una intención de uso que sirve para estimar la aceptación inicial del producto y ajustar la previsión de adopción real con un criterio prudente.
 
-La encuesta realizada por el proyecto aporta una validación directa de la demanda, ya que aproximadamente el 50% de las personas consultadas manifestó que se descargaría la aplicación. Esta cifra no se interpreta como una descarga automática e inmediata, sino como una intención de uso que sirve para estimar la aceptación inicial del producto y ajustar la previsión de adopción real con un criterio prudente.
+
+### Datos de usuarios y recaudación en Galicia
+
+| Tipos de receitas (TSI) | Tipo de usuario | 15 - A Coruña | 36 - Pontevedra | 27 - Lugo | 32 - Ourense | 12 - Galicia (Total) | Promedio Receitas/usuario |
+|---|---|---|---|---|---|---|---|
+| TSI 001 - Usuarios exentos de achega | Pensionistas y mayores de 65 años | 178.975 | 157.533 | 66.159 | 64.895 | 467.562 | |
+| TSI 001 - Receitas | | 9.765.855 | 7.943.135 | 3.942.073 | 3.770.426 | 25.421.489 | 54 |
+| TSI 002 - Usuarios con achega reducida dun 10% | Adultos trabajadores (40-64 años) | 205.429 | 166.758 | 59.542 | 61.732 | 493.461 | |
+| TSI 002 - Receitas | | 11.837.114 | 9.414.325 | 3.663.683 | 3.690.885 | 28.606.007 | 58 |
+| TSI 003 - Usuarios con achega dun 40% | Adultos jóvenes (25-39 años) | 420.115 | 373.329 | 120.663 | 111.779 | 1.025.886 | |
+| TSI 003 - Receitas | | 5.700.164 | 4.786.098 | 1.682.849 | 1.483.470 | 13.652.581 | 13 |
+| TSI 004 - Usuarios con achega dun 50% | Menores de edad y estudiantes | 267.417 | 206.550 | 58.361 | 50.691 | 583.019 | |
+| TSI 004 - Receitas | | 2.648.304 | 2.029.275 | 664.965 | 557.317 | 5.899.861 | 10 |
+| TSI 005 - Usuarios con achega dun 60% | Usuarios con discapacidad | 10.672 | 7.323 | 1.653 | 1.438 | 21.086 | |
+| TSI 005 - Receitas | | 132.450 | 102.221 | 26.033 | 25.080 | 285.784 | 14 |
+| **Total - Usuarios** | | **1.082.907** | **911.876** | **306.591** | **290.782** | **2.592.156** | |
+| **Total - Receitas** | | **30.085.347** | **24.276.456** | **9.980.221** | **9.527.941** | **73.869.965** | **28** |
+
 
 ## 3.2. Estimación de usuarios
 
@@ -125,8 +142,7 @@ El precio de 6 €/mes en el segundo semestre actúa como tarifa de entrada para
 
 ## 3.4. Referencias
 
-- [Datos do INE sobre recetas e usuarios de tarxetas santiarias]
-- Encuesta de salud en España, enfermedades crónicas: [https://www.ine.es/dyngs/Prensa/en/ESdE2023.htm](https://www.ine.es/dyngs/Prensa/en/ESdE2023.htm)
+- [Datos do INE sobre recetas e usuarios de tarxetas santiarias](https://www.ige.gal/igebdt/selector.jsp?idioma=es&COD=8291&API=true)
 - Adapty, *State of In-App Subscriptions 2026*: [https://adapty.io/state-of-in-app-subscriptions/](https://adapty.io/state-of-in-app-subscriptions/)
 - RevenueCat, *State of Subscription Apps 2026*: [https://www.revenuecat.com/state-of-subscription-apps/](https://www.revenuecat.com/state-of-subscription-apps/)
 - AppTweak, *App Store conversion rate / category benchmarks*: [https://www.apptweak.com/en/aso-blog/app-store-conversion-rate](https://www.apptweak.com/en/aso-blog/app-store-conversion-rate)
