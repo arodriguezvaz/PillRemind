@@ -32,10 +32,10 @@ import com.andres.pillremind.ui.screens.main.TopBarState
 fun MedicationsScreen(
     modifier: Modifier = Modifier,
     onMedicationClick: (medicationId: Int) -> Unit,
-    onTopBarChange: (TopBarState) -> Unit = {}
+    onTopBarChange: (TopBarState) -> Unit = {},
+    medicationsViewModel: MedicationsViewModel = hiltViewModel()
 ) {
-    val medicationsViewModel: MedicationsViewModel = hiltViewModel()
-
+    
     val medications by medicationsViewModel.medications.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {

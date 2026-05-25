@@ -195,8 +195,11 @@ Para la realización de los trámites se opta por contratar los servicios de una
 #### 3.2.4 Gastos de marketing
 
 Tener una página web es casi imprescindible para cualquier empresa, y más para un proyecto digital como este. Contar con una web aporta visibilidad y alcance; permite que personas a las que quizá no se ha podido llegar físicamente conozcan el servicio y se interesen. Asimismo, brinda credibilidad y confianza: una página web estructurada y que transmite seguridad demuestra que la empresa es legítima y organizada. También se puede utilizar como puente de comunicación con los usuarios, ya que desde ella se pueden incluir formularios de contacto, comunicar novedades y, en un futuro, implementar una estrategia de marketing digital.
-Para alojar la web es necesario contar con un dominio reconocible. Para comenzar, el elegido es farmaplus.gal. La otra opción más viable sería farmaplus.com, pero este tiene un coste más elevado y, como la empresa iniciará su actividad empresarial en Galicia, no representa un problema de marca significativo.
+
+Para alojar la web es necesario contar con un dominio reconocible. Para comenzar, el elegido es pillremind.gal. La otra opción más viable sería pillremind.com, pero este tiene un coste más elevado y, como la empresa iniciará su actividad empresarial en Galicia, no representa un problema de marca significativo.
+
 Además del dominio, también es necesario contar con un servicio de hosting que aloje la web en sus servidores. Actualmente, existe una amplia oferta de servicios de hosting que, además, incluyen certificado SSL, que garantiza que la web es segura, y direcciones de correo con el dominio. En este caso, se utilizará el hosting de Hostinger, que permite una dirección de correo, así como 13 copias de seguridad semanales, migración gratuita y una oferta que permite pagar cuatro años juntos.
+
 Adicionalmente, se realizará la captación de usuarios a través de la impresión de folletos, para lo cual se destinaron 1.200 €, lo que permitiría la impresión de alrededor de 9.000 folletos. Asimismo, se invertirá en anuncios en Facebook para captar nuevos usuarios, idealmente dentro del rango de los 40-50 años, que son los más propensos a utilizar la aplicación para sí mismos o para familiares.
 
 

@@ -1,12 +1,10 @@
 package com.andres.pillremind.navigation
 
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.andres.pillremind.data.repository.ProfileRepositoryImpl
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
 import com.andres.pillremind.ui.screens.profiles.ProfilesScreen
@@ -30,7 +28,8 @@ fun NavGraphBuilder.profileSelectionGraph(
                 onProfileSelected = { perfil ->
                     sessionViewModel.setActiveProfile(perfil.id)
                     navController.navigate(Graph.MAIN)
-                }
+                },
+                navController = navController
             )
         }
 

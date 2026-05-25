@@ -1,5 +1,8 @@
 package com.andres.pillremind.ui.screens.profile
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -60,20 +63,32 @@ fun ProfileScreen(
     onSaveClicked: () -> Unit = {},
     profileMode: ProfileMode = ProfileMode.Create,
     onDeletedClicked: () -> Unit = {},
-    onTopBarChange: (TopBarState) -> Unit = {}
+    onTopBarChange: (TopBarState) -> Unit = {},
+    profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
         onTopBarChange(TopBarState(title = "Ver Perfil"))
     }
-    val profileViewModel: ProfileViewModel = hiltViewModel()
     val nombre = remember { mutableStateOf("") }
     val urlImagen = remember { mutableStateOf("") }
     val perfil = profileViewModel.profile.collectAsState().value
 
+
+    var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
     //Variable que si es true muestra el diálogo de eliminación
     var showDeleteDialog by remember {
         mutableStateOf(false)
     }
+    rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        // uri es null si el usuario canceló, o el Uri de la imagen seleccionada
+        uri?.let {
+            // Guarda o usa la URI aquí
+            selectedPhotoUri = it
+        }
+    }
+
     when (profileMode) {
         ProfileMode.Create -> {
             Column(

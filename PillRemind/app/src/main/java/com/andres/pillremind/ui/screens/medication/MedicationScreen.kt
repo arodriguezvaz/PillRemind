@@ -71,9 +71,9 @@ fun MedicationScreen(
     onSaveClicked: () -> Unit = {},
     medicationMode: MedicationMode = MedicationMode.Create,
     onDeleteClicked: () -> Unit = {},
-    onTopBarChange: (TopBarState) -> Unit = {}
+    onTopBarChange: (TopBarState) -> Unit = {},
+    medicationViewModel: MedicationViewModel = hiltViewModel()
 ) {
-    val medicationViewModel: MedicationViewModel = hiltViewModel()
     val medication by medicationViewModel.medication.collectAsState()
     val medicationWeekDays by medicationViewModel.weekDays.collectAsState()
     val medicationTimes by medicationViewModel.times.collectAsState()

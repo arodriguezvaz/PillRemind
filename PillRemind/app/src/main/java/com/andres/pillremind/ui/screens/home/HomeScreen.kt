@@ -31,9 +31,10 @@ import com.andres.pillremind.ui.screens.main.TopBarState
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    onTopBarChange: (TopBarState) -> Unit = {}
+    onTopBarChange: (TopBarState) -> Unit = {},
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-    val homeViewModel: HomeViewModel = hiltViewModel()
+
     val todayIntakes by homeViewModel.todayIntakes.collectAsState()
     LaunchedEffect(Unit) {
         onTopBarChange(
