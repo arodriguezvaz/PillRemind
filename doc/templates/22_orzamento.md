@@ -2,7 +2,7 @@
 
 ## 1. Financiamiento
 
-Para financiar el proyecto se solicitará un **préstamo familiar**, por importe de **.....€**. Este importe se utilizará para acometer los gastos de constitución y prácticamente todos los del primer año. Este tipo de préstamo requiere la formalización mediante un contrato firmado, y no genera ningún gasto de notaría ni impuestos. Solo es necesario realizar, en el plazo de 1 mes desde la realización del contrato, la presentación en la Agencia Tributaria de Galicia, del Impuesto de Transmisiones Patrimoniales (Modelo 600), cuyo tipo impositivo para este supuesto es 0 %.
+Para financiar el proyecto se solicitará un **préstamo familiar**, por importe de **€**. Este importe se utilizará para acometer los gastos de constitución y prácticamente todos los del primer año. Este tipo de préstamo requiere la formalización mediante un contrato firmado, y no genera ningún gasto de notaría ni impuestos. Solo es necesario realizar, en el plazo de 1 mes desde la realización del contrato, la presentación en la Agencia Tributaria de Galicia, del Impuesto de Transmisiones Patrimoniales (Modelo 600), cuyo tipo impositivo para este supuesto es 0 %.
 
 ---
 
@@ -215,13 +215,21 @@ Adicionalmente, se realizará la captación de usuarios a través de la impresi�
 
 ### 3.3. Resumen: Cuenta de Resultados Previsional
 
-| Concepto                                                  | 1º semestre | 2º semestre | Año 2      | Año 3      |
-|-----------------------------------------------------------|-------------|-------------|------------|------------|
-| Número de descargas estimadas                             | 3.000       | 4.000       | 20.000     | 40.000     |
-| Número acumulado de descargas estimadas                   | 3.000       | 7.000       | 27.000     | 67.000     |
-| % de conversión a premium                                 | 90%         | 5%          | 7%         | 7%         |
-| Nuevos usuarios premium del período                       | 2.700       | 200         | 1.400      | 2.800      |
-| Usuarios premium activos acumulados al final del período (*) | 405         | 605         | 2.005      | 4.805      |
-| Precio suscripción del período                            | - €         | 6,00 €      | 12,00 €    | 12,00 €    |
-| Importe cuotas clientes premium                           | - €         | 3.630,00 €  | 24.060,00 €| 57.660,00 €|
-| Total de ventas                                           | - €         | 3.630,00 €  | 24.060,00 €| 57.672,00 €|
+| Concepto                             | Año 1      | Año 2      | Año 3      |
+|--------------------------------------|-------------|-------------|-------------|
+| **Ingresos**                         | 3.630,00 €  | 24.060,00 € | 57.672,00 € |
+| Ventas                               | 3.630,00 €  | 24.060,00 € | 57.672,00 € |
+| **Costes Variables**                 | 0,00 €      | 0,00 €      | 0,00 €      |
+| Materiales                           | 0,00 €      | 0,00 €      | 0,00 €      |
+| **Margen Bruto**                     | 3.630,00 €  | 24.060,00 € | 57.672,00 € |
+| **Costes fijos de Personal**         | 18.054,00 € | 18.054,00 € | 21.494,00 € |
+| Alquileres                           | 0,00 €      | 0,00 €      | 0,00 €      |
+| Gastos Generales                     | 12.936,76 € | 6.044,86 €  | 6.044,86 €  |
+| Seguros y Tributos                   | 500,00 €    | 500,00 €    | 500,00 €    |
+| Suministros                          | 0,00 €      | 0,00 €      | 0,00 €      |
+| **Costes Fijos**                     | 31.490,76 € | 24.598,86 € | 28.038,86 € |
+| **Resultado Bruto**                  | -27.860,76 €| -538,86 €   | 29.633,14 € |
+| Ingresos Financieros                 | 520,00 €    | 120,00 €    | 120,00 €    |
+| Gastos Financieros                   | 0,00 €      | 0,00 €      | 0,00 €      |
+| **Resultado Financiero**             | 520,00 €    | 120,00 €    | 120,00 €    |
+| **Beneficio antes de Impuestos**     | -27.340,76 €| -418,86 €   | 29.753,14 € |
