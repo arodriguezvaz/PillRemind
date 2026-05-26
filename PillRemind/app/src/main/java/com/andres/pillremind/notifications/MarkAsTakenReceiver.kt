@@ -28,9 +28,7 @@ class MarkAsTakenReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val intake = intakeRepository.getIntakeById(intakeId)
-                Log.d("PillDebug", "MarkAsTaken - Intake encontrada: $intake")
                 intakeRepository.updateIntake(intake!!.copy(takenAt = LocalDateTime.now()))
-                Log.d("PillDebug", "MarkAsTaken - Intake actualizada ok")
                 NotificationManagerCompat.from(context).cancel(intakeId)
             } catch (e: Exception) {
                 Log.e("PillDebug", "MarkAsTaken - Error", e)
