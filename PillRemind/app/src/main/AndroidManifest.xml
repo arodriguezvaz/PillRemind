@@ -30,16 +30,12 @@
 
         <receiver
             android:name=".notifications.AlarmReceiver"
-            android:exported="true" />
-        <!--
-                <receiver
-                    android:name=".notifications.BootReceiver"
-                    android:exported="true">
-                    <intent-filter>
-                        <action android:name="android.intent.action.BOOT_COMPLETED" />
-                    </intent-filter>
-                </receiver>
-                -->
+            android:exported="false" />
+
+        <receiver
+            android:name=".notifications.MarkAsTakenReceiver"
+            android:exported="false" />
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"

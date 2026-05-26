@@ -19,19 +19,17 @@ class AlarmScheduler @Inject constructor(
     /**
      * Programa una alarma exacta para un horario concreto.
      *
-     * @param scheduleId Identificador del horario asociado.
+     * @param intakeId Identificador del horario asociado.
      * @param triggerAtMillis Momento en milisegundos en el que debe ejecutarse la alarma.
      */
-    fun schedule(scheduleId: Int, triggerAtMillis: Long) {
+    fun schedule(intakeId: Int, triggerAtMillis: Long) {
         if (alarmManager.canScheduleExactAlarms()) {
-
-            // Intent utilizado por el BroadcastReceiver para mostrar la notificación
             val intent = Intent(context, AlarmReceiver::class.java).apply {
-                putExtra("schedule_id", scheduleId)
+                putExtra("intake_id", intakeId)
             }
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
-                scheduleId,
+                intakeId,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
@@ -45,13 +43,13 @@ class AlarmScheduler @Inject constructor(
 
     /**
      * Cancela la alarma asociada a un horario.
-     * @param scheduleId Identificador del horario cuya alarma se desea cancelar.
+     * @param intakeId Identificador del horario cuya alarma se desea cancelar.
      */
-    fun cancel(scheduleId: Int) {
+    fun cancel(intakeId: Int) {
         val intent = Intent(context, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            scheduleId,
+            intakeId,
             intent,
             PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
         )

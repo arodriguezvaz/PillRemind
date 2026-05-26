@@ -43,9 +43,10 @@ class IntakeRepositoryImpl @Inject constructor(
             }
             dia = dia.plusDays(1)
         }
-
-        intakeDao.insertIntakes(tomasAInsertar.map { it.toEntity() })
-        return tomasAInsertar
+        // Inserta las tomas en la base de datos y devuelve los IDs generados
+        val ids = intakeDao.insertIntakes(tomasAInsertar.map { it.toEntity() })
+        // Asigna los IDs generados a cada toma y devuelve la lista actualizada
+        return tomasAInsertar.mapIndexed { index, intake -> intake.copy(id = ids[index].toInt()) }
     }
 
     override suspend fun insertIntake(intake: Intake): Long {

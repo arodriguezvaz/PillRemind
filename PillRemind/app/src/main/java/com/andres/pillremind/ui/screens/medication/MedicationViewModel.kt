@@ -1,10 +1,12 @@
 package com.andres.pillremind.ui.screens.medication
 
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
+import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.WeekDay
@@ -26,6 +28,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 
 /**
  * ViewModel para la pantalla de medicación.
@@ -131,6 +134,7 @@ class MedicationViewModel @Inject constructor(
                         endDate = endDate
                     )
                 )
+                Log.d("PillDebug", "Medicamento creado con id: $medicationId")
 
                 for (day in weekDays) {
                     for (time in times) {
@@ -146,7 +150,12 @@ class MedicationViewModel @Inject constructor(
                     }
                 }
                 val desde = intakeRepository.getLastGeneratedDate()
-                intakeRepository.createIntakes(desde, LocalDate.now())
+                Log.d("PillDebug", "Generando intakes desde: $desde hasta: ${LocalDate.now()}")
+
+                val intakes = intakeRepository.createIntakes(desde, LocalDate.now())
+                Log.d("PillDebug", "Intakes generadas: ${intakes.size} -> $intakes")
+
+                scheduleAlarmsForIntakes(intakes)
             } else {
                 showMessage("No hay perfil activo")
             }
@@ -222,6 +231,39 @@ class MedicationViewModel @Inject constructor(
 
     }
 
+    /**
+     * Programa alarmas para las intakes cuya hora aún no ha pasado.
+     */
+    private fun scheduleAlarmsForIntakes(intakes: List<Intake>) {
+        val now = System.currentTimeMillis()
+        for (intake in intakes) {
+            // id=-1 significa que ya existía en BD (IGNORE), la saltamos
+            if (intake.id == -1) continue
+            val millis = intake.scheduledAt
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+            if (millis > now) {
+                alarmScheduler.schedule(intake.id, millis)
+            }
+        }
+    }
+
+    /*
+        /**
+         * Cancela las alarmas de las intakes futuras del medicamento actual.
+         * Se llama antes de actualizar o eliminar para no dejar alarmas huérfanas.
+         */
+        private suspend fun cancelFutureIntakeAlarms() {
+            if (medicationId == null) return
+            val now = LocalDateTime.now()
+            // Obtenemos las intakes futuras a través de los schedules actuales
+            schedules.value.forEach { schedule ->
+                intakeRepository.getFutureIntakesByScheduleId(schedule.id, now)
+                    .forEach { intake -> alarmScheduler.cancel(intake.id) }
+            }
+        }
+    */
     private fun showMessage(message: String) {
         _snackbarMessage.value = message
     }
