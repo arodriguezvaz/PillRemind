@@ -65,6 +65,7 @@ class ProfileViewModel @Inject constructor(
      * @param profile Perfil que se desea eliminar.
      */
     fun deleteProfile(profile: Profile) {
+        profile.urlImagen?.let { File(it).delete() }
         viewModelScope.launch {
             profileRepository.deleteProfile(profile)
             sessionManager.clearActiveProfile()

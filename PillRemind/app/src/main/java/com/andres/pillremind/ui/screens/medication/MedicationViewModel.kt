@@ -1,11 +1,14 @@
 package com.andres.pillremind.ui.screens.medication
 
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
+import com.andres.pillremind.data.utils.copyImageToInternalStorage
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Schedule
@@ -15,6 +18,7 @@ import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
 import com.andres.pillremind.notifications.AlarmScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,6 +28,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -48,7 +53,8 @@ class MedicationViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val alarmScheduler: AlarmScheduler,
     private val intakeRepository: IntakeRepository,
-    sessionManager: SessionManager
+    sessionManager: SessionManager,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
     //Recupera el profileId del sessionManager
     val profileId = sessionManager.activeProfileId
@@ -92,7 +98,7 @@ class MedicationViewModel @Inject constructor(
      */
     fun addMedication(
         nombre: String,
-        imageUrl: String? = null,
+        photoUri: Uri? = null,
         dose: Double,
         unit: String,
         startDate: LocalDate,
@@ -103,7 +109,9 @@ class MedicationViewModel @Inject constructor(
 
         val trimmedName = nombre.trim()
         val normalizedUnit = unit.trim()
-
+        val imagePath = photoUri?.let {
+            copyImageToInternalStorage(context, it)
+        }
         if (trimmedName.isBlank()) {
             showMessage("El nombre no puede estar vacío")
             return
@@ -126,7 +134,7 @@ class MedicationViewModel @Inject constructor(
                     Medication(
                         name = trimmedName,
                         profileId = profileId,
-                        imageUrl = imageUrl,
+                        imageUrl = imagePath,
                         dose = dose,
                         unit = normalizedUnit,
                         startDate = startDate,
@@ -164,7 +172,8 @@ class MedicationViewModel @Inject constructor(
      */
     fun updateMedication(
         name: String,
-        imageUrl: String? = null,
+        newPhotoUri: Uri? = null,
+        currentImagePath: String? = null,
         dose: Double,
         unit: String,
         startDate: LocalDate,
@@ -174,6 +183,12 @@ class MedicationViewModel @Inject constructor(
     ) {
         val trimmedName = name.trim()
         val normalizedUnit = unit.trim()
+        val imagePath = if (newPhotoUri != null) {
+            currentImagePath?.let { File(it).delete() }
+            copyImageToInternalStorage(context, newPhotoUri)
+        } else {
+            currentImagePath
+        }
         viewModelScope.launch {
             val profileId = profileId.firstOrNull()
 
@@ -183,7 +198,7 @@ class MedicationViewModel @Inject constructor(
                     id = medicationId,
                     name = trimmedName,
                     profileId = profileId,
-                    imageUrl = imageUrl,
+                    imageUrl = imagePath,
                     dose = dose,
                     unit = normalizedUnit,
                     startDate = startDate,
@@ -222,6 +237,7 @@ class MedicationViewModel @Inject constructor(
         for (schedule in schedules.value) {
             alarmScheduler.cancel(schedule.id)
         }
+        medication.imageUrl?.let { File(it).delete() }
         viewModelScope.launch {
             medicationRepository.deleteMedication(medication)
         }

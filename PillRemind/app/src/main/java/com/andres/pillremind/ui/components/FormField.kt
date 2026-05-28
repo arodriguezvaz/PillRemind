@@ -21,17 +21,15 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun FormField(
     label: String,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Column {
+    Column(modifier = modifier) {
         Text(text = label, style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(8.dp))
         content()
     }
 }
-
-
-enum class FormFieldSize { Small, Medium }
 
 
 @Preview(showBackground = true)

@@ -1,6 +1,7 @@
 package com.andres.pillremind.ui.screens.medication
 
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,19 +32,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
+import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.FormField
+import com.andres.pillremind.ui.components.ProfilePhotoPicker
 import com.andres.pillremind.ui.components.WeekDayChipGroup
 import com.andres.pillremind.ui.components.timeeditor.TimeListEditor
 import com.andres.pillremind.ui.screens.main.TopBarState
+import java.io.File
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -80,24 +88,59 @@ fun MedicationScreen(
 
     //Variables con estado mutable para los campos del formulario
     val name = remember { mutableStateOf("") }
-    val urlImagen = remember { mutableStateOf("") }
+    var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
 
     val dose = remember { mutableStateOf("") }
     val unit = remember { mutableStateOf("") }
 
     val startDate = remember { mutableStateOf<LocalDate?>(null) }
+    val isChronicTreatment = remember { mutableStateOf(false) }
     val endDate = remember { mutableStateOf<LocalDate?>(null) }
 
     val weekDays = remember { mutableStateOf(setOf<WeekDay>()) }
 
     val times = remember { mutableStateListOf<LocalTime>() }
 
+    val unitOptions = listOf(
+        "mg",
+        "g",
+        "mcg",
+        "kg",
 
+        "ml",
+        "l",
+
+        "comprimidos",
+        "cápsulas",
+        "pastillas",
+        "tabletas",
+
+        "gotas",
+        "sobres",
+        "ampollas",
+        "viales",
+
+        "inyecciones",
+        "dosis",
+        "puffs",
+        "sprays",
+
+        "UI",
+        "mEq",
+        "mmol",
+
+        "parches",
+        "supositorios",
+        "óvulos",
+
+        "cucharadas",
+        "cucharaditas"
+    )
     //Si medication no es null actualiza las variables con los valores de medication
     LaunchedEffect(medication) {
         medication?.let {
             name.value = it.name
-            urlImagen.value = it.imageUrl ?: ""
+            selectedPhotoUri = it.imageUrl?.let(Uri::parse)
             dose.value = it.dose.toString()
             unit.value = it.unit
             startDate.value = it.startDate
@@ -155,52 +198,97 @@ fun MedicationScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                //-----IMAGEN
+                ProfilePhotoPicker(
+                    photoUri = selectedPhotoUri,
+                    onPhotoSelected = { selectedPhotoUri = it },
+                    enabled = true,
+                    placeholderIcon = Icons.Default.AddAPhoto,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+                //-----------NOMBRE
                 FormField(label = stringResource(R.string.nombre)) {
                     AppTextField(
                         value = name.value,
                         onValueChange = { name.value = it },
                         placeholder = "Nombre del medicamento",
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
                     )
                 }
-                FormField(label = stringResource(R.string.url_imagen)) {
-                    AppTextField(
-                        value = urlImagen.value,
-                        onValueChange = { urlImagen.value = it },
-                        placeholder = "hhtps",
-                        modifier = Modifier.padding(bottom = 16.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    //---------DOSIS
+                    FormField(
+                        label = stringResource(R.string.dosis),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppTextField(
+                            value = dose.value,
+                            onValueChange = { dose.value = it },
+                            placeholder = "500",
+                            keyboardType = KeyboardType.Decimal
+                        )
+                    }
+                    FormField(
+                        label = stringResource(R.string.unidad),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppDropdownField(
+                            value = unit.value,
+                            options = unitOptions,
+                            onOptionSelected = { unit.value = it },
+                            placeholder = "Selecciona"
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isChronicTreatment.value,
+                        onCheckedChange = { isChronicTreatment.value = it },
+                        enabled = true
+                    )
+                    Text(
+                        text = "Tratamiento crónico",
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
-
-                FormField(label = stringResource(R.string.dosis)) {
-                    AppTextField(
-                        value = dose.value,
-                        onValueChange = { dose.value = it },
-                        placeholder = "Escribe algo...",
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                }
-                FormField(label = stringResource(R.string.unidad)) {
-                    AppTextField(
-                        value = unit.value,
-                        onValueChange = { unit.value = it },
-                        placeholder = "Escribe algo...",
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                }
-                FormField(label = stringResource(R.string.fecha_inicio)) {
-                    AppDatePickerField(
-                        value = startDate.value,
-                        onDateSelected = { startDate.value = it },
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                }
-                FormField(label = stringResource(R.string.fecha_fin)) {
-                    AppDatePickerField(
-                        value = endDate.value,
-                        onDateSelected = { endDate.value = it },
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    FormField(
+                        label = stringResource(R.string.fecha_inicio),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppDatePickerField(
+                            value = startDate.value,
+                            onDateSelected = { startDate.value = it },
+                            enabled = true
+                        )
+                    }
+                    FormField(
+                        label = stringResource(R.string.fecha_fin),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppDatePickerField(
+                            value = endDate.value,
+                            onDateSelected = { endDate.value = it },
+                            enabled = !isChronicTreatment.value
+                        )
+                    }
                 }
                 FormField(stringResource(R.string.periocidad)) {
                     WeekDayChipGroup(
@@ -224,7 +312,7 @@ fun MedicationScreen(
                     onClick = {
                         medicationViewModel.addMedication(
                             nombre = name.value,
-                            imageUrl = urlImagen.value.ifEmpty { null },
+                            photoUri = selectedPhotoUri,
                             dose = dose.value.toDoubleOrNull() ?: 0.0,
                             unit = unit.value,
                             startDate = startDate.value!!,
@@ -247,8 +335,11 @@ fun MedicationScreen(
         }
         //----------EDIT-----------
         MedicationMode.Edit -> {
-
-
+            var currentImagePath by remember { mutableStateOf(medication?.imageUrl) }
+            var newPhotoUri by remember { mutableStateOf<Uri?>(null) }
+            LaunchedEffect(medication) {
+                currentImagePath = medication?.imageUrl
+            }
             Column(
                 modifier = modifier
                     .fillMaxSize()
@@ -257,53 +348,95 @@ fun MedicationScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                ProfilePhotoPicker(
+                    photoUri = newPhotoUri ?: currentImagePath?.let { Uri.fromFile(File(it)) },
+                    onPhotoSelected = { newPhotoUri = it },
+                    enabled = true,
+                    placeholderIcon = Icons.Default.AddAPhoto,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
                 FormField(label = stringResource(R.string.nombre)) {
                     AppTextField(
                         value = name.value,
                         onValueChange = { name.value = it },
-                        modifier = Modifier.padding(bottom = 16.dp),
+                        placeholder = "Nombre del medicamento",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
                     )
                 }
-                FormField(label = stringResource(R.string.url_imagen)) {
-                    AppTextField(
-                        value = urlImagen.value,
-                        onValueChange = { urlImagen.value = it },
-                        placeholder = "hhtps",
-                        modifier = Modifier.padding(bottom = 16.dp),
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    FormField(
+                        label = stringResource(R.string.dosis),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppTextField(
+                            value = dose.value,
+                            onValueChange = { dose.value = it },
+                            placeholder = "500",
+                            keyboardType = KeyboardType.Decimal
+                        )
+                    }
+                    FormField(
+                        label = stringResource(R.string.unidad),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppDropdownField(
+                            value = unit.value,
+                            options = unitOptions,
+                            onOptionSelected = { unit.value = it },
+                            placeholder = "Selecciona"
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isChronicTreatment.value,
+                        onCheckedChange = { isChronicTreatment.value = it },
+                        enabled = true
+                    )
+                    Text(
+                        text = "Tratamiento crónico",
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
-
-                FormField(label = stringResource(R.string.dosis)) {
-                    AppTextField(
-                        value = dose.value,
-                        onValueChange = { dose.value = it },
-                        placeholder = "Escribe algo...",
-                        modifier = Modifier.padding(bottom = 16.dp),
-                    )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    FormField(
+                        label = stringResource(R.string.fecha_inicio),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppDatePickerField(
+                            value = startDate.value,
+                            onDateSelected = { startDate.value = it },
+                            enabled = true
+                        )
+                    }
+                    FormField(
+                        label = stringResource(R.string.fecha_fin),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppDatePickerField(
+                            value = endDate.value,
+                            onDateSelected = { endDate.value = it },
+                            enabled = !isChronicTreatment.value
+                        )
+                    }
                 }
-                FormField(label = stringResource(R.string.unidad)) {
-                    AppTextField(
-                        value = unit.value,
-                        onValueChange = { unit.value = it },
-                        placeholder = "Escribe algo...",
-                        modifier = Modifier.padding(bottom = 16.dp),
-                    )
-                }
-                FormField(label = stringResource(R.string.fecha_inicio)) {
-                    AppDatePickerField(
-                        value = startDate.value,
-                        onDateSelected = { startDate.value = it },
-                        modifier = Modifier.padding(bottom = 16.dp),
-                    )
-                }
-                FormField(label = stringResource(R.string.fecha_fin)) {
-                    AppDatePickerField(
-                        value = endDate.value,
-                        onDateSelected = { endDate.value = it },
-                        modifier = Modifier.padding(bottom = 16.dp),
-                    )
-                }
-
                 FormField(stringResource(R.string.periocidad)) {
                     WeekDayChipGroup(
                         selectedDays = weekDays.value,
@@ -339,7 +472,8 @@ fun MedicationScreen(
                         onClick = {
                             medicationViewModel.updateMedication(
                                 name = name.value,
-                                imageUrl = urlImagen.value.ifEmpty { null },
+                                newPhotoUri = newPhotoUri,
+                                currentImagePath = currentImagePath,
                                 dose = dose.value.toDoubleOrNull() ?: 0.0,
                                 unit = unit.value,
                                 startDate = startDate.value!!,
@@ -369,57 +503,97 @@ fun MedicationScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                ProfilePhotoPicker(
+                    photoUri = selectedPhotoUri,
+                    onPhotoSelected = { selectedPhotoUri = it },
+                    enabled = false,
+                    placeholderIcon = Icons.Default.AddAPhoto,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
                 FormField(label = stringResource(R.string.nombre)) {
                     AppTextField(
                         value = name.value,
                         onValueChange = { name.value = it },
-                        modifier = Modifier.padding(bottom = 16.dp),
+                        placeholder = "Nombre del medicamento",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
                         enabled = false
                     )
                 }
-                FormField(label = stringResource(R.string.url_imagen)) {
-                    AppTextField(
-                        value = urlImagen.value,
-                        onValueChange = { urlImagen.value = it },
-                        placeholder = "hhtps",
-                        modifier = Modifier.padding(bottom = 16.dp),
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    FormField(
+                        label = stringResource(R.string.dosis),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppTextField(
+                            value = dose.value,
+                            onValueChange = { dose.value = it },
+                            placeholder = "500",
+                            keyboardType = KeyboardType.Decimal,
+                            enabled = false
+                        )
+                    }
+                    FormField(
+                        label = stringResource(R.string.unidad),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppDropdownField(
+                            value = unit.value,
+                            options = unitOptions,
+                            onOptionSelected = { unit.value = it },
+                            placeholder = "Selecciona",
+                            enabled = false
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isChronicTreatment.value,
+                        onCheckedChange = { isChronicTreatment.value = it },
                         enabled = false
+                    )
+                    Text(
+                        text = "Tratamiento crónico",
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
-
-                FormField(label = stringResource(R.string.dosis)) {
-                    AppTextField(
-                        value = dose.value,
-                        onValueChange = { dose.value = it },
-                        placeholder = "Escribe algo...",
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        enabled = false
-                    )
-                }
-                FormField(label = stringResource(R.string.unidad)) {
-                    AppTextField(
-                        value = unit.value,
-                        onValueChange = { unit.value = it },
-                        placeholder = "Escribe algo...",
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        enabled = false
-                    )
-                }
-                FormField(label = stringResource(R.string.fecha_inicio)) {
-                    AppDatePickerField(
-                        value = startDate.value,
-                        onDateSelected = { startDate.value = it },
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        enabled = false
-                    )
-                }
-                FormField(label = stringResource(R.string.fecha_fin)) {
-                    AppDatePickerField(
-                        value = endDate.value,
-                        onDateSelected = { endDate.value = it },
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        enabled = false
-                    )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    FormField(
+                        label = stringResource(R.string.fecha_inicio),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppDatePickerField(
+                            value = startDate.value,
+                            onDateSelected = { startDate.value = it },
+                            enabled = false
+                        )
+                    }
+                    FormField(
+                        label = stringResource(R.string.fecha_fin),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppDatePickerField(
+                            value = endDate.value,
+                            onDateSelected = { endDate.value = it },
+                            enabled = false
+                        )
+                    }
                 }
                 //TODO
                 FormField(stringResource(R.string.periocidad)) {

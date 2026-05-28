@@ -22,7 +22,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.andres.pillremind.R
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -42,7 +44,7 @@ fun AppDatePickerField(
     value: LocalDate?,
     onDateSelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Selecciona fecha",
+    placeholder: String = stringResource(R.string.fecha_hint),
     enabled: Boolean = true,
     isError: Boolean = false
 ) {
