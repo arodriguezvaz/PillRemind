@@ -6,12 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Medication
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -21,8 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.andres.pillremind.R
 import com.andres.pillremind.data.local.projections.IntakeVisualState
 import com.andres.pillremind.data.local.projections.IntakeWithMedication
@@ -65,10 +67,15 @@ fun IntakeCard(
                         .size(64.dp)
                         .clip(RoundedCornerShape(14.dp)),
                 ) {
-                    if (intake.imageUrl == null) {
-                        DefaultAvatar()
+                    if (!intake.imageUrl.isNullOrEmpty()) {
+                        AsyncImage(
+                            model = intake.imageUrl,
+                            contentDescription = "Foto de ${intake.medicationName}",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     } else {
-                        // tu AsyncImage aquí
+                        DefaultPill()
                     }
                 }
 
@@ -101,22 +108,22 @@ fun IntakeCard(
     }
 }
 
-/**
- * Muestra un avatar por defecto cuando el medicamento no tiene imagen.
- */
+
 @Composable
-private fun DefaultAvatar() {
+fun DefaultPill() {
     Box(
         modifier = Modifier
             .size(64.dp)
             .background(
                 color = MaterialTheme.colorScheme.primaryContainer,
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(14.dp)
             ),
+        contentAlignment = Alignment.Center
     ) {
         Icon(
-            imageVector = Icons.Rounded.Medication,
-            contentDescription = "Default avatar",
+            painter = painterResource(R.drawable.ic_pill),
+            contentDescription = "Pill icon",
+            tint = MaterialTheme.colorScheme.onPrimaryContainer
         )
     }
 }

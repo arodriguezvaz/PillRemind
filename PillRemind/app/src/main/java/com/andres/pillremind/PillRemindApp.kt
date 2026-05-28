@@ -3,7 +3,16 @@ package com.andres.pillremind
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import coil.Coil
+import coil.ImageLoader
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+import com.andres.pillremind.notifications.DailyIntakeWorker
 import dagger.hilt.android.HiltAndroidApp
+import java.util.concurrent.TimeUnit
 
 /**
  * Clase Application de la app.
@@ -17,6 +26,53 @@ class PillRemindApp : Application() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        scheduleDailyIntakeWorker()
+        setupImageLoader()
+    }
+
+    /**
+     * Programa un worker periódico que se ejecuta una vez al día.
+     *
+     * El worker se registra como trabajo único para evitar que se creen
+     * múltiples instancias del mismo. Si ya existe un worker programado,
+     * se mantiene el actual gracias a [ExistingPeriodicWorkPolicy.KEEP].
+     */
+    private fun scheduleDailyIntakeWorker() {
+        val dailyWorkRequest = PeriodicWorkRequestBuilder<DailyIntakeWorker>(
+            1, TimeUnit.DAYS
+        ).build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "daily_intake_worker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            dailyWorkRequest
+        )
+    }
+
+    /**
+     * Configura el [ImageLoader] global de Coil.
+     *
+     * Se habilita una caché en memoria para almacenar imágenes utilizadas
+     * recientemente y una caché en disco para conservar imágenes entre
+     * ejecuciones de la aplicación.
+     */
+    private fun setupImageLoader() {
+        val imageLoader = ImageLoader.Builder(this)
+            //Configuración de caché en memoria
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.25)
+                    .build()
+            }
+            //Configuración de caché en disco
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(cacheDir.resolve("image_cache"))
+                    .maxSizePercent(0.02)
+                    .build()
+            }
+            .build()
+        Coil.setImageLoader(imageLoader)
     }
 
     /**
@@ -34,6 +90,4 @@ class PillRemindApp : Application() {
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)
     }
-
-
 }

@@ -1,5 +1,7 @@
 package com.andres.pillremind.navigation
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -34,14 +36,19 @@ fun NavGraphBuilder.profileSelectionGraph(
         }
 
         composable(ProfilesScreen.ProfileCreateScreen.route) {
-            ProfileScreen(
-                profileMode = ProfileMode.Create,
-                onSaveClicked = {
-                    navController.navigate(ProfilesScreen.ProfileSelectionScreen.route) {
-                        popUpTo(ProfilesScreen.ProfileSelectionScreen.route) { inclusive = true }
+            androidx.compose.material3.Scaffold { paddingValues ->
+                ProfileScreen(
+                    modifier = Modifier.padding(paddingValues),
+                    profileMode = ProfileMode.Create,
+                    onSaveClicked = {
+                        navController.navigate(ProfilesScreen.ProfileSelectionScreen.route) {
+                            popUpTo(ProfilesScreen.ProfileSelectionScreen.route) {
+                                inclusive = true
+                            }
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }

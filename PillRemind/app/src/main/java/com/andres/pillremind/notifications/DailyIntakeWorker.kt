@@ -10,6 +10,9 @@ import dagger.assisted.AssistedInject
 import java.time.LocalDate
 import java.time.ZoneId
 
+/**
+ * Worker para generar intakes diarios.
+ */
 @HiltWorker
 class DailyIntakeWorker @AssistedInject constructor(
     @Assisted context: Context,

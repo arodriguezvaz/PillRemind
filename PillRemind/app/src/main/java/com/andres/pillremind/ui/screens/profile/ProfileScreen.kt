@@ -1,8 +1,6 @@
 package com.andres.pillremind.ui.screens.profile
 
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,28 +35,16 @@ import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.FormField
+import com.andres.pillremind.ui.components.ProfilePhotoPicker
 import com.andres.pillremind.ui.screens.main.TopBarState
+import java.io.File
 
-/**
- * Modos en los que puede estar la pantalla de perfil.
- * - `Create`: crear un perfil nuevo.
- * - `View`: ver el perfil actual.
- * - `Edit`: editar un perfil existente.
- */
 sealed class ProfileMode {
     object Create : ProfileMode()
     object View : ProfileMode()
     object Edit : ProfileMode()
 }
 
-/**
- * Pantalla para crear, ver o editar un perfil.
- *
- * @param modifier Modificador opcional para la pantalla.
- * @param onSaveClicked Callback llamado tras guardar el perfil.
- * @param profileMode Modo inicial de la pantalla.
- * @param onDeletedClicked Callback llamado tras eliminar el perfil.
- */
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
@@ -69,27 +57,22 @@ fun ProfileScreen(
     LaunchedEffect(Unit) {
         onTopBarChange(TopBarState(title = "Ver Perfil"))
     }
-    val nombre = remember { mutableStateOf("") }
-    val urlImagen = remember { mutableStateOf("") }
+
+    val name = remember { mutableStateOf("") }
     val perfil = profileViewModel.profile.collectAsState().value
-
-
     var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
-    //Variable que si es true muestra el diálogo de eliminación
-    var showDeleteDialog by remember {
-        mutableStateOf(false)
-    }
-    rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
-        // uri es null si el usuario canceló, o el Uri de la imagen seleccionada
-        uri?.let {
-            // Guarda o usa la URI aquí
-            selectedPhotoUri = it
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var currentMode by remember { mutableStateOf(profileMode) }
+
+
+    LaunchedEffect(perfil) {
+        perfil?.let {
+            name.value = it.name
+            selectedPhotoUri = it.urlImagen?.let(Uri::parse)
         }
     }
-
-    when (profileMode) {
+    when (currentMode) {
+        //CREATE
         ProfileMode.Create -> {
             Column(
                 modifier = modifier
@@ -98,40 +81,46 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                ProfilePhotoPicker(
+                    photoUri = selectedPhotoUri,
+                    onPhotoSelected = { selectedPhotoUri = it },
+                    enabled = true,
+                    placeholderIcon = Icons.Default.AddAPhoto,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
                 FormField(label = stringResource(R.string.nombre)) {
                     AppTextField(
-                        value = nombre.value,
-                        onValueChange = { nombre.value = it },
-                        placeholder = "Nombre del perfil",
+                        value = name.value,
+                        onValueChange = { name.value = it },
+                        placeholder = "Nombre del peril",
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                 }
 
-                //TODO selector de imagen de perfil
-                FormField(label = stringResource(R.string.url_imagen)) {
-                    AppTextField(
-                        value = urlImagen.value,
-                        onValueChange = { urlImagen.value = it },
-                        placeholder = "URL de la imagen",
-                        modifier = Modifier.padding(bottom = 24.dp),
-                    )
-                }
                 AppButton(
                     text = "Guardar",
                     onClick = {
                         profileViewModel.addProfile(
-                            nombre = nombre.value,
-                            urlImagen = urlImagen.value.ifEmpty { null }
+                            nombre = name.value,
+                            photoUri = selectedPhotoUri
                         )
                         onSaveClicked()
                     },
                     size = ButtonSize.Large,
-                    enabled = nombre.value.isNotBlank()
+                    enabled = name.value.isNotBlank()
                 )
             }
         }
-
+        //EDIT
         ProfileMode.Edit -> {
+            var currentImagePath by remember { mutableStateOf(perfil?.urlImagen) }
+            var newPhotoUri by remember { mutableStateOf<Uri?>(null) }
+
+            LaunchedEffect(perfil) {
+                perfil?.name?.let { name.value = it }
+                currentImagePath = perfil?.urlImagen
+            }
+
             Column(
                 modifier = modifier
                     .fillMaxSize()
@@ -139,39 +128,43 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-                AppTextField(
-                    value = nombre.value,
-                    onValueChange = { nombre.value = it },
-                    placeholder = "Escribe algo...",
-                    modifier = Modifier.padding(bottom = 16.dp)
+                ProfilePhotoPicker(
+                    photoUri = newPhotoUri ?: currentImagePath?.let { Uri.fromFile(File(it)) },
+                    onPhotoSelected = { newPhotoUri = it }, // solo actualiza la nueva
+                    enabled = true,
+                    placeholderIcon = Icons.Default.AddAPhoto,
+                    modifier = Modifier.padding(bottom = 24.dp)
                 )
-
-                OutlinedTextField(
-                    value = urlImagen.value,
-                    onValueChange = { urlImagen.value = it },
-                    label = { Text("URL de imagen") },
-                    modifier = Modifier
-                        .padding(bottom = 24.dp),
-
+                FormField(label = stringResource(R.string.nombre)) {
+                    AppTextField(
+                        value = name.value,
+                        onValueChange = { name.value = it },
+                        placeholder = "Nombre del perfil",
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
-
+                }
                 AppButton(
                     text = "Guardar",
                     onClick = {
-                        profileViewModel.addProfile(
-                            nombre = nombre.value,
-                            urlImagen = urlImagen.value.ifEmpty { null }
+                        profileViewModel.updateProfile(
+                            nombre = name.value,
+                            newPhotoUri = newPhotoUri,
+                            currentImagePath = currentImagePath
                         )
                         onSaveClicked()
+                        currentMode = ProfileMode.View
                     },
                     size = ButtonSize.Large,
-                    enabled = nombre.value.isNotBlank()
+                    enabled = name.value.isNotBlank()
                 )
             }
         }
 
         ProfileMode.View -> {
+            LaunchedEffect(perfil) {
+                perfil?.urlImagen?.let { selectedPhotoUri = Uri.parse(it) }
+            }
+
             Column(
                 modifier = modifier
                     .fillMaxSize()
@@ -179,45 +172,50 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Hola ${perfil?.name}")
+                ProfilePhotoPicker(
+                    photoUri = selectedPhotoUri,
+                    onPhotoSelected = {},
+                    enabled = false,
+                    placeholderIcon = Icons.Default.Person,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+
+                FormField(label = stringResource(R.string.nombre)) {
+                    AppTextField(
+                        value = name.value,
+                        onValueChange = { name.value = it },
+                        placeholder = "Nombre del perfil",
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        enabled = false
+                    )
+                }
+
                 Row(modifier.fillMaxWidth()) {
-                    //ELIMINAR
                     AppButton(
-                        onClick = {
-                            perfil?.let {
-                                showDeleteDialog = true
-                            }
-                        },
+                        onClick = { perfil?.let { showDeleteDialog = true } },
                         text = stringResource(R.string.eliminar),
                         size = ButtonSize.Medium,
                         variant = ButtonVariant.Danger,
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
-                    //EDITAR
                     AppButton(
-                        onClick = {},
+                        onClick = { currentMode = ProfileMode.Edit },
                         text = stringResource(R.string.editar),
                         size = ButtonSize.Medium,
                         variant = ButtonVariant.Primary,
                         modifier = Modifier.weight(1f)
-
                     )
                 }
             }
         }
     }
+
     if (showDeleteDialog) {
         AlertDialog(
-            onDismissRequest = {
-                showDeleteDialog = false
-            },
-            title = {
-                Text("Eliminar medicamento")
-            },
-            text = {
-                Text("¿Seguro que quieres eliminar este medicamento?")
-            },
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Eliminar perfil") },
+            text = { Text("¿Seguro que quieres eliminar este perfil?") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -228,16 +226,10 @@ fun ProfileScreen(
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
                     )
-                ) {
-                    Text("Eliminar")
-                }
+                ) { Text("Eliminar") }
             },
             dismissButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                    }
-                ) {
+                TextButton(onClick = { showDeleteDialog = false }) {
                     Text("Cancelar")
                 }
             }

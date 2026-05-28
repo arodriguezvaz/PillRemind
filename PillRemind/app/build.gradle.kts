@@ -68,6 +68,8 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
+    //COIL
+    implementation(libs.coil.compose)
     //TESTING
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

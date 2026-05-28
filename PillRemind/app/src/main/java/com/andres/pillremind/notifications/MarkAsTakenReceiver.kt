@@ -13,6 +13,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
+/**
+ * Receptor de la notificación de tomar un medicamento.
+ *
+ */
 @AndroidEntryPoint
 class MarkAsTakenReceiver : BroadcastReceiver() {
 

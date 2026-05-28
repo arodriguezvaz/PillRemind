@@ -2,12 +2,14 @@ package com.andres.pillremind.ui.screens.profiles
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -20,8 +22,15 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ProfilesViewModel @Inject constructor(
-    private val repository: ProfileRepository
+    private val repository: ProfileRepository,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
+    
+    fun clearActiveProfile() {
+        viewModelScope.launch {
+            sessionManager.clearActiveProfile()
+        }
+    }
 
     /**
      * Flow con la lista de perfiles actualmente disponibles (initialValue = emptyList()).
