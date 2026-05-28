@@ -3,6 +3,7 @@ package com.andres.pillremind.ui.components
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -44,10 +45,10 @@ fun AppButton(
         ButtonVariant.Ghost -> Color.Transparent to MaterialTheme.colorScheme.primary
         ButtonVariant.Danger -> MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError
     }
-    val widthFraction = when (size) {
-        ButtonSize.Small -> 0.5f
-        ButtonSize.Medium -> 0.5f
-        ButtonSize.Large -> 1f
+    val buttonWidth = when (size) {
+        ButtonSize.Small -> 110.dp
+        ButtonSize.Medium -> 160.dp
+        ButtonSize.Large -> null
     }
     val (horizontalPadding, verticalPadding, textStyle) = when (size) {
         ButtonSize.Small -> Triple(12.dp, 6.dp, MaterialTheme.typography.labelMedium)
@@ -58,7 +59,11 @@ fun AppButton(
     Button(
         onClick = onClick,
         enabled = enabled && !isLoading,
-        modifier = modifier.fillMaxWidth(widthFraction),
+        modifier = if (buttonWidth != null) {
+            modifier.width(buttonWidth)
+        } else {
+            modifier.fillMaxWidth()
+        },
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
@@ -77,7 +82,7 @@ fun AppButton(
                 strokeWidth = 2.dp,
             )
         } else {
-            Text(text = text, style = textStyle)
+            Text(text = text, style = textStyle, maxLines = 1)
         }
     }
 }

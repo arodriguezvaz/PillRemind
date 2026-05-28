@@ -35,7 +35,7 @@ import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.FormField
-import com.andres.pillremind.ui.components.ProfilePhotoPicker
+import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.screens.main.TopBarState
 import java.io.File
 
@@ -81,7 +81,7 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ProfilePhotoPicker(
+                AppPhotoPicker(
                     photoUri = selectedPhotoUri,
                     onPhotoSelected = { selectedPhotoUri = it },
                     enabled = true,
@@ -128,7 +128,7 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ProfilePhotoPicker(
+                AppPhotoPicker(
                     photoUri = newPhotoUri ?: currentImagePath?.let { Uri.fromFile(File(it)) },
                     onPhotoSelected = { newPhotoUri = it }, // solo actualiza la nueva
                     enabled = true,
@@ -172,7 +172,7 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ProfilePhotoPicker(
+                AppPhotoPicker(
                     photoUri = selectedPhotoUri,
                     onPhotoSelected = {},
                     enabled = false,

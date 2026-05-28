@@ -32,7 +32,7 @@ import coil.compose.AsyncImage
 
 @Composable
 
-fun ProfilePhotoPicker(
+fun AppPhotoPicker(
     photoUri: Uri?,
     onPhotoSelected: (Uri) -> Unit,
     modifier: Modifier = Modifier,
