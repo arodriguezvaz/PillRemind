@@ -1,9 +1,11 @@
 package com.andres.pillremind.di
 
+import com.andres.pillremind.data.repository.AuthRepositoryImpl
 import com.andres.pillremind.data.repository.IntakeRepositoryImpl
 import com.andres.pillremind.data.repository.MedicationRepositoryImpl
 import com.andres.pillremind.data.repository.ProfileRepositoryImpl
 import com.andres.pillremind.data.repository.ScheduleRepositoryImpl
+import com.andres.pillremind.domain.repository.AuthRepository
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
@@ -34,4 +36,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindIntakeRepository(impl: IntakeRepositoryImpl): IntakeRepository
+
+    @Binds
+    abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
 }
