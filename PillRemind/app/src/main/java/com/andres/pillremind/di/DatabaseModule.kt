@@ -39,13 +39,13 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideProfileDao(db: AppDatabase) = db.perfilDao()
+    fun provideProfileDao(db: AppDatabase) = db.profileDao()
 
     @Provides
     fun provideMedicationDao(db: AppDatabase) = db.medicationDao()
 
     @Provides
-    fun provideUsuarioDao(db: AppDatabase) = db.usuarioDao()
+    fun provideUsuarioDao(db: AppDatabase) = db.userDao()
 
     @Provides
     fun provideScheduleDao(db: AppDatabase) = db.scheduleDao()

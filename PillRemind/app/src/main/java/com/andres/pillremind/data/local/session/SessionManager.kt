@@ -35,7 +35,10 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
     private object Keys {
         // Clave para almacenar el ID del profile activo
         val ACTIVE_PROFILE_ID = intPreferencesKey("active_profile_id")
-        val LAST_GENERATED_DATE = stringPreferencesKey("ultima_generacion") // 👈 añadir
+
+        // Clave para almacenar el ID de usuario activo
+        val ACTIVE_USER_ID = intPreferencesKey("active_user_id")
+        val LAST_GENERATED_DATE = stringPreferencesKey("ultima_generacion")
     }
 
     /**
@@ -63,6 +66,26 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
     suspend fun clearActiveProfile() {
         context.dataStore.edit { preferences ->
             preferences.remove(Keys.ACTIVE_PROFILE_ID)
+        }
+    }
+
+    /**
+     * Devuelve el ID almacenado si existe o null si no hay ningún usuario activo.
+     */
+    val activeUserId: Flow<Int?> = context.dataStore.data
+        .map { preferences ->
+            preferences[Keys.ACTIVE_USER_ID]
+        }
+
+    suspend fun setActiveUser(id: Int) {
+        context.dataStore.edit { preferences ->
+            preferences[Keys.ACTIVE_USER_ID] = id
+        }
+    }
+
+    suspend fun clearActiveUser() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(Keys.ACTIVE_USER_ID)
         }
     }
 

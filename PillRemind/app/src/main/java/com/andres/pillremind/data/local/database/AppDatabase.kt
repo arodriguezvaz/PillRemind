@@ -8,19 +8,19 @@ import com.andres.pillremind.data.local.dao.IntakeDao
 import com.andres.pillremind.data.local.dao.MedicationDao
 import com.andres.pillremind.data.local.dao.ProfileDao
 import com.andres.pillremind.data.local.dao.ScheduleDao
-import com.andres.pillremind.data.local.dao.UsuarioDao
+import com.andres.pillremind.data.local.dao.UserDao
 import com.andres.pillremind.data.local.entity.IntakeEntity
 import com.andres.pillremind.data.local.entity.MedicationEntity
 import com.andres.pillremind.data.local.entity.ProfileEntity
 import com.andres.pillremind.data.local.entity.ScheduleEntity
-import com.andres.pillremind.data.local.entity.UsuarioEntity
+import com.andres.pillremind.data.local.entity.UserEntity
 
 /**
  * Clase que representa la base de datos de la aplicación
  */
 @Database(
     entities = [
-        UsuarioEntity::class,
+        UserEntity::class,
         ProfileEntity::class,
         MedicationEntity::class,
         ScheduleEntity::class,
@@ -32,10 +32,10 @@ import com.andres.pillremind.data.local.entity.UsuarioEntity
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     //Dao para acceder a los datos de los usuarios
-    abstract fun usuarioDao(): UsuarioDao
+    abstract fun userDao(): UserDao
 
     //Dao para acceder a los datos de los perfiles
-    abstract fun perfilDao(): ProfileDao
+    abstract fun profileDao(): ProfileDao
 
     //Dao para acceder a los datos de los medicamentos
     abstract fun medicationDao(): MedicationDao

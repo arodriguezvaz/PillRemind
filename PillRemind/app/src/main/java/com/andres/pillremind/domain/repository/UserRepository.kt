@@ -1,0 +1,14 @@
+package com.andres.pillremind.domain.repository
+
+import com.andres.pillremind.domain.model.User
+
+/**
+ * Interfaz que define los métodos para acceder a los datos de los usuarios en la base de datos
+ */
+interface UserRepository {
+    suspend fun insertUser(user: User)
+    suspend fun updateUser(user: User)
+    suspend fun deleteUser(user: User)
+    suspend fun crearUserInvitado()
+    suspend fun getUser(): User?
+}

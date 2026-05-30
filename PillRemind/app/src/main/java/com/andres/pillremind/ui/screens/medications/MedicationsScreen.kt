@@ -35,7 +35,7 @@ fun MedicationsScreen(
     onTopBarChange: (TopBarState) -> Unit = {},
     medicationsViewModel: MedicationsViewModel = hiltViewModel()
 ) {
-    
+
     val medications by medicationsViewModel.medications.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -46,7 +46,7 @@ fun MedicationsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-
+        //TODO insertar un buscador
 
         if (medications.isEmpty()) {
             Box(

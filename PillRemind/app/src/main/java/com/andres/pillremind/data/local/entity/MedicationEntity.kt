@@ -36,6 +36,7 @@ data class MedicationEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val profileId: Int,
+    val supabaseId: String? = null,
     val name: String,
     val dose: Double,
     val unit: String,
