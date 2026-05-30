@@ -17,7 +17,7 @@ import com.andres.pillremind.data.local.entity.UserEntity
 @Dao
 interface UserDao {
     @Insert
-    suspend fun insertUser(user: UserEntity)
+    suspend fun insertUser(user: UserEntity): Long
 
     @Update
     suspend fun updateUser(user: UserEntity)
@@ -26,6 +26,6 @@ interface UserDao {
     suspend fun deleteUser(user: UserEntity)
 
     @Query("SELECT * FROM usuarios LIMIT 1")
-    fun getUser(): UserEntity?
+    suspend fun getUser(): UserEntity?
 }
 

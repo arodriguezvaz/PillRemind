@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -36,6 +37,12 @@ class ProfileViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    /**
+     * Flujo con el ID del usuario activo.
+     */
+    val activeUserId: Flow<Int?> = sessionManager.activeUserId
+
     /**
      * Agrega un nuevo perfil usando el repositorio.
      *
@@ -49,8 +56,10 @@ class ProfileViewModel @Inject constructor(
         }
         if (trimmedNombre.isNotEmpty()) {
             viewModelScope.launch {
+                val userId = activeUserId.firstOrNull() ?: return@launch
                 profileRepository.insertProfile(
                     Profile(
+                        usuarioId = userId,
                         name = trimmedNombre,
                         urlImagen = imagePath
                     )
@@ -89,7 +98,7 @@ class ProfileViewModel @Inject constructor(
 
         viewModelScope.launch {
             val activeProfileId = profileId.firstOrNull() ?: return@launch
-
+            val userId = activeUserId.firstOrNull() ?: return@launch
             val imagePath = if (newPhotoUri != null) {
                 // Borrar imagen antigua si existía
                 currentImagePath?.let { File(it).delete() }
@@ -103,6 +112,7 @@ class ProfileViewModel @Inject constructor(
             profileRepository.updateProfile(
                 Profile(
                     id = activeProfileId,
+                    usuarioId = userId,
                     name = trimmedNombre,
                     urlImagen = imagePath
                 )

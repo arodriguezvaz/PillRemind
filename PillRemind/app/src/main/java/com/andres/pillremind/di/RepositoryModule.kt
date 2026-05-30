@@ -8,6 +8,7 @@ import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
+import com.andres.pillremind.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -19,6 +20,9 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
+    @Binds
+    abstract fun bindUserRepository(impl: UserRepository): UserRepository
+
     @Binds
     abstract fun bindProfileRepository(impl: ProfileRepositoryImpl): ProfileRepository
 
