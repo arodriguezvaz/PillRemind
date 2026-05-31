@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -30,6 +32,7 @@ import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.PerfilCard
 import com.andres.pillremind.ui.screens.main.MainTopBar
+import com.andres.pillremind.ui.screens.main.TopBarAction
 import com.andres.pillremind.ui.screens.main.TopBarState
 
 /**
@@ -45,7 +48,8 @@ fun ProfilesScreen(
     onProfileSelected: (Profile) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    profilesViewModel: ProfilesViewModel = hiltViewModel()
+    profilesViewModel: ProfilesViewModel = hiltViewModel(),
+    onSettingClicked: () -> Unit,
 ) {
 
     LaunchedEffect(Unit) {
@@ -53,7 +57,15 @@ fun ProfilesScreen(
     }
     val perfiles by profilesViewModel.perfiles.collectAsStateWithLifecycle()
     var topBarState by remember {
-        mutableStateOf(TopBarState("Perfiles", true))
+        mutableStateOf(
+            TopBarState(
+                "Perfiles", true, actions = listOf(
+                    TopBarAction(
+                        icon = Icons.Rounded.Settings,
+                        contentDescription = "Ajustes",
+                        onClick = { onSettingClicked() }
+                    )
+                )))
     }
     Scaffold(
         modifier = modifier.fillMaxSize(),

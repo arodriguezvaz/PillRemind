@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.andres.pillremind.data.local.entity.UserEntity
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Interfaz que define los métodos para acceder a los datos de los usuarios en la base de datos
@@ -27,5 +28,8 @@ interface UserDao {
 
     @Query("SELECT * FROM usuarios LIMIT 1")
     suspend fun getUser(): UserEntity?
+
+    @Query("SELECT * FROM usuarios LIMIT 1")
+    fun getUserFlow(): Flow<UserEntity?>
 }
 

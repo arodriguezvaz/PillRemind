@@ -66,6 +66,13 @@ fun MainTopBar(
                 Text(state.title)
             }
         },
+        actions = {
+            state.actions.forEach { action ->
+                IconButton(onClick = action.onClick) {
+                    Icon(action.icon, contentDescription = action.contentDescription)
+                }
+            }
+        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background
         )

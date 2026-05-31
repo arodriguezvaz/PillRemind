@@ -7,6 +7,8 @@ import com.andres.pillremind.domain.model.TipoUsuario
 import com.andres.pillremind.domain.model.User
 import com.andres.pillremind.domain.repository.UserRepository
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.LocalDateTime
 
 /**
@@ -40,4 +42,7 @@ class UserRepositoryImpl @Inject constructor(private val userDao: UserDao) : Use
     override suspend fun getUser(): User? {
         return userDao.getUser()?.toDomain()
     }
+
+    override fun getUserFlow(): Flow<User?> = userDao.getUserFlow().map { it?.toDomain() }
+
 }

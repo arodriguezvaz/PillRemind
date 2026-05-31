@@ -3,10 +3,12 @@ package com.andres.pillremind.data.local.session
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.andres.pillremind.data.local.session.SessionManager.Keys.DARK_MODE_KEY
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -38,8 +40,12 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
 
         // Clave para almacenar el ID de usuario activo
         val ACTIVE_USER_ID = intPreferencesKey("active_user_id")
+        val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
         val LAST_GENERATED_DATE = stringPreferencesKey("ultima_generacion")
     }
+
+    val isDarkMode: Flow<Boolean> = context.dataStore.data
+        .map { it[DARK_MODE_KEY] ?: false }
 
     /**
      * Devuelve el ID almacenado si existe o null si no hay ningún profile activo.
@@ -93,6 +99,10 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
         .map { preferences ->
             preferences[Keys.LAST_GENERATED_DATE]?.let { LocalDate.parse(it) }
         }
+
+    suspend fun setDarkMode(enabled: Boolean) {
+        context.dataStore.edit { it[DARK_MODE_KEY] = enabled }
+    }
 
     suspend fun saveLastGeneratedDate(fecha: LocalDate) {
         context.dataStore.edit { preferences ->

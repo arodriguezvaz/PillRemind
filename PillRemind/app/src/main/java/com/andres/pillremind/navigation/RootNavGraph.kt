@@ -22,7 +22,7 @@ fun RootNavigationGraph(navController: NavHostController) {
         composable(route = Graph.MAIN) {
             MainScreen(rootNavController = navController)
         }
-
+        authGraph(navController)
     }
 }
 
@@ -32,4 +32,5 @@ object Graph {
     const val PROFILE_SELECTION = "profile_selection_graph"
     const val MAIN = "main_graph"
     const val MEDICATION = "medication_graph"
+    const val AUTH = "auth_graph"
 }
