@@ -3,6 +3,9 @@ package com.andres.pillremind.data.remote.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * DTO de horario utilizado para la comunicación con Supabase.
+ */
 @Serializable
 data class ScheduleDto(
     val id: String? = null,

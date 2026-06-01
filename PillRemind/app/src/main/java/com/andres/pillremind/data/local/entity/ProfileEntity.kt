@@ -6,12 +6,15 @@ import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 
 /**
- * Clase que representa un perfil de la aplicación en la base de datos
- * @property id Identificador único del profile
- * @property name Nombre del profile
- * @property imageUrl URL de la imagen del profile
- * @property createdAt Fecha de creación del profile
- * @property updatedAt Fecha de última actualización del profile
+ * Entidad que representa un perfil en la base de datos local.
+ *
+ * @property id Identificador unico del perfil.
+ * @property usuarioId Identificador del usuario propietario.
+ * @property supabaseId Identificador remoto en Supabase (opcional).
+ * @property name Nombre del perfil.
+ * @property imageUrl URL de la imagen del perfil (opcional).
+ * @property createdAt Fecha de creacion del registro.
+ * @property updatedAt Fecha de ultima actualizacion del registro.
  */
 @Entity(
     tableName = "profiles",

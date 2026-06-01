@@ -4,6 +4,9 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * DTO de usuario utilizado para la comunicación con Supabase.
+ */
 @Serializable
 data class UsuarioDto(
     val id: String? = null,

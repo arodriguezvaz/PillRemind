@@ -83,27 +83,42 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
             preferences[Keys.ACTIVE_USER_ID]
         }
 
+    /**
+     * Guarda el identificador del usuario activo.
+     */
     suspend fun setActiveUser(id: Int) {
         context.dataStore.edit { preferences ->
             preferences[Keys.ACTIVE_USER_ID] = id
         }
     }
 
+    /**
+     * Elimina el usuario activo almacenado.
+     */
     suspend fun clearActiveUser() {
         context.dataStore.edit { preferences ->
             preferences.remove(Keys.ACTIVE_USER_ID)
         }
     }
 
+    /**
+     * Fecha de la última generación de tomas.
+     */
     val lastGeneratedDate: Flow<LocalDate?> = context.dataStore.data
         .map { preferences ->
             preferences[Keys.LAST_GENERATED_DATE]?.let { LocalDate.parse(it) }
         }
 
+    /**
+     * Guarda la preferencia de modo oscuro.
+     */
     suspend fun setDarkMode(enabled: Boolean) {
         context.dataStore.edit { it[DARK_MODE_KEY] = enabled }
     }
 
+    /**
+     * Guarda la fecha de la última generación de tomas.
+     */
     suspend fun saveLastGeneratedDate(fecha: LocalDate) {
         context.dataStore.edit { preferences ->
             preferences[Keys.LAST_GENERATED_DATE] = fecha.toString()

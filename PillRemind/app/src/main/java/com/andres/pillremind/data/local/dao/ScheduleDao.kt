@@ -10,56 +10,77 @@ import com.andres.pillremind.domain.model.WeekDay
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Interfaz que define los métodos para interactuar con la base de datos
+ * Interfaz que define los métodos para interactuar con la base de datos.
  */
 @Dao
 interface ScheduleDao {
     /**
-     * Inserta un schedule en la base de datos
+     * Inserta un schedule y devuelve el ID generado.
+     *
+     * @param scheduleEntity Entidad del schedule a insertar.
+     * @return ID generado por la base de datos.
      */
     @Insert
     suspend fun insertSchedule(scheduleEntity: ScheduleEntity): Long
 
     /**
-     * Actualiza un schedule en la base de datos
-     * @param scheduleEntity ScheduleEntity a actualizar
+     * Actualiza un schedule existente.
+     *
+     * @param scheduleEntity Entidad del schedule con los cambios.
      */
     @Update
     suspend fun updateSchedule(scheduleEntity: ScheduleEntity)
 
     /**
-     * Elimina un schedule de la base de datos
+     * Elimina un schedule existente.
+     *
+     * @param scheduleEntity Entidad del schedule a eliminar.
      */
     @Delete
     suspend fun deleteSchedule(scheduleEntity: ScheduleEntity)
 
     /**
-     * Elimina todos los schedules de un medication de la base de datos
+     * Elimina todos los schedules de un medicamento.
+     *
+     * @param medicationId ID del medicamento propietario.
      */
     @Query("DELETE FROM schedules WHERE medicationId = :medicationId")
     suspend fun deleteByMedicationId(medicationId: Int)
 
     /**
-     * Obtiene todos los schedules de un medication de la base de datos
+     * Observa todos los schedules de un medicamento.
+     *
+     * @param medicationId ID del medicamento propietario.
+     * @return Flow con la lista de schedules del medicamento.
      */
     @Query("SELECT * FROM schedules WHERE medicationId = :medicationId")
     fun getSchedules(medicationId: Int): Flow<List<ScheduleEntity>>
 
     /**
-     * Obtiene un schedule a a partir de su id
+     * Devuelve un schedule por su ID.
+     *
+     * @param scheduleId ID del schedule.
+     * @return Schedule encontrado.
      */
     @Query("SELECT * FROM schedules WHERE id = :scheduleId")
     suspend fun getScheduleById(scheduleId: Int): ScheduleEntity
 
     /**
-     * Obtiene todos los schedules de un medication de un día concreto de la semana
+     * Observa los schedules de un dia concreto de la semana.
+     *
+     * @param day Dia de la semana a filtrar.
+     * @return Flow con la lista de schedules del dia.
      */
     @Query("SELECT * FROM schedules WHERE WeekDay = :day")
     fun getSchedulesByDay(day: WeekDay): Flow<List<ScheduleEntity>>
 
+    /**
+     * Devuelve todos los schedules pertenecientes a un usuario.
+     *
+     * @param usuarioId ID del usuario propietario.
+     * @return Lista con los schedules del usuario.
+     */
     @Query("SELECT * FROM schedules WHERE medicationId IN (SELECT id FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId))")
     suspend fun getAllByUsuario(usuarioId: Int): List<ScheduleEntity>
 
-    @Query("SELECT * FROM schedules WHERE id = :id")
-    suspend fun getScheduleByIdOnce(id: Int): ScheduleEntity?
 }

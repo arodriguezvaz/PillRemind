@@ -12,62 +12,53 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 
 /**
- * Interfaz que define los métodos para interactuar con la base de datos
+ * DAO para gestionar las tomas (intakes) en la base de datos local.
  */
 @Dao
 interface IntakeDao {
     /**
-     * Inserta un intake en la base de datos
+     * Inserta una toma y devuelve el ID generado.
      */
     @Insert
     suspend fun insertIntake(intake: IntakeEntity): Long
 
     /**
-     * Inserta una lista de tomas en la base de datos.
+     * Inserta una lista de tomas.
      *
      * Si ya existe una toma con el mismo `scheduleId` y `scheduledAt`,
-     * la inserción de esa toma se ignora automáticamente debido a la
-     * restricción UNIQUE definida en la entidad.
-     *
+     * la insercion de esa toma se ignora por la restriccion UNIQUE.
      *
      * @param intakes Lista de tomas a insertar.
-     *
-     * @return Lista con los IDs generados para las tomas insertadas.
-     * Las tomas ignoradas por conflicto devuelven `-1`.
+     * @return Lista con los IDs generados; las tomas ignoradas devuelven `-1`.
      */
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIntakes(intakes: List<IntakeEntity>): List<Long>
 
     /**
-     * Elimina un intake de la base de datos
+     * Elimina una toma existente.
      */
     @Delete
     suspend fun deleteIntake(intake: IntakeEntity)
 
     /**
-     * Actualiza un intake en la base de datos
+     * Actualiza una toma existente.
      */
     @Update
     suspend fun updateIntake(intake: IntakeEntity)
 
     /**
-     * Obtiene un intake por su ID
+     * Devuelve una toma por su ID.
      */
     @Query("SELECT * FROM intakes WHERE id = :intakeId")
     fun getIntakeById(intakeId: Int): IntakeEntity
 
     /**
-     * Observa las tomas programadas para el día actual de un perfil concreto,
-     * incluyendo información del medicamento asociado.
+     * Observa las tomas programadas del dia para un perfil, con datos del medicamento.
      *
-     * La consulta combina datos de IntakeEntity,ScheduleEntity, MedicationEntity
-     * y devuelve una proyección optimizada para mostrar las tomas en la pantalla principal.
-     *
-     * @param today Fecha para filtrar las tomas programadas.
-     * @param profileId ID del perfil propietario de los medicamentos.
-     *
-     * @return Flow reactivo con la lista de tomas del día junto a la información
-     * del medicamento asociado, ordenadas por fecha programada.
+     * @param startOfDay Inicio del dia.
+     * @param endOfDay Fin del dia.
+     * @param profileId ID del perfil propietario.
+     * @return Flow con la lista ordenada por fecha programada.
      */
     @Query(
         """
@@ -97,9 +88,15 @@ interface IntakeDao {
         profileId: Int
     ): Flow<List<IntakeWithMedication>>
 
+    /**
+     * Devuelve todas las tomas pertenecientes a un usuario.
+     */
     @Query("SELECT * FROM intakes WHERE scheduleId IN (SELECT id FROM schedules WHERE medicationId IN (SELECT id FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId)))")
     suspend fun getAllByUser(usuarioId: Int): List<IntakeEntity>
 
+    /**
+     * Devuelve las tomas futuras de un medicamento desde una fecha.
+     */
     @Query(
         """
     SELECT * FROM intakes 
@@ -114,6 +111,9 @@ interface IntakeDao {
         from: LocalDateTime
     ): List<IntakeEntity>
 
+    /**
+     * Elimina las tomas futuras de un medicamento desde una fecha.
+     */
     @Query(
         """
     DELETE FROM intakes 

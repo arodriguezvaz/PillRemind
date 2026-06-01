@@ -7,11 +7,13 @@ import com.andres.pillremind.domain.model.WeekDay
 import java.time.LocalTime
 
 /**
- * Clase que representa un horario de la aplicación en la base de datos
- * @property id Identificador único del horario
- * @property medicationId Identificador del medicamento al que pertenece el horario
- * @property weekDay de la semana en el que se programa la toma (recurrencia semanal)
- * @property time Hora a la que se debe tomar el medicamento
+ * Entidad que representa un horario de toma en la base de datos local.
+ *
+ * @property id Identificador unico del horario.
+ * @property medicationId Identificador del medicamento propietario.
+ * @property supabaseId Identificador remoto en Supabase (opcional).
+ * @property weekDay Dia de la semana en el que se programa la toma.
+ * @property time Hora a la que se debe tomar el medicamento.
  */
 @Entity(
     tableName = "schedules",

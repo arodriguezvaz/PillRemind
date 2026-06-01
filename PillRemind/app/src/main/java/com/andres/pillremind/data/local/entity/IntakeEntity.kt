@@ -7,13 +7,15 @@ import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 
 /**
- * Clase que representa una toma de un medicamento de la aplicación en la BD
- * @property id Identificador único de la toma
- * @property scheduleId Identificador del horario asociado
- * @property scheduledAt Fecha y hora programada de la toma
- * @property takenAt Fecha y hora real en la que se realizó la toma (opcional)
- * @property createdAt Fecha de creación del registro
- * @property updatedAt Fecha de última actualización del registro
+ * Entidad que representa una toma de medicamento en la base de datos local.
+ *
+ * @property id Identificador unico de la toma.
+ * @property scheduleId Identificador del horario asociado.
+ * @property supabaseId Identificador remoto en Supabase (opcional).
+ * @property scheduledAt Fecha y hora programada de la toma.
+ * @property takenAt Fecha y hora real en la que se realizo la toma (opcional).
+ * @property createdAt Fecha de creacion del registro.
+ * @property updatedAt Fecha de ultima actualizacion del registro.
  */
 @Entity(
     tableName = "intakes",

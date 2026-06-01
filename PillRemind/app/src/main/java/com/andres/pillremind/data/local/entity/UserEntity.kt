@@ -13,7 +13,6 @@ import java.time.LocalDateTime
  * @property email Email del usuario si es registrado, si no null
  * @property esPremium Indica si el usuario es premium
  * @property fechaPremium Fecha de vencimiento del plan premium, si no null
- * @property aceptaComunicaciones Indica si el usuario acepta recibir comunicaciones
  * @property syncPendiente Indica si hay cambios pendientes de sincronización con Supabase
  * @property createdAt Fecha de creación del usuario
  * @property updatedAt Fecha de última actualización del usuario
@@ -24,10 +23,10 @@ data class UserEntity(
     val id: Int = 0,
     val supabaseUid: String? = null,
     val tipoUsuario: TipoUsuario = TipoUsuario.INVITADO,
-    val email: String? = null,                 // null si es invitado
+    val email: String? = null,
     val esPremium: Boolean = false,
     val fechaPremium: LocalDateTime? = null,
-    val syncPendiente: Boolean = false,        // para upgrade a premium
+    val syncPendiente: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 )

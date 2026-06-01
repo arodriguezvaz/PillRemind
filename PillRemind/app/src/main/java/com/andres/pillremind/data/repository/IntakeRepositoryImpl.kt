@@ -24,13 +24,18 @@ class IntakeRepositoryImpl @Inject constructor(
     private val sessionManager: SessionManager,
 ) :
     IntakeRepository {
+
+    /**
+     * Genera e inserta en la base de datos las tomas programadas dentro
+     */
     override suspend fun createIntakes(desde: LocalDate, hasta: LocalDate): List<Intake> {
         val tomasAInsertar = mutableListOf<Intake>()
 
         var dia = desde
         while (!dia.isAfter(hasta)) {
+            //Obtine los horarios para el día de la semana actual
             val horarios = scheduleDao.getSchedulesByDay(dia.dayOfWeek.toWeekDay()).first()
-
+            //Por cada horario
             for (horario in horarios) {
                 val med = medicationDao.getMedicationById(horario.medicationId).first() ?: continue
                 if (med.startDate > dia) continue

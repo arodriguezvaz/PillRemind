@@ -9,49 +9,76 @@ import com.andres.pillremind.data.local.entity.MedicationEntity
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Interfaz que define los métodos para interactuar con la base de datos
+ * DAO para gestionar medicamentos en la base de datos local.
  */
 @Dao
 interface MedicationDao {
     /**
-     * Inserta un medication en la base de datos
-     * @param medication Medication a insertar
+     * Inserta un medicamento y devuelve el ID generado.
+     *
+     * @param medication Entidad del medicamento a insertar.
+     * @return ID generado por la base de datos.
      */
     @Insert
     suspend fun insertMedication(medication: MedicationEntity): Long
 
     /**
-     * Actualiza un medication en la base de datos
-     * @param medication Medication a actualizar
+     * Actualiza un medicamento existente.
+     *
+     * @param medication Entidad del medicamento con los cambios.
      */
     @Update
     suspend fun updateMedication(medication: MedicationEntity)
 
     /**
-     * Elimina un medication de la base de datos
-     * @param medication Medication a eliminar
+     * Elimina un medicamento existente.
+     *
+     * @param medication Entidad del medicamento a eliminar.
      */
     @Delete
     suspend fun deleteMedication(medication: MedicationEntity)
 
     /**
-     * Obtiene un medication por su ID
+     * Observa un medicamento por su ID.
+     *
+     * @param id ID del medicamento.
+     * @return Flow con el medicamento o null si no existe.
      */
     @Query("SELECT * FROM medications WHERE id = :id")
     fun getMedicationById(id: Int?): Flow<MedicationEntity?>
 
     /**
-     * Obtiene todos los medication de la base de datos
+     * Observa los medicamentos de un perfil.
+     *
+     * @param profileId ID del perfil propietario.
+     * @return Flow con la lista de medicamentos del perfil.
      */
     @Query("SELECT * FROM medications WHERE profileId = :profileId")
     fun getMedications(profileId: Int): Flow<List<MedicationEntity>>
 
+    /**
+     * Devuelve todos los medicamentos pertenecientes a un usuario.
+     *
+     * @param usuarioId ID del usuario propietario.
+     * @return Lista con los medicamentos del usuario.
+     */
     @Query("SELECT * FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId)")
     suspend fun getAllByUser(usuarioId: Int): List<MedicationEntity>
 
+    /**
+     * Devuelve un medicamento por su ID en una consulta unica.
+     *
+     * @param id ID del medicamento.
+     * @return Medicamento encontrado o null si no existe.
+     */
     @Query("SELECT * FROM medications WHERE id = :id")
     suspend fun getMedicationByIdOnce(id: Int): MedicationEntity?
 
+    /**
+     * Elimina todos los medicamentos de un usuario.
+     *
+     * @param usuarioId ID del usuario propietario.
+     */
     @Query("DELETE FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId)")
     suspend fun deleteAllByUsuario(usuarioId: Int)
 }

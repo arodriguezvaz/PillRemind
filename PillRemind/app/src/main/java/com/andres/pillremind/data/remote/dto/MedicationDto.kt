@@ -3,6 +3,12 @@ package com.andres.pillremind.data.remote.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * DTO que representa un medicamento en Supabase.
+ *
+ * Se utiliza para serializar y deserializar los datos intercambiados
+ * entre la aplicación y el backend.
+ */
 @Serializable
 data class MedicationDto(
     val id: String? = null,

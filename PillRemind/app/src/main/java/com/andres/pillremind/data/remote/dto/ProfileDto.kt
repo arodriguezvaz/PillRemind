@@ -3,6 +3,9 @@ package com.andres.pillremind.data.remote.dto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * DTO de perfil utilizado para la comunicación con Supabase.
+ */
 @Serializable
 data class ProfileDto(
     val id: String? = null,
