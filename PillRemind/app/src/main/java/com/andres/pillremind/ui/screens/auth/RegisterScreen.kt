@@ -87,7 +87,7 @@ fun RegisterScreen(
                     value = password,
                     onValueChange = { password = it },
                     placeholder = "Contraseña",
-                    // isPassword = true,
+                    isPasswordField = true,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
             }
@@ -96,7 +96,7 @@ fun RegisterScreen(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
                     placeholder = "Repite la contraseña",
-                    //isPassword = true,
+                    isPasswordField = true,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
             }

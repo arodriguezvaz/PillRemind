@@ -102,7 +102,7 @@ fun SettingsScreen(
                         text = "Cerrar sesión",
                         onClick = { settingsViewModel.logout() },
                         variant = ButtonVariant.Danger,
-                        size = ButtonSize.Large
+                        size = ButtonSize.Large,
                     )
                 } else {
                     Spacer(Modifier.height(8.dp))

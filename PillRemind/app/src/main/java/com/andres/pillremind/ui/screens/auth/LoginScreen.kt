@@ -91,7 +91,7 @@ fun LoginScreen(
                     value = password,
                     onValueChange = { password = it },
                     placeholder = "Contraseña",
-                    //isPassword = true,
+                    isPasswordField = true,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
             }
