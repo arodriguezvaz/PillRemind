@@ -45,4 +45,13 @@ interface MedicationDao {
      */
     @Query("SELECT * FROM medications WHERE profileId = :profileId")
     fun getMedications(profileId: Int): Flow<List<MedicationEntity>>
+
+    @Query("SELECT * FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId)")
+    suspend fun getAllByUser(usuarioId: Int): List<MedicationEntity>
+
+    @Query("SELECT * FROM medications WHERE id = :id")
+    suspend fun getMedicationByIdOnce(id: Int): MedicationEntity?
+
+    @Query("DELETE FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId)")
+    suspend fun deleteAllByUsuario(usuarioId: Int)
 }

@@ -12,7 +12,6 @@ interface UserRepository {
     suspend fun deleteUser(user: User)
     suspend fun crearUserInvitado()
     suspend fun getUser(): User?
-    
     fun getUserFlow(): Flow<User?>
 
 }

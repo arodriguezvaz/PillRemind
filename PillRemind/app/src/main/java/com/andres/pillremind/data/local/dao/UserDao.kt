@@ -31,5 +31,8 @@ interface UserDao {
 
     @Query("SELECT * FROM usuarios LIMIT 1")
     fun getUserFlow(): Flow<UserEntity?>
+
+    @Query("DELETE FROM profiles WHERE usuarioId = :usuarioId")
+    suspend fun deleteAllByUsuario(usuarioId: Int)
 }
 

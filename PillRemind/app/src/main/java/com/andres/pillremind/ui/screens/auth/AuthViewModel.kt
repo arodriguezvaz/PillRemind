@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.TipoUsuario
-import com.andres.pillremind.domain.model.User
 import com.andres.pillremind.domain.repository.AuthRepository
+import com.andres.pillremind.domain.repository.ProfileRepository
+import com.andres.pillremind.domain.repository.SyncRepository
 import com.andres.pillremind.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -18,7 +19,9 @@ import java.time.LocalDateTime
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val profileRepository: ProfileRepository,
+    private val syncRepository: SyncRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
@@ -35,7 +38,6 @@ class AuthViewModel @Inject constructor(
                         return@onSuccess
                     }
                     vincularUsuario(supabaseUid, email)
-                    _uiState.value = AuthUiState.Success
                 }
                 .onFailure {
                     _uiState.value = AuthUiState.Error(it.message ?: "Error al iniciar sesión")
@@ -64,26 +66,51 @@ class AuthViewModel @Inject constructor(
 
     private suspend fun vincularUsuario(supabaseUid: String, email: String) {
         val usuarioActual = userRepository.getUser()
-        if (usuarioActual != null) {
-            userRepository.updateUser(
-                usuarioActual.copy(
-                    supabaseUid = supabaseUid,
-                    email = email,
-                    tipoUsuario = TipoUsuario.REGISTRADO,
-                    syncPendiente = true,
-                    updatedAt = LocalDateTime.now()
-                )
-            )
+        val perfilesLocales =
+            usuarioActual?.id?.let { profileRepository.getAllByUser(it) } ?: emptyList()
+        // lo comprobamos luego en syncRepository
+
+        if (perfilesLocales.isEmpty()) {
+            // Sin perfiles locales → vincular y descargar Supabase
+            vincularYActualizar(supabaseUid, email)
+            syncRepository.downloadCompleto()
+            _uiState.value = AuthUiState.Success
         } else {
-            val id = userRepository.insertUser(
-                User(
-                    supabaseUid = supabaseUid,
-                    email = email,
-                    tipoUsuario = TipoUsuario.REGISTRADO,
-                    syncPendiente = true
-                )
+            // Hay perfiles locales → preguntar
+            vincularYActualizar(supabaseUid, email)
+            _uiState.value = AuthUiState.ConflictoPerfiles(supabaseUid, email)
+        }
+    }
+
+    private suspend fun vincularYActualizar(supabaseUid: String, email: String) {
+        val usuarioActual = userRepository.getUser() ?: return
+        val usuarioRemoto = syncRepository.getUsuarioRemoto(supabaseUid)
+
+        userRepository.updateUser(
+            usuarioActual.copy(
+                supabaseUid = supabaseUid,
+                email = email,
+                tipoUsuario = TipoUsuario.REGISTRADO,
+                esPremium = usuarioRemoto?.esPremium ?: false,
+                aceptaComunicaciones = usuarioRemoto?.aceptaComunicaciones ?: false,
+                syncPendiente = true,
+                updatedAt = LocalDateTime.now()
             )
-            sessionManager.setActiveUser(id.toInt())
+        )
+    }
+
+    fun resolverConflicto(mantenerLocales: Boolean) {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            if (mantenerLocales) {
+                syncRepository.syncCompleto()
+                    .onSuccess { _uiState.value = AuthUiState.Success }
+                    .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "Error") }
+            } else {
+                syncRepository.borrarLocalYDescargar()
+                    .onSuccess { _uiState.value = AuthUiState.Success }
+                    .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "Error") }
+            }
         }
     }
 
@@ -96,5 +123,6 @@ sealed class AuthUiState {
     object Idle : AuthUiState()
     object Loading : AuthUiState()
     object Success : AuthUiState()
+    data class ConflictoPerfiles(val supabaseUid: String, val email: String) : AuthUiState()
     data class Error(val message: String) : AuthUiState()
 }

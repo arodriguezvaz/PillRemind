@@ -44,5 +44,8 @@ interface IntakeRepository {
     suspend fun getLastGeneratedDate(): LocalDate
 
     suspend fun saveLastGeneratedDate(fecha: LocalDate)
+
+    suspend fun getAllByUser(userId: Int): List<Intake>
+
 }
 

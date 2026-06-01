@@ -53,7 +53,7 @@ class AlarmReceiver : BroadcastReceiver() {
                 // Si ya fue tomada no notificamos
                 if (intake!!.takenAt != null) return@launch
 
-                val schedule = scheduleRepository.getScheduleById(intake.scheduleId)
+                val schedule = scheduleRepository.getScheduleByIdOnce(intake.scheduleId)
                 val medication = medicationRepository.getMedicationById(schedule.medicationId)
                     .firstOrNull() ?: return@launch
 

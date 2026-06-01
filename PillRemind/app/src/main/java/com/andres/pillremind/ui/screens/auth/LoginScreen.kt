@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,9 +48,13 @@ fun LoginScreen(
     val uiState by authViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState) {
-        if (uiState is AuthUiState.Success) {
-            authViewModel.resetState()
-            onLoginSuccess()
+        when (uiState) {
+            is AuthUiState.Success -> {
+                authViewModel.resetState()
+                onLoginSuccess()
+            }
+
+            else -> {}
         }
     }
 
@@ -114,6 +120,23 @@ fun LoginScreen(
                 onClick = onNavigateToRegister,
                 size = ButtonSize.Large,
                 variant = ButtonVariant.Ghost
+            )
+        }
+        if (uiState is AuthUiState.ConflictoPerfiles) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text("Ya tienes datos guardados") },
+                text = { Text("¿Qué quieres hacer con los datos de este dispositivo?") },
+                confirmButton = {
+                    TextButton(onClick = { authViewModel.resolverConflicto(mantenerLocales = true) }) {
+                        Text("Subir mis datos")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { authViewModel.resolverConflicto(mantenerLocales = false) }) {
+                        Text("Descargar de la nube")
+                    }
+                }
             )
         }
     }

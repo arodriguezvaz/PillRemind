@@ -56,4 +56,10 @@ interface ScheduleDao {
      */
     @Query("SELECT * FROM schedules WHERE WeekDay = :day")
     fun getSchedulesByDay(day: WeekDay): Flow<List<ScheduleEntity>>
+
+    @Query("SELECT * FROM schedules WHERE medicationId IN (SELECT id FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId))")
+    suspend fun getAllByUsuario(usuarioId: Int): List<ScheduleEntity>
+
+    @Query("SELECT * FROM schedules WHERE id = :id")
+    suspend fun getScheduleByIdOnce(id: Int): ScheduleEntity?
 }

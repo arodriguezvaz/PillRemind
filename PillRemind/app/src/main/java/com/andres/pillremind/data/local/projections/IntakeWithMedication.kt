@@ -2,16 +2,17 @@ package com.andres.pillremind.data.local.projections
 
 import java.time.LocalDateTime
 
-//TODO añadir nombre del perfil del medicamento par que que se enseñe en la notificación
 data class IntakeWithMedication(
     val intakeId: Int,
     val scheduledAt: LocalDateTime,
     val scheduleId: Int,
+    val supabaseId: String?,
     val takenAt: LocalDateTime?,
     val medicationName: String,
     val dose: Double,
     val unit: String,
     val imageUrl: String?,
+    val profileName: String
 )
 
 

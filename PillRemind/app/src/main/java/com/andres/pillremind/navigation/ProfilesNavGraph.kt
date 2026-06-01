@@ -63,6 +63,11 @@ fun NavGraphBuilder.profileSelectionGraph(
                 onBack = {
                     navController.popBackStack()
                 },
+                onLogout = {
+                    navController.navigate(Graph.PROFILE_SELECTION) {
+                        popUpTo(Graph.ROOT) { inclusive = true }
+                    }
+                }
             )
         }
     }

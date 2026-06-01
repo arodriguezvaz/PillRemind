@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.screens.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.projections.IntakeWithMedication
@@ -9,6 +10,8 @@ import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
+import com.andres.pillremind.domain.repository.SyncRepository
+import com.andres.pillremind.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +39,9 @@ class HomeViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val medicationRepository: MedicationRepository,
     private val intakeRepository: IntakeRepository,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val syncRepository: SyncRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
     init {
         viewModelScope.launch {
@@ -47,6 +52,13 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private suspend fun syncSiEsPremium() {
+        val user = userRepository.getUser() ?: return
+        if (user.esPremium && user.supabaseUid != null) {
+            syncRepository.syncIntakes()
+                .onFailure { Log.e("Sync", "Error sync intakes: ${it.message}") }
+        }
+    }
 
     val profileId = sessionManager.activeProfileId
 
@@ -79,14 +91,17 @@ class HomeViewModel @Inject constructor(
     fun tomarIntake(intake: IntakeWithMedication) {
         viewModelScope.launch {
             val hoy = LocalDateTime.now()
+            val nuevaTomadoHoy = if (intake.takenAt == null) hoy else null
             val updatedIntake = Intake(
-                intake.intakeId,
-                intake.scheduleId,
-                intake.scheduledAt,
-                hoy,
+                id = intake.intakeId,
+                scheduleId = intake.scheduleId,
+                supabaseId = intake.supabaseId,
+                scheduledAt = intake.scheduledAt,
+                takenAt = nuevaTomadoHoy,
                 updatedAt = hoy
             )
             intakeRepository.updateIntake(updatedIntake)
+            syncSiEsPremium()
         }
     }
 

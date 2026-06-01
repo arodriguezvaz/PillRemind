@@ -75,14 +75,17 @@ interface IntakeDao {
         i.id as intakeId,
         i.scheduledAt,
         i.scheduleId,
+        i.supabaseId,
         i.takenAt,
         m.name as medicationName,
         m.dose,
         m.unit,
-        m.imageUrl
+        m.imageUrl,
+        p.name as profileName
     FROM intakes i
     JOIN schedules s ON s.id = i.scheduleId
     JOIN medications m ON m.id = s.medicationId
+    JOIN profiles p ON p.id = m.profileId
     WHERE i.scheduledAt BETWEEN :startOfDay AND :endOfDay
     AND m.profileId = :profileId
     ORDER BY i.scheduledAt
@@ -93,5 +96,8 @@ interface IntakeDao {
         endOfDay: LocalDateTime,
         profileId: Int
     ): Flow<List<IntakeWithMedication>>
+
+    @Query("SELECT * FROM intakes WHERE scheduleId IN (SELECT id FROM schedules WHERE medicationId IN (SELECT id FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId)))")
+    suspend fun getAllByUser(usuarioId: Int): List<IntakeEntity>
 
 }

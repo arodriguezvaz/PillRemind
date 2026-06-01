@@ -6,10 +6,21 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -21,19 +32,46 @@ import com.andres.pillremind.ui.components.settings.SettingsCard
 import com.andres.pillremind.ui.components.settings.SettingsInfoItem
 import com.andres.pillremind.ui.components.settings.SettingsLinkItem
 import com.andres.pillremind.ui.components.settings.SettingsToggleItem
+import com.andres.pillremind.ui.session.SessionViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onNavigateToLogin: () -> Unit,
     onBack: () -> Unit,
-    settingsViewModel: SettingsViewModel = hiltViewModel()
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
+    onLogout: () -> Unit,
+    sessionViewModel: SessionViewModel = hiltViewModel()
 ) {
 
     val usuario by settingsViewModel.usuario.collectAsStateWithLifecycle()
     val isDarkMode by settingsViewModel.isDarkMode.collectAsStateWithLifecycle()
+    val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
+    var esPremium by remember(usuario) { mutableStateOf(usuario?.esPremium ?: false) }
 
+
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is SettingsUiState.LoggedOut -> {
+                settingsViewModel.resetState()
+                sessionViewModel.reiniciarSesion()
+                onLogout()
+            }
+
+            else -> {}
+        }
+    }
     Scaffold(
-        topBar = { /* tu topbar con título "Ajustes" y back */ }
+        topBar = {
+            TopAppBar(
+                title = { Text("Ajustes") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, null)
+                    }
+                }
+            )
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -51,8 +89,12 @@ fun SettingsScreen(
                 }
                 SettingsToggleItem(
                     label = "Modo premium",
-                    checked = usuario?.esPremium ?: false,
-                    onCheckedChange = { settingsViewModel.togglePremium(it) }
+                    checked = esPremium,
+                    onCheckedChange = {
+                        esPremium = it
+                        settingsViewModel.togglePremium(it)
+                    },
+                    enabled = usuario?.email != null
                 )
                 if (usuario?.email != null) {
                     Spacer(Modifier.height(8.dp))

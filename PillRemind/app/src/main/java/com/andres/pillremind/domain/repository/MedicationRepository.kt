@@ -2,7 +2,6 @@ package com.andres.pillremind.domain.repository
 
 import com.andres.pillremind.domain.model.Medication
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Interfaz que define las operaciones de acceso a datos relacionadas con medicamentos
@@ -29,7 +28,14 @@ interface MedicationRepository {
     fun getMedicationById(medicationId: Int): Flow<Medication?>
 
     /**
+     * Obtiene un medicamento de la base de datos
+     */
+    suspend fun getMedicationByIdOnce(medicationId: Int): Medication?
+
+    /**
      * Obtiene todos los medicamentos de un perfil de la base de datos
      */
     fun getMedications(profileId: Int): Flow<List<Medication>>
+    suspend fun getAllByUser(userId: Int): List<Medication>
+    suspend fun deleteAllByUsuario(usuarioId: Int)
 }

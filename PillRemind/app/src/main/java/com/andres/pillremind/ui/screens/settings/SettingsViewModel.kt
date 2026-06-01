@@ -1,11 +1,14 @@
 package com.andres.pillremind.ui.screens.settings
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
-import com.andres.pillremind.domain.model.TipoUsuario
 import com.andres.pillremind.domain.model.User
 import com.andres.pillremind.domain.repository.AuthRepository
+import com.andres.pillremind.domain.repository.MedicationRepository
+import com.andres.pillremind.domain.repository.ProfileRepository
+import com.andres.pillremind.domain.repository.SyncRepository
 import com.andres.pillremind.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,8 +23,11 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val sessionManager: SessionManager,
+    private val medicationRepository: MedicationRepository,
+    private val profileRepository: ProfileRepository,
     private val userRepository: UserRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val syncRepository: SyncRepository
 ) : ViewModel() {
 
     val isDarkMode: StateFlow<Boolean> = sessionManager.isDarkMode
@@ -42,6 +48,9 @@ class SettingsViewModel @Inject constructor(
             userRepository.updateUser(
                 user.copy(esPremium = enabled, updatedAt = LocalDateTime.now())
             )
+            syncRepository.syncUsuario()
+                .onSuccess { Log.d("Sync", "Usuario sync OK") }
+                .onFailure { Log.e("Sync", "Error: ${it.message}", it) }
         }
     }
 
@@ -52,16 +61,14 @@ class SettingsViewModel @Inject constructor(
                 .onSuccess {
                     // Resetear usuario a invitado en Room
                     val user = usuario.value ?: return@onSuccess
-                    userRepository.updateUser(
-                        user.copy(
-                            supabaseUid = null,
-                            email = null,
-                            tipoUsuario = TipoUsuario.INVITADO,
-                            esPremium = false,
-                            syncPendiente = false,
-                            updatedAt = LocalDateTime.now()
-                        )
-                    )
+                    // Borrar todos los datos locales
+                    medicationRepository.deleteAllByUsuario(user.id)
+                    profileRepository.deleteAllByUsuario(user.id)
+                    userRepository.deleteUser(user)
+
+                    // Limpiar sesión
+                    sessionManager.clearActiveUser()
+                    sessionManager.clearActiveProfile()
                     _uiState.value = SettingsUiState.LoggedOut
                 }
                 .onFailure {
