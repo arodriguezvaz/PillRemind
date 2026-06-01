@@ -89,4 +89,15 @@ class IntakeRepositoryImpl @Inject constructor(
     override suspend fun getAllByUser(userId: Int): List<Intake> {
         return intakeDao.getAllByUser(userId).map { it.toDomain() }
     }
+
+    override suspend fun getFutureIntakesByMedicationId(
+        medicationId: Int,
+        date: LocalDateTime
+    ): List<Intake> {
+        return intakeDao.getFutureIntakesByMedicationId(medicationId, date).map { it.toDomain() }
+    }
+
+    override suspend fun deleteFutureIntakesByMedicationId(medicationId: Int, date: LocalDateTime) {
+        intakeDao.deleteFutureIntakesByMedicationId(medicationId, date)
+    }
 }

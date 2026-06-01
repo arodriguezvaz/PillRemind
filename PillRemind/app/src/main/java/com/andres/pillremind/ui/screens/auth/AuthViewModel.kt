@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
+
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
@@ -38,6 +39,7 @@ class AuthViewModel @Inject constructor(
                         return@onSuccess
                     }
                     vincularUsuario(supabaseUid, email)
+                    syncRepository.syncUsuario()
                 }
                 .onFailure {
                     _uiState.value = AuthUiState.Error(it.message ?: "Error al iniciar sesión")
@@ -56,6 +58,7 @@ class AuthViewModel @Inject constructor(
                         return@onSuccess
                     }
                     vincularUsuario(supabaseUid, email)
+                    syncRepository.syncUsuario()
                     _uiState.value = AuthUiState.Success
                 }
                 .onFailure {
@@ -63,6 +66,7 @@ class AuthViewModel @Inject constructor(
                 }
         }
     }
+
 
     private suspend fun vincularUsuario(supabaseUid: String, email: String) {
         val usuarioActual = userRepository.getUser()

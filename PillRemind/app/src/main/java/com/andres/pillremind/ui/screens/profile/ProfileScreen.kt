@@ -92,7 +92,7 @@ fun ProfileScreen(
                     AppTextField(
                         value = name.value,
                         onValueChange = { name.value = it },
-                        placeholder = "Nombre del peril",
+                        placeholder = stringResource(R.string.añadir_perfil),
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                 }

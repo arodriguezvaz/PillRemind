@@ -9,6 +9,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,7 +26,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.andres.pillremind.R
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 /**
@@ -46,7 +49,8 @@ fun AppDatePickerField(
     modifier: Modifier = Modifier,
     placeholder: String = stringResource(R.string.fecha_hint),
     enabled: Boolean = true,
-    isError: Boolean = false
+    isError: Boolean = false,
+    minDate: LocalDate? = null
 ) {
 
     var showDialog by remember { mutableStateOf(false) }
@@ -80,13 +84,24 @@ fun AppDatePickerField(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
                 disabledIndicatorColor = Color.Transparent
             ),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
         )
     }
 
 
     if (showDialog) {
-        val datePickerState = rememberDatePickerState()
+        val selectableDates = remember(minDate) {
+            object : SelectableDates {
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                    if (minDate == null) return true
+                    val date = Instant.ofEpochMilli(utcTimeMillis)
+                        .atZone(ZoneId.of("UTC"))
+                        .toLocalDate()
+                    return !date.isBefore(minDate)
+                }
+            }
+        }
+        val datePickerState = rememberDatePickerState(selectableDates = selectableDates)
 
         DatePickerDialog(
             onDismissRequest = { showDialog = false },
@@ -96,8 +111,8 @@ fun AppDatePickerField(
                         val selectedMillis = datePickerState.selectedDateMillis
                         if (selectedMillis != null) {
                             val selectedDate =
-                                java.time.Instant.ofEpochMilli(selectedMillis)
-                                    .atZone(java.time.ZoneId.systemDefault())
+                                Instant.ofEpochMilli(selectedMillis)
+                                    .atZone(ZoneId.systemDefault())
                                     .toLocalDate()
 
                             onDateSelected(selectedDate)
@@ -112,8 +127,9 @@ fun AppDatePickerField(
                 TextButton(onClick = { showDialog = false }) {
                     Text("Cancelar")
                 }
-            }
-        ) {
+            },
+
+            ) {
             DatePicker(state = datePickerState)
         }
     }

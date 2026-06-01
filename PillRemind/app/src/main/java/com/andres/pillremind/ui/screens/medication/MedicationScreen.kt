@@ -40,11 +40,11 @@ import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
+import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.FormField
-import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.WeekDayChipGroup
 import com.andres.pillremind.ui.components.timeeditor.TimeListEditor
 import com.andres.pillremind.ui.screens.main.TopBarState
@@ -80,6 +80,7 @@ fun MedicationScreen(
     medicationMode: MedicationMode = MedicationMode.Create,
     onDeleteClicked: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
+
     medicationViewModel: MedicationViewModel = hiltViewModel()
 ) {
     val medication by medicationViewModel.medication.collectAsState()
@@ -145,6 +146,7 @@ fun MedicationScreen(
             unit.value = it.unit
             startDate.value = it.startDate
             endDate.value = it.endDate
+            isChronicTreatment.value = it.isChronic
         }
     }
     LaunchedEffect(medicationWeekDays) {
@@ -184,9 +186,15 @@ fun MedicationScreen(
     BackHandler(enabled = currentMode == MedicationMode.Edit) {
         currentMode = MedicationMode.View
     }
-    //TODO
-    val snackbarMessage by medicationViewModel.snackbarMessage.collectAsState()
+
     val scrollState = rememberScrollState()
+    val isFormValid = name.value.isNotBlank() &&
+            dose.value.isNotBlank() &&
+            unit.value.isNotBlank() &&
+            startDate.value != null &&
+            weekDays.value.isNotEmpty() &&
+            times.isNotEmpty() &&
+            (isChronicTreatment.value || endDate.value != null)
     when (currentMode) {
         //---------CREATE---------
         MedicationMode.Create -> {
@@ -255,7 +263,10 @@ fun MedicationScreen(
                 ) {
                     Checkbox(
                         checked = isChronicTreatment.value,
-                        onCheckedChange = { isChronicTreatment.value = it },
+                        onCheckedChange = {
+                            isChronicTreatment.value = it
+                            if (it) endDate.value = null
+                        },
                         enabled = true
                     )
                     Text(
@@ -276,7 +287,7 @@ fun MedicationScreen(
                         AppDatePickerField(
                             value = startDate.value,
                             onDateSelected = { startDate.value = it },
-                            enabled = true
+                            enabled = true,
                         )
                     }
                     FormField(
@@ -286,7 +297,8 @@ fun MedicationScreen(
                         AppDatePickerField(
                             value = endDate.value,
                             onDateSelected = { endDate.value = it },
-                            enabled = !isChronicTreatment.value
+                            enabled = !isChronicTreatment.value,
+                            minDate = startDate.value
                         )
                     }
                 }
@@ -318,19 +330,15 @@ fun MedicationScreen(
                             startDate = startDate.value!!,
                             endDate = endDate.value,
                             weekDays = weekDays.value,
-                            times = times
+                            times = times,
+                            isChronic = isChronicTreatment.value
                         )
 
                         onSaveClicked()
                     },
                     size = ButtonSize.Large,
-                    enabled = name.value.isNotBlank()
+                    enabled = isFormValid
                 )
-            }
-            LaunchedEffect(snackbarMessage) {
-                snackbarMessage?.let {
-                    medicationViewModel.clearMessage()
-                }
             }
         }
         //----------EDIT-----------
@@ -402,7 +410,10 @@ fun MedicationScreen(
                 ) {
                     Checkbox(
                         checked = isChronicTreatment.value,
-                        onCheckedChange = { isChronicTreatment.value = it },
+                        onCheckedChange = {
+                            isChronicTreatment.value = it
+                            if (it) endDate.value = null
+                        },
                         enabled = true
                     )
                     Text(
@@ -433,7 +444,8 @@ fun MedicationScreen(
                         AppDatePickerField(
                             value = endDate.value,
                             onDateSelected = { endDate.value = it },
-                            enabled = !isChronicTreatment.value
+                            enabled = !isChronicTreatment.value,
+                            minDate = startDate.value
                         )
                     }
                 }
@@ -479,14 +491,15 @@ fun MedicationScreen(
                                 startDate = startDate.value!!,
                                 endDate = endDate.value,
                                 weekDays = weekDays.value,
-                                times = times
+                                times = times,
+                                isChronic = isChronicTreatment.value
                             )
 
                             currentMode = MedicationMode.View
                         },
                         size = ButtonSize.Medium,
                         modifier = Modifier.weight(1f),
-                        enabled = name.value.isNotBlank()
+                        enabled = isFormValid
                     )
                 }
             }
@@ -560,7 +573,10 @@ fun MedicationScreen(
                 ) {
                     Checkbox(
                         checked = isChronicTreatment.value,
-                        onCheckedChange = { isChronicTreatment.value = it },
+                        onCheckedChange = {
+                            isChronicTreatment.value = it
+                            if (it) endDate.value = null
+                        },
                         enabled = false
                     )
                     Text(
@@ -595,7 +611,6 @@ fun MedicationScreen(
                         )
                     }
                 }
-                //TODO
                 FormField(stringResource(R.string.periocidad)) {
                     WeekDayChipGroup(
                         selectedDays = weekDays.value,
@@ -636,12 +651,6 @@ fun MedicationScreen(
                         modifier = Modifier.weight(1f)
 
                     )
-                }
-            }
-
-            LaunchedEffect(snackbarMessage) {
-                snackbarMessage?.let {
-                    medicationViewModel.clearMessage()
                 }
             }
         }

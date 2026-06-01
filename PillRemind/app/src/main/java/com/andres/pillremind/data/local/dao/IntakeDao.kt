@@ -100,4 +100,28 @@ interface IntakeDao {
     @Query("SELECT * FROM intakes WHERE scheduleId IN (SELECT id FROM schedules WHERE medicationId IN (SELECT id FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId)))")
     suspend fun getAllByUser(usuarioId: Int): List<IntakeEntity>
 
+    @Query(
+        """
+    SELECT * FROM intakes 
+    WHERE scheduledAt > :from
+    AND scheduleId IN (
+        SELECT id FROM schedules WHERE medicationId = :medicationId
+    )
+"""
+    )
+    suspend fun getFutureIntakesByMedicationId(
+        medicationId: Int,
+        from: LocalDateTime
+    ): List<IntakeEntity>
+
+    @Query(
+        """
+    DELETE FROM intakes 
+    WHERE scheduledAt > :from
+    AND scheduleId IN (
+        SELECT id FROM schedules WHERE medicationId = :medicationId
+    )
+"""
+    )
+    suspend fun deleteFutureIntakesByMedicationId(medicationId: Int, from: LocalDateTime)
 }

@@ -27,7 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -66,7 +65,7 @@ class MedicationViewModel @Inject constructor(
     //Recupera el profileId del sessionManager
     val profileId = sessionManager.activeProfileId
     private val _snackbarMessage = MutableStateFlow<String?>(null)
-    val snackbarMessage = _snackbarMessage.asStateFlow()
+
 
     //Recupera el id del medicamento
     val medicationId = savedStateHandle.get<Int>("medicationId")
@@ -126,27 +125,14 @@ class MedicationViewModel @Inject constructor(
         startDate: LocalDate,
         endDate: LocalDate? = null,
         weekDays: Set<WeekDay>,
-        times: List<LocalTime>
+        times: List<LocalTime>,
+        isChronic: Boolean
     ) {
 
         val trimmedName = nombre.trim()
         val normalizedUnit = unit.trim()
         val imagePath = photoUri?.let {
             copyImageToInternalStorage(context, it)
-        }
-        if (trimmedName.isBlank()) {
-            showMessage("El nombre no puede estar vacío")
-            return
-        }
-
-        if (dose <= 0) {
-            showMessage("La dosis debe ser mayor que 0")
-            return
-        }
-
-        if (endDate != null && endDate.isBefore(startDate)) {
-            showMessage("La fecha de fin no puede ser anterior a la de inicio")
-            return
         }
 
         viewModelScope.launch {
@@ -160,7 +146,8 @@ class MedicationViewModel @Inject constructor(
                         dose = dose,
                         unit = normalizedUnit,
                         startDate = startDate,
-                        endDate = endDate
+                        endDate = endDate,
+                        isChronic = isChronic
                     )
                 )
                 Log.d("PillDebug", "Medicamento creado con id: $medicationId")
@@ -183,8 +170,6 @@ class MedicationViewModel @Inject constructor(
                 Log.d("PillDebug", "Intakes generadas: ${intakes.size} -> $intakes")
 
                 scheduleAlarmsForIntakes(intakes)
-            } else {
-                showMessage("No hay perfil activo")
             }
             syncSiEsPremium()
         }
@@ -202,7 +187,8 @@ class MedicationViewModel @Inject constructor(
         startDate: LocalDate,
         endDate: LocalDate? = null,
         weekDays: Set<WeekDay>,
-        times: List<LocalTime>
+        times: List<LocalTime>,
+        isChronic: Boolean
     ) {
         val trimmedName = name.trim()
         val normalizedUnit = unit.trim()
@@ -228,13 +214,18 @@ class MedicationViewModel @Inject constructor(
                     startDate = startDate,
                     endDate = endDate,
                     updatedAt = LocalDateTime.now(),
-                    supabaseId = medicamentoActual?.supabaseId
+                    supabaseId = medicamentoActual?.supabaseId,
+                    isChronic = isChronic
                 )
 
                 medicationRepository.updateMedication(updatedMedication)
+                cancelFutureIntakeAlarms()
+                intakeRepository.deleteFutureIntakesByMedicationId(
+                    medicationId,
+                    LocalDateTime.now()
+                )
 
                 scheduleRepository.deleteByMedicationId(medicationId)
-
                 for (day in weekDays) {
                     for (time in times) {
                         scheduleRepository.insertSchedule(
@@ -247,10 +238,9 @@ class MedicationViewModel @Inject constructor(
                     }
                 }
                 val desde = intakeRepository.getLastGeneratedDate()
-                intakeRepository.createIntakes(desde, LocalDate.now())
+                val intakes = intakeRepository.createIntakes(desde, LocalDate.now())
+                scheduleAlarmsForIntakes(intakes)
 
-            } else {
-                showMessage("No hay perfil activo")
             }
             syncSiEsPremium()
         }
@@ -300,29 +290,20 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
-    /*
-        /**
-         * Cancela las alarmas de las intakes futuras del medicamento actual.
-         * Se llama antes de actualizar o eliminar para no dejar alarmas huérfanas.
-         */
-        private suspend fun cancelFutureIntakeAlarms() {
-            if (medicationId == null) return
-            val now = LocalDateTime.now()
-            // Obtenemos las intakes futuras a través de los schedules actuales
-            schedules.value.forEach { schedule ->
-                intakeRepository.getFutureIntakesByScheduleId(schedule.id, now)
-                    .forEach { intake -> alarmScheduler.cancel(intake.id) }
-            }
-        }
-    */
-    private fun showMessage(message: String) {
-        _snackbarMessage.value = message
-    }
 
     /**
-     * Limpia el mensaje actual del snackbar.
+     * Cancela las alarmas de las intakes futuras del medicamento actual.
+     * Se llama antes de actualizar o eliminar para no dejar alarmas huérfanas.
      */
-    fun clearMessage() {
-        _snackbarMessage.value = null
+    private suspend fun cancelFutureIntakeAlarms() {
+        if (medicationId == null) return
+        val now = LocalDateTime.now()
+        // Obtenemos las intakes futuras a través de los schedules actuales
+        schedules.value.forEach { schedule ->
+            intakeRepository.getFutureIntakesByMedicationId(medicationId, now)
+                .forEach { intake -> alarmScheduler.cancel(intake.id) }
+        }
     }
+
+
 }

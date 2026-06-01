@@ -4,6 +4,7 @@ import com.andres.pillremind.data.local.projections.IntakeWithMedication
 import com.andres.pillremind.domain.model.Intake
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 /**
  * Interfaz que define las operaciones de acceso a datos relacionadas con tomas
@@ -47,5 +48,7 @@ interface IntakeRepository {
 
     suspend fun getAllByUser(userId: Int): List<Intake>
 
+    suspend fun getFutureIntakesByMedicationId(medicationId: Int, date: LocalDateTime): List<Intake>
+    suspend fun deleteFutureIntakesByMedicationId(medicationId: Int, date: LocalDateTime)
 }
 

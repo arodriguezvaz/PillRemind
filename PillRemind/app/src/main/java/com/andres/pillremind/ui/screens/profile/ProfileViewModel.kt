@@ -43,7 +43,6 @@ class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val syncRepository: SyncRepository,
     @ApplicationScope private val appScope: CoroutineScope,
-
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
+import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.MedicationCard
 import com.andres.pillremind.ui.screens.main.TopBarState
@@ -37,6 +39,7 @@ fun MedicationsScreen(
 ) {
 
     val medications by medicationsViewModel.medications.collectAsStateWithLifecycle()
+    val searchQuery by medicationsViewModel.searchQuery.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         onTopBarChange(TopBarState(title = "Medicamentos"))
@@ -46,7 +49,14 @@ fun MedicationsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        //TODO insertar un buscador
+        AppTextField(
+            value = searchQuery,
+            onValueChange = { medicationsViewModel.onSearchQueryChange(it) },
+            placeholder = "Buscar medicamento...",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp)
+        )
 
         if (medications.isEmpty()) {
             Box(

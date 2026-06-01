@@ -135,7 +135,7 @@ class SyncRepositoryImpl @Inject constructor(
 
         val user = userRepository.getUser() ?: error("No hay usuario local")
         Log.d("Sync", "esPremium a subir: ${user.esPremium}")
-
+        Log.d("Sync", "tipoUsuario a subir: ${user.tipoUsuario.name}")
         val dto = UsuarioDto(
             userId = supabaseUid,
             tipoUsuario = user.tipoUsuario.name,

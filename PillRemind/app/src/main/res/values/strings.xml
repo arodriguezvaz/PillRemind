@@ -29,5 +29,7 @@
     <string name="sleccionar_hora">Seleccionar hora</string>
     <string name="tomar">Tomar</string>">
     <string name="tomado">Tomado</string>
-    <string name="fecha_hint">dd/mm/yyyy</string>">
+    <string name="fecha_hint">dd/mm/yyyy</string>
+    <string name="añadir_perfil">Añadir perfil</string>
+    <string name="seleccion_la_hora">Selecciona la hora</string>">
 </resources>

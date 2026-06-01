@@ -2,6 +2,7 @@ package com.andres.pillremind.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
@@ -25,7 +26,8 @@ fun MainNavigationGraph(
     navController: NavHostController,
     rootNavController: NavHostController,
     paddingValues: PaddingValues,
-    onTopBarChange: (TopBarState) -> Unit
+    onTopBarChange: (TopBarState) -> Unit,
+    snackbarHostState: SnackbarHostState
 ) {
     NavHost(
         navController = navController,
@@ -61,13 +63,14 @@ fun MainNavigationGraph(
                 onTopBarChange = onTopBarChange,
             )
         }
-        medicationNavGraph(navController, onTopBarChange)
+        medicationNavGraph(navController, onTopBarChange, snackbarHostState)
     }
 }
 
 fun NavGraphBuilder.medicationNavGraph(
     navController: NavHostController,
-    onTopBarChange: (TopBarState) -> Unit
+    onTopBarChange: (TopBarState) -> Unit,
+    snackbarHostState: SnackbarHostState
 ) {
     navigation(
         route = Graph.MEDICATION,
@@ -86,7 +89,8 @@ fun NavGraphBuilder.medicationNavGraph(
                 onDeleteClicked = {
                     navController.popBackStack()
                 },
-                onTopBarChange = onTopBarChange
+                onTopBarChange = onTopBarChange,
+                snackbarHostState = snackbarHostState
             )
         }
         composable(route = MedicationScreens.MedicationCreateScreen.route) {
@@ -94,6 +98,7 @@ fun NavGraphBuilder.medicationNavGraph(
                 onSaveClicked = { navController.popBackStack() },
                 medicationMode = MedicationMode.Create,
                 onTopBarChange = onTopBarChange,
+                snackbarHostState = snackbarHostState
             )
         }
     }
