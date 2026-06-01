@@ -13,6 +13,8 @@ import java.time.LocalDateTime
  */
 data class Profile(
     val id: Int = 0,
+    val usuarioId: Int,
+    val supabaseId: String? = null,
     val name: String,
     val urlImagen: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),

@@ -3,6 +3,8 @@ package com.andres.pillremind
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -12,6 +14,7 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.andres.pillremind.notifications.DailyIntakeWorker
 import dagger.hilt.android.HiltAndroidApp
+import jakarta.inject.Inject
 import java.util.concurrent.TimeUnit
 
 /**
@@ -21,7 +24,16 @@ import java.util.concurrent.TimeUnit
  * para los recordatorios de medicación.
  */
 @HiltAndroidApp
-class PillRemindApp : Application() {
+class PillRemindApp : Application(), Configuration.Provider {
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
+
+    // Called by WorkManager before it initializes itself.
+    // Returning this configuration is what connects HiltWorkerFactory to WorkManager.
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
     override fun onCreate() {
         super.onCreate()

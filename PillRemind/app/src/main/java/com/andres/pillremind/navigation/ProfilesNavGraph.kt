@@ -10,6 +10,7 @@ import androidx.navigation.navigation
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
 import com.andres.pillremind.ui.screens.profiles.ProfilesScreen
+import com.andres.pillremind.ui.screens.settings.SettingsScreen
 import com.andres.pillremind.ui.session.SessionViewModel
 
 fun NavGraphBuilder.profileSelectionGraph(
@@ -31,7 +32,10 @@ fun NavGraphBuilder.profileSelectionGraph(
                     sessionViewModel.setActiveProfile(perfil.id)
                     navController.navigate(Graph.MAIN)
                 },
-                navController = navController
+                navController = navController,
+                onSettingClicked = {
+                    navController.navigate(ProfilesScreen.SettingsScreen.route)
+                }
             )
         }
 
@@ -47,8 +51,24 @@ fun NavGraphBuilder.profileSelectionGraph(
                             }
                         }
                     }
+
                 )
             }
+        }
+        composable(ProfilesScreen.SettingsScreen.route) {
+            SettingsScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Graph.AUTH)
+                },
+                onBack = {
+                    navController.popBackStack()
+                },
+                onLogout = {
+                    navController.navigate(Graph.PROFILE_SELECTION) {
+                        popUpTo(Graph.ROOT) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }
@@ -56,4 +76,5 @@ fun NavGraphBuilder.profileSelectionGraph(
 sealed class ProfilesScreen(val route: String) {
     object ProfileSelectionScreen : ProfilesScreen(route = "profiles")
     object ProfileCreateScreen : ProfilesScreen(route = "profile/create")
+    object SettingsScreen : ProfilesScreen(route = "settings")
 }

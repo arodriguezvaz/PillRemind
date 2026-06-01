@@ -33,8 +33,21 @@ class ProfileRepositoryImpl @Inject constructor(
         return profileDao.getProfileById(id).map { it?.toDomain() }
     }
 
+    override suspend fun getProfileByIdOnce(id: Int): Profile? {
+        return profileDao.getProfileByIdOnce(id)?.toDomain()
+    }
+
+    override suspend fun getAllByUser(userId: Int): List<Profile> {
+        return profileDao.getAllByUsuario(userId).map { it.toDomain() }
+    }
+
+    override suspend fun deleteAllByUsuario(usuarioId: Int) {
+        return profileDao.deleteAllByUsuario(usuarioId)
+    }
+
     override fun getProfiles(): Flow<List<Profile>> {
         return profileDao.getProfiles()
             .map { list -> list.map { it.toDomain() } }
     }
+
 }

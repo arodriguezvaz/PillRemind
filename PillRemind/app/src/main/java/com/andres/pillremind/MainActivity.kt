@@ -9,11 +9,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.net.toUri
 import androidx.navigation.compose.rememberNavController
+import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.navigation.RootNavigationGraph
 import com.andres.pillremind.ui.theme.PillRemindTheme
 import dagger.hilt.android.AndroidEntryPoint
+import jakarta.inject.Inject
 
 /**
  * Actividad principal de la aplicación.
@@ -23,7 +27,8 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
+    @Inject
+    lateinit var sessionManager: SessionManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -32,7 +37,8 @@ class MainActivity : ComponentActivity() {
         requestExactAlarmPermissionIfNeeded()
 
         setContent {
-            PillRemindTheme {
+            val isDarkMode by sessionManager.isDarkMode.collectAsState(initial = false)
+            PillRemindTheme(darkTheme = isDarkMode) {
                 RootNavigationGraph(navController = rememberNavController())
             }
         }

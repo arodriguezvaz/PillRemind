@@ -17,6 +17,7 @@ import java.time.LocalDateTime
 data class Intake(
     val id: Int = 0,
     val scheduleId: Int,
+    val supabaseId: String? = null,
     val scheduledAt: LocalDateTime,
     val takenAt: LocalDateTime? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),

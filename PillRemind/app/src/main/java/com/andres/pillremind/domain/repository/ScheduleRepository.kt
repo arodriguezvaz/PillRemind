@@ -36,5 +36,7 @@ interface ScheduleRepository {
     /**
      * Obtiene un horario por su ID
      */
-    suspend fun getScheduleById(scheduleId: Int): Schedule
+    suspend fun getScheduleByIdOnce(scheduleId: Int): Schedule
+
+    suspend fun getAllByUser(userId: Int): List<Schedule>
 }

@@ -45,4 +45,13 @@ interface ProfileDao {
      */
     @Query("SELECT * FROM profiles WHERE id = :id")
     fun getProfileById(id: Int?): Flow<ProfileEntity?>
+
+    @Query("SELECT * FROM profiles WHERE usuarioId = :usuarioId")
+    suspend fun getAllByUsuario(usuarioId: Int): List<ProfileEntity>
+
+    @Query("SELECT * FROM profiles WHERE id = :id")
+    suspend fun getProfileByIdOnce(id: Int?): ProfileEntity?
+
+    @Query("DELETE FROM profiles WHERE usuarioId = :usuarioId")
+    suspend fun deleteAllByUsuario(usuarioId: Int)
 }

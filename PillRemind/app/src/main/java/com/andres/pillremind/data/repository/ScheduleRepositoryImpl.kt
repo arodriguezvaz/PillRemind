@@ -1,7 +1,6 @@
 package com.andres.pillremind.data.repository
 
 import com.andres.pillremind.data.local.dao.ScheduleDao
-import com.andres.pillremind.data.local.entity.ScheduleEntity
 import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Schedule
@@ -34,12 +33,16 @@ class ScheduleRepositoryImpl @Inject constructor(
         scheduleDao.deleteByMedicationId(medicationId)
     }
 
-
     override fun getSchedules(medicationId: Int): Flow<List<Schedule>> {
         return scheduleDao.getSchedules(medicationId).map { list -> list.map { it.toDomain() } }
     }
 
-    override suspend fun getScheduleById(scheduleId: Int): Schedule {
+    override suspend fun getScheduleByIdOnce(scheduleId: Int): Schedule {
         return scheduleDao.getScheduleById(scheduleId).toDomain()
     }
+
+    override suspend fun getAllByUser(userId: Int): List<Schedule> {
+        return scheduleDao.getAllByUsuario(userId).map { it.toDomain() }
+    }
+
 }

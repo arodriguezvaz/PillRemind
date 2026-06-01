@@ -2,8 +2,6 @@ package com.andres.pillremind.data.mapper
 
 import com.andres.pillremind.data.local.entity.MedicationEntity
 import com.andres.pillremind.domain.model.Medication
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 /**
  * Convierte un objeto MedicationEntity en un objeto Entity
@@ -13,6 +11,7 @@ import java.time.LocalDateTime
 fun MedicationEntity.toDomain(): Medication = Medication(
     id = id,
     profileId = profileId,
+    supabaseId = supabaseId,
     name = name,
     dose = dose,
     unit = unit,
@@ -33,6 +32,7 @@ fun MedicationEntity.toDomain(): Medication = Medication(
 fun Medication.toEntity(): MedicationEntity = MedicationEntity(
     id = id,
     profileId = profileId,
+    supabaseId = supabaseId,
     name = name,
     dose = dose,
     unit = unit,

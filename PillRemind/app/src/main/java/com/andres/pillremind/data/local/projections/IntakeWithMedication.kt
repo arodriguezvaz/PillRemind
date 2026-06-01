@@ -6,11 +6,13 @@ data class IntakeWithMedication(
     val intakeId: Int,
     val scheduledAt: LocalDateTime,
     val scheduleId: Int,
+    val supabaseId: String?,
     val takenAt: LocalDateTime?,
     val medicationName: String,
     val dose: Double,
     val unit: String,
     val imageUrl: String?,
+    val profileName: String
 )
 
 

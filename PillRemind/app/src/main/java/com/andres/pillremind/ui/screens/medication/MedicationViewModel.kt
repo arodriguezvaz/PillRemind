@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.data.utils.copyImageToInternalStorage
+import com.andres.pillremind.di.ApplicationScope
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Schedule
@@ -16,10 +17,13 @@ import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
+import com.andres.pillremind.domain.repository.SyncRepository
+import com.andres.pillremind.domain.repository.UserRepository
 import com.andres.pillremind.notifications.AlarmScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -53,6 +57,9 @@ class MedicationViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val alarmScheduler: AlarmScheduler,
     private val intakeRepository: IntakeRepository,
+    private val syncRepository: SyncRepository,
+    private val userRepository: UserRepository,
+    @ApplicationScope private val appScope: CoroutineScope,
     sessionManager: SessionManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -63,6 +70,21 @@ class MedicationViewModel @Inject constructor(
 
     //Recupera el id del medicamento
     val medicationId = savedStateHandle.get<Int>("medicationId")
+
+
+    private fun syncSiEsPremium() {
+        appScope.launch {
+            val user = userRepository.getUser() ?: return@launch
+            if (user.esPremium && user.supabaseUid != null) {
+                syncRepository.syncMedicamentos()
+                    .onFailure { Log.e("Sync", "Error sync medicamentos: ${it.message}") }
+                syncRepository.syncSchedules()
+                    .onFailure { Log.e("Sync", "Error sync schedules: ${it.message}") }
+                syncRepository.syncIntakes()
+                    .onFailure { Log.e("Sync", "Error sync intakes: ${it.message}") }
+            }
+        }
+    }
 
     //Si el id no es null recupera la información del medicamento
     val medication: StateFlow<Medication?> = medicationId?.let { id ->
@@ -164,6 +186,7 @@ class MedicationViewModel @Inject constructor(
             } else {
                 showMessage("No hay perfil activo")
             }
+            syncSiEsPremium()
         }
     }
 
@@ -193,6 +216,7 @@ class MedicationViewModel @Inject constructor(
             val profileId = profileId.firstOrNull()
 
             if (profileId != null && medicationId != null) {
+                val medicamentoActual = medicationRepository.getMedicationByIdOnce(medicationId)
 
                 val updatedMedication = Medication(
                     id = medicationId,
@@ -204,6 +228,7 @@ class MedicationViewModel @Inject constructor(
                     startDate = startDate,
                     endDate = endDate,
                     updatedAt = LocalDateTime.now(),
+                    supabaseId = medicamentoActual?.supabaseId
                 )
 
                 medicationRepository.updateMedication(updatedMedication)
@@ -227,6 +252,7 @@ class MedicationViewModel @Inject constructor(
             } else {
                 showMessage("No hay perfil activo")
             }
+            syncSiEsPremium()
         }
     }
 
@@ -238,10 +264,22 @@ class MedicationViewModel @Inject constructor(
             alarmScheduler.cancel(schedule.id)
         }
         medication.imageUrl?.let { File(it).delete() }
+
+        val supabaseId = medication.supabaseId
+
         viewModelScope.launch {
             medicationRepository.deleteMedication(medication)
         }
 
+        if (supabaseId != null) {
+            appScope.launch {
+                val user = userRepository.getUser() ?: return@launch
+                if (user.esPremium && user.supabaseUid != null) {
+                    syncRepository.deleteMedication(supabaseId)
+                        .onFailure { Log.e("Sync", "Error borrando medicamento: ${it.message}") }
+                }
+            }
+        }
     }
 
     /**

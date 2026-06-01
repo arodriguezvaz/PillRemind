@@ -31,4 +31,7 @@ interface ProfileRepository {
      * Obtiene un perfil de la base de datos
      */
     fun getProfileById(id: Int): Flow<Profile?>
+    suspend fun getProfileByIdOnce(id: Int): Profile?
+    suspend fun getAllByUser(userId: Int): List<Profile>
+    suspend fun deleteAllByUsuario(usuarioId: Int)
 }

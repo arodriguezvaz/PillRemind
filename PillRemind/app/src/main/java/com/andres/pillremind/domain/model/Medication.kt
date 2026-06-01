@@ -1,7 +1,7 @@
 package com.andres.pillremind.domain.model
 
-import java.time.LocalDateTime
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 /**
  * Clase que representa un medicamento en la aplicación
@@ -21,6 +21,7 @@ import java.time.LocalDate
 data class Medication(
     val id: Int = 0,
     val profileId: Int,
+    val supabaseId: String? = null,
     val name: String,
     val dose: Double,
     val unit: String,
@@ -32,4 +33,3 @@ data class Medication(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 )
-
