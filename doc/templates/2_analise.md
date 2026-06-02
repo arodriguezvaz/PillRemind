@@ -99,24 +99,15 @@
   El usuario indica que ha tomado la medicación y la aplicación guarda el registro.
 - **Datos de salida:** Registro de toma almacenado
 
----
-
-### 10. Modificación de inventario
-- **Actor:** Sistema/Usuario
-- **Datos de entrada:** Confirmación de toma de medicación o notificación de compra de nueva caja
-- **Proceso:**  
-  El sistema actualiza automáticamente el inventario de medicamentos cuando el usuario confirma una toma o notifica la compra de nuevas dosis.
-- **Datos de salida:** Inventario actualizado
-
----
 
 ## Tipos de usuarios
 
-| Usuario | Descripción | Acceso / Funcionalidades |
-|---------|-------------|--------------------------|
-| Anónimo / Invitado | Usuario que utiliza la aplicación sin registro. | Funcionalidades básicas: crear, editar y eliminar recordatorios. Sin sincronización en la nube.|
-| Registrado (gratis) | Usuario que registró su correo | Funcionalidades básicas: crear, editar y eliminar recordatorios. Sin sincronización en la nube. Es la puerta de entrada al modelopreimum, se le podría ofreer un descueto por los primeros meses |
-| Premium | Usuario con cuenta de pago. | Todas las funcionalidades gratuitas, gestión de múltiples perfiles, sincronización en la nube, historial y estadísticas. Cuenta obligatoria para asociar suscripción y recuperar datos. |
+| Usuario             | Descripción                                        | Acceso / Funcionalidades                                                                                                                                                                                  |
+| ------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Anónimo / Invitado  | Usuario que utiliza la aplicación sin registrarse. | Funcionalidades básicas: crear, editar y eliminar recordatorios. Sin sincronización en la nube.                                                                                                           |
+| Registrado (gratis) | Usuario que ha registrado su correo electrónico.   | Funcionalidades básicas: crear, editar y eliminar recordatorios. Sin sincronización en la nube. Es la puerta de entrada al modelo premium y se le podría ofrecer un descuento durante los primeros meses. |
+| Premium             | Usuario con una suscripción de pago.               | Todas las funcionalidades gratuitas, gestión de múltiples perfiles, sincronización en la nube y recuperación de datos. La cuenta es obligatoria para asociar la suscripción y recuperar la información.   |
+
 
 ---
 
