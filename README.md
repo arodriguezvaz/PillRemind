@@ -12,7 +12,7 @@
 
 ## Licencia
 
-> _TODO_: É requisito INDISPENSABLE licenciar explicitamente o proxecto. Crea un ficheiro `LICENSE` na raíz do repositorio, coa especificación da licencia.
+- [Ficheiro License](LICENSE)
 
 ## Índice
 
