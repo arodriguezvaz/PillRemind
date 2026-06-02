@@ -43,3 +43,22 @@ Para la instalación del entorno de desarrollo solo es necesario tener Android S
 - [Vídeo do prototipo](https://drive.google.com/file/d/1_-ZXcwopkIS8GfKErutMvkEQoCRwyhbK/view?usp=sharing)
 - [Ubicación da Apk](doc/apks)
 
+### Prototipo 3
+- Data de entrega: 2/6/26
+- Funcionalidades implementadas:
+    - Creación de tomas mediante WorkManager, que agora tamén crea cada día as tomas do día e as anteriores se non se crearon por algún erro.
+    - Rexistro de toma dende a notificación e dende a app.
+    - Implementación de Supabase, o que implica o proceso de autenticación e a sincronización.
+    - Vistas de tomas.
+    - Pestana de axustes con interruptor de modo escuro.
+    - Bloqueo de creación de perfís en función do plan do usuario.
+    - Cambios visuais no formulario de creación de usuario.
+    - Busca de medicamentos na vista de medicamentos.
+    - Engadir imaxe de perfil.
+- Innovación:
+    - Implementación de Supabase.
+    - Implementación dun WorkManager.
+    - Implementación de Coin.
+
+
+- [Ubicación da Apk](doc/apks)
