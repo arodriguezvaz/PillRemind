@@ -23,14 +23,12 @@ medicación.
 
 ### 1.2. Funcionalidades do proxecto
 - Creación, edición e eliminación de recordatorios, adaptados a diferentes tipos
-  de tratamentos (puntuais, periódicos ou crónicos).
+  de tratamentos (periódicos ou crónicos).
 - Configuración de frecuencia e horarios personalizados para cada medicación.
 - Diferentes tipos de medicación con unidades específicas (comprimidos, xarabes,
   cremas, inxeccións, etc.).
 - Sistema de notificacións para lembrar a toma da medicación.
-- Rexistro das tomas realizadas, permitindo consultar o historial do tratamento.
-- Xestión do stock de medicamentos, notificando ao usuario cando a medicación
-  estea a piques de esgotarse.
+- Rexistro das tomas realizadas, permitindo consultar o historial de medicamentos tomados.
 - Xestión de múltiples perfís, orientada a persoas que coidan ou administran a
   medicación de terceiros (familiares, persoas maiores, etc.).
 - Interface sinxela e intuitiva, adaptada a todo tipo de usuarios.
@@ -82,6 +80,7 @@ Para o almacenamento de datos utilizarase:
 - Room: para o gardado de datos en local (medicacións, recordatorios e historial
   de tomas).
 - DataStore: para o gardado de preferencias do usuario.
-- Firebase Authentication e Cloud Firestore: para as funcionalidades premium,
-  permitindo o inicio de sesión e a sincronización de datos na nube entre
-  dispositivos.
+- Supabase: para as funcionalidades premium, permitindo o inicio de sesión e a 
+sincronización de datos na nube entre dispositivos. Escollouse esta tecnoloxía por 
+empregar PostgreSQL como base de datos relacional, o que facilita a xestión de información 
+estruturada e as relacións entre os distintos elementos da aplicación.
