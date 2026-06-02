@@ -20,18 +20,17 @@ import androidx.compose.ui.unit.dp
 import com.andres.pillremind.R
 import java.time.LocalTime
 import java.util.Calendar
-
+/**
+ * Editor de lista de horas; muestra `TimeItem`s y permite añadir nuevas horas
+ * mediante un selector de tiempo.
+ *
+ * @param times Lista de `LocalTime` a mostrar.
+ * @param onAddClick Lambda llamada con la hora seleccionada para añadir.
+ * @param onRemoveTime Lambda llamada para eliminar una hora.
+ * @param enabled Indica si el editor permite añadir/eliminar horas.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-        /**
-         * Editor de lista de horas; muestra `TimeItem`s y permite añadir nuevas horas
-         * mediante un selector de tiempo.
-         *
-         * @param times Lista de `LocalTime` a mostrar.
-         * @param onAddClick Lambda llamada con la hora seleccionada para añadir.
-         * @param onRemoveTime Lambda llamada para eliminar una hora.
-         * @param enabled Indica si el editor permite añadir/eliminar horas.
-         */
 fun TimeListEditor(
     times: List<LocalTime>,
     onAddClick: (LocalTime) -> Unit,

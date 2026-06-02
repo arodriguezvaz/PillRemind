@@ -31,6 +31,17 @@ import com.andres.pillremind.data.local.projections.IntakeVisualState
 import com.andres.pillremind.data.local.projections.IntakeWithMedication
 import java.time.format.DateTimeFormatter
 
+/**
+ * Tarjeta que muestra una toma de medicación con su estado visual.
+ *
+ * Permite visualizar la información del medicamento y marcar la toma como realizada
+ * según su estado actual (pendiente, retrasada o tomada).
+ *
+ * @param intake Información de la toma junto con el medicamento asociado.
+ * @param visualState Estado visual de la toma (pendiente, tomada o retrasada).
+ * @param onTake Acción ejecutada al pulsar el botón de tomar.
+ * @param modifier Modificador para personalizar el layout.
+ */
 @Composable
 fun IntakeCard(
     intake: IntakeWithMedication,
@@ -112,7 +123,9 @@ fun IntakeCard(
     }
 }
 
-
+/**
+ * Icono por defecto utilizado cuando un medicamento no tiene imagen asociada.
+ */
 @Composable
 fun DefaultPill() {
     Box(

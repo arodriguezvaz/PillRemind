@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 
 /**
  * DTO de usuario utilizado para la comunicación con Supabase.
+ *
+ *  * Se utiliza para serializar y deserializar los datos intercambiados
+ *  * entre la aplicación y el backend.
  */
 @Serializable
 data class UsuarioDto(

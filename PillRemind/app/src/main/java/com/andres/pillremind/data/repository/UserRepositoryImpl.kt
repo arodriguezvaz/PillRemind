@@ -27,6 +27,9 @@ class UserRepositoryImpl @Inject constructor(private val userDao: UserDao) : Use
         return userDao.deleteUser(user.toEntity())
     }
 
+    /**
+     * Comprueba si existe un ususario en la bd y si no lo hace se crea un usuario invitado
+     */
     override suspend fun crearUserInvitado() {
         val usuarioExistente = userDao.getUser()
         if (usuarioExistente == null) {

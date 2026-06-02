@@ -29,6 +29,8 @@ import com.andres.pillremind.ui.screens.main.TopBarState
  *
  * @param modifier Modificador opcional para la pantalla.
  * @param onMedicationClick Callback que recibe el id del medicamento seleccionado.
+ * @param onTopBarChange Callback para actualizar el estado de la TopBar.
+ * @param medicationsViewModel ViewModel que gestiona la lógica de medicamentos.
  */
 @Composable
 fun MedicationsScreen(

@@ -37,6 +37,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     /**
      * Envía un correo para restablecer la contraseña.
+     * NO IMPLEMENTADO
      */
     override suspend fun resetPassword(email: String): Result<Unit> = runCatching {
         auth.resetPasswordForEmail(email)

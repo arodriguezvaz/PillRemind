@@ -39,16 +39,41 @@ interface IntakeRepository {
     ): Flow<List<IntakeWithMedication>>
 
     /**
-     * Crea las tomas de hoy
+     * Crea las tomas desde una fecha a otra
+     * @param desde Fecha de inicio
+     * @param hasta Fecha de fin
      */
     suspend fun createIntakes(desde: LocalDate, hasta: LocalDate): List<Intake>
+
+    /**
+     * Obtiene la fecha de la última generación de tomas
+     */
     suspend fun getLastGeneratedDate(): LocalDate
 
+    /**
+     * Guarda la fecha de la última generación de tomas
+     * @param fecha Fecha de la última generación de tomas
+     */
     suspend fun saveLastGeneratedDate(fecha: LocalDate)
 
+    /**
+     * Obtiene todas las tomas de un usuario
+     * @param userId ID del usuario
+     */
     suspend fun getAllByUser(userId: Int): List<Intake>
 
+    /**
+     * Obtiene las tomas futuras de una medicación
+     * @param medicationId ID de la medicación
+     * @param date a partir de la que obtener las tomas
+     */
     suspend fun getFutureIntakesByMedicationId(medicationId: Int, date: LocalDateTime): List<Intake>
+
+    /**
+     * Elimina las tomas futuras de una medicación
+     * @param medicationId ID de la medicación
+     * @param date a partir de la que eliiminar las tomas
+     */
     suspend fun deleteFutureIntakesByMedicationId(medicationId: Int, date: LocalDateTime)
 }
 

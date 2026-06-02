@@ -34,6 +34,20 @@ import com.andres.pillremind.ui.components.settings.SettingsLinkItem
 import com.andres.pillremind.ui.components.settings.SettingsToggleItem
 import com.andres.pillremind.ui.session.SessionViewModel
 
+/**
+ * Pantalla de ajustes de la aplicación.
+ *
+ * Permite gestionar la configuración del usuario, incluyendo modo oscuro,
+ * estado de la sesión y acciones como cierre de sesión o navegación.
+ *
+ * Observa el estado del usuario y reacciona a eventos como logout.
+ *
+ * @param onNavigateToLogin Callback para navegar a la pantalla de login.
+ * @param onBack Callback para volver a la pantalla anterior.
+ * @param settingsViewModel ViewModel encargado de la lógica de ajustes.
+ * @param onLogout Callback ejecutado cuando el usuario cierra sesión.
+ * @param sessionViewModel ViewModel encargado de la gestión de sesión activa.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(

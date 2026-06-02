@@ -35,6 +35,12 @@ class SyncRepositoryImpl @Inject constructor(
     private val intakeRepository: IntakeRepository
 ) : SyncRepository {
 
+    /**
+     * Sincroniza todas las entidades de la aplicación con Supabase.
+     *
+     * La sincronización se realiza en orden para respetar las dependencias
+     * entre entidades (usuario → perfiles → medicamentos → horarios → tomas).
+     */
     override suspend fun syncCompleto(): Result<Unit> = runCatching {
         syncUsuario().getOrThrow()
         syncPerfiles().getOrThrow()
@@ -43,24 +49,36 @@ class SyncRepositoryImpl @Inject constructor(
         syncIntakes().getOrThrow()
     }
 
+    /**
+     * Elimina los datos locales y los vuelve a descargar desde Supabase.
+     */
     override suspend fun borrarLocalYDescargar(): Result<Unit> = runCatching {
         val user = userRepository.getUser() ?: error("No hay usuario local")
 
-        // Borrar datos locales en orden (cascade hace el resto)
+        // Borrar datos locales en orden el resto se borra con cascade
         medicationRepository.deleteAllByUsuario(user.id)
         profileRepository.deleteAllByUsuario(user.id)
 
-        // Descargar de Supabase
+        //  Descargar y reconstruir los datos desde Supabase
         downloadCompleto().getOrThrow()
     }
 
+    /**
+     * Descarga todos los datos del usuario desde Supabase y reconstruye
+     * la información en Room.
+     *
+     * Orden de descarga:
+     * perfiles → medicamentos → horarios → tomas.
+     */
     override suspend fun downloadCompleto(): Result<Unit> = runCatching {
-        val supabaseUid = auth.currentUserOrNull()?.id ?: error("No hay sesión")
+        //Verifica que haya sesión activa
+        auth.currentUserOrNull() ?: error("No hay sesión")
+        //Obtiene el usario invitado creado en Room
         val user = userRepository.getUser() ?: error("No hay usuario local")
 
-        // 1. Descargar y guardar perfiles
+        // Descargar y guardar perfiles
         val perfilesRemoto = postgrest.from("profiles")
-            .select { filter { eq("user_id", supabaseUid) } }
+            .select()
             .decodeList<ProfileDto>()
 
         perfilesRemoto.forEach { dto ->
@@ -73,11 +91,11 @@ class SyncRepositoryImpl @Inject constructor(
                 )
             ).toInt()
 
-            // 2. Descargar medicamentos de cada perfil
+            //Descargar medicamentos de cada perfil
             val medicamentosRemoto = postgrest.from("medications")
                 .select { filter { eq("profile_id", dto.id!!) } }
                 .decodeList<MedicationDto>()
-
+            //Inserta los medicamentos del remoto en Room
             medicamentosRemoto.forEach { medDto ->
                 val medicationId = medicationRepository.insertMedication(
                     Medication(
@@ -94,11 +112,11 @@ class SyncRepositoryImpl @Inject constructor(
                     )
                 ).toInt()
 
-                // 3. Descargar schedules de cada medicamento
+                // Descargar schedules de cada medicamento
                 val schedulesRemoto = postgrest.from("schedules")
                     .select { filter { eq("medication_id", medDto.id!!) } }
                     .decodeList<ScheduleDto>()
-
+                //Inserta los horarios del remoto en Room
                 schedulesRemoto.forEach { schedDto ->
                     val scheduleId = scheduleRepository.insertSchedule(
                         Schedule(
@@ -109,11 +127,11 @@ class SyncRepositoryImpl @Inject constructor(
                         )
                     ).toInt()
 
-                    // 4. Descargar intakes de cada schedule
+                    // Descargar schedules de cada medicamento
                     val intakesRemoto = postgrest.from("intakes")
                         .select { filter { eq("schedule_id", schedDto.id!!) } }
                         .decodeList<IntakeDto>()
-
+                    //Inserta las tomas del remoto en Room
                     intakesRemoto.forEach { intakeDto ->
                         intakeRepository.insertIntake(
                             Intake(
@@ -129,6 +147,12 @@ class SyncRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     * Sincroniza el usuario local con la tabla `usuarios` de Supabase.
+     *
+     * Si el usuario aún no tiene asociado un identificador de Supabase,
+     * se actualiza el registro local tras la sincronización.
+     */
     override suspend fun syncUsuario(): Result<Unit> = runCatching {
         val supabaseUid = auth.currentUserOrNull()?.id ?: error("No hay sesión")
         Log.d("Sync", "Sincronizando usuario con uid=$supabaseUid")
@@ -144,14 +168,19 @@ class SyncRepositoryImpl @Inject constructor(
             aceptaComunicaciones = user.aceptaComunicaciones
         )
 
+        // Inserta el usuario en Supabase
+        // Si ya existe un registro con el mismo user_id(supabaseId en room), se actualiza en lugar de crear uno nuevo.
+        // Se devuelve el registro resultante para obtener los identificadores generados.
         val resultado = postgrest.from("usuarios")
             .upsert(dto) {
+                // Si ya existe un usario con este id, se actualiza.
                 onConflict = "user_id"
+                //Devuelve el usario actualizado
                 select()
             }
             .decodeSingle<UsuarioDto>()
 
-        // Guardar supabaseUid en Room si no lo tenía
+        // Asociar el identificador remoto al usuario local la primera vez que se sincroniza
         if (user.supabaseUid == null) {
             userRepository.updateUser(
                 user.copy(
@@ -163,6 +192,7 @@ class SyncRepositoryImpl @Inject constructor(
         }
     }
 
+    //COmentar esto y revisar por si acaso
     override suspend fun syncPerfiles(): Result<Unit> = runCatching {
         val supabaseUid = auth.currentUserOrNull()?.id ?: error("No hay sesión")
         Log.d("SyncPerfiles", "supabaseUid=$supabaseUid")

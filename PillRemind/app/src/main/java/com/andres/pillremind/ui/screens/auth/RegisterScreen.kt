@@ -33,6 +33,17 @@ import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.FormField
 
+/**
+ * Pantalla de registro de usuario.
+ *
+ * Permite crear una nueva cuenta en la aplicación y gestionar la navegación
+ * hacia el login o el flujo principal tras el registro.
+ *
+ * @param onRegisterSuccess Callback ejecutado cuando el registro es exitoso.
+ * @param onNavigateToLogin Callback para navegar a la pantalla de inicio de sesión.
+ * @param onBack Callback para volver a la pantalla anterior.
+ * @param authViewModel ViewModel encargado de la lógica de autenticación.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(

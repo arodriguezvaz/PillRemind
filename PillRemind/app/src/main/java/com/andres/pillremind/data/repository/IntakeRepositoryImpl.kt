@@ -33,9 +33,9 @@ class IntakeRepositoryImpl @Inject constructor(
 
         var dia = desde
         while (!dia.isAfter(hasta)) {
-            //Obtine los horarios para el día de la semana actual
+            // Obtiene los horarios correspondientes al día de la semana actual
             val horarios = scheduleDao.getSchedulesByDay(dia.dayOfWeek.toWeekDay()).first()
-            //Por cada horario
+            // Para cada horario, obtiene el medicamento asociado y genera la toma únicamente si el medicamento está activo en la fecha actual
             for (horario in horarios) {
                 val med = medicationDao.getMedicationById(horario.medicationId).first() ?: continue
                 if (med.startDate > dia) continue
@@ -48,9 +48,9 @@ class IntakeRepositoryImpl @Inject constructor(
             }
             dia = dia.plusDays(1)
         }
-        // Inserta las tomas en la base de datos y devuelve los IDs generados
+        // Inserta las tomas y devuelve los IDs generados por Room
         val ids = intakeDao.insertIntakes(tomasAInsertar.map { it.toEntity() })
-        // Asigna los IDs generados a cada toma y devuelve la lista actualizada
+        // Asocia cada ID generado en room a su 'intake model' correspondiente. Si una toma ya existía, Room devuelve -1.
         return tomasAInsertar.mapIndexed { index, intake -> intake.copy(id = ids[index].toInt()) }
     }
 
@@ -58,7 +58,9 @@ class IntakeRepositoryImpl @Inject constructor(
         return intakeDao.insertIntake(intake.toEntity())
     }
 
-
+    /**
+     *
+     */
     override suspend fun deleteIntake(intake: Intake) {
         intakeDao.deleteIntake(intake.toEntity())
     }

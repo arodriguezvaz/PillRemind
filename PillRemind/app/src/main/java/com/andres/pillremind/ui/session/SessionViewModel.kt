@@ -68,9 +68,6 @@ class SessionViewModel @Inject constructor(
         }
     }
 
-    fun setActiveUser(user: User) {
-        viewModelScope.launch { sessionManager.setActiveUser(user.id) }
-    }
 
     fun reiniciarSesion() {
         viewModelScope.launch {

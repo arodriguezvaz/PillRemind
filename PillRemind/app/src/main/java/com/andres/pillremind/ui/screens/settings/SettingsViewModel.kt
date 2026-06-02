@@ -20,6 +20,21 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
 
+/**
+ * ViewModel encargado de la gestión de la pantalla de ajustes.
+ *
+ * Gestiona la configuración del usuario, modo oscuro, estado de sesión,
+ * sincronización de datos y operaciones de cuenta como logout o premium.
+ *
+ * Expone estados reactivos de usuario, tema y UI mediante StateFlow.
+ *
+ * @property sessionManager Gestor de sesión del usuario activo.
+ * @property medicationRepository Repositorio para la gestión de medicación.
+ * @property profileRepository Repositorio para la gestión de perfiles.
+ * @property userRepository Repositorio para la gestión del usuario local.
+ * @property authRepository Repositorio encargado de autenticación.
+ * @property syncRepository Repositorio encargado de la sincronización de datos.
+ */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val sessionManager: SessionManager,

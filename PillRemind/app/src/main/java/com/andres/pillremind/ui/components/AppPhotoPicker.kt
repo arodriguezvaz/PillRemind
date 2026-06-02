@@ -29,9 +29,20 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
-
+/**
+ * Componente para seleccionar o mostrar una imagen de perfil.
+ *
+ * Permite al usuario elegir una imagen desde la galería y mostrarla
+ * dentro de un contenedor circular o rectangular según el tamaño.
+ *
+ * @param photoUri URI de la imagen seleccionada (si existe).
+ * @param onPhotoSelected Callback que se ejecuta al seleccionar una imagen.
+ * @param modifier Modificador para personalizar el layout.
+ * @param enabled Indica si el selector está habilitado.
+ * @param size Tamaño del componente.
+ * @param placeholderIcon Icono mostrado cuando no hay imagen seleccionada.
+ */
 @Composable
-
 fun AppPhotoPicker(
     photoUri: Uri?,
     onPhotoSelected: (Uri) -> Unit,

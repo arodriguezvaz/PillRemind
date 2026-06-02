@@ -34,7 +34,16 @@ import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.FormField
 
-
+/**
+ * Pantalla de inicio de sesión.
+ *
+ * Permite al usuario autenticarse en la aplicación mediante email y contraseña.
+ *
+ * @param onLoginSuccess Callback ejecutado cuando el inicio de sesión es correcto.
+ * @param onNavigateToRegister Callback para navegar a la pantalla de registro.
+ * @param onBack Callback para volver a la pantalla anterior.
+ * @param authViewModel ViewModel encargado de la lógica de autenticación.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
@@ -45,6 +54,7 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    //Estado de la UI de la autenticación
     val uiState by authViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState) {

@@ -14,6 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+/**
+ * Card reutilizable para secciones de ajustes.
+ *
+ * @param title Título opcional mostrado en la parte superior.
+ * @param modifier Modificador para personalizar el layout.
+ * @param content Contenido interno de la card.
+ */
 @Composable
 fun SettingsCard(
     title: String? = null,

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -25,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,6 +43,9 @@ import com.andres.pillremind.ui.screens.main.TopBarState
  * @param onAddClicked Callback que se ejecuta al pulsar el botón de añadir.
  * @param onProfileSelected Callback que recibe el perfil seleccionado.
  * @param modifier Modificador opcional para la pantalla.
+ * @param profilesViewModel ViewModel que gestiona la lógica de perfiles.
+ * @param onSettingClicked Callback que se ejecuta al pulsar el botón de ajustes.
+ * @param navController Controlador de navegación para la pantalla principal.
  */
 @Composable
 fun ProfilesScreen(
@@ -97,7 +100,7 @@ fun ProfilesScreen(
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ) {
                 Icon(
-                    painter = painterResource(id = android.R.drawable.ic_input_add),
+                    imageVector = Icons.Rounded.Add,
                     contentDescription = "Agregar profile",
                 )
             }

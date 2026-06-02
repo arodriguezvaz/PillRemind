@@ -9,6 +9,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+/**
+ * Elemento de información para pantallas de ajustes.
+ *
+ * Muestra una etiqueta y su valor asociado en formato vertical.
+ *
+ * @param label Texto descriptivo del campo.
+ * @param value Valor mostrado asociado a la etiqueta.
+ * @param modifier Modificador para personalizar el layout.
+ */
 @Composable
 fun SettingsInfoItem(
     label: String,

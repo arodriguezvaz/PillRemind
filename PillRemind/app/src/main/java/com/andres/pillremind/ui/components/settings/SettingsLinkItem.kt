@@ -9,6 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * Elemento clicable de ajustes tipo enlace.
+ *
+ * Muestra un texto interactivo que ejecuta una acción al pulsarlo.
+ *
+ * @param label Texto mostrado como enlace.
+ * @param onClick Acción ejecutada al hacer clic.
+ * @param modifier Modificador para personalizar el layout.
+ */
 @Composable
 fun SettingsLinkItem(
     label: String,

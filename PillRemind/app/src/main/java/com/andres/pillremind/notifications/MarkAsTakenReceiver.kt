@@ -14,8 +14,11 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 /**
- * Receptor de la notificación de tomar un medicamento.
+ * BroadcastReceiver encargado de marcar una toma de medicación como realizada
+ * cuando el usuario pulsa la acción "Tomar" desde la notificación.
  *
+ * Este receptor se ejecuta desde una PendingIntent asociada a la notificación
+ * y actualiza la base de datos indicando que la toma ha sido completada.
  */
 @AndroidEntryPoint
 class MarkAsTakenReceiver : BroadcastReceiver() {
@@ -27,16 +30,22 @@ class MarkAsTakenReceiver : BroadcastReceiver() {
         val intakeId = intent.getIntExtra("intake_id", -1)
         if (intakeId == -1) return
 
+        // Permite continuar la ejecución de forma asíncrona fuera de onReceive()
         val pendingResult = goAsync()
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
+
+                // Obtiene la toma desde la base de datos
                 val intake = intakeRepository.getIntakeById(intakeId)
+                // Marca la toma como realizada actualizando la fecha de realización
                 intakeRepository.updateIntake(intake!!.copy(takenAt = LocalDateTime.now()))
+                // Elimina la notificación una vez marcada como tomada
                 NotificationManagerCompat.from(context).cancel(intakeId)
             } catch (e: Exception) {
                 Log.e("PillDebug", "MarkAsTaken - Error", e)
             } finally {
+                // Finaliza el procesamiento asíncrono del BroadcastReceiver
                 pendingResult.finish()
             }
         }

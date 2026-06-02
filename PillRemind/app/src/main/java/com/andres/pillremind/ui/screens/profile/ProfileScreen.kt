@@ -39,12 +39,35 @@ import com.andres.pillremind.ui.components.FormField
 import com.andres.pillremind.ui.screens.main.TopBarState
 import java.io.File
 
+/**
+ * Representa los distintos modos de uso de la pantalla de perfil.
+ *
+ * Permite definir si la pantalla se usa para crear, visualizar o editar un perfil.
+ */
 sealed class ProfileMode {
     object Create : ProfileMode()
     object View : ProfileMode()
     object Edit : ProfileMode()
 }
 
+/**
+ * Pantalla de gestión de perfil de usuario.
+ *
+ * Permite crear, visualizar y editar un perfil según el modo activo.
+ * Gestiona la imagen del perfil, el nombre del usuario y la eliminación del perfil.
+ *
+ * Incluye tres modos de funcionamiento:
+ * - Create: creación de un nuevo perfil.
+ * - View: visualización del perfil existente.
+ * - Edit: edición de datos del perfil.
+ *
+ * @param modifier Modificador opcional para la pantalla.
+ * @param onSaveClicked Callback ejecutado al guardar cambios.
+ * @param profileMode Modo inicial de la pantalla (crear, ver o editar).
+ * @param onDeletedClicked Callback ejecutado tras eliminar el perfil.
+ * @param onTopBarChange Callback para modificar la TopBar.
+ * @param profileViewModel ViewModel encargado de la lógica del perfil.
+ */
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,

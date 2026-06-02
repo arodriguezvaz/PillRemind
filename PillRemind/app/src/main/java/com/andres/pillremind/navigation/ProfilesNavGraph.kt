@@ -13,6 +13,14 @@ import com.andres.pillremind.ui.screens.profiles.ProfilesScreen
 import com.andres.pillremind.ui.screens.settings.SettingsScreen
 import com.andres.pillremind.ui.session.SessionViewModel
 
+/**
+ * Grafo de navegación para la selección y gestión de perfiles.
+ *
+ * Incluye las pantallas de selección de perfil, creación de perfil
+ * y configuración de la aplicación
+ *
+ * @param navController Controlador de navegación para esta parte del grafo
+ */
 fun NavGraphBuilder.profileSelectionGraph(
     navController: NavHostController,
 ) {
@@ -20,7 +28,7 @@ fun NavGraphBuilder.profileSelectionGraph(
         route = Graph.PROFILE_SELECTION,
         startDestination = ProfilesScreen.ProfileSelectionScreen.route
     ) {
-
+        //Pantalla de selección de perfiles
         composable(ProfilesScreen.ProfileSelectionScreen.route) {
             val sessionViewModel: SessionViewModel = hiltViewModel()
             ProfilesScreen(
@@ -29,6 +37,7 @@ fun NavGraphBuilder.profileSelectionGraph(
                 },
 
                 onProfileSelected = { perfil ->
+                    //Gurdar el id del perfil activo y navegar al grafo main
                     sessionViewModel.setActiveProfile(perfil.id)
                     navController.navigate(Graph.MAIN)
                 },
@@ -38,7 +47,7 @@ fun NavGraphBuilder.profileSelectionGraph(
                 }
             )
         }
-
+        //Pantalla de selección de creación de perfil
         composable(ProfilesScreen.ProfileCreateScreen.route) {
             androidx.compose.material3.Scaffold { paddingValues ->
                 ProfileScreen(
@@ -47,7 +56,7 @@ fun NavGraphBuilder.profileSelectionGraph(
                     onSaveClicked = {
                         navController.navigate(ProfilesScreen.ProfileSelectionScreen.route) {
                             popUpTo(ProfilesScreen.ProfileSelectionScreen.route) {
-                                inclusive = true
+                                inclusive = false
                             }
                         }
                     }
@@ -55,6 +64,7 @@ fun NavGraphBuilder.profileSelectionGraph(
                 )
             }
         }
+        //Pantalla de configuración de la aplicación
         composable(ProfilesScreen.SettingsScreen.route) {
             SettingsScreen(
                 onNavigateToLogin = {
@@ -65,7 +75,7 @@ fun NavGraphBuilder.profileSelectionGraph(
                 },
                 onLogout = {
                     navController.navigate(Graph.PROFILE_SELECTION) {
-                        popUpTo(Graph.ROOT) { inclusive = true }
+                        popUpTo(Graph.ROOT) { inclusive = false }
                     }
                 }
             )
@@ -73,8 +83,29 @@ fun NavGraphBuilder.profileSelectionGraph(
     }
 }
 
+/**
+ * Destinos de navegación pertenecientes al flujo de selección de perfiles.
+ *
+ * Cada objeto representa una pantalla accesible dentro del grafo
+ * [Graph.PROFILE_SELECTION].
+ *
+ * @property route Ruta utilizada por Navigation Compose para identificar
+ * el destino.
+ */
 sealed class ProfilesScreen(val route: String) {
-    object ProfileSelectionScreen : ProfilesScreen(route = "profiles")
-    object ProfileCreateScreen : ProfilesScreen(route = "profile/create")
-    object SettingsScreen : ProfilesScreen(route = "settings")
+
+    /**
+     * Pantalla de selección de perfiles.
+     */
+    object ProfileSelectionScreen : ProfilesScreen("profiles")
+
+    /**
+     * Pantalla de creación de un nuevo perfil.
+     */
+    object ProfileCreateScreen : ProfilesScreen("profile/create")
+
+    /**
+     * Pantalla de configuración de la aplicación.
+     */
+    object SettingsScreen : ProfilesScreen("settings")
 }

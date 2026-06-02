@@ -21,6 +21,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.andres.pillremind.navigation.BottomBarScreens
 
+/**
+ * TopAppBar principal de la aplicación.
+ *
+ * Muestra el título actual, el logo opcional, acciones configurables
+ * y un botón de navegación hacia atrás cuando la pantalla lo permite.
+ *
+ * La visibilidad del botón "back" depende de la ruta actual del NavController
+ * y de si existe una pantalla anterior en la pila de navegación.
+ *
+ * @param state Estado de la TopBar (título, logo y acciones).
+ * @param navController Controlador de navegación para gestionar el back stack.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopBar(

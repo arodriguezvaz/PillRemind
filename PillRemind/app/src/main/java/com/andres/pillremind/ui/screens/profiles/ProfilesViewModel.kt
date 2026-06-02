@@ -22,6 +22,8 @@ import javax.inject.Inject
  * [StateFlow] para que la UI pueda observar los cambios de forma cómoda.
  *
  * @property repository Repositorio usado para obtener los perfiles.
+ * @property sessionManager Gestor de sesión para obtener el perfil activo.
+ * @property userRepository Repositorio usado para obtener el usuario actual.
  */
 @HiltViewModel
 class ProfilesViewModel @Inject constructor(
