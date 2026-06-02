@@ -3,18 +3,27 @@
 ## Diagrama da arquitectura
 ```mermaid
 graph TD
-    UI[Jetpack Compose] --> VM[ViewModel + Coroutines]
+    UI[Jetpack Compose] --> VM[ViewModel]
+
     VM --> REPO[Repository]
-    REPO --> ROOM[(Room - SQLite local)]
+
     REPO -->|solo premium| SUP[Supabase SDK]
+
     SUP --> AUTH[Gestión de usuarios]
-    SUP --> STORAGE[(Base de datos en la nube)]
-    ALARM[AlarmScheduler] -->|AlarmManager| NOTIF[Notificaciones]
-    VM --> ALARM
-    WORK[WorkManager] -->|sync background| SUP
-    REPO -->|premium| WORK
+    SUP --> CLOUD[(Base de datos en la nube)]
+
+    VM --> ALARM[AlarmScheduler]
+    ALARM -->|AlarmManager| NOTIF[Notificaciones]
+
+    WORK[WorkManager]
+
+    WORK -->|genera intakes diarios| ROOM
+    WORK -->|programa alarmas| ALARM
+
+    REPO -->|nuevo medicamento o cambios| ROOM[(Room - SQLite)]
+    REPO -->|genera intakes afectados| ALARM
 ```
-## Diagrama de Base de Datos
+## Diagrama de Base de Datos de Room
 ```mermaid
 erDiagram
   USUARIO {
@@ -72,6 +81,73 @@ erDiagram
   PERFIL ||--o{ MEDICAMENTO : tiene
   MEDICAMENTO ||--o{ HORARIO : define
   HORARIO ||--o{ TOMA : genera
+```
+
+## Diagrama de Base de Datos de Supabase
+
+```mermaid
+erDiagram
+
+    AUTH_USERS ||--|| USUARIOS : "user_id"
+    AUTH_USERS ||--o{ PROFILES : "user_id"
+
+    PROFILES ||--o{ MEDICATIONS : "profile_id"
+
+    MEDICATIONS ||--o{ SCHEDULES : "medication_id"
+
+    SCHEDULES ||--o{ INTAKES : "schedule_id"
+
+    USUARIOS {
+        UUID id PK
+        UUID user_id FK
+        TEXT tipo_usuario
+        TEXT email
+        BOOLEAN es_premium
+        TIMESTAMPTZ fecha_premium
+        BOOLEAN acepta_comunicaciones
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    PROFILES {
+        UUID id PK
+        UUID user_id FK
+        TEXT name
+        TEXT image_url
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    MEDICATIONS {
+        UUID id PK
+        UUID profile_id FK
+        TEXT name
+        DOUBLE dose
+        TEXT unit
+        BOOLEAN is_chronic
+        DATE start_date
+        DATE end_date
+        TEXT image_url
+        TEXT leaflet_url
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    SCHEDULES {
+        UUID id PK
+        UUID medication_id FK
+        TEXT week_day
+        TIME time
+    }
+
+    INTAKES {
+        UUID id PK
+        UUID schedule_id FK
+        TIMESTAMPTZ scheduled_at
+        TIMESTAMPTZ taken_at
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
 ```
 ## Deseño de interface de usuarios
 [Enlace al diseño de Figma](https://www.figma.com/design/7y2djfr8ghHQxxFoeNE2IY/PilRemind?node-id=0-1&t=AqZHzNxyVJfyXzod-1)
