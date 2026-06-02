@@ -65,7 +65,7 @@ class AuthViewModel @Inject constructor(
                     syncRepository.syncUsuario()
                 }
                 .onFailure {
-                    _uiState.value = AuthUiState.Error(it.message ?: "Error al iniciar sesión")
+                    _uiState.value = AuthUiState.Error(mapAuthError(it.message))
                 }
         }
     }
@@ -96,7 +96,7 @@ class AuthViewModel @Inject constructor(
                     syncRepository.syncUsuario()
                 }
                 .onFailure {
-                    _uiState.value = AuthUiState.Error(it.message ?: "Error al registrarse")
+                    _uiState.value = AuthUiState.Error(mapAuthError(it.message))
                 }
         }
     }
@@ -172,6 +172,40 @@ class AuthViewModel @Inject constructor(
                     .onSuccess { _uiState.value = AuthUiState.Success }
                     .onFailure { _uiState.value = AuthUiState.Error(it.message ?: "Error") }
             }
+        }
+    }
+
+    private fun mapAuthError(message: String?): String {
+        return when {
+            message == null -> "Error desconocido"
+            message.contains("invalid_credentials", ignoreCase = true) ||
+                    message.contains("Invalid login credentials", ignoreCase = true) ->
+                "Email o contraseña incorrectos"
+
+            message.contains("validation_failed", ignoreCase = true) ||
+                    message.contains("Unable to validate email", ignoreCase = true) ||
+                    message.contains("invalid format", ignoreCase = true) ->
+                "El formato del email no es válido"
+
+            message.contains("weak_password", ignoreCase = true) ||
+                    message.contains("Password should be at least", ignoreCase = true) ->
+                "La contraseña debe tener al menos 6 caracteres"
+
+            message.contains("Email not confirmed", ignoreCase = true) ->
+                "Debes confirmar tu email antes de iniciar sesión"
+
+            message.contains("User already registered", ignoreCase = true) ->
+                "Este email ya está registrado"
+
+            message.contains("network", ignoreCase = true) ||
+                    message.contains("timeout", ignoreCase = true) ->
+                "Error de conexión. Comprueba tu internet"
+
+            message.contains("rate limit", ignoreCase = true) ||
+                    message.contains("over_email_send_rate_limit", ignoreCase = true) ->
+                "Demasiados intentos. Espera unos minutos"
+
+            else -> "Error inesperado. Inténtalo de nuevo"
         }
     }
 
