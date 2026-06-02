@@ -1,14 +1,37 @@
 # Proyecto fin de ciclo
 
-> _TODO_: Este documento será a páxina de inicio do teu proxecto. Será o primeiro que vexa quen se interese por el. Coida a súa redacción e ortografía. Vai eliminando as liñas "_TODO_" a medida que completes a redacción de cada apartado. Inclúe neste apartado o título do proxecto e a autoría.
-
+ **PILLRemind**
+ 
 ## Descrición
 
-> _TODO_: Realiza unha breve descrición do proxecto (entre 100 e 300 palabras). Resalta o fundamental **coas túas propias palabras**. Utiliza unha linguaxe correcta, **pero natural**, que poida ser entendida pola maioría das persoas, incluso as que non teñan un coñecemento técnico da materia.
+
+A aplicación desenvolvida é un sistema de recordatorio de medicación cuxo obxectivo principal é axudar ás persoas a 
+xestionar de maneira sinxela e segura os seus tratamentos (medicamentos, suplementación, etc.). Está pensada tanto 
+para usuarios que controlan a súa propia medicación como para aqueles que deben administrar ou supervisar a doutras persoas, 
+como familiares ou persoas dependentes.
+
+A aplicación permite rexistrar medicamentos indicando datos como o nome, a dose, a frecuencia e os horarios de toma. 
+A partir desta información, o sistema xera recordatorios e notificacións no momento adecuado para evitar esquecementos. 
+Ademais, o usuario pode confirmar a toma da medicación, o que permite levar un control do cumprimento do tratamento.
+
+Outro dos aspectos importantes é a xestión de perfís, que permite organizar a medicación de diferentes persoas dentro 
+dunha mesma conta, especialmente útil no caso de usuarios premium. Tamén conta con funcionalidades de modificación e 
+eliminación de medicamentos, así como sincronización de datos na nube para manter a información actualizada en distintos dispositivos.
 
 ## Sobre a autoría
 
-> _TODO_: Realiza unha breve descrición de quen es (perfil profesional), puntos fortes, tecnoloxías que máis dominas... e os motivos que te levaron a elaborar este proxecto. **Non máis de 200 palabras**.
+O autor deste proxecto é Andrés Rodríguez Vázquez, estudante de 2º DAM no IES San Clemente. 
+Está interesado no ámbito tecnolóxico e científico. Os seus puntos fortes son a detección 
+de problemas da vida real, o traballo en equipo e o pensamento lóxico.
+
+As tecnoloxías que máis domina son Kotlin e Java. Ademais, durante as prácticas en empresa 
+traballou con React, o que lle permitiu familiarizarse co desenvolvemento de interfaces de usuario reactivas, 
+como Jetpack Compose. Debido a isto, escolleu realizar unha aplicación en Kotlin e Jetpack Compose, 
+xa que son tecnoloxías modernas e en uso, con gran respaldo por parte de Google e da comunidade de Kotlin Multiplatform.
+
+O motivo da realización deste proxecto foi persoal: decatouse de que con frecuencia se 
+esquece de tomar a medicación e non quería que outras empresas tivesen información sobre a súa medicación. 
+Por iso, decidiu crear unha aplicación que lle resultase útil a nivel persoal e familiar.
 
 ## Licencia
 
