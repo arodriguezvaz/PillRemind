@@ -120,6 +120,40 @@ class ReminderScheduler @Inject constructor(
             .forEach { intake -> alarmScheduler.cancel(intake.id) }
     }
 
+    /**
+     * Cancela las alarmas futuras de todos los medicamentos de un perfil.
+     *
+     * Se usa antes de borrar el perfil para no dejar alarmas huérfanas en
+     * `AlarmManager` apuntando a tomas que Room eliminará en cascada.
+     *
+     * @param profileId Perfil cuyas alarmas se cancelan.
+     * @param from Momento desde el que se consideran tomas futuras.
+     */
+    suspend fun cancelFutureForProfile(
+        profileId: Int,
+        from: LocalDateTime = LocalDateTime.now()
+    ) {
+        intakeRepository.getFutureIntakesByProfileId(profileId, from)
+            .forEach { intake -> alarmScheduler.cancel(intake.id) }
+    }
+
+    /**
+     * Cancela las alarmas futuras de todas las tomas de un usuario.
+     *
+     * Se usa antes del logout, que elimina los datos locales del usuario.
+     *
+     * @param userId Usuario cuyas alarmas se cancelan.
+     * @param from Momento desde el que se consideran tomas futuras.
+     */
+    suspend fun cancelFutureForUser(
+        userId: Int,
+        from: LocalDateTime = LocalDateTime.now()
+    ) {
+        intakeRepository.getAllByUser(userId)
+            .filter { intake -> intake.scheduledAt.isAfter(from) }
+            .forEach { intake -> alarmScheduler.cancel(intake.id) }
+    }
+
     private fun LocalDateTime.toEpochMillis(): Long =
         atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }

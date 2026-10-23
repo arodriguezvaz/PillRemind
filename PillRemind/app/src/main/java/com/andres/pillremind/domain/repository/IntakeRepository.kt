@@ -70,6 +70,13 @@ interface IntakeRepository {
     suspend fun getFutureIntakesByMedicationId(medicationId: Int, date: LocalDateTime): List<Intake>
 
     /**
+     * Obtiene las tomas futuras de todos los medicamentos de un perfil
+     * @param profileId ID del perfil
+     * @param date a partir de la que obtener las tomas
+     */
+    suspend fun getFutureIntakesByProfileId(profileId: Int, date: LocalDateTime): List<Intake>
+
+    /**
      * Elimina las tomas futuras de una medicación
      * @param medicationId ID de la medicación
      * @param date a partir de la que eliiminar las tomas

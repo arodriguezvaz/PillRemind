@@ -242,9 +242,11 @@ fun ProfileScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        profileViewModel.deleteProfile(perfil!!)
                         showDeleteDialog = false
-                        onDeletedClicked()
+                        perfil?.let {
+                            profileViewModel.deleteProfile(it)
+                            onDeletedClicked()
+                        }
                     },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.error

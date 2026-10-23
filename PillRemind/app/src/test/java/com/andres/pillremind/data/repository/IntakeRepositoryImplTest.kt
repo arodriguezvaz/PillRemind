@@ -14,6 +14,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
@@ -95,5 +96,12 @@ class IntakeRepositoryImplTest {
         val result = repository.createIntakes(date, date)
 
         assertEquals(7, result.single().id)
+    }
+
+    @Test
+    fun `getIntakeById devuelve null si la toma ya no existe`() = runTest {
+        coEvery { intakeDao.getIntakeById(99) } returns null
+
+        assertNull(repository.getIntakeById(99))
     }
 }

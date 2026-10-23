@@ -5,9 +5,12 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.repository.IntakeRepository
@@ -24,8 +27,9 @@ import kotlinx.coroutines.launch
  * BroadcastReceiver encargado de recibir las alarmas programadas y mostrar las notificaciones
  * de recordatorio de medicación.
  *
- * Tras mostrar la notificación, la alarma se vuelve a programar para la siguiente ocurrencia
- * del horario.
+ * Tras procesar el aviso, repone la ventana rodante de recordatorios. Así una
+ * alarma disparada también sirve como mecanismo de auto-recuperación si el
+ * worker diario se ha retrasado o ha fallado.
  */
 @AndroidEntryPoint
 class AlarmReceiver : BroadcastReceiver() {
@@ -41,6 +45,9 @@ class AlarmReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var profileRepository: ProfileRepository
+
+    @Inject
+    lateinit var reminderScheduler: ReminderScheduler
 
     override fun onReceive(context: Context, intent: Intent) {
         // Obtiene el identificador de la toma asociada a la alarma.
@@ -61,29 +68,42 @@ class AlarmReceiver : BroadcastReceiver() {
             try {
                 val intake = intakeRepository.getIntakeById(intakeId)
 
-                // Si ya fue tomada no notificamos
-                if (intake!!.takenAt != null) return@launch
+                // Si la toma ya no existe o ya fue registrada, no se muestra el aviso.
+                if (intake != null && intake.takenAt == null) {
+                    val schedule = scheduleRepository.getScheduleByIdOnce(intake.scheduleId)
+                    // Recupera el medicamento y el perfil asociados a la toma programada.
+                    // Si alguno de ellos no existe, se omite la notificación para evitar
+                    // mostrar información incompleta.
+                    val medication = schedule?.let {
+                        medicationRepository.getMedicationByIdOnce(it.medicationId)
+                    }
+                    val profile = medication?.let {
+                        profileRepository.getProfileByIdOnce(it.profileId)
+                    }
 
-                val schedule = scheduleRepository.getScheduleByIdOnce(intake.scheduleId)
-                // Recupera el medicamento y el perfil asociados a la toma programada.
-                // Si alguno de ellos no existe, se cancela el procesamiento para evitar
-                // generar una notificación con información incompleta.
-                val medication =
-                    medicationRepository.getMedicationByIdOnce(schedule.medicationId)
-                        ?: return@launch
-                val profile =
-                    profileRepository.getProfileByIdOnce(medication.profileId)
-                        ?: return@launch
-
-                // Muestra la notificación únicamente si el permiso ha sido concedido.
-                if (androidx.core.content.ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-                ) {
-                    showNotification(context, intake, medication.name, profile.name)
+                    // Muestra la notificación únicamente si el permiso ha sido concedido.
+                    if (medication != null && profile != null &&
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        showNotification(context, intake, medication.name, profile.name)
+                    }
                 }
+            } catch (e: Exception) {
+                Log.e("AlarmReceiver", "Error procesando la alarma de la toma $intakeId", e)
             } finally {
+                // Una alarma disparada también repone la ventana rodante. Así, aunque
+                // el worker diario se retrase o falle, los próximos días siguen cubiertos.
+                runCatching { reminderScheduler.generateWindow() }
+                    .onFailure {
+                        Log.e(
+                            "AlarmReceiver",
+                            "No se pudo refrescar la ventana de recordatorios",
+                            it
+                        )
+                    }
                 // Finaliza el procesamiento asíncrono del BroadcastReceiver.
                 pendingResult.finish()
             }

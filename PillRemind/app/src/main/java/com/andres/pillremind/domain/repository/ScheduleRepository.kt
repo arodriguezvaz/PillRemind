@@ -39,10 +39,10 @@ interface ScheduleRepository {
     fun getSchedules(medicationId: Int): Flow<List<Schedule>>
 
     /**
-     * Obtiene un horario por su ID
+     * Obtiene un horario por su ID, o null si ya no existe
      * @param scheduleId ID del horario
      */
-    suspend fun getScheduleByIdOnce(scheduleId: Int): Schedule
+    suspend fun getScheduleByIdOnce(scheduleId: Int): Schedule?
 
     /**
      * Obtiene todos los horarios de un usuario

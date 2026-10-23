@@ -12,6 +12,7 @@ import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.domain.repository.SyncRepository
 import com.andres.pillremind.domain.repository.UserRepository
+import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -35,6 +36,7 @@ import java.io.File
  *
  * @property profileRepository Repositorio de perfiles.
  * @property sessionManager Gestor de sesión con el perfil activo.
+ * @property reminderScheduler Coordinador de alarmas de recordatorio.
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -42,6 +44,7 @@ class ProfileViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val userRepository: UserRepository,
     private val syncRepository: SyncRepository,
+    private val reminderScheduler: ReminderScheduler,
     @ApplicationScope private val appScope: CoroutineScope,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -102,8 +105,22 @@ class ProfileViewModel @Inject constructor(
         val supabaseId = profile.supabaseId
 
         viewModelScope.launch {
+            // Cancelar las alarmas antes de que Room borre las tomas en cascada.
+            runCatching { reminderScheduler.cancelFutureForProfile(profile.id) }
+                .onFailure {
+                    Log.e(
+                        "PillDebug",
+                        "No se pudieron cancelar las alarmas del perfil ${profile.id}",
+                        it
+                    )
+                }
+
             profileRepository.deleteProfile(profile)
-            sessionManager.clearActiveProfile()
+
+            // Solo se limpia la sesión si el perfil borrado era el activo.
+            if (sessionManager.activeProfileId.firstOrNull() == profile.id) {
+                sessionManager.clearActiveProfile()
+            }
         }
 
         // Borrar en Supabase en appScope, independiente de la navegación

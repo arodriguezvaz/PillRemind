@@ -10,6 +10,7 @@ import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.domain.repository.SyncRepository
 import com.andres.pillremind.domain.repository.UserRepository
+import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,6 +35,7 @@ import javax.inject.Inject
  * @property userRepository Repositorio para la gestión del usuario local.
  * @property authRepository Repositorio encargado de autenticación.
  * @property syncRepository Repositorio encargado de la sincronización de datos.
+ * @property reminderScheduler Coordinador de alarmas de recordatorio.
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -42,7 +44,8 @@ class SettingsViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
-    private val syncRepository: SyncRepository
+    private val syncRepository: SyncRepository,
+    private val reminderScheduler: ReminderScheduler
 ) : ViewModel() {
 
     val isDarkMode: StateFlow<Boolean> = sessionManager.isDarkMode
@@ -76,14 +79,26 @@ class SettingsViewModel @Inject constructor(
                 .onSuccess {
                     // Resetear usuario a invitado en Room
                     val user = usuario.value ?: return@onSuccess
+
+                    // Cancelar las alarmas antes de borrar las tomas locales.
+                    runCatching { reminderScheduler.cancelFutureForUser(user.id) }
+                        .onFailure {
+                            Log.e(
+                                "PillDebug",
+                                "No se pudieron cancelar las alarmas del usuario",
+                                it
+                            )
+                        }
+
                     // Borrar todos los datos locales
                     medicationRepository.deleteAllByUsuario(user.id)
                     profileRepository.deleteAllByUsuario(user.id)
                     userRepository.deleteUser(user)
 
-                    // Limpiar sesión
+                    // Limpiar sesión y la fecha de generación del usuario anterior
                     sessionManager.clearActiveUser()
                     sessionManager.clearActiveProfile()
+                    sessionManager.clearLastGeneratedDate()
                     _uiState.value = SettingsUiState.LoggedOut
                 }
                 .onFailure {

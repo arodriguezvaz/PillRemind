@@ -124,4 +124,14 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
             preferences[Keys.LAST_GENERATED_DATE] = fecha.toString()
         }
     }
+
+    /**
+     * Borra la fecha de última generación para que el siguiente usuario o la
+     * siguiente descarga reconstruyan la ventana desde cero.
+     */
+    suspend fun clearLastGeneratedDate() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(Keys.LAST_GENERATED_DATE)
+        }
+    }
 }

@@ -57,13 +57,13 @@ interface ScheduleDao {
     fun getSchedules(medicationId: Int): Flow<List<ScheduleEntity>>
 
     /**
-     * Devuelve un schedule por su ID.
+     * Devuelve un schedule por su ID, o null si ya no existe.
      *
      * @param scheduleId ID del schedule.
-     * @return Schedule encontrado.
+     * @return Schedule encontrado o null.
      */
     @Query("SELECT * FROM schedules WHERE id = :scheduleId")
-    suspend fun getScheduleById(scheduleId: Int): ScheduleEntity
+    suspend fun getScheduleById(scheduleId: Int): ScheduleEntity?
 
     /**
      * Observa los schedules de un dia concreto de la semana.

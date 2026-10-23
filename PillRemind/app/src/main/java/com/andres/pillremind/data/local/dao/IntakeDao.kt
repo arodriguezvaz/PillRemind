@@ -56,10 +56,10 @@ interface IntakeDao {
     suspend fun updateIntake(intake: IntakeEntity)
 
     /**
-     * Devuelve una toma por su ID.
+     * Devuelve una toma por su ID, o null si ya no existe.
      */
     @Query("SELECT * FROM intakes WHERE id = :intakeId")
-    fun getIntakeById(intakeId: Int): IntakeEntity
+    fun getIntakeById(intakeId: Int): IntakeEntity?
 
     /**
      * Observa las tomas programadas del dia para un perfil, con datos del medicamento.
@@ -117,6 +117,25 @@ interface IntakeDao {
     )
     suspend fun getFutureIntakesByMedicationId(
         medicationId: Int,
+        from: LocalDateTime
+    ): List<IntakeEntity>
+
+    /**
+     * Devuelve las tomas futuras de todos los medicamentos de un perfil.
+     */
+    @Query(
+        """
+    SELECT * FROM intakes
+    WHERE scheduledAt > :from
+    AND scheduleId IN (
+        SELECT id FROM schedules WHERE medicationId IN (
+            SELECT id FROM medications WHERE profileId = :profileId
+        )
+    )
+"""
+    )
+    suspend fun getFutureIntakesByProfileId(
+        profileId: Int,
         from: LocalDateTime
     ): List<IntakeEntity>
 
