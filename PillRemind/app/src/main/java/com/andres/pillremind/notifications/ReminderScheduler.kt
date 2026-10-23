@@ -21,6 +21,47 @@ class ReminderScheduler @Inject constructor(
     private val alarmScheduler: AlarmScheduler,
 ) {
 
+    companion object {
+        /**
+         * Número de días hacia delante que se mantienen generados y programados.
+         *
+         * Una ventana semanal cubre un ciclo completo de horarios y da margen
+         * suficiente para absorber retrasos del worker diario sin dejar huecos.
+         */
+        const val WINDOW_DAYS = 7L
+    }
+
+    /**
+     * Genera la ventana rodante de [WINDOW_DAYS] días y programa sus alarmas.
+     *
+     * El rango empieza en la última fecha generada (o en hoy, si esa fecha es
+     * futura) y termina en `hoy + WINDOW_DAYS - 1`. La inserción es idempotente:
+     * los días que ya existían no se duplican y conservan su ID real.
+     *
+     * @param today Día de referencia para calcular la ventana.
+     * @param now Momento de referencia para decidir qué tomas son futuras.
+     * @return Tomas generadas, incluidas las que ya existían, con su ID real.
+     */
+    suspend fun generateWindow(
+        today: LocalDate = LocalDate.now(),
+        now: LocalDateTime = LocalDateTime.now()
+    ): List<Intake> {
+        val desde = intakeRepository.getLastGeneratedDate()
+        val hasta = windowEnd(today)
+        val inicio = if (desde.isBefore(today)) desde else today
+        val intakes = generateAndSchedule(inicio, hasta, now)
+        intakeRepository.saveLastGeneratedDate(hasta)
+        return intakes
+    }
+
+    /**
+     * Calcula el último día de la ventana rodante.
+     *
+     * @param today Día de referencia.
+     */
+    fun windowEnd(today: LocalDate = LocalDate.now()): LocalDate =
+        today.plusDays(WINDOW_DAYS - 1)
+
     /**
      * Genera las tomas del rango indicado y programa las alarmas de las futuras.
      *

@@ -2,11 +2,14 @@ package com.andres.pillremind.notifications
 
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.repository.IntakeRepository
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -74,6 +77,55 @@ class ReminderSchedulerTest {
         scheduler.generateAndSchedule(tomorrow, today, now)
 
         coVerify(exactly = 1) { intakeRepository.createIntakes(today, today) }
+    }
+
+    @Test
+    fun `generateWindow genera siete dias desde hoy y guarda el fin de ventana`() = runTest {
+        val end = today.plusDays(ReminderScheduler.WINDOW_DAYS - 1)
+        val future = Intake(
+            id = 1,
+            scheduleId = 10,
+            scheduledAt = now.plusHours(1)
+        )
+        coEvery { intakeRepository.getLastGeneratedDate() } returns today
+        coEvery { intakeRepository.createIntakes(today, end) } returns listOf(future)
+        coEvery { intakeRepository.saveLastGeneratedDate(end) } just Runs
+
+        scheduler.generateWindow(today, now)
+
+        coVerify(exactly = 1) { intakeRepository.createIntakes(today, end) }
+        coVerify(exactly = 1) { intakeRepository.saveLastGeneratedDate(end) }
+        verify(exactly = 1) { alarmScheduler.schedule(1, any()) }
+    }
+
+    @Test
+    fun `generateWindow normaliza una ultima generacion futura`() = runTest {
+        val end = today.plusDays(ReminderScheduler.WINDOW_DAYS - 1)
+        coEvery { intakeRepository.getLastGeneratedDate() } returns today.plusDays(3)
+        coEvery { intakeRepository.createIntakes(today, end) } returns emptyList()
+        coEvery { intakeRepository.saveLastGeneratedDate(end) } just Runs
+
+        scheduler.generateWindow(today, now)
+
+        coVerify(exactly = 1) { intakeRepository.createIntakes(today, end) }
+    }
+
+    @Test
+    fun `generateWindow conserva el inicio si la ultima generacion es pasada`() = runTest {
+        val start = today.minusDays(2)
+        val end = today.plusDays(ReminderScheduler.WINDOW_DAYS - 1)
+        coEvery { intakeRepository.getLastGeneratedDate() } returns start
+        coEvery { intakeRepository.createIntakes(start, end) } returns emptyList()
+        coEvery { intakeRepository.saveLastGeneratedDate(end) } just Runs
+
+        scheduler.generateWindow(today, now)
+
+        coVerify(exactly = 1) { intakeRepository.createIntakes(start, end) }
+    }
+
+    @Test
+    fun `windowEnd devuelve el septimo dia de la ventana`() {
+        assertEquals(today.plusDays(6), scheduler.windowEnd(today))
     }
 
     @Test

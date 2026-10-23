@@ -49,10 +49,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     init {
         viewModelScope.launch {
-            val desde = intakeRepository.getLastGeneratedDate()
-            val ahora = LocalDate.now()
-            reminderScheduler.generateAndSchedule(desde, ahora)
-            intakeRepository.saveLastGeneratedDate(ahora)
+            reminderScheduler.generateWindow()
         }
     }
 

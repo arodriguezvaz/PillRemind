@@ -161,10 +161,12 @@ class MedicationViewModel @Inject constructor(
                         ).toInt()
                     }
                 }
-                val desde = intakeRepository.getLastGeneratedDate()
-                Log.d("PillDebug", "Generando intakes desde: $desde hasta: ${LocalDate.now()}")
+                Log.d(
+                    "PillDebug",
+                    "Generando ventana rodante de ${ReminderScheduler.WINDOW_DAYS} días"
+                )
 
-                val intakes = reminderScheduler.generateAndSchedule(desde, LocalDate.now())
+                val intakes = reminderScheduler.generateWindow()
                 Log.d("PillDebug", "Intakes generadas: ${intakes.size}")
             }
             syncSiEsPremium()
@@ -233,8 +235,7 @@ class MedicationViewModel @Inject constructor(
                         )
                     }
                 }
-                val desde = intakeRepository.getLastGeneratedDate()
-                reminderScheduler.generateAndSchedule(desde, LocalDate.now())
+                reminderScheduler.generateWindow()
 
             }
             syncSiEsPremium()
