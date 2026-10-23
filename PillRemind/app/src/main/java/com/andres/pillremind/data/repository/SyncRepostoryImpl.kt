@@ -73,7 +73,7 @@ class SyncRepositoryImpl @Inject constructor(
     override suspend fun downloadCompleto(): Result<Unit> = runCatching {
         //Verifica que haya sesión activa
         auth.currentUserOrNull() ?: error("No hay sesión")
-        //Obtiene el usario invitado creado en Room
+        //Obtiene el usuario invitado creado en Room
         val user = userRepository.getUser() ?: error("No hay usuario local")
 
         // Descargar y guardar perfiles
@@ -192,7 +192,7 @@ class SyncRepositoryImpl @Inject constructor(
         }
     }
 
-    //COmentar esto y revisar por si acaso
+    //Comentar esto y revisar por si acaso
     override suspend fun syncPerfiles(): Result<Unit> = runCatching {
         val supabaseUid = auth.currentUserOrNull()?.id ?: error("No hay sesión")
         Log.d("SyncPerfiles", "supabaseUid=$supabaseUid")

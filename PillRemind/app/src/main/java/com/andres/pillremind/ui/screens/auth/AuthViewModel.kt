@@ -101,7 +101,17 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-
+    /**
+     * Vincula el usuario local con su cuenta remota y gestiona el estado inicial de sincronización.
+     *
+     * Comprueba si el usuario tiene perfiles locales:
+     * - Si no tiene perfiles, realiza una descarga completa desde el servidor y finaliza con éxito.
+     * - Si existen perfiles locales, se detecta un posible conflicto y se notifica a la UI
+     *   para que el usuario decida cómo resolverlo.
+     *
+     * @param supabaseUid Identificador único del usuario en el backend.
+     * @param email Correo electrónico asociado al usuario.
+     */
     private suspend fun vincularUsuario(supabaseUid: String, email: String) {
         val usuarioActual = userRepository.getUser()
         val perfilesLocales =
@@ -120,17 +130,6 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Vincula el usuario local con su cuenta remota y gestiona el estado inicial de sincronización.
-     *
-     * Comprueba si el usuario tiene perfiles locales:
-     * - Si no tiene perfiles, realiza una descarga completa desde el servidor y finaliza con éxito.
-     * - Si existen perfiles locales, se detecta un posible conflicto y se notifica a la UI
-     *   para que el usuario decida cómo resolverlo.
-     *
-     * @param supabaseUid Identificador único del usuario en el backend.
-     * @param email Correo electrónico asociado al usuario.
-     */
     private suspend fun vincularYActualizar(supabaseUid: String, email: String) {
         val usuarioActual = userRepository.getUser() ?: return
         val usuarioRemoto = syncRepository.getUsuarioRemoto(supabaseUid)

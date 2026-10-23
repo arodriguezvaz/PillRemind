@@ -15,11 +15,11 @@ import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import javax.inject.Singleton
 
-/* Módulo de Hilt que proporciona las dependencias necesarias para trabajar con Supabase.
-*
-* Este módulo crea un único cliente de Supabase (Singleton) y expone sus módulos
-* principales (Auth, Postgrest y Storage) para poder inyectarlos en toda la aplicación.
-*/
+/** Módulo de Hilt que proporciona las dependencias necesarias para trabajar con Supabase.
+ *
+ * Este módulo crea un único cliente de Supabase (Singleton) y expone sus módulos
+ * principales (Auth, Postgrest y Storage) para poder inyectarlos en toda la aplicación.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object SupabaseModule {

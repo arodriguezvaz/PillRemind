@@ -22,7 +22,7 @@ import java.io.File
  */
 fun copyImageToInternalStorage(context: Context, uri: Uri): String? {
     return try {
-// Obtiene un InputStream para leer el contenido de la imagen seleccionada.
+        // Obtiene un InputStream para leer el contenido de la imagen seleccionada.
         val inputStream = context.contentResolver.openInputStream(uri) ?: return null
         // Genera un nombre único para la imagen usando la fecha actual.
         val fileName = "profile_${System.currentTimeMillis()}.jpg"

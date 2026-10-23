@@ -15,7 +15,6 @@ import javax.inject.Singleton
  * de otros posibles CoroutineScope que existan en la aplicación esto permite saber a hilt cual inyectar
  *
  * Este qualifier permite pedir específicamente el scope global de la aplicación:@ApplicationScope CoroutineScope
- *
  * en lugar de otros scopes como viewModelScope.
  */
 @Qualifier
