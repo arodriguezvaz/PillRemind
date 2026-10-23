@@ -12,6 +12,7 @@ import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.domain.repository.SyncRepository
 import com.andres.pillremind.domain.repository.UserRepository
+import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,7 +33,9 @@ import java.time.LocalDateTime
  *
  * @param profileRepository Repositorio para obtener datos de perfil.
  * @param medicationRepository Repositorio para obtener medicamentos.
+ * @param intakeRepository Repositorio de tomas.
  * @param sessionManager Gestor de sesión que expone el perfil activo.
+ * @param reminderScheduler Coordina la generación de tomas y la programación de alarmas.
  */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -41,13 +44,14 @@ class HomeViewModel @Inject constructor(
     private val intakeRepository: IntakeRepository,
     private val sessionManager: SessionManager,
     private val syncRepository: SyncRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val reminderScheduler: ReminderScheduler
 ) : ViewModel() {
     init {
         viewModelScope.launch {
             val desde = intakeRepository.getLastGeneratedDate()
             val ahora = LocalDate.now()
-            intakeRepository.createIntakes(desde, ahora)
+            reminderScheduler.generateAndSchedule(desde, ahora)
             intakeRepository.saveLastGeneratedDate(ahora)
         }
     }

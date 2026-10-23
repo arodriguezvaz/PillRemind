@@ -48,10 +48,21 @@ class IntakeRepositoryImpl @Inject constructor(
             }
             dia = dia.plusDays(1)
         }
-        // Inserta las tomas y devuelve los IDs generados por Room
+        // Inserta las tomas. Room devuelve -1 para las que ya existían por la
+        // restricción UNIQUE, así que después se consultan sus IDs reales.
+        if (tomasAInsertar.isEmpty()) return emptyList()
+
         val ids = intakeDao.insertIntakes(tomasAInsertar.map { it.toEntity() })
-        // Asocia cada ID generado en room a su 'intake model' correspondiente. Si una toma ya existía, Room devuelve -1.
-        return tomasAInsertar.mapIndexed { index, intake -> intake.copy(id = ids[index].toInt()) }
+        val existentes = intakeDao.getIntakesBetween(
+            desde.atStartOfDay(),
+            hasta.atTime(LocalTime.MAX)
+        ).associateBy { it.scheduleId to it.scheduledAt }
+
+        return tomasAInsertar.mapIndexed { index, intake ->
+            val id = existentes[intake.scheduleId to intake.scheduledAt]?.id
+                ?: ids[index].toInt()
+            intake.copy(id = id)
+        }
     }
 
     override suspend fun insertIntake(intake: Intake): Long {

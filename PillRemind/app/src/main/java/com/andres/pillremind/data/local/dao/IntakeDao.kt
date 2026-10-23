@@ -35,6 +35,15 @@ interface IntakeDao {
     suspend fun insertIntakes(intakes: List<IntakeEntity>): List<Long>
 
     /**
+     * Devuelve las tomas cuya fecha programada está dentro del rango indicado.
+     *
+     * Se usa para recuperar los IDs reales de tomas que ya existían y que Room
+     * no devuelve al insertar con [OnConflictStrategy.IGNORE].
+     */
+    @Query("SELECT * FROM intakes WHERE scheduledAt BETWEEN :start AND :end")
+    suspend fun getIntakesBetween(start: LocalDateTime, end: LocalDateTime): List<IntakeEntity>
+
+    /**
      * Elimina una toma existente.
      */
     @Delete

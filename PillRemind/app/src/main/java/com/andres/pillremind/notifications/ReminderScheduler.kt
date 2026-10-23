@@ -1,0 +1,84 @@
+package com.andres.pillremind.notifications
+
+import com.andres.pillremind.domain.model.Intake
+import com.andres.pillremind.domain.repository.IntakeRepository
+import jakarta.inject.Inject
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+
+/**
+ * Coordina la generación de tomas y la programación de sus alarmas.
+ *
+ * Centraliza la lógica que antes repetían HomeViewModel, MedicationViewModel y
+ * DailyIntakeWorker, para que todos programen alarmas sobre los IDs reales de Room.
+ *
+ * @param intakeRepository Repositorio de tomas.
+ * @param alarmScheduler Programador de alarmas del sistema.
+ */
+class ReminderScheduler @Inject constructor(
+    private val intakeRepository: IntakeRepository,
+    private val alarmScheduler: AlarmScheduler,
+) {
+
+    /**
+     * Genera las tomas del rango indicado y programa las alarmas de las futuras.
+     *
+     * @param desde Primer día a generar.
+     * @param hasta Último día a generar.
+     * @param now Momento de referencia para decidir qué tomas son futuras.
+     * @return Tomas generadas, incluidas las que ya existían, con su ID real.
+     */
+    suspend fun generateAndSchedule(
+        desde: LocalDate,
+        hasta: LocalDate,
+        now: LocalDateTime = LocalDateTime.now()
+    ): List<Intake> {
+        // Si la última generación quedó en una fecha posterior (por ejemplo,
+        // porque el worker ya generó mañana), se genera al menos el día `hasta`
+        // para no dejar sin tomas el día actual.
+        val inicio = if (desde.isAfter(hasta)) hasta else desde
+        val intakes = intakeRepository.createIntakes(inicio, hasta)
+        scheduleFuture(intakes, now)
+        return intakes
+    }
+
+    /**
+     * Programa alarmas solo para tomas con ID válido y hora futura.
+     *
+     * @param intakes Tomas a programar.
+     * @param now Momento de referencia para descartar las ya pasadas.
+     */
+    fun scheduleFuture(
+        intakes: List<Intake>,
+        now: LocalDateTime = LocalDateTime.now()
+    ) {
+        val nowMillis = now.toEpochMillis()
+
+        intakes.forEach { intake ->
+            if (intake.id <= 0) return@forEach
+
+            val triggerAtMillis = intake.scheduledAt.toEpochMillis()
+            if (triggerAtMillis > nowMillis) {
+                alarmScheduler.schedule(intake.id, triggerAtMillis)
+            }
+        }
+    }
+
+    /**
+     * Cancela las alarmas de las tomas futuras de un medicamento.
+     *
+     * @param medicationId Medicamento cuyas alarmas se cancelan.
+     * @param from Momento desde el que se consideran tomas futuras.
+     */
+    suspend fun cancelFutureForMedication(
+        medicationId: Int,
+        from: LocalDateTime = LocalDateTime.now()
+    ) {
+        intakeRepository.getFutureIntakesByMedicationId(medicationId, from)
+            .forEach { intake -> alarmScheduler.cancel(intake.id) }
+    }
+
+    private fun LocalDateTime.toEpochMillis(): Long =
+        atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+}

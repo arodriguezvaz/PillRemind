@@ -10,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.data.utils.copyImageToInternalStorage
 import com.andres.pillremind.di.ApplicationScope
-import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.WeekDay
@@ -19,7 +18,7 @@ import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
 import com.andres.pillremind.domain.repository.SyncRepository
 import com.andres.pillremind.domain.repository.UserRepository
-import com.andres.pillremind.notifications.AlarmScheduler
+import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -35,18 +34,17 @@ import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.ZoneId
 
 /**
  * ViewModel para la pantalla de medicación.
  *
  * Maneja la creación, actualización y eliminación de `Medication` y sus `Schedule`s,
- * además de programar/cancelar alarmas mediante [AlarmScheduler].
+ * además de programar/cancelar alarmas mediante [ReminderScheduler].
  *
  * @param savedStateHandle Handle para recuperar parámetros de navegación (por ejemplo `medicationId`).
  * @param medicationRepository Repositorio para operaciones CRUD sobre medicaciones.
  * @param scheduleRepository Repositorio para los horarios asociados a medicamentos.
- * @param alarmScheduler Programador de alarmas para notificaciones.
+ * @param reminderScheduler Coordina la generación de tomas y la programación de alarmas.
  * @param sessionManager Gestor de sesión que expone el perfil activo.
  */
 @HiltViewModel
@@ -54,7 +52,7 @@ class MedicationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val medicationRepository: MedicationRepository,
     private val scheduleRepository: ScheduleRepository,
-    private val alarmScheduler: AlarmScheduler,
+    private val reminderScheduler: ReminderScheduler,
     private val intakeRepository: IntakeRepository,
     private val syncRepository: SyncRepository,
     private val userRepository: UserRepository,
@@ -166,10 +164,8 @@ class MedicationViewModel @Inject constructor(
                 val desde = intakeRepository.getLastGeneratedDate()
                 Log.d("PillDebug", "Generando intakes desde: $desde hasta: ${LocalDate.now()}")
 
-                val intakes = intakeRepository.createIntakes(desde, LocalDate.now())
-                Log.d("PillDebug", "Intakes generadas: ${intakes.size} -> $intakes")
-
-                scheduleAlarmsForIntakes(intakes)
+                val intakes = reminderScheduler.generateAndSchedule(desde, LocalDate.now())
+                Log.d("PillDebug", "Intakes generadas: ${intakes.size}")
             }
             syncSiEsPremium()
         }
@@ -219,7 +215,7 @@ class MedicationViewModel @Inject constructor(
                 )
 
                 medicationRepository.updateMedication(updatedMedication)
-                cancelFutureIntakeAlarms()
+                reminderScheduler.cancelFutureForMedication(medicationId)
                 intakeRepository.deleteFutureIntakesByMedicationId(
                     medicationId,
                     LocalDateTime.now()
@@ -238,8 +234,7 @@ class MedicationViewModel @Inject constructor(
                     }
                 }
                 val desde = intakeRepository.getLastGeneratedDate()
-                val intakes = intakeRepository.createIntakes(desde, LocalDate.now())
-                scheduleAlarmsForIntakes(intakes)
+                reminderScheduler.generateAndSchedule(desde, LocalDate.now())
 
             }
             syncSiEsPremium()
@@ -250,14 +245,12 @@ class MedicationViewModel @Inject constructor(
      * Elimina el medicamento y cancela las alarmas asociadas.
      */
     fun deleteMedication(medication: Medication) {
-        for (schedule in schedules.value) {
-            alarmScheduler.cancel(schedule.id)
-        }
         medication.imageUrl?.let { File(it).delete() }
 
         val supabaseId = medication.supabaseId
 
         viewModelScope.launch {
+            reminderScheduler.cancelFutureForMedication(medication.id)
             medicationRepository.deleteMedication(medication)
         }
 
@@ -271,39 +264,5 @@ class MedicationViewModel @Inject constructor(
             }
         }
     }
-
-    /**
-     * Programa alarmas para las intakes cuya hora aún no ha pasado.
-     */
-    private fun scheduleAlarmsForIntakes(intakes: List<Intake>) {
-        val now = System.currentTimeMillis()
-        for (intake in intakes) {
-            // id=-1 significa que ya existía en BD (IGNORE), la saltamos
-            if (intake.id == -1) continue
-            val millis = intake.scheduledAt
-                .atZone(ZoneId.systemDefault())
-                .toInstant()
-                .toEpochMilli()
-            if (millis > now) {
-                alarmScheduler.schedule(intake.id, millis)
-            }
-        }
-    }
-
-
-    /**
-     * Cancela las alarmas de las intakes futuras del medicamento actual.
-     * Se llama antes de actualizar o eliminar para no dejar alarmas huérfanas.
-     */
-    private suspend fun cancelFutureIntakeAlarms() {
-        if (medicationId == null) return
-        val now = LocalDateTime.now()
-        // Obtenemos las intakes futuras a través de los schedules actuales
-        schedules.value.forEach { schedule ->
-            intakeRepository.getFutureIntakesByMedicationId(medicationId, now)
-                .forEach { intake -> alarmScheduler.cancel(intake.id) }
-        }
-    }
-
 
 }
