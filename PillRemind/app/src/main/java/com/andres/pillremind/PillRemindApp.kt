@@ -13,6 +13,7 @@ import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.andres.pillremind.notifications.DailyIntakeWorker
+import com.andres.pillremind.notifications.NotificationChannels
 import dagger.hilt.android.HiltAndroidApp
 import jakarta.inject.Inject
 import java.util.concurrent.TimeUnit
@@ -93,11 +94,11 @@ class PillRemindApp : Application(), Configuration.Provider {
      */
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
-            "pill_remind_channel",
-            "Recordatorios de medicamentos",
+            NotificationChannels.REMINDERS,
+            getString(R.string.notification_channel_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Avisos para tomar la medicación"
+            description = getString(R.string.notification_channel_description)
         }
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)

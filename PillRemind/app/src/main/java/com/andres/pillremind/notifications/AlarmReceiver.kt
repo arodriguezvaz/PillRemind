@@ -11,6 +11,7 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.andres.pillremind.MainActivity
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.repository.IntakeRepository
@@ -114,9 +115,9 @@ class AlarmReceiver : BroadcastReceiver() {
      * Genera y muestra una notificación recordando al usuario que debe realizar
      * una toma de medicación.
      *
-     * La notificación incluye una acción rápida que permite marcar la toma como
-     * realizada directamente desde el panel de notificaciones mediante un
-     * [PendingIntent] asociado a [MarkAsTakenReceiver].
+     * La notificación abre la app al tocar el cuerpo y incluye una acción rápida
+     * que permite marcar la toma como realizada directamente desde el panel de
+     * notificaciones mediante un [PendingIntent] asociado a [MarkAsTakenReceiver].
      *
      * @param context Contexto utilizado para crear y mostrar la notificación.
      * @param intake Toma programada asociada a la notificación.
@@ -130,6 +131,16 @@ class AlarmReceiver : BroadcastReceiver() {
         medicationName: String,
         profileName: String
     ) {
+        // Abre la app al tocar el cuerpo de la notificación.
+        val contentPendingIntent = PendingIntent.getActivity(
+            context,
+            intake.id,
+            Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         // Se utiliza un PendingIntent para permitir que la acción de la notificación
         // ejecute un BroadcastReceiver incluso cuando la aplicación no se encuentra abierta,
         // posibilitando marcar una toma como realizada directamente desde la notificación.
@@ -143,13 +154,24 @@ class AlarmReceiver : BroadcastReceiver() {
         )
         // Construye la notificación mostrando la información de la toma pendiente
         // e incorpora una acción rápida para registrar la medicación como tomada.
-        val notification = NotificationCompat.Builder(context, "pill_remind_channel")
+        val notification = NotificationCompat.Builder(context, NotificationChannels.REMINDERS)
             .setSmallIcon(R.drawable.ic_pill)
-            .setContentTitle("Hora de tomar $medicationName")
-            .setContentText("${intake.scheduledAt.toLocalTime()} — no olvides la dosis de $profileName")
+            .setContentTitle(context.getString(R.string.notification_title, medicationName))
+            .setContentText(
+                context.getString(
+                    R.string.notification_text,
+                    intake.scheduledAt.toLocalTime().toString(),
+                    profileName
+                )
+            )
+            .setContentIntent(contentPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
-            .addAction(R.drawable.ic_pill, "Tomar", takenPendingIntent)
+            .addAction(
+                R.drawable.ic_pill,
+                context.getString(R.string.notification_action_take),
+                takenPendingIntent
+            )
             .build()
 
         NotificationManagerCompat.from(context).notify(intake.id, notification)

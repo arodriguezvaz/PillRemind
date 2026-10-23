@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">PillRemind</string>
+    <string name="notification_channel_name">Recordatorios de medicamentos</string>
+    <string name="notification_channel_description">Avisos para tomar la medicación</string>
+    <string name="notification_title">Hora de tomar %1$s</string>
+    <string name="notification_text">%1$s — no olvides la dosis de %2$s</string>
+    <string name="notification_action_take">Tomar</string>
     <string name="nombre">Nombre</string>
     <string name="url_imagen">Url de la imagen</string>
     <string name="fecha_inicio">Fecha inicio:</string>
@@ -27,9 +32,9 @@
     <string name="horario">Horario:</string>
     <string name="guardar">Guardar</string>
     <string name="sleccionar_hora">Seleccionar hora</string>
-    <string name="tomar">Tomar</string>">
+    <string name="tomar">Tomar</string>
     <string name="tomado">Tomado</string>
     <string name="fecha_hint">dd/mm/yyyy</string>
     <string name="añadir_perfil">Añadir perfil</string>
-    <string name="seleccion_la_hora">Selecciona la hora</string>">
+    <string name="seleccion_la_hora">Selecciona la hora</string>
 </resources>
