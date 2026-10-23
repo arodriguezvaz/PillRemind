@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local generated index and private known-issues audit
+.codegraph/
+/INCIDENCIAS.md
