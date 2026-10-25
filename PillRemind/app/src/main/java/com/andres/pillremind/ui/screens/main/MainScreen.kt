@@ -6,10 +6,13 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -17,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
+import kotlinx.coroutines.launch
 
 /**
  * Pantalla principal de la aplicación.
@@ -48,11 +52,15 @@ fun MainScreen(
         )
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     currentRoute !in bottomBarRoutes
             && navController.previousBackStackEntry != null
     Scaffold(
         topBar = { MainTopBar(state = topBarState, navController = navController) },
         bottomBar = { MainBottomBar(navController = navController) },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             if (showFab) {
                 FloatingActionButton(
@@ -68,7 +76,10 @@ fun MainScreen(
             navController = navController,
             rootNavController = rootNavController,
             paddingValues = paddingValues,
-            onTopBarChange = { topBarState = it }
+            onTopBarChange = { topBarState = it },
+            onMessage = { message ->
+                coroutineScope.launch { snackbarHostState.showSnackbar(message) }
+            }
         )
     }
 }

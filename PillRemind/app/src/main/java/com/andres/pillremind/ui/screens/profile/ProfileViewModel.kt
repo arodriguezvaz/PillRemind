@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.andres.pillremind.R
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.data.utils.copyImageToInternalStorage
 import com.andres.pillremind.di.ApplicationScope
@@ -19,13 +20,16 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 
 /**
@@ -53,6 +57,16 @@ class ProfileViewModel @Inject constructor(
      * Flujo con el ID del usuario activo.
      */
     val activeUserId: Flow<Int?> = sessionManager.activeUserId
+
+    private val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
+
+    /**
+     * Limpia el mensaje pendiente de mostrar en la snackbar.
+     */
+    fun clearSnackbarMessage() {
+        _snackbarMessage.value = null
+    }
 
 
     private fun syncSiEsPremium() {
@@ -96,15 +110,26 @@ class ProfileViewModel @Inject constructor(
     /**
      * Elimina un perfil y limpia la sesión activa si corresponde.
      *
+     * Si el perfil existe también en Supabase, el borrado remoto se confirma
+     * antes de tocar los datos locales. Si falla, no se borra nada y se avisa al usuario.
+     *
      * @param profile Perfil que se desea eliminar.
+     * @param onDeleted Callback ejecutado solo si el borrado se completó correctamente.
      */
-    fun deleteProfile(profile: Profile) {
-        profile.urlImagen?.let { File(it).delete() }
-
-        // Guardar supabaseId antes de borrar de Room
-        val supabaseId = profile.supabaseId
-
+    fun deleteProfile(profile: Profile, onDeleted: () -> Unit = {}) {
         viewModelScope.launch {
+            val supabaseId = profile.supabaseId
+            if (supabaseId != null) {
+                val remoteResult = withTimeoutOrNull(DELETE_TIMEOUT_MS) {
+                    syncRepository.deleteProfile(supabaseId)
+                }
+                if (remoteResult == null || remoteResult.isFailure) {
+                    Log.e("Sync", "Error borrando perfil: ${remoteResult?.exceptionOrNull()}")
+                    _snackbarMessage.value = context.getString(R.string.error_borrado_perfil)
+                    return@launch
+                }
+            }
+
             // Cancelar las alarmas antes de que Room borre las tomas en cascada.
             runCatching { reminderScheduler.cancelFutureForProfile(profile.id) }
                 .onFailure {
@@ -115,23 +140,15 @@ class ProfileViewModel @Inject constructor(
                     )
                 }
 
+            profile.urlImagen?.let { File(it).delete() }
             profileRepository.deleteProfile(profile)
 
             // Solo se limpia la sesión si el perfil borrado era el activo.
             if (sessionManager.activeProfileId.firstOrNull() == profile.id) {
                 sessionManager.clearActiveProfile()
             }
-        }
 
-        // Borrar en Supabase en appScope, independiente de la navegación
-        if (supabaseId != null) {
-            appScope.launch {
-                val user = userRepository.getUser() ?: return@launch
-                if (user.esPremium) {
-                    syncRepository.deleteProfile(supabaseId)
-                        .onFailure { Log.e("Sync", "Error borrando perfil: ${it.message}") }
-                }
-            }
+            onDeleted()
         }
     }
 
@@ -195,5 +212,10 @@ class ProfileViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = null
             )
+
+    companion object {
+        /** Tiempo máximo de espera para confirmar un borrado remoto. */
+        private const val DELETE_TIMEOUT_MS = 10_000L
+    }
 
 }

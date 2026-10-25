@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppPhotoPicker
@@ -67,6 +68,7 @@ sealed class ProfileMode {
  * @param onDeletedClicked Callback ejecutado tras eliminar el perfil.
  * @param onTopBarChange Callback para modificar la TopBar.
  * @param profileViewModel ViewModel encargado de la lógica del perfil.
+ * @param onMessage Callback para mostrar mensajes al usuario en la snackbar.
  */
 @Composable
 fun ProfileScreen(
@@ -75,10 +77,20 @@ fun ProfileScreen(
     profileMode: ProfileMode = ProfileMode.Create,
     onDeletedClicked: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
+    onMessage: (String) -> Unit = {},
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
         onTopBarChange(TopBarState(title = "Ver Perfil"))
+    }
+
+    val snackbarMessage by profileViewModel.snackbarMessage.collectAsStateWithLifecycle()
+
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let {
+            onMessage(it)
+            profileViewModel.clearSnackbarMessage()
+        }
     }
 
     val name = remember { mutableStateOf("") }
@@ -244,8 +256,9 @@ fun ProfileScreen(
                     onClick = {
                         showDeleteDialog = false
                         perfil?.let {
-                            profileViewModel.deleteProfile(it)
-                            onDeletedClicked()
+                            profileViewModel.deleteProfile(it) {
+                                onDeletedClicked()
+                            }
                         }
                     },
                     colors = ButtonDefaults.textButtonColors(

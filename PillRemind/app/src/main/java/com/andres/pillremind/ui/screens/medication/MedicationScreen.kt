@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.ui.components.AppButton
@@ -72,6 +73,7 @@ sealed class MedicationMode {
  * @param onSaveClicked Callback llamado tras guardar la medicación.
  * @param medicationMode Modo inicial de la pantalla (por defecto `Create`).
  * @param onDeleteClicked Callback llamado tras eliminar la medicación.
+ * @param onMessage Callback para mostrar mensajes al usuario en la snackbar.
  */
 @Composable
 fun MedicationScreen(
@@ -80,12 +82,21 @@ fun MedicationScreen(
     medicationMode: MedicationMode = MedicationMode.Create,
     onDeleteClicked: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
+    onMessage: (String) -> Unit = {},
 
     medicationViewModel: MedicationViewModel = hiltViewModel()
 ) {
     val medication by medicationViewModel.medication.collectAsState()
     val medicationWeekDays by medicationViewModel.weekDays.collectAsState()
     val medicationTimes by medicationViewModel.times.collectAsState()
+    val snackbarMessage by medicationViewModel.snackbarMessage.collectAsStateWithLifecycle()
+
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let {
+            onMessage(it)
+            medicationViewModel.clearSnackbarMessage()
+        }
+    }
 
     //Variables con estado mutable para los campos del formulario
     val name = remember { mutableStateOf("") }
@@ -669,9 +680,12 @@ fun MedicationScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        medicationViewModel.deleteMedication(medication!!)
                         showDeleteDialog = false
-                        onDeleteClicked()
+                        medication?.let {
+                            medicationViewModel.deleteMedication(it) {
+                                onDeleteClicked()
+                            }
+                        }
                     },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.error

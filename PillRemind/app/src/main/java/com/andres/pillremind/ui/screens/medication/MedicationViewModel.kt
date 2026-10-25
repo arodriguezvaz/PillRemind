@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.andres.pillremind.R
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.data.utils.copyImageToInternalStorage
 import com.andres.pillremind.di.ApplicationScope
@@ -26,10 +27,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -63,6 +66,14 @@ class MedicationViewModel @Inject constructor(
     //Recupera el profileId del sessionManager
     val profileId = sessionManager.activeProfileId
     private val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
+
+    /**
+     * Limpia el mensaje pendiente de mostrar en la snackbar.
+     */
+    fun clearSnackbarMessage() {
+        _snackbarMessage.value = null
+    }
 
 
     //Recupera el id del medicamento
@@ -244,26 +255,38 @@ class MedicationViewModel @Inject constructor(
 
     /**
      * Elimina el medicamento y cancela las alarmas asociadas.
+     *
+     * Si el medicamento existe también en Supabase, el borrado remoto se confirma
+     * antes de tocar los datos locales. Si falla, no se borra nada y se avisa al usuario.
+     *
+     * @param medication Medicamento que se desea eliminar.
+     * @param onDeleted Callback ejecutado solo si el borrado se completó correctamente.
      */
-    fun deleteMedication(medication: Medication) {
-        medication.imageUrl?.let { File(it).delete() }
-
-        val supabaseId = medication.supabaseId
-
+    fun deleteMedication(medication: Medication, onDeleted: () -> Unit = {}) {
         viewModelScope.launch {
-            reminderScheduler.cancelFutureForMedication(medication.id)
-            medicationRepository.deleteMedication(medication)
-        }
-
-        if (supabaseId != null) {
-            appScope.launch {
-                val user = userRepository.getUser() ?: return@launch
-                if (user.esPremium && user.supabaseUid != null) {
+            val supabaseId = medication.supabaseId
+            if (supabaseId != null) {
+                val remoteResult = withTimeoutOrNull(DELETE_TIMEOUT_MS) {
                     syncRepository.deleteMedication(supabaseId)
-                        .onFailure { Log.e("Sync", "Error borrando medicamento: ${it.message}") }
+                }
+                if (remoteResult == null || remoteResult.isFailure) {
+                    Log.e("Sync", "Error borrando medicamento: ${remoteResult?.exceptionOrNull()}")
+                    _snackbarMessage.value =
+                        context.getString(R.string.error_borrado_medicamento)
+                    return@launch
                 }
             }
+
+            medication.imageUrl?.let { File(it).delete() }
+            reminderScheduler.cancelFutureForMedication(medication.id)
+            medicationRepository.deleteMedication(medication)
+            onDeleted()
         }
+    }
+
+    companion object {
+        /** Tiempo máximo de espera para confirmar un borrado remoto. */
+        private const val DELETE_TIMEOUT_MS = 10_000L
     }
 
 }
