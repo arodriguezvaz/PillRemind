@@ -53,12 +53,4 @@ interface UserDao {
      */
     @Query("SELECT * FROM usuarios LIMIT 1")
     fun getUserFlow(): Flow<UserEntity?>
-
-    /**
-     * Elimina todos los perfiles de un usuario.
-     *
-     * @param usuarioId ID del usuario propietario.
-     */
-    @Query("DELETE FROM profiles WHERE usuarioId = :usuarioId")
-    suspend fun deleteAllByUsuario(usuarioId: Int)
 }
