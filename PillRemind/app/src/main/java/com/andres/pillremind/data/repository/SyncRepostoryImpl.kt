@@ -336,6 +336,7 @@ class SyncRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteProfile(supabaseId: String): Result<Unit> = runCatching {
+        if (!puedeBorrarEnRemoto()) return@runCatching
         postgrest.from("profiles")
             .delete {
                 filter { eq("id", supabaseId) }
@@ -343,9 +344,23 @@ class SyncRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteMedication(supabaseId: String): Result<Unit> = runCatching {
+        if (!puedeBorrarEnRemoto()) return@runCatching
         postgrest.from("medications")
             .delete {
                 filter { eq("id", supabaseId) }
             }
+    }
+
+    /**
+     * Comprueba si el usuario actual tiene datos en Supabase que deban borrarse.
+     *
+     * Los usuarios gratuitos solo tienen datos locales, por lo que el borrado remoto
+     * se considera completado sin realizar ninguna llamada de red.
+     *
+     * @return `true` si el usuario es premium y tiene usuario remoto.
+     */
+    private suspend fun puedeBorrarEnRemoto(): Boolean {
+        val user = userRepository.getUser() ?: return false
+        return user.esPremium && user.supabaseUid != null
     }
 }
