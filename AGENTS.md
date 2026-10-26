@@ -8,18 +8,18 @@
 
 ## Branch context
 
-This repository keeps both the current local-only app and archived branches of the
-earlier Supabase version. Check the current branch with `git branch --show-current`
-before assuming the architecture:
+This repository keeps the current local-only app on `master` and archived branches
+of the earlier Supabase version. Check the current branch with
+`git branch --show-current` before assuming the architecture:
 
-- `local/sin-nube`: local-only app. No Supabase, authentication, sync, or INTERNET permission.
-- `master`: still the cloud version until `local/sin-nube` is merged; after that it becomes local-only.
-- `respaldo/nube`: archived cloud version from `master` (no notification fixes).
+- `master`: current local-only app. No Supabase, authentication, sync, or INTERNET permission.
+- `local/sin-nube`: same local-only version, kept as the working branch that was merged into `master`.
+- `respaldo/nube`: archived cloud version from the old `master` (no notification fixes).
 - `respaldo/integridad` and `fix/integridad`: archived cloud version with notification and sync fixes.
 - `fix/notificaciones`: archived cloud version with notification fixes only.
 
-Do not reintroduce Supabase into `local/sin-nube`. Do not apply the local-only
-cleanup on the archive branches: Supabase is still part of their code.
+Do not reintroduce Supabase into `master` or `local/sin-nube`. Do not apply the
+local-only cleanup on the archive branches: Supabase is still part of their code.
 
 ## Commands
 
@@ -27,7 +27,7 @@ cleanup on the archive branches: Supabase is still part of their code.
 cd PillRemind
 ./gradlew assembleDebug
 ./gradlew testDebugUnitTest
-./gradlew testDebugUnitTest --tests "com.andres.pillremind.ExampleUnitTest"
+./gradlew testDebugUnitTest --tests "com.andres.pillremind.notifications.ReminderSchedulerTest"
 ./gradlew connectedDebugAndroidTest   # device/emulator required
 ./gradlew lintDebug
 ```
@@ -50,5 +50,5 @@ cd PillRemind
 
 ## Docs
 
-- Tracked docs are the root `README.md` and `doc/templates/` (academic project write-up). Do not assume the old architecture docs still exist; verify behavior against code and Gradle config.
-- Keep the local `PillRemind/INCIDENCIAS.md` audit out of Git and out of public releases.
+- Tracked docs are the root `README.md` and `doc/templates/` (academic project write-up). The README describes the current local-only app; `doc/templates/` is historical and may still describe the removed Supabase version. Verify behavior against code and Gradle config.
+- Keep the local `PillRemind/INCIDENCIAS.md` audit out of Git and out of public releases. It is a personal audit document; review it separately from implementation changes.
