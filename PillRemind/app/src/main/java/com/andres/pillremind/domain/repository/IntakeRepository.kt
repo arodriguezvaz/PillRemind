@@ -57,12 +57,6 @@ interface IntakeRepository {
     suspend fun saveLastGeneratedDate(fecha: LocalDate)
 
     /**
-     * Obtiene todas las tomas de un usuario
-     * @param userId ID del usuario
-     */
-    suspend fun getAllByUser(userId: Int): List<Intake>
-
-    /**
      * Obtiene las tomas futuras de una medicación
      * @param medicationId ID de la medicación
      * @param date a partir de la que obtener las tomas

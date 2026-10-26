@@ -158,17 +158,4 @@ class ReminderSchedulerTest {
         verify(exactly = 1) { alarmScheduler.cancel(1) }
         verify(exactly = 1) { alarmScheduler.cancel(2) }
     }
-
-    @Test
-    fun `cancelFutureForUser ignora las tomas pasadas`() = runTest {
-        coEvery { intakeRepository.getAllByUser(7) } returns listOf(
-            Intake(id = 1, scheduleId = 10, scheduledAt = now.minusHours(1)),
-            Intake(id = 2, scheduleId = 10, scheduledAt = now.plusHours(1))
-        )
-
-        scheduler.cancelFutureForUser(7, now)
-
-        verify(exactly = 0) { alarmScheduler.cancel(1) }
-        verify(exactly = 1) { alarmScheduler.cancel(2) }
-    }
 }

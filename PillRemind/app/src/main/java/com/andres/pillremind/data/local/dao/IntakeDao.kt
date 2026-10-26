@@ -97,12 +97,6 @@ interface IntakeDao {
     ): Flow<List<IntakeWithMedication>>
 
     /**
-     * Devuelve todas las tomas pertenecientes a un usuario.
-     */
-    @Query("SELECT * FROM intakes WHERE scheduleId IN (SELECT id FROM schedules WHERE medicationId IN (SELECT id FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId)))")
-    suspend fun getAllByUser(usuarioId: Int): List<IntakeEntity>
-
-    /**
      * Devuelve las tomas futuras de un medicamento desde una fecha.
      */
     @Query(

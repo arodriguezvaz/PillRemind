@@ -104,10 +104,6 @@ class IntakeRepositoryImpl @Inject constructor(
         sessionManager.saveLastGeneratedDate(fecha)
     }
 
-    override suspend fun getAllByUser(userId: Int): List<Intake> {
-        return intakeDao.getAllByUser(userId).map { it.toDomain() }
-    }
-
     override suspend fun getFutureIntakesByMedicationId(
         medicationId: Int,
         date: LocalDateTime

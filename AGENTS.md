@@ -18,18 +18,19 @@ cd PillRemind
 ```
 
 - Builds need a full JDK with `javac`, not just a JRE. On this machine the system Java 17 is JRE-only, so use `JAVA_HOME=/opt/android-studio/jbr ./gradlew ...` (verified working).
-- `local.properties` is gitignored but mandatory: `sdk.dir`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`. `app/build.gradle.kts` reads it at configuration time into `BuildConfig`; missing Supabase values break the app at runtime. Never commit this file.
+- `local.properties` is gitignored but mandatory: only `sdk.dir` is required. It no longer contains Supabase values. Never commit this file.
 - Dependencies/versions live in `gradle/libs.versions.toml`. AGP 9 uses built-in Kotlin; `android.disallowKotlinSourceSets=false` in `gradle.properties` is required for KSP. Gradle prints a non-fatal "KSP is too old for Kotlin 2.3.20" warning; keep KSP aligned when upgrading Kotlin.
-- No CI, ktlint/detekt, or real test suite exists (only the template unit/instrumented tests). `lintDebug` is not clean; before attributing a failure to your change, check whether it already exists on the base revision.
+- No CI or ktlint/detekt exists. Unit tests cover intake generation and the reminder scheduler; `lintDebug` is not clean, so before attributing a failure to your change, check whether it already exists on the base revision.
 
 ## Architecture
 
-- Layers: `domain/model` + `domain/repository` interfaces; `data/local` (Room entities/DAOs/relations/converters plus DataStore `SessionManager`), `data/remote/dto` (Supabase), `data/mapper`, `data/repository` implementations; `ui/screens/<feature>` Screen+ViewModel pairs; `ui/components`; `di` Hilt modules; `navigation` nested graphs; `notifications` alarm/worker pipeline.
+- Layers: `domain/model` + `domain/repository` interfaces; `data/local` (Room entities/DAOs/relations/converters plus DataStore `SessionManager`), `data/mapper`, `data/repository` implementations; `ui/screens/<feature>` Screen+ViewModel pairs; `ui/components`; `di` Hilt modules; `navigation` nested graphs; `notifications` alarm/worker pipeline.
+- The app is local-only: there is no authentication, remote database, sync layer, or network permission. Do not reintroduce Supabase or account fields.
 - New repository: interface in `domain/repository`, implementation in `data/repository`, binding in `di/RepositoryModule`. New entity/DAO: register in `AppDatabase` and provide it through `DatabaseModule`. ViewModels use `@HiltViewModel` and screens obtain them with `hiltViewModel()`.
-- Room is version 1 with `exportSchema = false` and `fallbackToDestructiveMigration(dropAllTables = true)`. No migrations exist; bump `AppDatabase.version` for any schema change and expect local data loss.
-- Local rows use Int primary keys plus nullable Supabase IDs (`supabaseId`; the user uses `supabaseUid`). Remote DTOs map snake_case columns; tables are `usuarios`, `profiles`, `medications`, `schedules`, and `intakes`. Sync is hand-written in `data/repository/SyncRepostoryImpl.kt` (filename typo; class is `SyncRepositoryImpl`); preserve the `supabaseId` links when changing it.
+- Room is version 2 with `exportSchema = false` and `fallbackToDestructiveMigration(dropAllTables = true)`. No migrations exist; bump `AppDatabase.version` for any schema change and expect local data loss.
+- Local rows use Int primary keys. Tables are `usuarios`, `profiles`, `medications`, `schedules`, and `intakes`; profiles belong to the single local user.
 - WorkManager is Hilt-initialized: the default `WorkManagerInitializer` is removed in `AndroidManifest.xml`, and `PillRemindApp` supplies `HiltWorkerFactory`. New workers need `@HiltWorker` + `@AssistedInject`; do not re-add the default initializer.
-- Reminder pipeline: the unique periodic `daily_intake_worker` creates tomorrow's intakes, `AlarmScheduler` sets exact alarms, `AlarmReceiver` posts notifications, and `MarkAsTakenReceiver` records the intake. Changes here need on-device verification (exact alarms, notifications, boot behavior, permissions). A local-only known-issues audit may exist at `PillRemind/INCIDENCIAS.md`; it is Git-ignored and must never be committed or published.
+- Reminder pipeline: the unique periodic `daily_intake_worker` maintains a rolling 7-day window of intakes, `AlarmScheduler` sets exact alarms (with an inexact fallback), `AlarmReceiver` posts notifications, `BootReceiver` reschedules after boot/update, and `MarkAsTakenReceiver` records the intake. Changes here need on-device verification (exact alarms, notifications, boot behavior, permissions). A local-only known-issues audit may exist at `PillRemind/INCIDENCIAS.md`; it is Git-ignored and must never be committed or published.
 - `SessionManager` stores active user/profile IDs, dark mode, and the last intake-generation date in DataStore. Profile selection is the root navigation destination, and the active profile drives home/medication data.
 
 ## Docs

@@ -93,15 +93,6 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
     }
 
     /**
-     * Elimina el usuario activo almacenado.
-     */
-    suspend fun clearActiveUser() {
-        context.dataStore.edit { preferences ->
-            preferences.remove(Keys.ACTIVE_USER_ID)
-        }
-    }
-
-    /**
      * Fecha de la última generación de tomas.
      */
     val lastGeneratedDate: Flow<LocalDate?> = context.dataStore.data
@@ -122,16 +113,6 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
     suspend fun saveLastGeneratedDate(fecha: LocalDate) {
         context.dataStore.edit { preferences ->
             preferences[Keys.LAST_GENERATED_DATE] = fecha.toString()
-        }
-    }
-
-    /**
-     * Borra la fecha de última generación para que el siguiente usuario o la
-     * siguiente descarga reconstruyan la ventana desde cero.
-     */
-    suspend fun clearLastGeneratedDate() {
-        context.dataStore.edit { preferences ->
-            preferences.remove(Keys.LAST_GENERATED_DATE)
         }
     }
 }

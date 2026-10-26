@@ -28,7 +28,6 @@ import java.time.LocalDateTime
  * convertidos a `StateFlow` para su observación en la UI.
  *
  * @param profileRepository Repositorio para obtener datos de perfil.
- * @param medicationRepository Repositorio para obtener medicamentos.
  * @param intakeRepository Repositorio de tomas.
  * @param sessionManager Gestor de sesión que expone el perfil activo.
  * @param reminderScheduler Coordina la generación de tomas y la programación de alarmas.

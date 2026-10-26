@@ -137,23 +137,6 @@ class ReminderScheduler @Inject constructor(
             .forEach { intake -> alarmScheduler.cancel(intake.id) }
     }
 
-    /**
-     * Cancela las alarmas futuras de todas las tomas de un usuario.
-     *
-     * Se usa antes del logout, que elimina los datos locales del usuario.
-     *
-     * @param userId Usuario cuyas alarmas se cancelan.
-     * @param from Momento desde el que se consideran tomas futuras.
-     */
-    suspend fun cancelFutureForUser(
-        userId: Int,
-        from: LocalDateTime = LocalDateTime.now()
-    ) {
-        intakeRepository.getAllByUser(userId)
-            .filter { intake -> intake.scheduledAt.isAfter(from) }
-            .forEach { intake -> alarmScheduler.cancel(intake.id) }
-    }
-
     private fun LocalDateTime.toEpochMillis(): Long =
         atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }
