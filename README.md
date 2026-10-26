@@ -15,8 +15,14 @@ A partir desta información, o sistema xera recordatorios e notificacións no mo
 Ademais, o usuario pode confirmar a toma da medicación, o que permite levar un control do cumprimento do tratamento.
 
 Outro dos aspectos importantes é a xestión de perfís, que permite organizar a medicación de diferentes persoas dentro 
-dunha mesma conta, especialmente útil no caso de usuarios premium. Tamén conta con funcionalidades de modificación e 
-eliminación de medicamentos, así como sincronización de datos na nube para manter a información actualizada en distintos dispositivos.
+dun mesmo dispositivo. A aplicación funciona integramente de forma local: non require conta nin conexión a internet,
+e os datos gárdanse só no dispositivo. Tamén conta con funcionalidades de modificación e eliminación de medicamentos,
+así como recordatorios e notificacións para cada toma.
+
+## Almacenamento local
+
+Todos os datos (perfís, medicamentos, horarios e tomas) gárdanse nunha base de datos Room no propio dispositivo.
+A aplicación non envía información a servidores externos nin sincroniza datos entre dispositivos.
 
 ## Sobre a autoría
 
