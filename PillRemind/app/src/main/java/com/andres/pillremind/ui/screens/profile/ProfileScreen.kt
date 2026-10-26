@@ -125,9 +125,9 @@ fun ProfileScreen(
                     onClick = {
                         profileViewModel.addProfile(
                             nombre = name.value,
-                            photoUri = selectedPhotoUri
+                            photoUri = selectedPhotoUri,
+                            onSaved = onSaveClicked
                         )
-                        onSaveClicked()
                     },
                     size = ButtonSize.Large,
                     enabled = name.value.isNotBlank()
@@ -172,10 +172,12 @@ fun ProfileScreen(
                         profileViewModel.updateProfile(
                             nombre = name.value,
                             newPhotoUri = newPhotoUri,
-                            currentImagePath = currentImagePath
+                            currentImagePath = currentImagePath,
+                            onSaved = {
+                                onSaveClicked()
+                                currentMode = ProfileMode.View
+                            }
                         )
-                        onSaveClicked()
-                        currentMode = ProfileMode.View
                     },
                     size = ButtonSize.Large,
                     enabled = name.value.isNotBlank()

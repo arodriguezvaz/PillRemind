@@ -89,6 +89,8 @@ class MedicationViewModel @Inject constructor(
      *
      * Valida campos básicos y, si existe un perfil activo, inserta la medicación,
      * crea los schedules y programa las alarmas correspondientes.
+     *
+     * @param onSaved Callback ejecutado cuando la medicación y sus tomas ya están guardadas.
      */
     fun addMedication(
         nombre: String,
@@ -99,7 +101,8 @@ class MedicationViewModel @Inject constructor(
         endDate: LocalDate? = null,
         weekDays: Set<WeekDay>,
         times: List<LocalTime>,
-        isChronic: Boolean
+        isChronic: Boolean,
+        onSaved: () -> Unit = {}
     ) {
 
         val trimmedName = nombre.trim()
@@ -144,11 +147,15 @@ class MedicationViewModel @Inject constructor(
                 val intakes = reminderScheduler.generateWindow()
                 Log.d("PillDebug", "Intakes generadas: ${intakes.size}")
             }
+            onSaved()
         }
     }
 
     /**
      * Actualiza un medicamento existente y reemplaza sus horarios.
+     *
+     * @param onSaved Callback ejecutado cuando la actualización y la generación
+     * de tomas ya han terminado.
      */
     fun updateMedication(
         name: String,
@@ -160,7 +167,8 @@ class MedicationViewModel @Inject constructor(
         endDate: LocalDate? = null,
         weekDays: Set<WeekDay>,
         times: List<LocalTime>,
-        isChronic: Boolean
+        isChronic: Boolean,
+        onSaved: () -> Unit = {}
     ) {
         val trimmedName = name.trim()
         val normalizedUnit = unit.trim()
@@ -208,6 +216,7 @@ class MedicationViewModel @Inject constructor(
                 }
                 reminderScheduler.generateWindow()
             }
+            onSaved()
         }
     }
 

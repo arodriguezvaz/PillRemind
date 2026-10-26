@@ -330,10 +330,9 @@ fun MedicationScreen(
                             endDate = endDate.value,
                             weekDays = weekDays.value,
                             times = times,
-                            isChronic = isChronicTreatment.value
+                            isChronic = isChronicTreatment.value,
+                            onSaved = onSaveClicked
                         )
-
-                        onSaveClicked()
                     },
                     size = ButtonSize.Large,
                     enabled = isFormValid
@@ -491,10 +490,12 @@ fun MedicationScreen(
                                 endDate = endDate.value,
                                 weekDays = weekDays.value,
                                 times = times,
-                                isChronic = isChronicTreatment.value
+                                isChronic = isChronicTreatment.value,
+                                onSaved = {
+                                    currentMode = MedicationMode.View
+                                    onSaveClicked()
+                                }
                             )
-
-                            currentMode = MedicationMode.View
                         },
                         size = ButtonSize.Medium,
                         modifier = Modifier.weight(1f),

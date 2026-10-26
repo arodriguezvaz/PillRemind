@@ -52,8 +52,9 @@ class ProfileViewModel @Inject constructor(
      *
      * @param nombre Nombre del perfil.
      * @param photoUri URI opcional de la imagen del perfil.
+     * @param onSaved Callback ejecutado cuando el perfil ya está guardado.
      */
-    fun addProfile(nombre: String, photoUri: Uri? = null) {
+    fun addProfile(nombre: String, photoUri: Uri? = null, onSaved: () -> Unit = {}) {
         val trimmedNombre = nombre.trim()
         val imagePath = photoUri?.let {
             copyImageToInternalStorage(context, it)
@@ -68,6 +69,7 @@ class ProfileViewModel @Inject constructor(
                         urlImagen = imagePath
                     )
                 )
+                onSaved()
             }
         }
     }
@@ -110,11 +112,13 @@ class ProfileViewModel @Inject constructor(
      * @param nombre Nombre actualizado del perfil.
      * @param newPhotoUri URI nueva del picker.
      * @param currentImagePath Ruta actual guardada en Room.
+     * @param onSaved Callback ejecutado cuando el perfil ya está actualizado.
      */
     fun updateProfile(
         nombre: String,
         newPhotoUri: Uri? = null,
-        currentImagePath: String? = null
+        currentImagePath: String? = null,
+        onSaved: () -> Unit = {}
     ) {
         val trimmedNombre = nombre.trim()
         if (trimmedNombre.isBlank()) return
@@ -141,6 +145,7 @@ class ProfileViewModel @Inject constructor(
                     urlImagen = imagePath
                 )
             )
+            onSaved()
         }
     }
 
