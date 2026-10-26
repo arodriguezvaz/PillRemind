@@ -6,6 +6,21 @@
 - Package is `com.andres.pillremind`. Entrypoints: `MainActivity` (Compose UI) and `PillRemindApp` (Hilt/Application setup).
 - Docs are Spanish/Galician, and code comments, KDoc, and UI strings are Spanish. Keep identifiers in English and match the surrounding style.
 
+## Branch context
+
+This repository keeps both the current local-only app and archived branches of the
+earlier Supabase version. Check the current branch with `git branch --show-current`
+before assuming the architecture:
+
+- `local/sin-nube`: local-only app. No Supabase, authentication, sync, or INTERNET permission.
+- `master`: still the cloud version until `local/sin-nube` is merged; after that it becomes local-only.
+- `respaldo/nube`: archived cloud version from `master` (no notification fixes).
+- `respaldo/integridad` and `fix/integridad`: archived cloud version with notification and sync fixes.
+- `fix/notificaciones`: archived cloud version with notification fixes only.
+
+Do not reintroduce Supabase into `local/sin-nube`. Do not apply the local-only
+cleanup on the archive branches: Supabase is still part of their code.
+
 ## Commands
 
 ```bash
