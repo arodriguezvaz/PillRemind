@@ -15,7 +15,7 @@ import coil.memory.MemoryCache
 import com.andres.pillremind.notifications.DailyIntakeWorker
 import com.andres.pillremind.notifications.NotificationChannels
 import dagger.hilt.android.HiltAndroidApp
-import jakarta.inject.Inject
+import javax.inject.Inject
 import java.util.concurrent.TimeUnit
 
 /**

@@ -12,7 +12,7 @@ import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted

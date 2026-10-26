@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
-import jakarta.inject.Inject
+import javax.inject.Inject
 
 /**
  * Clase encargada de programar y cancelar alarmas relacionadas

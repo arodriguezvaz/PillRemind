@@ -2,7 +2,7 @@ package com.andres.pillremind.notifications
 
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.repository.IntakeRepository
-import jakarta.inject.Inject
+import javax.inject.Inject
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId

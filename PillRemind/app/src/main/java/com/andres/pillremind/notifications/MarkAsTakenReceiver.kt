@@ -7,7 +7,7 @@ import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.andres.pillremind.domain.repository.IntakeRepository
 import dagger.hilt.android.AndroidEntryPoint
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

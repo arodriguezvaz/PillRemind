@@ -10,7 +10,7 @@ import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.toWeekDay
 import com.andres.pillremind.domain.repository.IntakeRepository
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate

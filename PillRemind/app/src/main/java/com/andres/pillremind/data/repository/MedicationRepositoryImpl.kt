@@ -5,7 +5,7 @@ import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.repository.MedicationRepository
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

@@ -5,7 +5,7 @@ import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.User
 import com.andres.pillremind.domain.repository.UserRepository
-import jakarta.inject.Inject
+import javax.inject.Inject
 import java.time.LocalDateTime
 
 /**

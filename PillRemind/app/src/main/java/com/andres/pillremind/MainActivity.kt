@@ -13,7 +13,7 @@ import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.navigation.RootNavigationGraph
 import com.andres.pillremind.ui.theme.PillRemindTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jakarta.inject.Inject
+import javax.inject.Inject
 
 /**
  * Actividad principal de la aplicación.

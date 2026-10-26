@@ -10,7 +10,7 @@ import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

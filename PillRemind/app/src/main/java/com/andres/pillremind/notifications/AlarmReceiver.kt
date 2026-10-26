@@ -19,7 +19,7 @@ import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
 import dagger.hilt.android.AndroidEntryPoint
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
