@@ -16,8 +16,6 @@ import com.andres.pillremind.ui.screens.main.MainScreen
  * usuario selecciona o crea un perfil. Una vez seleccionado un perfil,
  * se navega al destino principal [Graph.MAIN].
  *
- * También registra el flujo de autenticación mediante [Graph.AUTH].
- *
  * @param navController Controlador encargado de gestionar la navegación
  * entre los diferentes destinos.
  */
@@ -34,7 +32,6 @@ fun RootNavigationGraph(navController: NavHostController) {
         composable(route = Graph.MAIN) {
             MainScreen(rootNavController = navController)
         }
-        authGraph(navController)
     }
 }
 
@@ -65,9 +62,4 @@ object Graph {
      * Grafo relacionado con la gestión de medicamentos.
      */
     const val MEDICATION = "medication_graph"
-
-    /**
-     * Grafo encargado de las pantallas de autenticación.
-     */
-    const val AUTH = "auth_graph"
 }

@@ -5,31 +5,23 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.andres.pillremind.R
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.data.utils.copyImageToInternalStorage
-import com.andres.pillremind.di.ApplicationScope
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.ProfileRepository
-import com.andres.pillremind.domain.repository.SyncRepository
-import com.andres.pillremind.domain.repository.UserRepository
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 
 /**
@@ -46,10 +38,7 @@ import java.io.File
 class ProfileViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val sessionManager: SessionManager,
-    private val userRepository: UserRepository,
-    private val syncRepository: SyncRepository,
     private val reminderScheduler: ReminderScheduler,
-    @ApplicationScope private val appScope: CoroutineScope,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -58,34 +47,11 @@ class ProfileViewModel @Inject constructor(
      */
     val activeUserId: Flow<Int?> = sessionManager.activeUserId
 
-    private val _snackbarMessage = MutableStateFlow<String?>(null)
-    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
-
-    /**
-     * Limpia el mensaje pendiente de mostrar en la snackbar.
-     */
-    fun clearSnackbarMessage() {
-        _snackbarMessage.value = null
-    }
-
-
-    private fun syncSiEsPremium() {
-        appScope.launch {
-            val user = userRepository.getUser() ?: return@launch
-            Log.d("Sync", "esPremium=${user.esPremium}, supabaseUid=${user.supabaseUid}")
-            if (user.esPremium) {
-                syncRepository.syncPerfiles()
-                    .onSuccess { Log.d("Sync", "Sync OK") }
-                    .onFailure { Log.e("Sync", "Error: ${it.message}", it) }
-            }
-        }
-    }
-
     /**
      * Agrega un nuevo perfil usando el repositorio.
      *
      * @param nombre Nombre del perfil.
-     * @param photoUri URL opcional de la imagen del perfil.
+     * @param photoUri URI opcional de la imagen del perfil.
      */
     fun addProfile(nombre: String, photoUri: Uri? = null) {
         val trimmedNombre = nombre.trim()
@@ -102,7 +68,6 @@ class ProfileViewModel @Inject constructor(
                         urlImagen = imagePath
                     )
                 )
-                syncSiEsPremium()
             }
         }
     }
@@ -110,26 +75,11 @@ class ProfileViewModel @Inject constructor(
     /**
      * Elimina un perfil y limpia la sesión activa si corresponde.
      *
-     * Si el perfil existe también en Supabase, el borrado remoto se confirma
-     * antes de tocar los datos locales. Si falla, no se borra nada y se avisa al usuario.
-     *
      * @param profile Perfil que se desea eliminar.
-     * @param onDeleted Callback ejecutado solo si el borrado se completó correctamente.
+     * @param onDeleted Callback ejecutado cuando el borrado se completa.
      */
     fun deleteProfile(profile: Profile, onDeleted: () -> Unit = {}) {
         viewModelScope.launch {
-            val supabaseId = profile.supabaseId
-            if (supabaseId != null) {
-                val remoteResult = withTimeoutOrNull(DELETE_TIMEOUT_MS) {
-                    syncRepository.deleteProfile(supabaseId)
-                }
-                if (remoteResult == null || remoteResult.isFailure) {
-                    Log.e("Sync", "Error borrando perfil: ${remoteResult?.exceptionOrNull()}")
-                    _snackbarMessage.value = context.getString(R.string.error_borrado_perfil)
-                    return@launch
-                }
-            }
-
             // Cancelar las alarmas antes de que Room borre las tomas en cascada.
             runCatching { reminderScheduler.cancelFutureForProfile(profile.id) }
                 .onFailure {
@@ -157,12 +107,14 @@ class ProfileViewModel @Inject constructor(
     /**
      * Actualiza un perfil existente.
      *
-     * @param profile Perfil con los valores actualizados.
+     * @param nombre Nombre actualizado del perfil.
+     * @param newPhotoUri URI nueva del picker.
+     * @param currentImagePath Ruta actual guardada en Room.
      */
     fun updateProfile(
         nombre: String,
-        newPhotoUri: Uri? = null,       // URI nueva del picker
-        currentImagePath: String? = null // ruta actual guardada en Room
+        newPhotoUri: Uri? = null,
+        currentImagePath: String? = null
     ) {
         val trimmedNombre = nombre.trim()
         if (trimmedNombre.isBlank()) return
@@ -170,8 +122,6 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             val activeProfileId = profileId.firstOrNull() ?: return@launch
             val userId = activeUserId.firstOrNull() ?: return@launch
-
-            val perfilActual = profileRepository.getProfileByIdOnce(activeProfileId)
 
             val imagePath = if (newPhotoUri != null) {
                 // Borrar imagen antigua si existía
@@ -188,14 +138,11 @@ class ProfileViewModel @Inject constructor(
                     id = activeProfileId,
                     usuarioId = userId,
                     name = trimmedNombre,
-                    urlImagen = imagePath,
-                    supabaseId = perfilActual?.supabaseId
+                    urlImagen = imagePath
                 )
             )
-            syncSiEsPremium()
         }
     }
-
 
     /**
      * Flujo con el perfil activo observado desde la sesión.
@@ -212,10 +159,4 @@ class ProfileViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = null
             )
-
-    companion object {
-        /** Tiempo máximo de espera para confirmar un borrado remoto. */
-        private const val DELETE_TIMEOUT_MS = 10_000L
-    }
-
 }

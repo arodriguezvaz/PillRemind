@@ -9,7 +9,6 @@ import java.time.LocalDateTime
  * @property intakeId Identificador local de la toma.
  * @property scheduledAt Fecha y hora programadas para la toma.
  * @property scheduleId Identificador de la programación asociada.
- * @property supabaseId Identificador de la toma en Supabase. Puede ser null si aún no se ha sincronizado.
  * @property takenAt Fecha y hora en la que se registró la toma. Es null si aún no se ha tomado.
  * @property medicationName Nombre del medicamento.
  * @property dose Cantidad que debe administrarse en cada toma.
@@ -21,7 +20,6 @@ data class IntakeWithMedication(
     val intakeId: Int,
     val scheduledAt: LocalDateTime,
     val scheduleId: Int,
-    val supabaseId: String?,
     val takenAt: LocalDateTime?,
     val medicationName: String,
     val dose: Double,

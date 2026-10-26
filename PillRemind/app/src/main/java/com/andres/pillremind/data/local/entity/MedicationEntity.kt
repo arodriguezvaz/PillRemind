@@ -11,7 +11,6 @@ import java.time.LocalDateTime
  *
  * @property id Identificador unico del medicamento.
  * @property profileId Identificador del perfil propietario.
- * @property supabaseId Identificador remoto en Supabase (opcional).
  * @property name Nombre del medicamento.
  * @property dose Dosis del medicamento.
  * @property unit Unidad de medida de la dosis.
@@ -38,7 +37,6 @@ data class MedicationEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val profileId: Int,
-    val supabaseId: String? = null,
     val name: String,
     val dose: Double,
     val unit: String,

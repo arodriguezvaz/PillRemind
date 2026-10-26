@@ -75,7 +75,6 @@ interface IntakeDao {
         i.id as intakeId,
         i.scheduledAt,
         i.scheduleId,
-        i.supabaseId,
         i.takenAt,
         m.name as medicationName,
         m.dose,

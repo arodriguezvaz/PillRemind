@@ -11,7 +11,6 @@ import com.andres.pillremind.domain.model.Profile
 fun ProfileEntity.toDomain(): Profile = Profile(
     id = id,
     usuarioId = usuarioId,
-    supabaseId = supabaseId,
     name = name,
     urlImagen = imageUrl,
     createdAt = createdAt,
@@ -25,8 +24,7 @@ fun ProfileEntity.toDomain(): Profile = Profile(
  */
 fun Profile.toEntity(): ProfileEntity = ProfileEntity(
     id = id,
-    usuarioId = usuarioId,       // ← añadir
-    supabaseId = supabaseId,     // ← añadir
+    usuarioId = usuarioId,
     name = name,
     imageUrl = urlImagen,
     createdAt = createdAt,

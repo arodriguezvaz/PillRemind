@@ -43,10 +43,4 @@ interface ScheduleRepository {
      * @param scheduleId ID del horario
      */
     suspend fun getScheduleByIdOnce(scheduleId: Int): Schedule?
-
-    /**
-     * Obtiene todos los horarios de un usuario
-     * @param userId ID del usuario propietario
-     */
-    suspend fun getAllByUser(userId: Int): List<Schedule>
 }

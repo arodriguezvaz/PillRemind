@@ -67,16 +67,8 @@ fun NavGraphBuilder.profileSelectionGraph(
         //Pantalla de configuración de la aplicación
         composable(ProfilesScreen.SettingsScreen.route) {
             SettingsScreen(
-                onNavigateToLogin = {
-                    navController.navigate(Graph.AUTH)
-                },
                 onBack = {
                     navController.popBackStack()
-                },
-                onLogout = {
-                    navController.navigate(Graph.PROFILE_SELECTION) {
-                        popUpTo(Graph.ROOT) { inclusive = false }
-                    }
                 }
             )
         }

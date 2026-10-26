@@ -37,6 +37,4 @@
     <string name="fecha_hint">dd/mm/yyyy</string>
     <string name="añadir_perfil">Añadir perfil</string>
     <string name="seleccion_la_hora">Selecciona la hora</string>
-    <string name="error_borrado_medicamento">No se pudo borrar el medicamento. Comprueba tu conexión e inténtalo de nuevo.</string>
-    <string name="error_borrado_perfil">No se pudo borrar el perfil. Comprueba tu conexión e inténtalo de nuevo.</string>
 </resources>

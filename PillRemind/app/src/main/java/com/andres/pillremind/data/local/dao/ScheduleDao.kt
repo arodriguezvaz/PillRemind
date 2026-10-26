@@ -73,14 +73,4 @@ interface ScheduleDao {
      */
     @Query("SELECT * FROM schedules WHERE WeekDay = :day")
     fun getSchedulesByDay(day: WeekDay): Flow<List<ScheduleEntity>>
-
-    /**
-     * Devuelve todos los schedules pertenecientes a un usuario.
-     *
-     * @param usuarioId ID del usuario propietario.
-     * @return Lista con los schedules del usuario.
-     */
-    @Query("SELECT * FROM schedules WHERE medicationId IN (SELECT id FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId))")
-    suspend fun getAllByUsuario(usuarioId: Int): List<ScheduleEntity>
-
 }

@@ -11,7 +11,6 @@ import com.andres.pillremind.domain.model.Medication
 fun MedicationEntity.toDomain(): Medication = Medication(
     id = id,
     profileId = profileId,
-    supabaseId = supabaseId,
     name = name,
     dose = dose,
     unit = unit,
@@ -32,7 +31,6 @@ fun MedicationEntity.toDomain(): Medication = Medication(
 fun Medication.toEntity(): MedicationEntity = MedicationEntity(
     id = id,
     profileId = profileId,
-    supabaseId = supabaseId,
     name = name,
     dose = dose,
     unit = unit,

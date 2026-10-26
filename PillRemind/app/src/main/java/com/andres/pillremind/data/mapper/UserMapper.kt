@@ -10,29 +10,17 @@ import com.andres.pillremind.domain.model.User
  */
 fun UserEntity.toDomain(): User = User(
     id = id,
-    supabaseUid = supabaseUid,
-    tipoUsuario = tipoUsuario,
-    email = email,
-    esPremium = esPremium,
-    fechaPremium = fechaPremium,
-    syncPendiente = syncPendiente,
     createdAt = createdAt,
     updatedAt = updatedAt
 )
 
 /**
- * Convierte un objeto User en un objeto UserEntity compatiblecon la base de datos
+ * Convierte un objeto User en un objeto UserEntity compatible con la base de datos
  * @return UserEntity
  * @receiver User
  */
 fun User.toEntity(): UserEntity = UserEntity(
     id = id,
-    supabaseUid = supabaseUid,
-    tipoUsuario = tipoUsuario,
-    email = email,
-    esPremium = esPremium,
-    fechaPremium = fechaPremium,
-    syncPendiente = syncPendiente,
     createdAt = createdAt,
     updatedAt = updatedAt
 )

@@ -2,7 +2,6 @@ package com.andres.pillremind.data.local.converters
 
 import androidx.room.TypeConverter
 import com.andres.pillremind.domain.model.WeekDay
-import com.andres.pillremind.domain.model.TipoUsuario
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -21,17 +20,6 @@ class Converters {
     @TypeConverter
     fun toLocalDateTime(value: String?): LocalDateTime? {
         return value?.let { LocalDateTime.parse(it) }
-    }
-
-    // -------- TipoUsuario --------
-    @TypeConverter
-    fun fromTipoUsuario(tipo: TipoUsuario): String {
-        return tipo.name
-    }
-
-    @TypeConverter
-    fun toTipoUsuario(value: String): TipoUsuario {
-        return TipoUsuario.valueOf(value)
     }
 
     //-------LocalDate-----------

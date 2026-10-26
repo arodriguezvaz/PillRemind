@@ -57,15 +57,6 @@ interface MedicationDao {
     fun getMedications(profileId: Int): Flow<List<MedicationEntity>>
 
     /**
-     * Devuelve todos los medicamentos pertenecientes a un usuario.
-     *
-     * @param usuarioId ID del usuario propietario.
-     * @return Lista con los medicamentos del usuario.
-     */
-    @Query("SELECT * FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId)")
-    suspend fun getAllByUser(usuarioId: Int): List<MedicationEntity>
-
-    /**
      * Devuelve un medicamento por su ID en una consulta unica.
      *
      * @param id ID del medicamento.
@@ -73,12 +64,4 @@ interface MedicationDao {
      */
     @Query("SELECT * FROM medications WHERE id = :id")
     suspend fun getMedicationByIdOnce(id: Int): MedicationEntity?
-
-    /**
-     * Elimina todos los medicamentos de un usuario.
-     *
-     * @param usuarioId ID del usuario propietario.
-     */
-    @Query("DELETE FROM medications WHERE profileId IN (SELECT id FROM profiles WHERE usuarioId = :usuarioId)")
-    suspend fun deleteAllByUsuario(usuarioId: Int)
 }

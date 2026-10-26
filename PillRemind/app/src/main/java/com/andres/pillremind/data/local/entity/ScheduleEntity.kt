@@ -11,7 +11,6 @@ import java.time.LocalTime
  *
  * @property id Identificador unico del horario.
  * @property medicationId Identificador del medicamento propietario.
- * @property supabaseId Identificador remoto en Supabase (opcional).
  * @property weekDay Dia de la semana en el que se programa la toma.
  * @property time Hora a la que se debe tomar el medicamento.
  */
@@ -30,7 +29,6 @@ data class ScheduleEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val medicationId: Int,
-    val supabaseId: String? = null,
     val weekDay: WeekDay,
     val time: LocalTime
 )

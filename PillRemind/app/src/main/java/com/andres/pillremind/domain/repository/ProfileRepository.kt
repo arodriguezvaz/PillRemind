@@ -41,16 +41,4 @@ interface ProfileRepository {
      * @param id ID del perfil
      */
     suspend fun getProfileByIdOnce(id: Int): Profile?
-
-    /**
-     * Obtiene todos los perfiles de un usuario
-     * @param userId ID del usuario propietario
-     */
-    suspend fun getAllByUser(userId: Int): List<Profile>
-
-    /**
-     * Elimina todos los perfiles de un usuario
-     * @param usuarioId ID del usuario propietario
-     */
-    suspend fun deleteAllByUsuario(usuarioId: Int)
 }

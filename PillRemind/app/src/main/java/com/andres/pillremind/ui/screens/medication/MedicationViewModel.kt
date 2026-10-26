@@ -1,38 +1,30 @@
 package com.andres.pillremind.ui.screens.medication
 
-
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.andres.pillremind.R
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.data.utils.copyImageToInternalStorage
-import com.andres.pillremind.di.ApplicationScope
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
-import com.andres.pillremind.domain.repository.SyncRepository
-import com.andres.pillremind.domain.repository.UserRepository
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -57,42 +49,14 @@ class MedicationViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val reminderScheduler: ReminderScheduler,
     private val intakeRepository: IntakeRepository,
-    private val syncRepository: SyncRepository,
-    private val userRepository: UserRepository,
-    @ApplicationScope private val appScope: CoroutineScope,
     sessionManager: SessionManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
     //Recupera el profileId del sessionManager
     val profileId = sessionManager.activeProfileId
-    private val _snackbarMessage = MutableStateFlow<String?>(null)
-    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
-
-    /**
-     * Limpia el mensaje pendiente de mostrar en la snackbar.
-     */
-    fun clearSnackbarMessage() {
-        _snackbarMessage.value = null
-    }
-
 
     //Recupera el id del medicamento
     val medicationId = savedStateHandle.get<Int>("medicationId")
-
-
-    private fun syncSiEsPremium() {
-        appScope.launch {
-            val user = userRepository.getUser() ?: return@launch
-            if (user.esPremium && user.supabaseUid != null) {
-                syncRepository.syncMedicamentos()
-                    .onFailure { Log.e("Sync", "Error sync medicamentos: ${it.message}") }
-                syncRepository.syncSchedules()
-                    .onFailure { Log.e("Sync", "Error sync schedules: ${it.message}") }
-                syncRepository.syncIntakes()
-                    .onFailure { Log.e("Sync", "Error sync intakes: ${it.message}") }
-            }
-        }
-    }
 
     //Si el id no es null recupera la información del medicamento
     val medication: StateFlow<Medication?> = medicationId?.let { id ->
@@ -180,7 +144,6 @@ class MedicationViewModel @Inject constructor(
                 val intakes = reminderScheduler.generateWindow()
                 Log.d("PillDebug", "Intakes generadas: ${intakes.size}")
             }
-            syncSiEsPremium()
         }
     }
 
@@ -211,8 +174,6 @@ class MedicationViewModel @Inject constructor(
             val profileId = profileId.firstOrNull()
 
             if (profileId != null && medicationId != null) {
-                val medicamentoActual = medicationRepository.getMedicationByIdOnce(medicationId)
-
                 val updatedMedication = Medication(
                     id = medicationId,
                     name = trimmedName,
@@ -223,7 +184,6 @@ class MedicationViewModel @Inject constructor(
                     startDate = startDate,
                     endDate = endDate,
                     updatedAt = LocalDateTime.now(),
-                    supabaseId = medicamentoActual?.supabaseId,
                     isChronic = isChronic
                 )
 
@@ -247,46 +207,22 @@ class MedicationViewModel @Inject constructor(
                     }
                 }
                 reminderScheduler.generateWindow()
-
             }
-            syncSiEsPremium()
         }
     }
 
     /**
      * Elimina el medicamento y cancela las alarmas asociadas.
      *
-     * Si el medicamento existe también en Supabase, el borrado remoto se confirma
-     * antes de tocar los datos locales. Si falla, no se borra nada y se avisa al usuario.
-     *
      * @param medication Medicamento que se desea eliminar.
-     * @param onDeleted Callback ejecutado solo si el borrado se completó correctamente.
+     * @param onDeleted Callback ejecutado cuando el borrado se completa.
      */
     fun deleteMedication(medication: Medication, onDeleted: () -> Unit = {}) {
         viewModelScope.launch {
-            val supabaseId = medication.supabaseId
-            if (supabaseId != null) {
-                val remoteResult = withTimeoutOrNull(DELETE_TIMEOUT_MS) {
-                    syncRepository.deleteMedication(supabaseId)
-                }
-                if (remoteResult == null || remoteResult.isFailure) {
-                    Log.e("Sync", "Error borrando medicamento: ${remoteResult?.exceptionOrNull()}")
-                    _snackbarMessage.value =
-                        context.getString(R.string.error_borrado_medicamento)
-                    return@launch
-                }
-            }
-
             medication.imageUrl?.let { File(it).delete() }
             reminderScheduler.cancelFutureForMedication(medication.id)
             medicationRepository.deleteMedication(medication)
             onDeleted()
         }
     }
-
-    companion object {
-        /** Tiempo máximo de espera para confirmar un borrado remoto. */
-        private const val DELETE_TIMEOUT_MS = 10_000L
-    }
-
 }

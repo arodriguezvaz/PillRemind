@@ -12,7 +12,6 @@ import com.andres.pillremind.domain.model.Schedule
 fun ScheduleEntity.toDomain(): Schedule = Schedule(
     id = id,
     medicationId = medicationId,
-    supabaseId = supabaseId,
     weekDay = weekDay,
     time = time
 )
@@ -25,7 +24,6 @@ fun ScheduleEntity.toDomain(): Schedule = Schedule(
 fun Schedule.toEntity(): ScheduleEntity = ScheduleEntity(
     id = id,
     medicationId = medicationId,
-    supabaseId = supabaseId,
     weekDay = weekDay,
     time = time
 )

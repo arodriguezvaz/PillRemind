@@ -39,12 +39,4 @@ class MedicationRepositoryImpl @Inject constructor(private val medicationDao: Me
     override fun getMedications(profileId: Int): Flow<List<Medication>> {
         return medicationDao.getMedications(profileId).map { list -> list.map { it.toDomain() } }
     }
-
-    override suspend fun getAllByUser(userId: Int): List<Medication> {
-        return medicationDao.getAllByUser(userId).map { it.toDomain() }
-    }
-
-    override suspend fun deleteAllByUsuario(usuarioId: Int) {
-        return medicationDao.deleteAllByUsuario(usuarioId)
-    }
 }

@@ -1,6 +1,5 @@
 package com.andres.pillremind.ui.screens.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.projections.IntakeWithMedication
@@ -8,10 +7,7 @@ import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.IntakeRepository
-import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
-import com.andres.pillremind.domain.repository.SyncRepository
-import com.andres.pillremind.domain.repository.UserRepository
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -40,24 +36,13 @@ import java.time.LocalDateTime
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
-    private val medicationRepository: MedicationRepository,
     private val intakeRepository: IntakeRepository,
     private val sessionManager: SessionManager,
-    private val syncRepository: SyncRepository,
-    private val userRepository: UserRepository,
     private val reminderScheduler: ReminderScheduler
 ) : ViewModel() {
     init {
         viewModelScope.launch {
             reminderScheduler.generateWindow()
-        }
-    }
-
-    private suspend fun syncSiEsPremium() {
-        val user = userRepository.getUser() ?: return
-        if (user.esPremium && user.supabaseUid != null) {
-            syncRepository.syncIntakes()
-                .onFailure { Log.e("Sync", "Error sync intakes: ${it.message}") }
         }
     }
 
@@ -96,14 +81,11 @@ class HomeViewModel @Inject constructor(
             val updatedIntake = Intake(
                 id = intake.intakeId,
                 scheduleId = intake.scheduleId,
-                supabaseId = intake.supabaseId,
                 scheduledAt = intake.scheduledAt,
                 takenAt = nuevaTomadoHoy,
                 updatedAt = hoy
             )
             intakeRepository.updateIntake(updatedIntake)
-            syncSiEsPremium()
         }
     }
-
 }

@@ -5,12 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.ProfileRepository
-import com.andres.pillremind.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,20 +20,12 @@ import javax.inject.Inject
  *
  * @property repository Repositorio usado para obtener los perfiles.
  * @property sessionManager Gestor de sesión para obtener el perfil activo.
- * @property userRepository Repositorio usado para obtener el usuario actual.
  */
 @HiltViewModel
 class ProfilesViewModel @Inject constructor(
     private val repository: ProfileRepository,
-    private val sessionManager: SessionManager,
-    private val userRepository: UserRepository
+    private val sessionManager: SessionManager
 ) : ViewModel() {
-    private val _snackbarMessage = MutableStateFlow<String?>(null)
-    val snackbarMessage = _snackbarMessage.asStateFlow()
-
-    fun clearMessage() {
-        _snackbarMessage.value = null
-    }
 
     fun clearActiveProfile() {
         viewModelScope.launch {
@@ -53,22 +42,4 @@ class ProfilesViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
-
-    fun puedeCrearPerfil(onPuede: () -> Unit) {
-        viewModelScope.launch {
-            val user = userRepository.getUser() ?: return@launch
-            val limite = if (user.esPremium) 3 else 1
-            val perfilesActuales = perfiles.value
-
-            if (perfilesActuales.size >= limite) {
-                _snackbarMessage.value = if (user.esPremium)
-                    "Has alcanzado el límite de 3 perfiles para tu plan"
-                else
-                    "Con el plan gratuito solo puedes tener 1 perfil. Hazte premium para más"
-            } else {
-                onPuede()
-            }
-        }
-    }
-
 }

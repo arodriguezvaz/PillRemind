@@ -1,11 +1,8 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -22,15 +19,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        val properties = Properties()
-        properties.load(project.rootProject.file("local.properties").inputStream())
-        buildConfigField(
-            "String",
-            "SUPABASE_PUBLISHABLE_KEY",
-            "\"${properties.getProperty("SUPABASE_PUBLISHABLE_KEY")}\""
-        )
-        buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
     }
 
     buildTypes {
@@ -48,7 +36,6 @@ android {
     }
     buildFeatures {
         compose = true
-        buildConfig = true
     }
 }
 
@@ -81,14 +68,6 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
-    //SUPABASE
-    implementation(platform(libs.bom))
-    implementation(libs.postgrest.kt)
-    implementation(libs.auth.kt)
-    implementation(libs.storage.kt)
-    implementation(libs.ktor.client.android)
-    //SERIALIZACION
-    implementation(libs.kotlinx.serialization.json)
     //COIL
     implementation(libs.coil.compose)
     //TESTING

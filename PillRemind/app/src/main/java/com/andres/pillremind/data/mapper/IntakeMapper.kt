@@ -11,7 +11,6 @@ import com.andres.pillremind.domain.model.Intake
 fun IntakeEntity.toDomain(): Intake = Intake(
     id = id,
     scheduleId = scheduleId,
-    supabaseId = supabaseId,
     scheduledAt = scheduledAt,
     takenAt = takenAt,
     createdAt = createdAt,
@@ -26,7 +25,6 @@ fun IntakeEntity.toDomain(): Intake = Intake(
 fun Intake.toEntity(): IntakeEntity = IntakeEntity(
     id = id,
     scheduleId = scheduleId,
-    supabaseId = supabaseId,
     scheduledAt = scheduledAt,
     takenAt = takenAt,
     createdAt = createdAt,

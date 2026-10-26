@@ -35,15 +35,13 @@ import com.andres.pillremind.ui.screens.profile.ProfileScreen
  * solapamientos con otros componentes de la interfaz.
  * @param onTopBarChange Callback utilizado para actualizar el estado de la barra
  * superior según la pantalla mostrada.
- * @param onMessage Callback utilizado para mostrar mensajes al usuario en la snackbar.
  */
 @Composable
 fun MainNavigationGraph(
     navController: NavHostController,
     rootNavController: NavHostController,
     paddingValues: PaddingValues,
-    onTopBarChange: (TopBarState) -> Unit,
-    onMessage: (String) -> Unit = {}
+    onTopBarChange: (TopBarState) -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -80,10 +78,9 @@ fun MainNavigationGraph(
                     }
                 },
                 onTopBarChange = onTopBarChange,
-                onMessage = onMessage,
             )
         }
-        medicationNavGraph(navController, onTopBarChange, onMessage)
+        medicationNavGraph(navController, onTopBarChange)
     }
 }
 
@@ -102,12 +99,10 @@ fun MainNavigationGraph(
  * entre los destinos de este subgrafo.
  * @param onTopBarChange Callback utilizado para actualizar el estado de la
  * barra superior según la pantalla mostrada.
- * @param onMessage Callback utilizado para mostrar mensajes al usuario en la snackbar.
  */
 fun NavGraphBuilder.medicationNavGraph(
     navController: NavHostController,
-    onTopBarChange: (TopBarState) -> Unit,
-    onMessage: (String) -> Unit = {}
+    onTopBarChange: (TopBarState) -> Unit
 ) {
     navigation(
         route = Graph.MEDICATION,
@@ -127,7 +122,6 @@ fun NavGraphBuilder.medicationNavGraph(
                     navController.popBackStack()
                 },
                 onTopBarChange = onTopBarChange,
-                onMessage = onMessage,
             )
         }
         composable(route = MedicationScreens.MedicationCreateScreen.route) {

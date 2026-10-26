@@ -42,16 +42,4 @@ interface MedicationRepository {
      * @param profileId ID del perfil
      */
     fun getMedications(profileId: Int): Flow<List<Medication>>
-
-    /**
-     * Obtiene todos los medicamentos de un usuario
-     * @param userId ID del usuario propietario
-     */
-    suspend fun getAllByUser(userId: Int): List<Medication>
-
-    /**
-     * Elimina todos los medicamentos de un usuario
-     * @param usuarioId ID del usuario propietario
-     */
-    suspend fun deleteAllByUsuario(usuarioId: Int)
 }

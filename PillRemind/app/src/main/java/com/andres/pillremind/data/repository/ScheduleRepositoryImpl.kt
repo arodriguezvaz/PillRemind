@@ -40,9 +40,4 @@ class ScheduleRepositoryImpl @Inject constructor(
     override suspend fun getScheduleByIdOnce(scheduleId: Int): Schedule? {
         return scheduleDao.getScheduleById(scheduleId)?.toDomain()
     }
-
-    override suspend fun getAllByUser(userId: Int): List<Schedule> {
-        return scheduleDao.getAllByUsuario(userId).map { it.toDomain() }
-    }
-
 }

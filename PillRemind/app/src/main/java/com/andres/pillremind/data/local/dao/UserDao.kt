@@ -1,15 +1,12 @@
 package com.andres.pillremind.data.local.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Update
 import com.andres.pillremind.data.local.entity.UserEntity
-import kotlinx.coroutines.flow.Flow
 
 /**
- * DAO para acceder a los datos de usuario en la base de datos local.
+ * DAO para acceder a los datos del usuario local en la base de datos.
  */
 @Dao
 interface UserDao {
@@ -23,34 +20,10 @@ interface UserDao {
     suspend fun insertUser(user: UserEntity): Long
 
     /**
-     * Actualiza un usuario existente.
-     *
-     * @param user Entidad del usuario con los cambios.
-     */
-    @Update
-    suspend fun updateUser(user: UserEntity)
-
-    /**
-     * Elimina un usuario existente.
-     *
-     * @param user Entidad del usuario a eliminar.
-     */
-    @Delete
-    suspend fun deleteUser(user: UserEntity)
-
-    /**
      * Devuelve el usuario local, si existe.
      *
      * @return Usuario encontrado o null si no hay registros.
      */
     @Query("SELECT * FROM usuarios LIMIT 1")
     suspend fun getUser(): UserEntity?
-
-    /**
-     * Observa el usuario local, si existe.
-     *
-     * @return Flow con el usuario o null si no hay registros.
-     */
-    @Query("SELECT * FROM usuarios LIMIT 1")
-    fun getUserFlow(): Flow<UserEntity?>
 }

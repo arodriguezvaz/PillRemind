@@ -10,7 +10,6 @@ import java.time.LocalDateTime
  *
  * @property id Identificador unico del perfil.
  * @property usuarioId Identificador del usuario propietario.
- * @property supabaseId Identificador remoto en Supabase (opcional).
  * @property name Nombre del perfil.
  * @property imageUrl URL de la imagen del perfil (opcional).
  * @property createdAt Fecha de creacion del registro.
@@ -31,7 +30,6 @@ data class ProfileEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val usuarioId: Int,
-    val supabaseId: String? = null,
     val name: String,
     val imageUrl: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),

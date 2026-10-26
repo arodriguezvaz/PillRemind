@@ -56,15 +56,6 @@ interface ProfileDao {
     fun getProfileById(id: Int?): Flow<ProfileEntity?>
 
     /**
-     * Devuelve todos los perfiles pertenecientes a un usuario.
-     *
-     * @param usuarioId ID del usuario propietario.
-     * @return Lista con los perfiles del usuario.
-     */
-    @Query("SELECT * FROM profiles WHERE usuarioId = :usuarioId")
-    suspend fun getAllByUsuario(usuarioId: Int): List<ProfileEntity>
-
-    /**
      * Devuelve un perfil por su ID en una consulta unica.
      *
      * @param id ID del perfil.
@@ -72,12 +63,4 @@ interface ProfileDao {
      */
     @Query("SELECT * FROM profiles WHERE id = :id")
     suspend fun getProfileByIdOnce(id: Int?): ProfileEntity?
-
-    /**
-     * Elimina todos los perfiles de un usuario.
-     *
-     * @param usuarioId ID del usuario propietario.
-     */
-    @Query("DELETE FROM profiles WHERE usuarioId = :usuarioId")
-    suspend fun deleteAllByUsuario(usuarioId: Int)
 }
