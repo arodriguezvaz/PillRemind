@@ -38,12 +38,17 @@ class IntakeRepositoryImpl @Inject constructor(
             // Para cada horario, obtiene el medicamento asociado y genera la toma únicamente si el medicamento está activo en la fecha actual
             for (horario in horarios) {
                 val med = medicationDao.getMedicationById(horario.medicationId).first() ?: continue
+                if (med.deletedAt != null) continue
                 if (med.startDate > dia) continue
                 if (med.endDate != null && med.endDate < dia) continue
 
                 tomasAInsertar += Intake(
+                    medicationId = med.id,
                     scheduleId = horario.id,
                     scheduledAt = LocalDateTime.of(dia, horario.time),
+                    medicationNameSnapshot = med.name,
+                    doseSnapshot = med.dose,
+                    unitSnapshot = med.unit
                 )
             }
             dia = dia.plusDays(1)
@@ -56,28 +61,17 @@ class IntakeRepositoryImpl @Inject constructor(
         val existentes = intakeDao.getIntakesBetween(
             desde.atStartOfDay(),
             hasta.atTime(LocalTime.MAX)
-        ).associateBy { it.scheduleId to it.scheduledAt }
+        ).associateBy { it.medicationId to it.scheduledAt }
 
         return tomasAInsertar.mapIndexed { index, intake ->
-            val id = existentes[intake.scheduleId to intake.scheduledAt]?.id
+            val id = existentes[intake.medicationId to intake.scheduledAt]?.id
                 ?: ids[index].toInt()
             intake.copy(id = id)
         }
     }
 
-    override suspend fun insertIntake(intake: Intake): Long {
-        return intakeDao.insertIntake(intake.toEntity())
-    }
-
-    /**
-     *
-     */
-    override suspend fun deleteIntake(intake: Intake) {
-        intakeDao.deleteIntake(intake.toEntity())
-    }
-
-    override suspend fun updateIntake(intake: Intake) {
-        intakeDao.updateIntake(intake.toEntity())
+    override suspend fun markTaken(intakeId: Int, takenAt: LocalDateTime?) {
+        intakeDao.markTaken(intakeId, takenAt, LocalDateTime.now())
     }
 
     override suspend fun getIntakeById(intakeId: Int): Intake? {

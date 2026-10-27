@@ -10,9 +10,13 @@ import com.andres.pillremind.domain.model.Intake
  */
 fun IntakeEntity.toDomain(): Intake = Intake(
     id = id,
+    medicationId = medicationId,
     scheduleId = scheduleId,
     scheduledAt = scheduledAt,
     takenAt = takenAt,
+    medicationNameSnapshot = medicationNameSnapshot,
+    doseSnapshot = doseSnapshot,
+    unitSnapshot = unitSnapshot,
     createdAt = createdAt,
     updatedAt = updatedAt
 )
@@ -24,9 +28,13 @@ fun IntakeEntity.toDomain(): Intake = Intake(
  */
 fun Intake.toEntity(): IntakeEntity = IntakeEntity(
     id = id,
+    medicationId = medicationId,
     scheduleId = scheduleId,
     scheduledAt = scheduledAt,
     takenAt = takenAt,
+    medicationNameSnapshot = medicationNameSnapshot,
+    doseSnapshot = doseSnapshot,
+    unitSnapshot = unitSnapshot,
     createdAt = createdAt,
     updatedAt = updatedAt
 )

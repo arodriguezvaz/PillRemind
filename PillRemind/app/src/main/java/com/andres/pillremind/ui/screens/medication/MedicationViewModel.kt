@@ -87,8 +87,8 @@ class MedicationViewModel @Inject constructor(
     /**
      * Crea un nuevo medicamento con sus horarios y programa las alarmas.
      *
-     * Valida campos básicos y, si existe un perfil activo, inserta la medicación,
-     * crea los schedules y programa las alarmas correspondientes.
+     * La inserción del medicamento y de sus horarios se hace en una sola
+     * transacción. La generación de tomas y alarmas se hace después del commit.
      *
      * @param onSaved Callback ejecutado cuando la medicación y sus tomas ya están guardadas.
      */
@@ -112,47 +112,41 @@ class MedicationViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val profileId = profileId.firstOrNull()
-            if (profileId != null) {
-                val medicationId = medicationRepository.insertMedication(
-                    Medication(
-                        name = trimmedName,
-                        profileId = profileId,
-                        imageUrl = imagePath,
-                        dose = dose,
-                        unit = normalizedUnit,
-                        startDate = startDate,
-                        endDate = endDate,
-                        isChronic = isChronic
-                    )
-                )
-                Log.d("PillDebug", "Medicamento creado con id: $medicationId")
+            val profileId = profileId.firstOrNull() ?: return@launch
+            val medication = Medication(
+                name = trimmedName,
+                profileId = profileId,
+                imageUrl = imagePath,
+                dose = dose,
+                unit = normalizedUnit,
+                startDate = startDate,
+                endDate = endDate,
+                isChronic = isChronic
+            )
+            val newSchedules = buildSchedules(weekDays, times, medicationId = 0)
 
-                for (day in weekDays) {
-                    for (time in times) {
-                        scheduleRepository.insertSchedule(
-                            Schedule(
-                                medicationId = medicationId.toInt(),
-                                weekDay = day,
-                                time = time,
-                            )
-                        ).toInt()
-                    }
+            val saved = runCatching {
+                medicationRepository.insertMedicationWithSchedules(medication, newSchedules)
+            }.onFailure {
+                Log.e("PillDebug", "No se pudo guardar el medicamento", it)
+            }.isSuccess
+
+            if (!saved) return@launch
+
+            runCatching { reminderScheduler.generateWindow() }
+                .onFailure {
+                    Log.e("PillDebug", "No se pudieron generar las tomas al crear", it)
                 }
-                Log.d(
-                    "PillDebug",
-                    "Generando ventana rodante de ${ReminderScheduler.WINDOW_DAYS} días"
-                )
-
-                val intakes = reminderScheduler.generateWindow()
-                Log.d("PillDebug", "Intakes generadas: ${intakes.size}")
-            }
             onSaved()
         }
     }
 
     /**
      * Actualiza un medicamento existente y reemplaza sus horarios.
+     *
+     * Primero se guardan los IDs de las tomas futuras para poder cancelar sus
+     * alarmas. Después se actualiza la base de datos en una transacción y, solo
+     * si el commit va bien, se cancelan las alarmas antiguas y se regeneran.
      *
      * @param onSaved Callback ejecutado cuando la actualización y la generación
      * de tomas ya han terminado.
@@ -179,59 +173,90 @@ class MedicationViewModel @Inject constructor(
             currentImagePath
         }
         viewModelScope.launch {
-            val profileId = profileId.firstOrNull()
+            val id = medicationId ?: return@launch
+            val currentMedication = medicationRepository.getMedicationByIdOnce(id) ?: return@launch
+            val now = LocalDateTime.now()
+            val futureIntakeIds = intakeRepository
+                .getFutureIntakesByMedicationId(id, now)
+                .map { it.id }
 
-            if (profileId != null && medicationId != null) {
-                val updatedMedication = Medication(
-                    id = medicationId,
-                    name = trimmedName,
-                    profileId = profileId,
-                    imageUrl = imagePath,
-                    dose = dose,
-                    unit = normalizedUnit,
-                    startDate = startDate,
-                    endDate = endDate,
-                    updatedAt = LocalDateTime.now(),
-                    isChronic = isChronic
+            val updatedMedication = currentMedication.copy(
+                name = trimmedName,
+                imageUrl = imagePath,
+                dose = dose,
+                unit = normalizedUnit,
+                startDate = startDate,
+                endDate = endDate,
+                isChronic = isChronic,
+                updatedAt = now
+            )
+            val newSchedules = buildSchedules(weekDays, times, medicationId = id)
+
+            val saved = runCatching {
+                medicationRepository.updateMedicationWithSchedules(
+                    medication = updatedMedication,
+                    schedules = newSchedules,
+                    deleteFutureFrom = now
                 )
+            }.onFailure {
+                Log.e("PillDebug", "No se pudo actualizar el medicamento", it)
+            }.isSuccess
 
-                medicationRepository.updateMedication(updatedMedication)
-                reminderScheduler.cancelFutureForMedication(medicationId)
-                intakeRepository.deleteFutureIntakesByMedicationId(
-                    medicationId,
-                    LocalDateTime.now()
-                )
+            if (!saved) return@launch
 
-                scheduleRepository.deleteByMedicationId(medicationId)
-                for (day in weekDays) {
-                    for (time in times) {
-                        scheduleRepository.insertSchedule(
-                            Schedule(
-                                medicationId = medicationId,
-                                weekDay = day,
-                                time = time
-                            )
-                        )
-                    }
+            reminderScheduler.cancelAlarms(futureIntakeIds)
+            runCatching { reminderScheduler.generateWindow() }
+                .onFailure {
+                    Log.e("PillDebug", "No se pudieron regenerar las tomas al editar", it)
                 }
-                reminderScheduler.generateWindow()
-            }
             onSaved()
         }
     }
 
     /**
-     * Elimina el medicamento y cancela las alarmas asociadas.
+     * Archiva el medicamento y cancela sus alarmas futuras.
      *
-     * @param medication Medicamento que se desea eliminar.
-     * @param onDeleted Callback ejecutado cuando el borrado se completa.
+     * No se borra el historial de tomas ni la imagen, para poder conservar
+     * las estadísticas y el historial.
+     *
+     * @param medication Medicamento que se desea archivar.
+     * @param onArchived Callback ejecutado cuando el archivado se completa.
      */
-    fun deleteMedication(medication: Medication, onDeleted: () -> Unit = {}) {
+    fun archiveMedication(medication: Medication, onArchived: () -> Unit = {}) {
         viewModelScope.launch {
-            medication.imageUrl?.let { File(it).delete() }
-            reminderScheduler.cancelFutureForMedication(medication.id)
-            medicationRepository.deleteMedication(medication)
-            onDeleted()
+            val now = LocalDateTime.now()
+            val futureIntakeIds = intakeRepository
+                .getFutureIntakesByMedicationId(medication.id, now)
+                .map { it.id }
+
+            val archived = runCatching {
+                medicationRepository.softDeleteMedication(
+                    medicationId = medication.id,
+                    deletedAt = now,
+                    deleteFutureFrom = now
+                )
+            }.onFailure {
+                Log.e("PillDebug", "No se pudo archivar el medicamento", it)
+            }.isSuccess
+
+            if (!archived) return@launch
+
+            reminderScheduler.cancelAlarms(futureIntakeIds)
+            onArchived()
+        }
+    }
+
+    private fun buildSchedules(
+        weekDays: Set<WeekDay>,
+        times: List<LocalTime>,
+        medicationId: Int
+    ): List<Schedule> = weekDays.flatMap { day ->
+        times.map { time ->
+            Schedule(
+                medicationId = medicationId,
+                weekDay = day,
+                time = time
+            )
         }
     }
 }

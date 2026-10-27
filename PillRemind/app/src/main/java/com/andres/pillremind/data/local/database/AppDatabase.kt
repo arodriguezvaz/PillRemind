@@ -26,7 +26,7 @@ import com.andres.pillremind.data.local.entity.UserEntity
         ScheduleEntity::class,
         IntakeEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

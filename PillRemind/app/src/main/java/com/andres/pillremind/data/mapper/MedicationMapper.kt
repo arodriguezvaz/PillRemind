@@ -20,7 +20,8 @@ fun MedicationEntity.toDomain(): Medication = Medication(
     imageUrl = imageUrl,
     leafletUrl = leafletUrl,
     createdAt = createdAt,
-    updatedAt = updatedAt
+    updatedAt = updatedAt,
+    deletedAt = deletedAt
 )
 
 /**
@@ -40,5 +41,6 @@ fun Medication.toEntity(): MedicationEntity = MedicationEntity(
     imageUrl = imageUrl,
     leafletUrl = leafletUrl,
     createdAt = createdAt,
-    updatedAt = updatedAt
+    updatedAt = updatedAt,
+    deletedAt = deletedAt
 )

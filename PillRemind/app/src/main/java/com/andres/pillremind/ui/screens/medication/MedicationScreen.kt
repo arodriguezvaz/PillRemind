@@ -71,14 +71,14 @@ sealed class MedicationMode {
  * @param modifier Modificador opcional para la pantalla.
  * @param onSaveClicked Callback llamado tras guardar la medicación.
  * @param medicationMode Modo inicial de la pantalla (por defecto `Create`).
- * @param onDeleteClicked Callback llamado tras eliminar la medicación.
+ * @param onArchivedClicked Callback llamado tras archivar la medicación.
  */
 @Composable
 fun MedicationScreen(
     modifier: Modifier = Modifier,
     onSaveClicked: () -> Unit = {},
     medicationMode: MedicationMode = MedicationMode.Create,
-    onDeleteClicked: () -> Unit = {},
+    onArchivedClicked: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
     medicationViewModel: MedicationViewModel = hiltViewModel()
 ) {
@@ -165,7 +165,7 @@ fun MedicationScreen(
     var currentMode by remember { mutableStateOf(medicationMode) }
 
     //Variable que si es true muestra el diálogo de eliminación
-    var showDeleteDialog by remember {
+    var showArchiveDialog by remember {
         mutableStateOf(false)
     }
 
@@ -465,12 +465,12 @@ fun MedicationScreen(
                     )
                 }
                 Row(modifier.fillMaxWidth()) {
-                    //ELIMINAR
+                    //ARCHIVAR
                     AppButton(
                         onClick = {
-                            showDeleteDialog = true
+                            showArchiveDialog = true
                         },
-                        text = stringResource(R.string.eliminar),
+                        text = "Archivar",
                         size = ButtonSize.Medium,
                         variant = ButtonVariant.Danger,
                         modifier = Modifier.weight(1f)
@@ -631,12 +631,12 @@ fun MedicationScreen(
                     )
                 }
                 Row(modifier.fillMaxWidth()) {
-                    //ELIMINAR
+                    //ARCHIVAR
                     AppButton(
                         onClick = {
-                            showDeleteDialog = true
+                            showArchiveDialog = true
                         },
-                        text = stringResource(R.string.eliminar),
+                        text = "Archivar",
                         size = ButtonSize.Medium,
                         variant = ButtonVariant.Danger,
                         modifier = Modifier.weight(1f)
@@ -655,24 +655,27 @@ fun MedicationScreen(
             }
         }
     }
-    if (showDeleteDialog) {
+    if (showArchiveDialog) {
         AlertDialog(
             onDismissRequest = {
-                showDeleteDialog = false
+                showArchiveDialog = false
             },
             title = {
-                Text("Eliminar medicamento")
+                Text("Archivar medicamento")
             },
             text = {
-                Text("¿Seguro que quieres eliminar este medicamento?")
+                Text(
+                    "Dejará de aparecer en la lista y no generará recordatorios. " +
+                        "Se conservará el historial de tomas."
+                )
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        showDeleteDialog = false
+                        showArchiveDialog = false
                         medication?.let {
-                            medicationViewModel.deleteMedication(it) {
-                                onDeleteClicked()
+                            medicationViewModel.archiveMedication(it) {
+                                onArchivedClicked()
                             }
                         }
                     },
@@ -680,13 +683,13 @@ fun MedicationScreen(
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Eliminar")
+                    Text("Archivar")
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = {
-                        showDeleteDialog = false
+                        showArchiveDialog = false
                     }
                 ) {
                     Text("Cancelar")

@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.andres.pillremind.data.local.entity.MedicationEntity
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDateTime
 
 /**
  * DAO para gestionar medicamentos en la base de datos local.
@@ -48,13 +49,23 @@ interface MedicationDao {
     fun getMedicationById(id: Int?): Flow<MedicationEntity?>
 
     /**
-     * Observa los medicamentos de un perfil.
+     * Observa los medicamentos activos de un perfil.
      *
      * @param profileId ID del perfil propietario.
-     * @return Flow con la lista de medicamentos del perfil.
+     * @return Flow con la lista de medicamentos no archivados.
      */
-    @Query("SELECT * FROM medications WHERE profileId = :profileId")
+    @Query("SELECT * FROM medications WHERE profileId = :profileId AND deletedAt IS NULL")
     fun getMedications(profileId: Int): Flow<List<MedicationEntity>>
+
+    /**
+     * Marca un medicamento como archivado sin borrar su historial.
+     */
+    @Query("UPDATE medications SET deletedAt = :deletedAt, updatedAt = :updatedAt WHERE id = :medicationId")
+    suspend fun markDeleted(
+        medicationId: Int,
+        deletedAt: LocalDateTime,
+        updatedAt: LocalDateTime
+    )
 
     /**
      * Devuelve un medicamento por su ID en una consulta unica.

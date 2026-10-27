@@ -11,19 +11,9 @@ import java.time.LocalDateTime
  */
 interface IntakeRepository {
     /**
-     * Inserta una toma de medicación en la base de datos
+     * Marca una toma como tomada o pendiente sin modificar sus snapshots.
      */
-    suspend fun insertIntake(intake: Intake): Long
-
-    /**
-     * Elimina una toma de medicación de la base de datos
-     */
-    suspend fun deleteIntake(intake: Intake)
-
-    /**
-     * Actualiza una toma de medicación en la base de datos
-     */
-    suspend fun updateIntake(intake: Intake)
+    suspend fun markTaken(intakeId: Int, takenAt: LocalDateTime?)
 
     /**
      * Obtiene una toma de medicación de la base de datos

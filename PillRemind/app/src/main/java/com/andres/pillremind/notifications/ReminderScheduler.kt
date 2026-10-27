@@ -107,6 +107,18 @@ class ReminderScheduler @Inject constructor(
     }
 
     /**
+     * Cancela las alarmas asociadas a una lista de tomas.
+     *
+     * Se usa cuando ya se han guardado los IDs de las tomas futuras que van a
+     * desaparecer y la transacción de base de datos ha terminado bien.
+     *
+     * @param intakeIds IDs de las tomas cuyas alarmas se cancelan.
+     */
+    fun cancelAlarms(intakeIds: List<Int>) {
+        intakeIds.forEach { intakeId -> alarmScheduler.cancel(intakeId) }
+    }
+
+    /**
      * Cancela las alarmas de las tomas futuras de un medicamento.
      *
      * @param medicationId Medicamento cuyas alarmas se cancelan.

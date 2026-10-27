@@ -21,6 +21,7 @@ import java.time.LocalDateTime
  * @property leafletUrl URL del prospecto del medicamento (opcional).
  * @property createdAt Fecha de creacion del registro.
  * @property updatedAt Fecha de ultima actualizacion del registro.
+ * @property deletedAt Fecha de archivo del medicamento; null si sigue activo.
  */
 @Entity(
     tableName = "medications",
@@ -46,5 +47,6 @@ data class MedicationEntity(
     val imageUrl: String? = null,
     val leafletUrl: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: LocalDateTime = LocalDateTime.now(),
+    val deletedAt: LocalDateTime? = null
 )

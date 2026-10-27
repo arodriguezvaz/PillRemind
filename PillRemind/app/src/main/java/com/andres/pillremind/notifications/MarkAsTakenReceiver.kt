@@ -35,14 +35,9 @@ class MarkAsTakenReceiver : BroadcastReceiver() {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                // Actualiza únicamente takenAt para no tocar los snapshots de la toma.
+                intakeRepository.markTaken(intakeId, LocalDateTime.now())
 
-                // Obtiene la toma desde la base de datos. Si ya no existe (por ejemplo,
-                // porque se borró el medicamento), solo se retira la notificación.
-                val intake = intakeRepository.getIntakeById(intakeId)
-                if (intake != null) {
-                    // Marca la toma como realizada actualizando la fecha de realización
-                    intakeRepository.updateIntake(intake.copy(takenAt = LocalDateTime.now()))
-                }
                 // Elimina la notificación una vez marcada como tomada
                 NotificationManagerCompat.from(context).cancel(intakeId)
             } catch (e: Exception) {

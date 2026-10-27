@@ -17,6 +17,7 @@ import java.time.LocalDateTime
  * @property leafletUrl URL del prospecto del medicamento
  * @property createdAt Fecha de creación del medicamento
  * @property updatedAt Fecha de última actualización del medicamento
+ * @property deletedAt Fecha en la que se archivó el medicamento; null si está activo
  */
 data class Medication(
     val id: Int = 0,
@@ -30,5 +31,6 @@ data class Medication(
     val imageUrl: String? = null,
     val leafletUrl: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now(),
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: LocalDateTime = LocalDateTime.now(),
+    val deletedAt: LocalDateTime? = null
 )

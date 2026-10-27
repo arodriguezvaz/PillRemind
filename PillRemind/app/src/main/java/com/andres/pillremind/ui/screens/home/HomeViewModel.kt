@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.projections.IntakeWithMedication
 import com.andres.pillremind.data.local.session.SessionManager
-import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
@@ -77,14 +76,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val hoy = LocalDateTime.now()
             val nuevaTomadoHoy = if (intake.takenAt == null) hoy else null
-            val updatedIntake = Intake(
-                id = intake.intakeId,
-                scheduleId = intake.scheduleId,
-                scheduledAt = intake.scheduledAt,
-                takenAt = nuevaTomadoHoy,
-                updatedAt = hoy
-            )
-            intakeRepository.updateIntake(updatedIntake)
+            intakeRepository.markTaken(intake.intakeId, nuevaTomadoHoy)
         }
     }
 }

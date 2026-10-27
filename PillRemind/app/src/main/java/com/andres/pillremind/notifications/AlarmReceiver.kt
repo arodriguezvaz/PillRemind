@@ -17,7 +17,6 @@ import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
-import com.andres.pillremind.domain.repository.ScheduleRepository
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -34,9 +33,6 @@ import kotlinx.coroutines.launch
  */
 @AndroidEntryPoint
 class AlarmReceiver : BroadcastReceiver() {
-
-    @Inject
-    lateinit var scheduleRepository: ScheduleRepository
 
     @Inject
     lateinit var medicationRepository: MedicationRepository
@@ -71,19 +67,17 @@ class AlarmReceiver : BroadcastReceiver() {
 
                 // Si la toma ya no existe o ya fue registrada, no se muestra el aviso.
                 if (intake != null && intake.takenAt == null) {
-                    val schedule = scheduleRepository.getScheduleByIdOnce(intake.scheduleId)
                     // Recupera el medicamento y el perfil asociados a la toma programada.
                     // Si alguno de ellos no existe, se omite la notificación para evitar
                     // mostrar información incompleta.
-                    val medication = schedule?.let {
-                        medicationRepository.getMedicationByIdOnce(it.medicationId)
-                    }
+                    val medication = medicationRepository.getMedicationByIdOnce(intake.medicationId)
                     val profile = medication?.let {
                         profileRepository.getProfileByIdOnce(it.profileId)
                     }
 
-                    // Muestra la notificación únicamente si el permiso ha sido concedido.
-                    if (medication != null && profile != null &&
+                    // Muestra la notificación únicamente si el medicamento sigue
+                    // activo, el perfil existe y el permiso ha sido concedido.
+                    if (medication != null && medication.deletedAt == null && profile != null &&
                         ContextCompat.checkSelfPermission(
                             context,
                             Manifest.permission.POST_NOTIFICATIONS

@@ -6,11 +6,15 @@ import java.time.LocalDateTime
  * Proyección utilizada para mostrar una toma junto con la información
  * del medicamento y del perfil al que pertenece.
  *
+ * Los campos de nombre, dosis y unidad se leen de los snapshots guardados
+ * en la toma para que el historial no cambie al editar el medicamento.
+ *
  * @property intakeId Identificador local de la toma.
+ * @property medicationId Identificador del medicamento propietario.
  * @property scheduledAt Fecha y hora programadas para la toma.
- * @property scheduleId Identificador de la programación asociada.
+ * @property scheduleId Identificador del horario asociado, si todavía existe.
  * @property takenAt Fecha y hora en la que se registró la toma. Es null si aún no se ha tomado.
- * @property medicationName Nombre del medicamento.
+ * @property medicationName Nombre del medicamento en el momento de crear la toma.
  * @property dose Cantidad que debe administrarse en cada toma.
  * @property unit Unidad de medida de la dosis (mg, ml, comprimidos, etc.).
  * @property imageUrl URL de la imagen del medicamento. Puede ser null.
@@ -18,8 +22,9 @@ import java.time.LocalDateTime
  */
 data class IntakeWithMedication(
     val intakeId: Int,
+    val medicationId: Int,
     val scheduledAt: LocalDateTime,
-    val scheduleId: Int,
+    val scheduleId: Int?,
     val takenAt: LocalDateTime?,
     val medicationName: String,
     val dose: Double,

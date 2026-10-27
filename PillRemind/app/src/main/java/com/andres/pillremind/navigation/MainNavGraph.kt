@@ -118,7 +118,7 @@ fun NavGraphBuilder.medicationNavGraph(
             backStackEntry.arguments?.getInt("medicationId")
             MedicationScreen(
                 medicationMode = MedicationMode.View,
-                onDeleteClicked = {
+                onArchivedClicked = {
                     navController.popBackStack()
                 },
                 onTopBarChange = onTopBarChange,
