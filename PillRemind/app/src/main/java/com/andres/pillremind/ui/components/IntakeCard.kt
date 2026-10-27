@@ -27,8 +27,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.andres.pillremind.R
-import com.andres.pillremind.data.local.projections.IntakeVisualState
-import com.andres.pillremind.data.local.projections.IntakeWithMedication
+import com.andres.pillremind.domain.model.IntakeVisualState
+import com.andres.pillremind.domain.model.IntakeWithMedication
 import java.time.format.DateTimeFormatter
 
 /**

@@ -2,8 +2,8 @@ package com.andres.pillremind.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.andres.pillremind.data.local.projections.IntakeWithMedication
 import com.andres.pillremind.data.local.session.SessionManager
+import com.andres.pillremind.domain.model.IntakeWithMedication
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.ProfileRepository

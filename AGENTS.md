@@ -40,6 +40,7 @@ cd PillRemind
 ## Architecture
 
 - Layers: `domain/model` + `domain/repository` interfaces; `data/local` (Room entities/DAOs/relations/converters plus DataStore `SessionManager`), `data/mapper`, `data/repository` implementations; `ui/screens/<feature>` Screen+ViewModel pairs; `ui/components`; `di` Hilt modules; `navigation` nested graphs; `notifications` alarm/worker pipeline.
+- Keep `domain` pure Kotlin: no Android resources, no `data.*` imports. UI labels for domain enums belong to `ui/components` (for example, `WeekDayLabels.kt`).
 - The app is local-only: there is no authentication, remote database, sync layer, or network permission. Do not reintroduce Supabase or account fields.
 - New repository: interface in `domain/repository`, implementation in `data/repository`, binding in `di/RepositoryModule`. New entity/DAO: register in `AppDatabase` and provide it through `DatabaseModule`. ViewModels use `@HiltViewModel` and screens obtain them with `hiltViewModel()`.
 - Room is version 3 with `exportSchema = false` and `fallbackToDestructiveMigration(dropAllTables = true)`. No migrations exist; bump `AppDatabase.version` for any schema change and expect local data loss.

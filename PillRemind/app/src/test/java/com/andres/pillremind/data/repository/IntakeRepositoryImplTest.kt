@@ -6,12 +6,14 @@ import com.andres.pillremind.data.local.dao.ScheduleDao
 import com.andres.pillremind.data.local.entity.IntakeEntity
 import com.andres.pillremind.data.local.entity.MedicationEntity
 import com.andres.pillremind.data.local.entity.ScheduleEntity
+import com.andres.pillremind.data.local.projections.IntakeWithMedicationRow
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.WeekDay
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -174,5 +176,33 @@ class IntakeRepositoryImplTest {
         repository.markTaken(99, null)
 
         coVerify(exactly = 1) { intakeDao.markTaken(99, null, any()) }
+    }
+
+    @Test
+    fun `getIntakesForToday mapea la proyeccion de Room al dominio`() = runTest {
+        every { intakeDao.getIntakesForToday(any(), any(), any()) } returns flowOf(
+            listOf(
+                IntakeWithMedicationRow(
+                    intakeId = 99,
+                    medicationId = 20,
+                    scheduledAt = scheduledAt,
+                    scheduleId = 10,
+                    takenAt = null,
+                    medicationName = "Ibuprofeno",
+                    dose = 600.0,
+                    unit = "mg",
+                    imageUrl = null,
+                    profileName = "Andres"
+                )
+            )
+        )
+
+        val result = repository.getIntakesForToday(date, 1).first()
+
+        assertEquals(1, result.size)
+        assertEquals(99, result.single().intakeId)
+        assertEquals(20, result.single().medicationId)
+        assertEquals("Ibuprofeno", result.single().medicationName)
+        assertEquals("Andres", result.single().profileName)
     }
 }

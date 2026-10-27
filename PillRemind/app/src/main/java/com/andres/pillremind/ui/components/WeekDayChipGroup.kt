@@ -56,7 +56,7 @@ fun WeekDayChipGroup(
                     onSelectionChange(newSelection)
                 },
                 label = {
-                    Text(text = stringResource(id = day.shortName))
+                    Text(text = stringResource(id = day.shortNameRes()))
                 },
                 enabled = enabled,
                 colors = FilterChipDefaults.filterChipColors(

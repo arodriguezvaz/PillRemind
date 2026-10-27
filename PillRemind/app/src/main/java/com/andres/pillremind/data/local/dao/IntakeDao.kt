@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.andres.pillremind.data.local.entity.IntakeEntity
-import com.andres.pillremind.data.local.projections.IntakeWithMedication
+import com.andres.pillremind.data.local.projections.IntakeWithMedicationRow
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 
@@ -89,7 +89,7 @@ interface IntakeDao {
         startOfDay: LocalDateTime,
         endOfDay: LocalDateTime,
         profileId: Int
-    ): Flow<List<IntakeWithMedication>>
+    ): Flow<List<IntakeWithMedicationRow>>
 
     /**
      * Devuelve las tomas futuras de un medicamento desde una fecha.

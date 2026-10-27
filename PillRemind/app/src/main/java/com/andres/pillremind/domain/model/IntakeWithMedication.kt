@@ -1,12 +1,12 @@
-package com.andres.pillremind.data.local.projections
+package com.andres.pillremind.domain.model
 
 import java.time.LocalDateTime
 
 /**
- * Proyección utilizada para mostrar una toma junto con la información
- * del medicamento y del perfil al que pertenece.
+ * Proyección de dominio utilizada para mostrar una toma junto con la
+ * información del medicamento y del perfil al que pertenece.
  *
- * Los campos de nombre, dosis y unidad se leen de los snapshots guardados
+ * Los campos de nombre, dosis y unidad proceden de los snapshots guardados
  * en la toma para que el historial no cambie al editar el medicamento.
  *
  * @property intakeId Identificador local de la toma.
@@ -51,7 +51,6 @@ fun IntakeWithMedication.visualState(): IntakeVisualState {
     else
         IntakeVisualState.PENDING
 }
-
 
 /**
  * Estados visuales posibles para una toma de medicamento.

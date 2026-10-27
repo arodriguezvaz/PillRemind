@@ -1,21 +1,21 @@
 package com.andres.pillremind.domain.model
 
-import com.andres.pillremind.R
 import java.time.DayOfWeek
 
 /**
- * Representa los días de la semana utilizados en la aplicación.
- * Incluye recursos de texto para su representación en la interfaz de usuario,
- * tanto en formato completo como abreviado.
+ * Representa los días de la semana utilizados por el dominio.
+ *
+ * No contiene recursos ni etiquetas de interfaz: la capa UI es la encargada
+ * de traducir cada valor a su texto correspondiente.
  */
-enum class WeekDay(val label: Int, val shortName: Int) {
-    MONDAY(R.string.lunes, R.string.lunesShort),
-    TUESDAY(R.string.martes, R.string.martesShort),
-    WEDNESDAY(R.string.miercoles, R.string.miercolesShort),
-    THURSDAY(R.string.jueves, R.string.juevesShort),
-    FRIDAY(R.string.viernes, R.string.viernesShort),
-    SATURDAY(R.string.sabado, R.string.sabadoShort),
-    SUNDAY(R.string.domingo, R.string.domingoShort)
+enum class WeekDay {
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY,
+    SUNDAY
 }
 
 /**

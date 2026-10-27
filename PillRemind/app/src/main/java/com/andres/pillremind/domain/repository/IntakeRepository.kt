@@ -1,7 +1,7 @@
 package com.andres.pillremind.domain.repository
 
-import com.andres.pillremind.data.local.projections.IntakeWithMedication
 import com.andres.pillremind.domain.model.Intake
+import com.andres.pillremind.domain.model.IntakeWithMedication
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.time.LocalDateTime

@@ -3,16 +3,17 @@ package com.andres.pillremind.data.repository
 import com.andres.pillremind.data.local.dao.IntakeDao
 import com.andres.pillremind.data.local.dao.MedicationDao
 import com.andres.pillremind.data.local.dao.ScheduleDao
-import com.andres.pillremind.data.local.projections.IntakeWithMedication
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Intake
+import com.andres.pillremind.domain.model.IntakeWithMedication
 import com.andres.pillremind.domain.model.toWeekDay
 import com.andres.pillremind.domain.repository.IntakeRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -86,7 +87,7 @@ class IntakeRepositoryImpl @Inject constructor(
             today.atStartOfDay(),
             today.atTime(LocalTime.MAX),
             profileId
-        )
+        ).map { rows -> rows.map { it.toDomain() } }
     }
 
     override suspend fun getLastGeneratedDate(): LocalDate {
