@@ -1,6 +1,7 @@
 package com.andres.pillremind.notifications
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -29,6 +30,11 @@ class DailyIntakeWorker @AssistedInject constructor(
             reminderScheduler.generateWindow()
             Result.success()
         } catch (e: Exception) {
+            Log.e(
+                "DailyIntakeWorker",
+                "No se pudo generar la ventana de tomas; se reintentará",
+                e
+            )
             Result.retry()
         }
     }
