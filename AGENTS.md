@@ -52,5 +52,5 @@ cd PillRemind
 
 ## Docs
 
-- Tracked docs are the root `README.md` and `doc/templates/` (academic project write-up). The README describes the current local-only app; `doc/templates/` is historical and may still describe the removed Supabase version. Verify behavior against code and Gradle config.
+- Tracked docs are the root `README.md`, `MEJORAS_FUTURAS.md` (deferred improvements) and `doc/templates/` (academic project write-up). The README describes the current local-only app; `doc/templates/` is historical and may still describe the removed Supabase version. Verify behavior against code and Gradle config.
 - Keep the local `PillRemind/INCIDENCIAS.md` audit out of Git and out of public releases. It is a personal audit document; review it separately from implementation changes.
