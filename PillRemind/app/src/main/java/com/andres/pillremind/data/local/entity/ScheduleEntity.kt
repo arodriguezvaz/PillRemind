@@ -2,6 +2,7 @@ package com.andres.pillremind.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.andres.pillremind.domain.model.WeekDay
 import java.time.LocalTime
@@ -23,7 +24,8 @@ import java.time.LocalTime
             childColumns = ["medicationId"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index("medicationId")]
 )
 data class ScheduleEntity(
     @PrimaryKey(autoGenerate = true)

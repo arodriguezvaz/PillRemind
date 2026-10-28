@@ -2,6 +2,7 @@ package com.andres.pillremind.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 
@@ -24,7 +25,8 @@ import java.time.LocalDateTime
             childColumns = ["usuarioId"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index("usuarioId")]
 )
 data class ProfileEntity(
     @PrimaryKey(autoGenerate = true)

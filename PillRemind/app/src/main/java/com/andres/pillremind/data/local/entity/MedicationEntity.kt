@@ -2,6 +2,7 @@ package com.andres.pillremind.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -32,7 +33,8 @@ import java.time.LocalDateTime
             childColumns = ["profileId"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index("profileId")]
 )
 data class MedicationEntity(
     @PrimaryKey(autoGenerate = true)
