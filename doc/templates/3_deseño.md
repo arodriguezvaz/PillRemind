@@ -1,5 +1,10 @@
 # Deseño
 
+> **Nota:** este documento describe unha versión anterior da aplicación, con
+> Supabase, autenticación e sincronización na nube. A versión actual é local-only
+> e garda todos os datos en Room no dispositivo. Consérvase como documentación
+> histórica.
+
 ## Diagrama da arquitectura
 
 ```mermaid
@@ -17,8 +22,6 @@ graph TD
     WORK -->|mantén a ventá de 7 días| ROOM
     WORK -->|programa alarmas| ALARM
 ```
-
-> A versión con Supabase consérvase unicamente nas ramas históricas. A rama actual é local-only: todos os datos se gardan en Room no dispositivo.
 
 ## Diagrama de Base de Datos de Room
 

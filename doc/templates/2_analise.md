@@ -1,5 +1,10 @@
 # Análisis: Requisitos del sistema
 
+> **Nota:** este documento describe una versión anterior de la aplicación, con
+> Supabase, autenticación y sincronización en la nube. La versión actual es
+> local-only y guarda todos los datos en Room en el dispositivo. Se conserva como
+> documentación histórica.
+
 ## Funcionalidades
 
 ### 1. Alta de medicamento

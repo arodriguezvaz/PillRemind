@@ -1,5 +1,10 @@
 # Manuais
 
+> **Nota:** este documento describe unha versión anterior da aplicación, con
+> Supabase, autenticación e sincronización na nube. A versión actual é local-only
+> e garda todos os datos en Room no dispositivo. Consérvase como documentación
+> histórica.
+
 ## Manual técnico do proxecto
 
 Cando o usuario accede á aplicación, aparece na pestana de perfís, na que pode observar un botón de engadir perfil e un botón de axustes.

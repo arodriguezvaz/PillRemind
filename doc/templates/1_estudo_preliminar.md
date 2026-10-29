@@ -1,5 +1,10 @@
 # Estudo preliminar
 
+> **Nota:** este documento describe unha versión anterior da aplicación, con
+> Supabase, autenticación e sincronización na nube. A versión actual é local-only
+> e garda todos os datos en Room no dispositivo. Consérvase como documentación
+> histórica.
+
 ## 1. Descrición do proxecto
 Este proxecto ten como finalidade desenvolver unha aplicación de recordatorios
 para a toma de medicación. A aplicación permitirá aos usuarios xestionar de

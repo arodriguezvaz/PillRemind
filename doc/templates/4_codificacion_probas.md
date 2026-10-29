@@ -1,6 +1,11 @@
 
 # Codificación y Pruebas
 
+> **Nota:** este documento describe una versión anterior de la aplicación, con
+> Supabase, autenticación y sincronización en la nube. La versión actual es
+> local-only y guarda todos los datos en Room en el dispositivo. Se conserva como
+> documentación histórica.
+
 ## Instalación del entorno de desarrollo
 
 Para la instalación del entorno de desarrollo solo es necesario tener Android Studio y descargar el repositorio. Para probar la ejecución simplemente también se puede instalar la APK en un teléfono móvil o emulador con Android.
