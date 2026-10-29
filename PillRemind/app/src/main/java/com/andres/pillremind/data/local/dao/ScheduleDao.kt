@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.andres.pillremind.data.local.entity.ScheduleEntity
-import com.andres.pillremind.domain.model.WeekDay
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -66,11 +65,12 @@ interface ScheduleDao {
     suspend fun getScheduleById(scheduleId: Int): ScheduleEntity?
 
     /**
-     * Observa los schedules de un dia concreto de la semana.
+     * Devuelve todos los schedules en una sola consulta.
      *
-     * @param day Dia de la semana a filtrar.
-     * @return Flow con la lista de schedules del dia.
+     * Se usa al generar tomas para no consultar la base de datos por cada día.
+     *
+     * @return Lista completa de schedules.
      */
-    @Query("SELECT * FROM schedules WHERE WeekDay = :day")
-    fun getSchedulesByDay(day: WeekDay): Flow<List<ScheduleEntity>>
+    @Query("SELECT * FROM schedules")
+    suspend fun getAllSchedulesOnce(): List<ScheduleEntity>
 }

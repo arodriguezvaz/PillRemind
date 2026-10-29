@@ -35,9 +35,11 @@ class IntakeRepositoryImplTest {
     private lateinit var intakeDao: IntakeDao
     private lateinit var scheduleDao: ScheduleDao
     private lateinit var medicationDao: MedicationDao
+    private lateinit var sessionManager: SessionManager
     private lateinit var repository: IntakeRepositoryImpl
 
     private val date = LocalDate.of(2026, 10, 23)
+    private val nextDay = date.plusDays(1)
     private val time = LocalTime.of(9, 0)
     private val scheduledAt = LocalDateTime.of(date, time)
 
@@ -46,24 +48,23 @@ class IntakeRepositoryImplTest {
         intakeDao = mockk()
         scheduleDao = mockk()
         medicationDao = mockk()
+        sessionManager = mockk(relaxed = true)
         repository = IntakeRepositoryImpl(
             intakeDao = intakeDao,
             scheduleDao = scheduleDao,
             medicationDao = medicationDao,
-            sessionManager = mockk<SessionManager>(relaxed = true)
+            sessionManager = sessionManager
         )
 
-        every { scheduleDao.getSchedulesByDay(WeekDay.FRIDAY) } returns flowOf(
-            listOf(
-                ScheduleEntity(
-                    id = 10,
-                    medicationId = 20,
-                    weekDay = WeekDay.FRIDAY,
-                    time = time
-                )
+        coEvery { scheduleDao.getAllSchedulesOnce() } returns listOf(
+            ScheduleEntity(
+                id = 10,
+                medicationId = 20,
+                weekDay = WeekDay.FRIDAY,
+                time = time
             )
         )
-        every { medicationDao.getMedicationById(20) } returns flowOf(
+        coEvery { medicationDao.getMedicationsByIdsOnce(any()) } returns listOf(
             MedicationEntity(
                 id = 20,
                 profileId = 1,
@@ -104,17 +105,6 @@ class IntakeRepositoryImplTest {
     @Test
     fun `createIntakes copia los datos del medicamento en los snapshots`() = runTest {
         coEvery { intakeDao.insertIntakes(any()) } returns listOf(7L)
-        coEvery { intakeDao.getIntakesBetween(any(), any()) } returns listOf(
-            IntakeEntity(
-                id = 7,
-                medicationId = 20,
-                scheduleId = 10,
-                scheduledAt = scheduledAt,
-                medicationNameSnapshot = "Ibuprofeno",
-                doseSnapshot = 600.0,
-                unitSnapshot = "mg"
-            )
-        )
 
         val result = repository.createIntakes(date, date)
 
@@ -126,26 +116,53 @@ class IntakeRepositoryImplTest {
     @Test
     fun `createIntakes conserva el ID de una toma nueva`() = runTest {
         coEvery { intakeDao.insertIntakes(any()) } returns listOf(7L)
-        coEvery { intakeDao.getIntakesBetween(any(), any()) } returns listOf(
-            IntakeEntity(
-                id = 7,
-                medicationId = 20,
-                scheduleId = 10,
-                scheduledAt = scheduledAt,
-                medicationNameSnapshot = "Ibuprofeno",
-                doseSnapshot = 600.0,
-                unitSnapshot = "mg"
-            )
-        )
 
         val result = repository.createIntakes(date, date)
 
         assertEquals(7, result.single().id)
+        coVerify(exactly = 0) { intakeDao.getIntakesBetween(any(), any()) }
+    }
+
+    @Test
+    fun `createIntakes consulta horarios y medicamentos una sola vez`() = runTest {
+        coEvery { scheduleDao.getAllSchedulesOnce() } returns listOf(
+            ScheduleEntity(
+                id = 10,
+                medicationId = 20,
+                weekDay = WeekDay.FRIDAY,
+                time = time
+            ),
+            ScheduleEntity(
+                id = 11,
+                medicationId = 20,
+                weekDay = WeekDay.SATURDAY,
+                time = time
+            )
+        )
+        coEvery { intakeDao.insertIntakes(any()) } returns listOf(1L, 2L)
+
+        val result = repository.createIntakes(date, nextDay)
+
+        assertEquals(2, result.size)
+        coVerify(exactly = 1) { scheduleDao.getAllSchedulesOnce() }
+        coVerify(exactly = 1) { medicationDao.getMedicationsByIdsOnce(listOf(20)) }
+        coVerify(exactly = 0) { intakeDao.getIntakesBetween(any(), any()) }
+    }
+
+    @Test
+    fun `createIntakes no consulta medicamentos si no hay horarios`() = runTest {
+        coEvery { scheduleDao.getAllSchedulesOnce() } returns emptyList()
+
+        val result = repository.createIntakes(date, date)
+
+        assertEquals(0, result.size)
+        coVerify(exactly = 0) { medicationDao.getMedicationsByIdsOnce(any()) }
+        coVerify(exactly = 0) { intakeDao.insertIntakes(any()) }
     }
 
     @Test
     fun `createIntakes no genera tomas para un medicamento archivado`() = runTest {
-        every { medicationDao.getMedicationById(20) } returns flowOf(
+        coEvery { medicationDao.getMedicationsByIdsOnce(any()) } returns listOf(
             MedicationEntity(
                 id = 20,
                 profileId = 1,
@@ -160,6 +177,73 @@ class IntakeRepositoryImplTest {
         val result = repository.createIntakes(date, date)
 
         assertEquals(0, result.size)
+    }
+
+    @Test
+    fun `createIntakes no genera tomas antes de la fecha de inicio`() = runTest {
+        coEvery { medicationDao.getMedicationsByIdsOnce(any()) } returns listOf(
+            MedicationEntity(
+                id = 20,
+                profileId = 1,
+                name = "Ibuprofeno",
+                dose = 600.0,
+                unit = "mg",
+                startDate = date.plusDays(1)
+            )
+        )
+
+        val result = repository.createIntakes(date, date)
+
+        assertEquals(0, result.size)
+    }
+
+    @Test
+    fun `createIntakes no genera tomas despues de la fecha de fin`() = runTest {
+        coEvery { medicationDao.getMedicationsByIdsOnce(any()) } returns listOf(
+            MedicationEntity(
+                id = 20,
+                profileId = 1,
+                name = "Ibuprofeno",
+                dose = 600.0,
+                unit = "mg",
+                startDate = date.minusDays(1),
+                endDate = date.minusDays(1)
+            )
+        )
+
+        val result = repository.createIntakes(date, date)
+
+        assertEquals(0, result.size)
+    }
+
+    @Test
+    fun `createIntakes no genera tomas de otro dia de la semana`() = runTest {
+        coEvery { scheduleDao.getAllSchedulesOnce() } returns listOf(
+            ScheduleEntity(
+                id = 10,
+                medicationId = 20,
+                weekDay = WeekDay.MONDAY,
+                time = time
+            )
+        )
+
+        val result = repository.createIntakes(date, date)
+
+        assertEquals(0, result.size)
+    }
+
+    @Test
+    fun `getLastGeneratedDate devuelve hoy si no hay fecha guardada`() = runTest {
+        every { sessionManager.lastGeneratedDate } returns flowOf(null)
+
+        assertEquals(LocalDate.now(), repository.getLastGeneratedDate())
+    }
+
+    @Test
+    fun `getLastGeneratedDate devuelve la fecha guardada`() = runTest {
+        every { sessionManager.lastGeneratedDate } returns flowOf(date)
+
+        assertEquals(date, repository.getLastGeneratedDate())
     }
 
     @Test

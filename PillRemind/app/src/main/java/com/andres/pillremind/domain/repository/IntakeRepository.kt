@@ -36,7 +36,8 @@ interface IntakeRepository {
     suspend fun createIntakes(desde: LocalDate, hasta: LocalDate): List<Intake>
 
     /**
-     * Obtiene la fecha de la última generación de tomas
+     * Obtiene la fecha de la última generación de tomas.
+     * Si no hay ninguna guardada, devuelve hoy.
      */
     suspend fun getLastGeneratedDate(): LocalDate
 

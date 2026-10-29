@@ -75,4 +75,16 @@ interface MedicationDao {
      */
     @Query("SELECT * FROM medications WHERE id = :id")
     suspend fun getMedicationByIdOnce(id: Int): MedicationEntity?
+
+    /**
+     * Devuelve los medicamentos indicados en una sola consulta.
+     *
+     * Se usa al generar tomas para cargar de golpe todos los medicamentos
+     * referenciados por los horarios.
+     *
+     * @param ids IDs de los medicamentos a recuperar.
+     * @return Lista de medicamentos encontrados.
+     */
+    @Query("SELECT * FROM medications WHERE id IN (:ids)")
+    suspend fun getMedicationsByIdsOnce(ids: List<Int>): List<MedicationEntity>
 }

@@ -30,15 +30,25 @@ class IntakeRepositoryImpl @Inject constructor(
      * Genera e inserta en la base de datos las tomas programadas dentro
      */
     override suspend fun createIntakes(desde: LocalDate, hasta: LocalDate): List<Intake> {
+        // Carga los horarios y los medicamentos una sola vez para evitar
+        // consultas repetidas por cada día y por cada horario.
+        val horarios = scheduleDao.getAllSchedulesOnce()
+        if (horarios.isEmpty()) return emptyList()
+
+        val medicamentos = medicationDao
+            .getMedicationsByIdsOnce(horarios.map { it.medicationId }.distinct())
+            .associateBy { it.id }
+
+        val horariosPorDia = horarios.groupBy { it.weekDay }
         val tomasAInsertar = mutableListOf<Intake>()
 
         var dia = desde
         while (!dia.isAfter(hasta)) {
-            // Obtiene los horarios correspondientes al día de la semana actual
-            val horarios = scheduleDao.getSchedulesByDay(dia.dayOfWeek.toWeekDay()).first()
-            // Para cada horario, obtiene el medicamento asociado y genera la toma únicamente si el medicamento está activo en la fecha actual
-            for (horario in horarios) {
-                val med = medicationDao.getMedicationById(horario.medicationId).first() ?: continue
+            // Obtiene los horarios correspondientes al día de la semana actual.
+            val horariosDelDia = horariosPorDia[dia.dayOfWeek.toWeekDay()].orEmpty()
+            // Genera la toma únicamente si el medicamento está activo en la fecha actual.
+            for (horario in horariosDelDia) {
+                val med = medicamentos[horario.medicationId] ?: continue
                 if (med.deletedAt != null) continue
                 if (med.startDate > dia) continue
                 if (med.endDate != null && med.endDate < dia) continue
@@ -59,10 +69,15 @@ class IntakeRepositoryImpl @Inject constructor(
         if (tomasAInsertar.isEmpty()) return emptyList()
 
         val ids = intakeDao.insertIntakes(tomasAInsertar.map { it.toEntity() })
-        val existentes = intakeDao.getIntakesBetween(
-            desde.atStartOfDay(),
-            hasta.atTime(LocalTime.MAX)
-        ).associateBy { it.medicationId to it.scheduledAt }
+        // Solo hace falta recuperar IDs si alguna toma ya existía.
+        val existentes = if (ids.any { it == -1L }) {
+            intakeDao.getIntakesBetween(
+                desde.atStartOfDay(),
+                hasta.atTime(LocalTime.MAX)
+            ).associateBy { it.medicationId to it.scheduledAt }
+        } else {
+            emptyMap()
+        }
 
         return tomasAInsertar.mapIndexed { index, intake ->
             val id = existentes[intake.medicationId to intake.scheduledAt]?.id
@@ -91,8 +106,10 @@ class IntakeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getLastGeneratedDate(): LocalDate {
+        // Si todavía no se ha generado ninguna ventana, se empieza hoy para no
+        // crear un historial ficticio de tomas pasadas.
         return sessionManager.lastGeneratedDate.first()
-            ?: LocalDate.now().minusDays(30)
+            ?: LocalDate.now()
     }
 
     override suspend fun saveLastGeneratedDate(fecha: LocalDate) {
