@@ -9,7 +9,7 @@ import com.andres.pillremind.data.local.entity.ProfileEntity
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Interfaz que define los métodos para interacatuar con la base de datos.
+ * Interfaz que define los métodos para interactuar con la base de datos.
  */
 @Dao
 interface ProfileDao {

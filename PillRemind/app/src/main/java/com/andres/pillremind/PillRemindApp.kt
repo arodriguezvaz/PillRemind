@@ -29,8 +29,8 @@ class PillRemindApp : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
-    // Called by WorkManager before it initializes itself.
-    // Returning this configuration is what connects HiltWorkerFactory to WorkManager.
+    // WorkManager llama a esta propiedad antes de inicializarse.
+    // Esta configuración conecta HiltWorkerFactory con WorkManager.
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
@@ -71,13 +71,13 @@ class PillRemindApp : Application(), Configuration.Provider {
      */
     private fun setupImageLoader() {
         val imageLoader = ImageLoader.Builder(this)
-            //Configuración de caché en memoria
+            // Configuración de caché en memoria
             .memoryCache {
                 MemoryCache.Builder(this)
                     .maxSizePercent(0.25)
                     .build()
             }
-            //Configuración de caché en disco
+            // Configuración de caché en disco
             .diskCache {
                 DiskCache.Builder()
                     .directory(cacheDir.resolve("image_cache"))

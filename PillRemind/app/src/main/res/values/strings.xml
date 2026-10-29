@@ -6,7 +6,6 @@
     <string name="notification_text">%1$s — no olvides la dosis de %2$s</string>
     <string name="notification_action_take">Tomar</string>
     <string name="nombre">Nombre</string>
-    <string name="url_imagen">Url de la imagen</string>
     <string name="fecha_inicio">Fecha inicio:</string>
     <string name="unidad">Unidad:</string>
     <string name="dosis">Dosis:</string>
@@ -31,7 +30,6 @@
     <string name="domingoShort">D</string>
     <string name="horario">Horario:</string>
     <string name="guardar">Guardar</string>
-    <string name="sleccionar_hora">Seleccionar hora</string>
     <string name="tomar">Tomar</string>
     <string name="tomado">Tomado</string>
     <string name="fecha_hint">dd/mm/yyyy</string>
