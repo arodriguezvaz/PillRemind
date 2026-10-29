@@ -77,16 +77,23 @@ fun ProfileScreen(
     onTopBarChange: (TopBarState) -> Unit = {},
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        onTopBarChange(TopBarState(title = "Ver Perfil"))
-    }
-
     val name = remember { mutableStateOf("") }
     val perfil = profileViewModel.profile.collectAsState().value
     var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var currentMode by remember { mutableStateOf(profileMode) }
 
+    LaunchedEffect(currentMode) {
+        onTopBarChange(
+            TopBarState(
+                title = when (currentMode) {
+                    ProfileMode.Create -> "Crear perfil"
+                    ProfileMode.View -> "Ver Perfil"
+                    ProfileMode.Edit -> "Editar perfil"
+                }
+            )
+        )
+    }
 
     LaunchedEffect(perfil) {
         perfil?.let {
