@@ -5,7 +5,7 @@ package com.andres.pillremind.ui.screens.main
  *
  * @property title Título que se mostrará en la topbar.
  * @property showLogo Si es true, se mostrará el logo de la app encima del título.
- * @property canGoBack Si es true , se muestra la flecha de retroceso
+ * @property actions Acciones que se muestran en la barra superior.
  */
 data class TopBarState(
     val title: String,

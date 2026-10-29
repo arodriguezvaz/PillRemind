@@ -113,9 +113,7 @@ fun NavGraphBuilder.medicationNavGraph(
             arguments = listOf(navArgument("medicationId") {
                 type = NavType.IntType
             })
-        ) { backStackEntry ->
-
-            backStackEntry.arguments?.getInt("medicationId")
+        ) {
             MedicationScreen(
                 medicationMode = MedicationMode.View,
                 onArchivedClicked = {

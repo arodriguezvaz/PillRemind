@@ -12,14 +12,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.andres.pillremind.navigation.BottomBarScreens
 
 /**
  * TopAppBar principal de la aplicación.
@@ -32,25 +30,19 @@ import com.andres.pillremind.navigation.BottomBarScreens
  *
  * @param state Estado de la TopBar (título, logo y acciones).
  * @param navController Controlador de navegación para gestionar el back stack.
+ * @param topLevelRoutes Rutas principales que no muestran flecha de retroceso.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopBar(
     state: TopBarState,
-    navController: NavHostController
+    navController: NavHostController,
+    topLevelRoutes: Set<String>
 ) {
-    navController.previousBackStackEntry != null
-    val bottomBarRoutes = remember {
-        setOf(
-            BottomBarScreens.Home.route,
-            BottomBarScreens.Medications.route,
-            BottomBarScreens.Profile.route
-        )
-    }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val canGoBack = currentRoute !in bottomBarRoutes
-            && navController.previousBackStackEntry != null
+    val canGoBack = currentRoute !in topLevelRoutes &&
+        navController.previousBackStackEntry != null
     TopAppBar(
         navigationIcon = {
             if (canGoBack) {

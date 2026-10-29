@@ -1,12 +1,19 @@
 package com.andres.pillremind.navigation
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.andres.pillremind.ui.screens.main.MainTopBar
+import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
 import com.andres.pillremind.ui.screens.profiles.ProfilesScreen
@@ -44,12 +51,24 @@ fun NavGraphBuilder.profileSelectionGraph(
                 navController = navController,
                 onSettingClicked = {
                     navController.navigate(ProfilesScreen.SettingsScreen.route)
-                }
+                },
+                topLevelRoutes = setOf(ProfilesScreen.ProfileSelectionScreen.route)
             )
         }
         //Pantalla de selección de creación de perfil
         composable(ProfilesScreen.ProfileCreateScreen.route) {
-            androidx.compose.material3.Scaffold { paddingValues ->
+            var topBarState by remember {
+                mutableStateOf(TopBarState(title = "Crear perfil"))
+            }
+            Scaffold(
+                topBar = {
+                    MainTopBar(
+                        state = topBarState,
+                        navController = navController,
+                        topLevelRoutes = setOf(ProfilesScreen.ProfileSelectionScreen.route)
+                    )
+                }
+            ) { paddingValues ->
                 ProfileScreen(
                     modifier = Modifier.padding(paddingValues),
                     profileMode = ProfileMode.Create,
@@ -58,9 +77,10 @@ fun NavGraphBuilder.profileSelectionGraph(
                             popUpTo(ProfilesScreen.ProfileSelectionScreen.route) {
                                 inclusive = false
                             }
+                            launchSingleTop = true
                         }
-                    }
-
+                    },
+                    onTopBarChange = { topBarState = it }
                 )
             }
         }

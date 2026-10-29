@@ -38,9 +38,9 @@ fun MainScreen(
     val showFab =
         currentRoute == BottomBarScreens.Home.route || currentRoute == BottomBarScreens.Medications.route
     var topBarState by remember {
-        mutableStateOf(TopBarState(""))
+        mutableStateOf(TopBarState(title = "Medicamentos", showLogo = true))
     }
-    val bottomBarRoutes = remember {
+    val topLevelRoutes = remember {
         setOf(
             BottomBarScreens.Home.route,
             BottomBarScreens.Medications.route,
@@ -48,10 +48,14 @@ fun MainScreen(
         )
     }
 
-    currentRoute !in bottomBarRoutes
-            && navController.previousBackStackEntry != null
     Scaffold(
-        topBar = { MainTopBar(state = topBarState, navController = navController) },
+        topBar = {
+            MainTopBar(
+                state = topBarState,
+                navController = navController,
+                topLevelRoutes = topLevelRoutes
+            )
+        },
         bottomBar = { MainBottomBar(navController = navController) },
         floatingActionButton = {
             if (showFab) {

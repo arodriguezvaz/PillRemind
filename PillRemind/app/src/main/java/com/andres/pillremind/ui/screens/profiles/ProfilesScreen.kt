@@ -44,6 +44,7 @@ import com.andres.pillremind.ui.screens.main.TopBarState
  * @param profilesViewModel ViewModel que gestiona la lógica de perfiles.
  * @param onSettingClicked Callback que se ejecuta al pulsar el botón de ajustes.
  * @param navController Controlador de navegación para la pantalla principal.
+ * @param topLevelRoutes Rutas principales que no muestran flecha de retroceso.
  */
 @Composable
 fun ProfilesScreen(
@@ -53,6 +54,7 @@ fun ProfilesScreen(
     navController: NavHostController,
     profilesViewModel: ProfilesViewModel = hiltViewModel(),
     onSettingClicked: () -> Unit,
+    topLevelRoutes: Set<String>,
 ) {
 
     LaunchedEffect(Unit) {
@@ -73,7 +75,11 @@ fun ProfilesScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            MainTopBar(state = topBarState, navController)
+            MainTopBar(
+                state = topBarState,
+                navController = navController,
+                topLevelRoutes = topLevelRoutes
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
