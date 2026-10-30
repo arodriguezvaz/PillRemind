@@ -1,6 +1,7 @@
 package com.andres.pillremind.ui.screens.profile
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -93,6 +94,10 @@ fun ProfileScreen(
                 }
             )
         )
+    }
+
+    BackHandler(enabled = currentMode == ProfileMode.Edit) {
+        currentMode = ProfileMode.View
     }
 
     LaunchedEffect(perfil) {
