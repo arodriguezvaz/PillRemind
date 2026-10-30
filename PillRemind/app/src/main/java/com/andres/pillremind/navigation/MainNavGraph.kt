@@ -45,7 +45,6 @@ fun MainNavigationGraph(
 ) {
     NavHost(
         navController = navController,
-        route = Graph.MAIN,
         startDestination = BottomBarScreens.Home.route,
         modifier = Modifier.padding(paddingValues)
     ) {
