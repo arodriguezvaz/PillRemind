@@ -14,16 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,11 +30,14 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.settings.SettingsCard
 import com.andres.pillremind.ui.components.settings.SettingsLinkItem
 import com.andres.pillremind.ui.components.settings.SettingsToggleItem
+import com.andres.pillremind.ui.screens.main.MainTopBar
+import com.andres.pillremind.ui.screens.main.TopBarState
 
 /**
  * Pantalla de ajustes de la aplicación.
@@ -49,13 +45,14 @@ import com.andres.pillremind.ui.components.settings.SettingsToggleItem
  * Permite gestionar el modo oscuro y muestra el estado del permiso de alarmas
  * exactas. Los datos de la aplicación son siempre locales.
  *
- * @param onBack Callback para volver a la pantalla anterior.
+ * @param navController Controlador de navegación para volver a la pantalla anterior.
+ * @param topLevelRoutes Rutas principales que no muestran flecha de retroceso.
  * @param settingsViewModel ViewModel encargado de la lógica de ajustes.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit,
+    navController: NavHostController,
+    topLevelRoutes: Set<String>,
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
 
@@ -71,16 +68,10 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Ajustes") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                ),
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, null)
-                    }
-                }
+            MainTopBar(
+                state = TopBarState(title = "Ajustes"),
+                navController = navController,
+                topLevelRoutes = topLevelRoutes
             )
         }
     ) { padding ->

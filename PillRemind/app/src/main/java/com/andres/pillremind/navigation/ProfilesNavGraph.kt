@@ -87,9 +87,8 @@ fun NavGraphBuilder.profileSelectionGraph(
         //Pantalla de configuración de la aplicación
         composable(ProfilesScreen.SettingsScreen.route) {
             SettingsScreen(
-                onBack = {
-                    navController.popBackStack()
-                }
+                navController = navController,
+                topLevelRoutes = setOf(ProfilesScreen.ProfileSelectionScreen.route)
             )
         }
     }
