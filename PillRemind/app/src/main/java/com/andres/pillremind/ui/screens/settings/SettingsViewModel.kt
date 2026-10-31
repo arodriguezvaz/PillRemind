@@ -1,8 +1,11 @@
 package com.andres.pillremind.ui.screens.settings
 
 import android.net.Uri
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.andres.pillremind.R
+import com.andres.pillremind.data.backup.BackupError
 import com.andres.pillremind.data.backup.BackupException
 import com.andres.pillremind.data.backup.BackupFileStore
 import com.andres.pillremind.data.local.session.SessionManager
@@ -41,13 +44,13 @@ sealed interface BackupUiState {
     data class AwaitingConfirmation(val encrypted: Boolean) : BackupUiState
 
     /** La exportación terminó correctamente. */
-    data class Exported(val message: String) : BackupUiState
+    data object Exported : BackupUiState
 
     /** La importación terminó correctamente. */
-    data class Imported(val message: String) : BackupUiState
+    data object Imported : BackupUiState
 
     /** La operación falló. */
-    data class Error(val message: String) : BackupUiState
+    data class Error(@StringRes val messageRes: Int) : BackupUiState
 }
 
 /**
@@ -103,7 +106,7 @@ class SettingsViewModel @Inject constructor(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _backupState.value = BackupUiState.Error(e.userMessage())
+                _backupState.value = BackupUiState.Error(e.userMessageRes())
             }
         }
     }
@@ -124,12 +127,12 @@ class SettingsViewModel @Inject constructor(
                         backupRepository.exportTo(output, password)
                     }
                 }
-                _backupState.value = BackupUiState.Exported("Copia exportada correctamente")
+                _backupState.value = BackupUiState.Exported
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 backupFileStore.delete(uri)
-                _backupState.value = BackupUiState.Error(e.userMessage())
+                _backupState.value = BackupUiState.Error(e.userMessageRes())
             } finally {
                 password?.fill('\u0000')
             }
@@ -152,11 +155,11 @@ class SettingsViewModel @Inject constructor(
                         backupRepository.importFrom(input, password)
                     }
                 }
-                _backupState.value = BackupUiState.Imported("Datos importados correctamente")
+                _backupState.value = BackupUiState.Imported
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _backupState.value = BackupUiState.Error(e.userMessage())
+                _backupState.value = BackupUiState.Error(e.userMessageRes())
             } finally {
                 password?.fill('\u0000')
             }
@@ -185,6 +188,22 @@ class SettingsViewModel @Inject constructor(
         _backupState.value is BackupUiState.Working ||
             _backupState.value is BackupUiState.Inspecting
 
-    private fun Throwable.userMessage(): String =
-        (this as? BackupException)?.message ?: "No se pudo completar la operación"
+    private fun Throwable.userMessageRes(): Int = when (this) {
+        is BackupException -> when (error) {
+            BackupError.INVALID_FILE -> R.string.backup_error_invalid_file
+            BackupError.UNSUPPORTED_VERSION -> R.string.backup_error_unsupported_version
+            BackupError.PASSWORD_REQUIRED -> R.string.backup_error_password_required
+            BackupError.WRONG_PASSWORD -> R.string.backup_error_wrong_password
+            BackupError.CORRUPTED -> R.string.backup_error_corrupted
+            BackupError.TOO_LARGE -> R.string.backup_error_too_large
+            BackupError.MISSING_IMAGES -> R.string.backup_error_missing_images
+            BackupError.INVALID_DATA -> R.string.backup_error_invalid_data
+            BackupError.IMAGES_ERROR -> R.string.backup_error_images
+            BackupError.SAVE_ERROR -> R.string.backup_error_save
+            BackupError.IO_ERROR -> R.string.backup_error_io
+            BackupError.GENERIC -> R.string.backup_error_generic
+        }
+
+        else -> R.string.backup_error_generic
+    }
 }

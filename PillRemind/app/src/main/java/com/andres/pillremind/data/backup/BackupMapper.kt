@@ -181,7 +181,10 @@ private fun resolveImagePath(
 ): String? {
     if (archivePath == null) return null
     return imagePaths[archivePath]
-        ?: throw BackupException("La copia no contiene la imagen $archivePath")
+        ?: throw BackupException(
+            BackupError.MISSING_IMAGES,
+            "La copia no contiene la imagen $archivePath"
+        )
 }
 
 /**
@@ -194,7 +197,11 @@ fun parseBackupDateTime(value: String, field: String): LocalDateTime =
     try {
         LocalDateTime.parse(value)
     } catch (e: DateTimeParseException) {
-        throw BackupException("Fecha y hora inválida en $field", e)
+        throw BackupException(
+            BackupError.INVALID_DATA,
+            "Fecha y hora inválida en $field",
+            e
+        )
     }
 
 /**
@@ -204,7 +211,11 @@ fun parseBackupDate(value: String, field: String): LocalDate =
     try {
         LocalDate.parse(value)
     } catch (e: DateTimeParseException) {
-        throw BackupException("Fecha inválida en $field", e)
+        throw BackupException(
+            BackupError.INVALID_DATA,
+            "Fecha inválida en $field",
+            e
+        )
     }
 
 /**
@@ -214,7 +225,11 @@ fun parseBackupTime(value: String, field: String): LocalTime =
     try {
         LocalTime.parse(value)
     } catch (e: DateTimeParseException) {
-        throw BackupException("Hora inválida en $field", e)
+        throw BackupException(
+            BackupError.INVALID_DATA,
+            "Hora inválida en $field",
+            e
+        )
     }
 
 /**
@@ -224,5 +239,9 @@ fun parseBackupWeekDay(value: String, field: String): WeekDay =
     try {
         WeekDay.valueOf(value)
     } catch (e: IllegalArgumentException) {
-        throw BackupException("Día de la semana inválido en $field", e)
+        throw BackupException(
+            BackupError.INVALID_DATA,
+            "Día de la semana inválido en $field",
+            e
+        )
     }

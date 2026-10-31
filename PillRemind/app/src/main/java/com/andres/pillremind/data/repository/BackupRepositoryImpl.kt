@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.room.withTransaction
 import com.andres.pillremind.data.backup.BackupArchive
 import com.andres.pillremind.data.backup.BackupCrypto
+import com.andres.pillremind.data.backup.BackupError
 import com.andres.pillremind.data.backup.BackupException
 import com.andres.pillremind.data.backup.BackupImageStore
 import com.andres.pillremind.data.backup.BackupSerializer
@@ -83,7 +84,10 @@ class BackupRepositoryImpl @Inject constructor(
             val header = BackupCrypto.readHeader(input)
             val payload = if (header.encrypted) {
                 val secret = password
-                    ?: throw BackupException("Esta copia está protegida con contraseña")
+                    ?: throw BackupException(
+                        BackupError.PASSWORD_REQUIRED,
+                        "Esta copia está protegida con contraseña"
+                    )
                 BackupCrypto.decryptingStream(input, secret)
             } else {
                 input
@@ -96,10 +100,18 @@ class BackupRepositoryImpl @Inject constructor(
                 BackupArchive.read(ByteArrayInputStream(payloadBytes))
             } catch (e: Exception) {
                 if (header.encrypted) {
-                    throw BackupException("Contraseña incorrecta o archivo dañado", e)
+                    throw BackupException(
+                        BackupError.WRONG_PASSWORD,
+                        "Contraseña incorrecta o archivo dañado",
+                        e
+                    )
                 }
                 if (e is BackupException) throw e
-                throw BackupException("El archivo de copia está dañado", e)
+                throw BackupException(
+                    BackupError.CORRUPTED,
+                    "El archivo de copia está dañado",
+                    e
+                )
             }
 
             val backup = BackupSerializer.decode(contents.json)
@@ -111,7 +123,10 @@ class BackupRepositoryImpl @Inject constructor(
                 ).toSet()
             val missingImages = referencedImages - contents.images.keys
             if (missingImages.isNotEmpty()) {
-                throw BackupException("La copia no contiene todas las imágenes referenciadas")
+                throw BackupException(
+                    BackupError.MISSING_IMAGES,
+                    "La copia no contiene todas las imágenes referenciadas"
+                )
             }
 
             val imagesToRestore = contents.images.filterKeys { it in referencedImages }
@@ -148,7 +163,11 @@ class BackupRepositoryImpl @Inject constructor(
                 }
             } catch (e: Exception) {
                 imageStore.deleteImages(newImages.values)
-                throw BackupException("No se pudieron guardar los datos importados", e)
+                throw BackupException(
+                    BackupError.SAVE_ERROR,
+                    "No se pudieron guardar los datos importados",
+                    e
+                )
             }
 
             reminderScheduler.cancelAlarms(oldFutureIntakeIds)

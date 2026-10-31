@@ -35,4 +35,56 @@
     <string name="fecha_hint">dd/mm/yyyy</string>
     <string name="añadir_perfil">Añadir perfil</string>
     <string name="seleccion_la_hora">Selecciona la hora</string>
+
+    <!-- Ajustes -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_dark_mode">Modo oscuro</string>
+    <string name="settings_reminders_title">Recordatorios</string>
+    <string name="settings_exact_alarms_disabled">Las alarmas exactas están desactivadas. Sin este permiso los recordatorios pueden retrasarse.</string>
+    <string name="settings_allow_exact_alarms">Permitir alarmas exactas</string>
+    <string name="settings_data_title">Datos</string>
+    <string name="settings_data_description">Copia de seguridad local de perfiles, medicamentos, horarios, historial e imágenes.</string>
+    <string name="settings_export_data">Exportar datos</string>
+    <string name="settings_import_data">Importar datos</string>
+    <string name="settings_backup_in_progress">Procesando copia de seguridad…</string>
+    <string name="settings_backup_privacy_warning">El archivo contiene datos de salud. Si no lo proteges con contraseña, cualquiera que lo tenga podrá leerlo.</string>
+    <string name="settings_legal_title">Legal</string>
+    <string name="settings_privacy_policy">Política de Privacidad</string>
+    <string name="settings_terms">Términos y condiciones de uso</string>
+    <string name="settings_legal_notice">Aviso Legal</string>
+
+    <!-- Copia de seguridad -->
+    <string name="backup_export_success">Copia exportada correctamente</string>
+    <string name="backup_export_title">Exportar datos</string>
+    <string name="backup_export_description">Se creará un archivo con todos los perfiles, medicamentos, horarios, historial e imágenes.</string>
+    <string name="backup_protect_with_password">Proteger con contraseña</string>
+    <string name="backup_password_min_length">Contraseña (mínimo 8 caracteres)</string>
+    <string name="backup_repeat_password">Repetir contraseña</string>
+    <string name="backup_password_warning">Si olvidas la contraseña, no podrás recuperar la copia.</string>
+    <string name="backup_export_action">Exportar</string>
+    <string name="backup_cancel">Cancelar</string>
+    <string name="backup_password_too_short">La contraseña debe tener al menos 8 caracteres</string>
+    <string name="backup_passwords_mismatch">Las contraseñas no coinciden</string>
+    <string name="backup_import_title">Importar copia de seguridad</string>
+    <string name="backup_import_warning">Se reemplazarán todos los perfiles, medicamentos, horarios, historial e imágenes actuales. Esta acción no se puede deshacer.</string>
+    <string name="backup_continue">Continuar</string>
+    <string name="backup_password_title">Copia protegida</string>
+    <string name="backup_password_description">Introduce la contraseña con la que se exportó esta copia.</string>
+    <string name="backup_password_label">Contraseña</string>
+    <string name="backup_password_required">Introduce la contraseña</string>
+    <string name="backup_import_action">Importar</string>
+    <string name="backup_import_success_title">Importación completada</string>
+    <string name="backup_import_success_message">Los datos se han importado.</string>
+    <string name="backup_error_invalid_file">El archivo no es una copia de seguridad válida</string>
+    <string name="backup_error_unsupported_version">Versión de copia no compatible</string>
+    <string name="backup_error_password_required">Esta copia está protegida con contraseña</string>
+    <string name="backup_error_wrong_password">Contraseña incorrecta o archivo dañado</string>
+    <string name="backup_error_corrupted">El archivo de copia está dañado</string>
+    <string name="backup_error_too_large">La copia supera el tamaño máximo permitido</string>
+    <string name="backup_error_missing_images">La copia no contiene todas las imágenes referenciadas</string>
+    <string name="backup_error_invalid_data">La copia contiene datos no válidos</string>
+    <string name="backup_error_images">No se pudieron restaurar las imágenes</string>
+    <string name="backup_error_save">No se pudieron guardar los datos importados</string>
+    <string name="backup_error_io">No se pudo acceder al archivo seleccionado</string>
+    <string name="backup_error_generic">No se pudo completar la operación</string>
 </resources>

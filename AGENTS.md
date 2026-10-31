@@ -6,6 +6,12 @@
 - Package is `com.andres.pillremind`. Entrypoints: `MainActivity` (Compose UI) and `PillRemindApp` (Hilt/Application setup).
 - Docs are Spanish/Galician, and code comments, KDoc, and UI strings are Spanish. Keep identifiers in English and match the surrounding style.
 
+## UI strings
+
+- Do not hardcode user-facing text in Compose or other UI code. Add labels, titles, dialog texts, snackbars, error messages and accessibility text to `PillRemind/app/src/main/res/values/strings.xml`, and read them with `stringResource` or `context.getString`.
+- ViewModels and other layers should expose `@StringRes` IDs (or an error type mapped in the UI) instead of literal user-facing messages.
+- This applies to new code and to any screen or file being modified. When touching a screen with legacy hardcoded strings, move its texts to resources as part of that change.
+
 ## Branch context
 
 This repository keeps the current local-only app on `master` and archived branches

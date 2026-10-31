@@ -7,7 +7,7 @@ import java.time.LocalDateTime
  *
  * Se comprueban el formato, la versión, los identificadores, las referencias
  * entre tablas, las fechas y las rutas de imagen. Cualquier problema lanza una
- * [BackupException] con un mensaje apto para el usuario.
+ * [BackupException] con un código que la UI traduce a un texto propio.
  */
 object BackupValidator {
 
@@ -21,13 +21,22 @@ object BackupValidator {
      */
     fun validate(file: BackupFileDto) {
         if (file.format != BackupFormat.NAME) {
-            throw BackupException("El archivo no es una copia de seguridad de PillRemind")
+            throw BackupException(
+                BackupError.INVALID_FILE,
+                "El archivo no es una copia de seguridad de PillRemind"
+            )
         }
         if (file.formatVersion != BackupFormat.VERSION) {
-            throw BackupException("Versión de copia no compatible")
+            throw BackupException(
+                BackupError.UNSUPPORTED_VERSION,
+                "Versión de copia no compatible"
+            )
         }
         if (file.users.isEmpty()) {
-            throw BackupException("La copia no contiene ningún usuario")
+            throw BackupException(
+                BackupError.INVALID_DATA,
+                "La copia no contiene ningún usuario"
+            )
         }
 
         requireUnique(file.users.map { it.id }, "usuarios")
@@ -50,10 +59,10 @@ object BackupValidator {
         file.profiles.forEach { profile ->
             requirePositiveId(profile.id, "perfil")
             if (profile.usuarioId !in userIds) {
-                throw BackupException("El perfil ${profile.name} referencia un usuario inexistente")
+                throw invalidData("El perfil ${profile.name} referencia un usuario inexistente")
             }
             if (profile.name.isBlank()) {
-                throw BackupException("La copia contiene un perfil sin nombre")
+                throw invalidData("La copia contiene un perfil sin nombre")
             }
             validateImagePath(profile.imagePath, "el perfil ${profile.name}")
             parseBackupDateTime(profile.createdAt, "perfil")
@@ -63,13 +72,15 @@ object BackupValidator {
         file.medications.forEach { medication ->
             requirePositiveId(medication.id, "medicamento")
             if (medication.profileId !in profileIds) {
-                throw BackupException("El medicamento ${medication.name} referencia un perfil inexistente")
+                throw invalidData(
+                    "El medicamento ${medication.name} referencia un perfil inexistente"
+                )
             }
             if (medication.name.isBlank()) {
-                throw BackupException("La copia contiene un medicamento sin nombre")
+                throw invalidData("La copia contiene un medicamento sin nombre")
             }
             if (!medication.dose.isFinite()) {
-                throw BackupException("La dosis de ${medication.name} no es válida")
+                throw invalidData("La dosis de ${medication.name} no es válida")
             }
             validateImagePath(medication.imagePath, "el medicamento ${medication.name}")
             parseBackupDate(medication.startDate, "medicamento")
@@ -82,7 +93,7 @@ object BackupValidator {
         file.schedules.forEach { schedule ->
             requirePositiveId(schedule.id, "horario")
             if (schedule.medicationId !in medicationIds) {
-                throw BackupException("Un horario referencia un medicamento inexistente")
+                throw invalidData("Un horario referencia un medicamento inexistente")
             }
             parseBackupWeekDay(schedule.weekDay, "horario")
             parseBackupTime(schedule.time, "horario")
@@ -92,15 +103,15 @@ object BackupValidator {
         file.intakes.forEach { intake ->
             requirePositiveId(intake.id, "toma")
             if (intake.medicationId !in medicationIds) {
-                throw BackupException("Una toma referencia un medicamento inexistente")
+                throw invalidData("Una toma referencia un medicamento inexistente")
             }
             intake.scheduleId?.let { scheduleId ->
                 if (scheduleId !in scheduleIds) {
-                    throw BackupException("Una toma referencia un horario inexistente")
+                    throw invalidData("Una toma referencia un horario inexistente")
                 }
             }
             if (!intake.doseSnapshot.isFinite()) {
-                throw BackupException("Una toma contiene una dosis no válida")
+                throw invalidData("Una toma contiene una dosis no válida")
             }
             val scheduledAt = parseBackupDateTime(intake.scheduledAt, "toma")
             intake.takenAt?.let { parseBackupDateTime(it, "toma") }
@@ -109,27 +120,30 @@ object BackupValidator {
 
             val key = intake.medicationId to scheduledAt
             if (!intakeKeys.add(key)) {
-                throw BackupException("La copia contiene tomas duplicadas")
+                throw invalidData("La copia contiene tomas duplicadas")
             }
         }
     }
 
     private fun requireUnique(ids: List<Int>, table: String) {
         if (ids.size != ids.toSet().size) {
-            throw BackupException("La copia contiene identificadores duplicados en $table")
+            throw invalidData("La copia contiene identificadores duplicados en $table")
         }
     }
 
     private fun requirePositiveId(id: Int, table: String) {
         if (id <= 0) {
-            throw BackupException("Identificador inválido en $table")
+            throw invalidData("Identificador inválido en $table")
         }
     }
 
     private fun validateImagePath(path: String?, owner: String) {
         if (path == null) return
         if (!imagePathRegex.matches(path) || path.contains("..")) {
-            throw BackupException("Ruta de imagen inválida en $owner")
+            throw invalidData("Ruta de imagen inválida en $owner")
         }
     }
+
+    private fun invalidData(message: String): BackupException =
+        BackupException(BackupError.INVALID_DATA, message)
 }

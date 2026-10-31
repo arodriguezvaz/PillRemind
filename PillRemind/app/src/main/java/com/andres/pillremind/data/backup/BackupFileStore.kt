@@ -25,7 +25,10 @@ class BackupFileStore @Inject constructor(
      */
     fun openInput(uri: Uri): InputStream =
         context.contentResolver.openInputStream(uri)
-            ?: throw BackupException("No se pudo abrir el archivo seleccionado")
+            ?: throw BackupException(
+                BackupError.IO_ERROR,
+                "No se pudo abrir el archivo seleccionado"
+            )
 
     /**
      * Crea o trunca el archivo de destino.
@@ -34,7 +37,10 @@ class BackupFileStore @Inject constructor(
      */
     fun openOutput(uri: Uri): OutputStream =
         context.contentResolver.openOutputStream(uri, "wt")
-            ?: throw BackupException("No se pudo crear el archivo de copia")
+            ?: throw BackupException(
+                BackupError.IO_ERROR,
+                "No se pudo crear el archivo de copia"
+            )
 
     /**
      * Nombre sugerido para una copia nueva.

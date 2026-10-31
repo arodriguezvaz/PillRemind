@@ -30,8 +30,16 @@ object BackupSerializer {
         try {
             json.decodeFromString<BackupFileDto>(content)
         } catch (e: SerializationException) {
-            throw BackupException("El archivo no es una copia de seguridad válida", e)
+            throw BackupException(
+                BackupError.INVALID_FILE,
+                "El archivo no es una copia de seguridad válida",
+                e
+            )
         } catch (e: IllegalArgumentException) {
-            throw BackupException("El archivo no es una copia de seguridad válida", e)
+            throw BackupException(
+                BackupError.INVALID_FILE,
+                "El archivo no es una copia de seguridad válida",
+                e
+            )
         }
 }

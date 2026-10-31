@@ -55,14 +55,23 @@ object BackupArchive {
     fun write(output: OutputStream, json: String, images: Map<String, File>) {
         val jsonBytes = json.toByteArray(Charsets.UTF_8)
         if (jsonBytes.size > MAX_JSON_BYTES) {
-            throw BackupException("El archivo de datos de la copia es demasiado grande")
+            throw BackupException(
+                BackupError.TOO_LARGE,
+                "El archivo de datos de la copia es demasiado grande"
+            )
         }
         if (images.size > MAX_IMAGES) {
-            throw BackupException("La copia contiene demasiadas imágenes")
+            throw BackupException(
+                BackupError.TOO_LARGE,
+                "La copia contiene demasiadas imágenes"
+            )
         }
         val totalBytes = jsonBytes.size.toLong() + images.values.sumOf { it.length() }
         if (totalBytes > MAX_TOTAL_BYTES) {
-            throw BackupException("La copia supera el tamaño máximo permitido")
+            throw BackupException(
+                BackupError.TOO_LARGE,
+                "La copia supera el tamaño máximo permitido"
+            )
         }
 
         ZipOutputStream(BufferedOutputStream(output)).use { zip ->
@@ -100,13 +109,19 @@ object BackupArchive {
                     continue
                 }
                 if (!entryNames.add(name)) {
-                    throw BackupException("La copia contiene entradas duplicadas")
+                    throw BackupException(
+                        BackupError.CORRUPTED,
+                        "La copia contiene entradas duplicadas"
+                    )
                 }
 
                 when {
                     name == JSON_ENTRY -> {
                         if (json != null) {
-                            throw BackupException("La copia contiene varios archivos de datos")
+                            throw BackupException(
+                                BackupError.CORRUPTED,
+                                "La copia contiene varios archivos de datos"
+                            )
                         }
                         val remaining = MAX_JSON_BYTES.coerceAtMost(MAX_TOTAL_BYTES - totalBytes)
                         val bytes = readEntry(zip, remaining)
@@ -116,7 +131,10 @@ object BackupArchive {
 
                     imageNameRegex.matches(name) && !name.contains("..") -> {
                         if (images.size >= MAX_IMAGES) {
-                            throw BackupException("La copia contiene demasiadas imágenes")
+                            throw BackupException(
+                                BackupError.TOO_LARGE,
+                                "La copia contiene demasiadas imágenes"
+                            )
                         }
                         val remaining = MAX_TOTAL_BYTES - totalBytes
                         val bytes = readEntry(zip, remaining)
@@ -124,20 +142,29 @@ object BackupArchive {
                         images[name] = bytes
                     }
 
-                    else -> throw BackupException("La copia contiene archivos no permitidos")
+                    else -> throw BackupException(
+                        BackupError.CORRUPTED,
+                        "La copia contiene archivos no permitidos"
+                    )
                 }
 
                 zip.closeEntry()
             }
 
-            val content = json ?: throw BackupException("La copia no contiene el archivo de datos")
+            val content = json ?: throw BackupException(
+                BackupError.CORRUPTED,
+                "La copia no contiene el archivo de datos"
+            )
             return Contents(content, images)
         }
     }
 
     private fun readEntry(zip: ZipInputStream, maxBytes: Long): ByteArray {
         if (maxBytes <= 0) {
-            throw BackupException("La copia es demasiado grande")
+            throw BackupException(
+                BackupError.TOO_LARGE,
+                "La copia es demasiado grande"
+            )
         }
 
         val output = ByteArrayOutputStream()
@@ -149,7 +176,10 @@ object BackupArchive {
             if (read == -1) break
             total += read
             if (total > maxBytes) {
-                throw BackupException("La copia es demasiado grande")
+                throw BackupException(
+                    BackupError.TOO_LARGE,
+                    "La copia es demasiado grande"
+                )
             }
             output.write(buffer, 0, read)
         }

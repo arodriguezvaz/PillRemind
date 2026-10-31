@@ -71,17 +71,26 @@ object BackupCrypto {
     fun readHeader(input: InputStream): Header {
         val fileMagic = readFully(input, magic.size)
         if (!fileMagic.contentEquals(magic)) {
-            throw BackupException("El archivo no es una copia de seguridad de PillRemind")
+            throw BackupException(
+                BackupError.INVALID_FILE,
+                "El archivo no es una copia de seguridad de PillRemind"
+            )
         }
 
         val version = readFully(input, 1)[0].toInt() and 0xFF
         if (version != CONTAINER_VERSION) {
-            throw BackupException("Versión de copia no compatible")
+            throw BackupException(
+                BackupError.UNSUPPORTED_VERSION,
+                "Versión de copia no compatible"
+            )
         }
 
         val flags = readFully(input, 1)[0].toInt() and 0xFF
         if ((flags and FLAG_ENCRYPTED.inv()) != 0) {
-            throw BackupException("Copia de seguridad no compatible")
+            throw BackupException(
+                BackupError.UNSUPPORTED_VERSION,
+                "Copia de seguridad no compatible"
+            )
         }
 
         return Header(encrypted = (flags and FLAG_ENCRYPTED) != 0)
@@ -146,7 +155,10 @@ object BackupCrypto {
         while (offset < size) {
             val read = input.read(buffer, offset, size - offset)
             if (read == -1) {
-                throw BackupException("El archivo de copia está incompleto")
+                throw BackupException(
+                    BackupError.CORRUPTED,
+                    "El archivo de copia está incompleto"
+                )
             }
             offset += read
         }

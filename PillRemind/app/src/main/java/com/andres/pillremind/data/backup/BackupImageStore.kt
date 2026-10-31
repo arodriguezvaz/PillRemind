@@ -82,7 +82,11 @@ class BackupImageStore @Inject constructor(
             }
         } catch (e: Exception) {
             created.forEach { file -> runCatching { file.delete() } }
-            throw BackupException("No se pudieron restaurar las imágenes", e)
+            throw BackupException(
+                BackupError.IMAGES_ERROR,
+                "No se pudieron restaurar las imágenes",
+                e
+            )
         }
     }
 

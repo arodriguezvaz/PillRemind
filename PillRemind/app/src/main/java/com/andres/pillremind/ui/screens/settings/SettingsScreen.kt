@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.settings.SettingsCard
@@ -91,7 +93,14 @@ fun SettingsScreen(
     var pendingExportUri by rememberSaveable { mutableStateOf<String?>(null) }
 
     val busy = backupState is BackupUiState.Working ||
-        backupState is BackupUiState.Inspecting
+            backupState is BackupUiState.Inspecting
+
+    val exportedMessage = stringResource(R.string.backup_export_success)
+    val genericErrorMessage = stringResource(R.string.backup_error_generic)
+    val errorMessage = when (val state = backupState) {
+        is BackupUiState.Error -> stringResource(state.messageRes)
+        else -> null
+    }
 
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/octet-stream")
@@ -120,7 +129,7 @@ fun SettingsScreen(
             }
 
             is BackupUiState.Exported -> {
-                snackbarHostState.showSnackbar(state.message)
+                snackbarHostState.showSnackbar(exportedMessage)
                 settingsViewModel.consumeBackupState()
             }
 
@@ -129,7 +138,7 @@ fun SettingsScreen(
             }
 
             is BackupUiState.Error -> {
-                snackbarHostState.showSnackbar(state.message)
+                snackbarHostState.showSnackbar(errorMessage ?: genericErrorMessage)
                 settingsViewModel.consumeBackupState()
             }
 
@@ -145,7 +154,7 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             MainTopBar(
-                state = TopBarState(title = "Ajustes"),
+                state = TopBarState(title = stringResource(R.string.settings_title)),
                 navController = navController,
                 topLevelRoutes = topLevelRoutes
             )
@@ -164,7 +173,7 @@ fun SettingsScreen(
             // Tarjeta de apariencia
             SettingsCard {
                 SettingsToggleItem(
-                    label = "Modo oscuro",
+                    label = stringResource(R.string.settings_dark_mode),
                     checked = isDarkMode,
                     onCheckedChange = { settingsViewModel.toggleDarkMode(it) }
                 )
@@ -172,16 +181,15 @@ fun SettingsScreen(
 
             // Aviso de alarmas exactas: no se abre Ajustes automáticamente.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !exactAlarmsAllowed) {
-                SettingsCard(title = "Recordatorios") {
+                SettingsCard(title = stringResource(R.string.settings_reminders_title)) {
                     Text(
-                        text = "Las alarmas exactas están desactivadas. Sin este permiso " +
-                            "los recordatorios pueden retrasarse.",
+                        text = stringResource(R.string.settings_exact_alarms_disabled),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(Modifier.height(12.dp))
                     AppButton(
-                        text = "Permitir alarmas exactas",
+                        text = stringResource(R.string.settings_allow_exact_alarms),
                         onClick = { openExactAlarmSettings(context) },
                         size = ButtonSize.Large
                     )
@@ -189,16 +197,15 @@ fun SettingsScreen(
             }
 
             // Copia de seguridad local
-            SettingsCard(title = "Datos") {
+            SettingsCard(title = stringResource(R.string.settings_data_title)) {
                 Text(
-                    text = "Copia de seguridad local de perfiles, medicamentos, horarios, " +
-                        "historial e imágenes.",
+                    text = stringResource(R.string.settings_data_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(10.dp))
                 SettingsLinkItem(
-                    label = "Exportar datos",
+                    label = stringResource(R.string.settings_export_data),
                     onClick = {
                         if (!busy) {
                             exportLauncher.launch(settingsViewModel.suggestedBackupFileName())
@@ -207,7 +214,7 @@ fun SettingsScreen(
                     enabled = !busy
                 )
                 SettingsLinkItem(
-                    label = "Importar datos",
+                    label = stringResource(R.string.settings_import_data),
                     onClick = { if (!busy) importLauncher.launch(arrayOf("*/*")) },
                     enabled = !busy
                 )
@@ -222,7 +229,7 @@ fun SettingsScreen(
                             strokeWidth = 2.dp
                         )
                         Text(
-                            text = "Procesando copia de seguridad…",
+                            text = stringResource(R.string.settings_backup_in_progress),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -230,18 +237,17 @@ fun SettingsScreen(
                 }
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    text = "El archivo contiene datos de salud. Si no lo proteges con " +
-                        "contraseña, cualquiera que lo tenga podrá leerlo.",
+                    text = stringResource(R.string.settings_backup_privacy_warning),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             // Tarjeta legal
-            SettingsCard(title = "Legal") {
-                SettingsLinkItem("Política de Privacidad", { /* abrir url */ })
-                SettingsLinkItem("Términos y condiciones de uso", { /* abrir url */ })
-                SettingsLinkItem("Aviso Legal", { /* abrir url */ })
+            SettingsCard(title = stringResource(R.string.settings_legal_title)) {
+                SettingsLinkItem(stringResource(R.string.settings_privacy_policy), { /* abrir url */ })
+                SettingsLinkItem(stringResource(R.string.settings_terms), { /* abrir url */ })
+                SettingsLinkItem(stringResource(R.string.settings_legal_notice), { /* abrir url */ })
             }
         }
     }
@@ -271,12 +277,9 @@ fun SettingsScreen(
                 pendingImportUri = null
                 settingsViewModel.consumeBackupState()
             },
-            title = { Text("Importar copia de seguridad") },
+            title = { Text(stringResource(R.string.backup_import_title)) },
             text = {
-                Text(
-                    "Se reemplazarán todos los perfiles, medicamentos, horarios, historial " +
-                        "e imágenes actuales. Esta acción no se puede deshacer."
-                )
+                Text(stringResource(R.string.backup_import_warning))
             },
             confirmButton = {
                 TextButton(
@@ -290,7 +293,7 @@ fun SettingsScreen(
                         }
                     }
                 ) {
-                    Text("Continuar")
+                    Text(stringResource(R.string.backup_continue))
                 }
             },
             dismissButton = {
@@ -301,7 +304,7 @@ fun SettingsScreen(
                         settingsViewModel.consumeBackupState()
                     }
                 ) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.backup_cancel))
                 }
             }
         )
@@ -329,9 +332,9 @@ fun SettingsScreen(
     if (showImportSuccessDialog) {
         AlertDialog(
             onDismissRequest = { /* La copia ya está aplicada; solo se cierra con el botón. */ },
-            title = { Text("Importación completada") },
+            title = { Text(stringResource(R.string.backup_import_success_title)) },
             text = {
-                Text("Los datos se han restaurado. Selecciona un perfil para continuar.")
+                Text(stringResource(R.string.backup_import_success_message))
             },
             confirmButton = {
                 TextButton(
@@ -342,7 +345,7 @@ fun SettingsScreen(
                         navController.popBackStack()
                     }
                 ) {
-                    Text("Elegir perfil")
+                    Text(stringResource(R.string.backup_continue))
                 }
             }
         )
@@ -363,38 +366,37 @@ private fun ExportBackupDialog(
     var protectWithPassword by remember { mutableStateOf(false) }
     var password by remember { mutableStateOf("") }
     var confirmation by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf<String?>(null) }
+    var errorRes by remember { mutableStateOf<Int?>(null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Exportar datos") },
+        title = { Text(stringResource(R.string.backup_export_title)) },
         text = {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    "Se creará un archivo con todos los perfiles, medicamentos, horarios, " +
-                        "historial e imágenes."
+                    stringResource(R.string.backup_export_description)
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = protectWithPassword,
                         onCheckedChange = {
                             protectWithPassword = it
-                            error = null
+                            errorRes = null
                         }
                     )
-                    Text("Proteger con contraseña")
+                    Text(stringResource(R.string.backup_protect_with_password))
                 }
                 if (protectWithPassword) {
                     OutlinedTextField(
                         value = password,
                         onValueChange = {
                             password = it
-                            error = null
+                            errorRes = null
                         },
-                        label = { Text("Contraseña (mínimo 8 caracteres)") },
+                        label = { Text(stringResource(R.string.backup_password_min_length)) },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
@@ -403,22 +405,22 @@ private fun ExportBackupDialog(
                         value = confirmation,
                         onValueChange = {
                             confirmation = it
-                            error = null
+                            errorRes = null
                         },
-                        label = { Text("Repetir contraseña") },
+                        label = { Text(stringResource(R.string.backup_repeat_password)) },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                     )
                     Text(
-                        text = "Si olvidas la contraseña, no podrás recuperar la copia.",
+                        text = stringResource(R.string.backup_password_warning),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                error?.let {
+                errorRes?.let {
                     Text(
-                        text = it,
+                        text = stringResource(it),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error
                     )
@@ -431,11 +433,11 @@ private fun ExportBackupDialog(
                     if (protectWithPassword) {
                         when {
                             password.length < 8 -> {
-                                error = "La contraseña debe tener al menos 8 caracteres"
+                                errorRes = R.string.backup_password_too_short
                             }
 
                             password != confirmation -> {
-                                error = "Las contraseñas no coinciden"
+                                errorRes = R.string.backup_passwords_mismatch
                             }
 
                             else -> onConfirm(password)
@@ -445,12 +447,12 @@ private fun ExportBackupDialog(
                     }
                 }
             ) {
-                Text("Exportar")
+                Text(stringResource(R.string.backup_export_action))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(R.string.backup_cancel))
             }
         }
     )
@@ -468,28 +470,28 @@ private fun ImportPasswordDialog(
     onConfirm: (String) -> Unit
 ) {
     var password by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf<String?>(null) }
+    var errorRes by remember { mutableStateOf<Int?>(null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Copia protegida") },
+        title = { Text(stringResource(R.string.backup_password_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Introduce la contraseña con la que se exportó esta copia.")
+                Text(stringResource(R.string.backup_password_description))
                 OutlinedTextField(
                     value = password,
                     onValueChange = {
                         password = it
-                        error = null
+                        errorRes = null
                     },
-                    label = { Text("Contraseña") },
+                    label = { Text(stringResource(R.string.backup_password_label)) },
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                 )
-                error?.let {
+                errorRes?.let {
                     Text(
-                        text = it,
+                        text = stringResource(it),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error
                     )
@@ -500,18 +502,18 @@ private fun ImportPasswordDialog(
             TextButton(
                 onClick = {
                     if (password.isBlank()) {
-                        error = "Introduce la contraseña"
+                        errorRes = R.string.backup_password_required
                     } else {
                         onConfirm(password)
                     }
                 }
             ) {
-                Text("Importar")
+                Text(stringResource(R.string.backup_import_action))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(R.string.backup_cancel))
             }
         }
     )
