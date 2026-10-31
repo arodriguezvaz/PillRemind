@@ -17,20 +17,26 @@ import androidx.compose.ui.unit.dp
  * @param label Texto mostrado como enlace.
  * @param onClick Acción ejecutada al hacer clic.
  * @param modifier Modificador para personalizar el layout.
+ * @param enabled Indica si el elemento se puede pulsar.
  */
 @Composable
 fun SettingsLinkItem(
     label: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Text(
         text = label,
         style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.primary,
+        color = if (enabled) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+        },
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(vertical = 4.dp)
     )
 }

@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.andres.pillremind.data.local.converters.Converters
+import com.andres.pillremind.data.local.dao.BackupDao
 import com.andres.pillremind.data.local.dao.IntakeDao
 import com.andres.pillremind.data.local.dao.MedicationDao
 import com.andres.pillremind.data.local.dao.ProfileDao
@@ -45,4 +46,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     //Dao para acceder a los datos de las tomas
     abstract fun intakeDao(): IntakeDao
+
+    //Dao para exportar e importar copias de seguridad
+    abstract fun backupDao(): BackupDao
 }

@@ -115,4 +115,16 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
             preferences[Keys.LAST_GENERATED_DATE] = fecha.toString()
         }
     }
+
+    /**
+     * Borra la fecha de la última generación de tomas.
+     *
+     * Se usa tras importar una copia para que la ventana de recordatorios se
+     * regenere desde el día actual.
+     */
+    suspend fun clearLastGeneratedDate() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(Keys.LAST_GENERATED_DATE)
+        }
+    }
 }

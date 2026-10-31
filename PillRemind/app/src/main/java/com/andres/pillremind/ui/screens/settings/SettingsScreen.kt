@@ -5,25 +5,42 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -42,8 +59,9 @@ import com.andres.pillremind.ui.screens.main.TopBarState
 /**
  * Pantalla de ajustes de la aplicación.
  *
- * Permite gestionar el modo oscuro y muestra el estado del permiso de alarmas
- * exactas. Los datos de la aplicación son siempre locales.
+ * Permite gestionar el modo oscuro, el estado del permiso de alarmas exactas y
+ * la exportación e importación de una copia de seguridad local. Los datos de la
+ * aplicación son siempre locales.
  *
  * @param navController Controlador de navegación para volver a la pantalla anterior.
  * @param topLevelRoutes Rutas principales que no muestran flecha de retroceso.
@@ -57,9 +75,67 @@ fun SettingsScreen(
 ) {
 
     val isDarkMode by settingsViewModel.isDarkMode.collectAsStateWithLifecycle()
+    val backupState by settingsViewModel.backupState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
     var exactAlarmsAllowed by remember { mutableStateOf(canScheduleExactAlarms(context)) }
+
+    var showExportDialog by rememberSaveable { mutableStateOf(false) }
+    var showImportConfirmation by rememberSaveable { mutableStateOf(false) }
+    var showImportPasswordDialog by rememberSaveable { mutableStateOf(false) }
+    var showImportSuccessDialog by rememberSaveable { mutableStateOf(false) }
+    var importIsEncrypted by rememberSaveable { mutableStateOf(false) }
+    var pendingImportUri by rememberSaveable { mutableStateOf<String?>(null) }
+    var pendingExportUri by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val busy = backupState is BackupUiState.Working ||
+        backupState is BackupUiState.Inspecting
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/octet-stream")
+    ) { uri ->
+        if (uri != null) {
+            pendingExportUri = uri.toString()
+            showExportDialog = true
+        }
+    }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            pendingImportUri = uri.toString()
+            settingsViewModel.inspectBackup(uri)
+        }
+    }
+
+    LaunchedEffect(backupState) {
+        when (val state = backupState) {
+            is BackupUiState.AwaitingConfirmation -> {
+                importIsEncrypted = state.encrypted
+                showImportConfirmation = true
+                settingsViewModel.consumeBackupState()
+            }
+
+            is BackupUiState.Exported -> {
+                snackbarHostState.showSnackbar(state.message)
+                settingsViewModel.consumeBackupState()
+            }
+
+            is BackupUiState.Imported -> {
+                showImportSuccessDialog = true
+            }
+
+            is BackupUiState.Error -> {
+                snackbarHostState.showSnackbar(state.message)
+                settingsViewModel.consumeBackupState()
+            }
+
+            else -> Unit
+        }
+    }
 
     // Al volver de los ajustes del sistema se refresca el estado del permiso.
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
@@ -73,7 +149,8 @@ fun SettingsScreen(
                 navController = navController,
                 topLevelRoutes = topLevelRoutes
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -111,6 +188,55 @@ fun SettingsScreen(
                 }
             }
 
+            // Copia de seguridad local
+            SettingsCard(title = "Datos") {
+                Text(
+                    text = "Copia de seguridad local de perfiles, medicamentos, horarios, " +
+                        "historial e imágenes.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(10.dp))
+                SettingsLinkItem(
+                    label = "Exportar datos",
+                    onClick = {
+                        if (!busy) {
+                            exportLauncher.launch(settingsViewModel.suggestedBackupFileName())
+                        }
+                    },
+                    enabled = !busy
+                )
+                SettingsLinkItem(
+                    label = "Importar datos",
+                    onClick = { if (!busy) importLauncher.launch(arrayOf("*/*")) },
+                    enabled = !busy
+                )
+                if (busy) {
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Text(
+                            text = "Procesando copia de seguridad…",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    text = "El archivo contiene datos de salud. Si no lo proteges con " +
+                        "contraseña, cualquiera que lo tenga podrá leerlo.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
             // Tarjeta legal
             SettingsCard(title = "Legal") {
                 SettingsLinkItem("Política de Privacidad", { /* abrir url */ })
@@ -119,6 +245,276 @@ fun SettingsScreen(
             }
         }
     }
+
+    if (showExportDialog) {
+        ExportBackupDialog(
+            onDismiss = {
+                showExportDialog = false
+                pendingExportUri?.toUri()?.let { settingsViewModel.discardExport(it) }
+                pendingExportUri = null
+            },
+            onConfirm = { password ->
+                showExportDialog = false
+                val uri = pendingExportUri?.toUri()
+                pendingExportUri = null
+                if (uri != null) {
+                    settingsViewModel.exportBackup(uri, password?.toCharArray())
+                }
+            }
+        )
+    }
+
+    if (showImportConfirmation) {
+        AlertDialog(
+            onDismissRequest = {
+                showImportConfirmation = false
+                pendingImportUri = null
+                settingsViewModel.consumeBackupState()
+            },
+            title = { Text("Importar copia de seguridad") },
+            text = {
+                Text(
+                    "Se reemplazarán todos los perfiles, medicamentos, horarios, historial " +
+                        "e imágenes actuales. Esta acción no se puede deshacer."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showImportConfirmation = false
+                        val uri = pendingImportUri?.toUri()
+                        when {
+                            uri == null -> settingsViewModel.consumeBackupState()
+                            importIsEncrypted -> showImportPasswordDialog = true
+                            else -> settingsViewModel.importBackup(uri, null)
+                        }
+                    }
+                ) {
+                    Text("Continuar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showImportConfirmation = false
+                        pendingImportUri = null
+                        settingsViewModel.consumeBackupState()
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+    if (showImportPasswordDialog) {
+        ImportPasswordDialog(
+            onDismiss = {
+                showImportPasswordDialog = false
+                pendingImportUri = null
+                settingsViewModel.consumeBackupState()
+            },
+            onConfirm = { password ->
+                showImportPasswordDialog = false
+                val uri = pendingImportUri?.toUri()
+                if (uri != null) {
+                    settingsViewModel.importBackup(uri, password.toCharArray())
+                } else {
+                    settingsViewModel.consumeBackupState()
+                }
+            }
+        )
+    }
+
+    if (showImportSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = { /* La copia ya está aplicada; solo se cierra con el botón. */ },
+            title = { Text("Importación completada") },
+            text = {
+                Text("Los datos se han restaurado. Selecciona un perfil para continuar.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showImportSuccessDialog = false
+                        pendingImportUri = null
+                        settingsViewModel.consumeBackupState()
+                        navController.popBackStack()
+                    }
+                ) {
+                    Text("Elegir perfil")
+                }
+            }
+        )
+    }
+}
+
+/**
+ * Diálogo para elegir si la copia se protege con contraseña.
+ *
+ * @param onDismiss Acción al cancelar.
+ * @param onConfirm Recibe la contraseña, o `null` si la copia no se cifra.
+ */
+@Composable
+private fun ExportBackupDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String?) -> Unit
+) {
+    var protectWithPassword by remember { mutableStateOf(false) }
+    var password by remember { mutableStateOf("") }
+    var confirmation by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Exportar datos") },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    "Se creará un archivo con todos los perfiles, medicamentos, horarios, " +
+                        "historial e imágenes."
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = protectWithPassword,
+                        onCheckedChange = {
+                            protectWithPassword = it
+                            error = null
+                        }
+                    )
+                    Text("Proteger con contraseña")
+                }
+                if (protectWithPassword) {
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = {
+                            password = it
+                            error = null
+                        },
+                        label = { Text("Contraseña (mínimo 8 caracteres)") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    )
+                    OutlinedTextField(
+                        value = confirmation,
+                        onValueChange = {
+                            confirmation = it
+                            error = null
+                        },
+                        label = { Text("Repetir contraseña") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    )
+                    Text(
+                        text = "Si olvidas la contraseña, no podrás recuperar la copia.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                error?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (protectWithPassword) {
+                        when {
+                            password.length < 8 -> {
+                                error = "La contraseña debe tener al menos 8 caracteres"
+                            }
+
+                            password != confirmation -> {
+                                error = "Las contraseñas no coinciden"
+                            }
+
+                            else -> onConfirm(password)
+                        }
+                    } else {
+                        onConfirm(null)
+                    }
+                }
+            ) {
+                Text("Exportar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
+}
+
+/**
+ * Diálogo para introducir la contraseña de una copia cifrada.
+ *
+ * @param onDismiss Acción al cancelar.
+ * @param onConfirm Recibe la contraseña introducida.
+ */
+@Composable
+private fun ImportPasswordDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var password by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Copia protegida") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Introduce la contraseña con la que se exportó esta copia.")
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = {
+                        password = it
+                        error = null
+                    },
+                    label = { Text("Contraseña") },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                )
+                error?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (password.isBlank()) {
+                        error = "Introduce la contraseña"
+                    } else {
+                        onConfirm(password)
+                    }
+                }
+            ) {
+                Text("Importar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
 }
 
 /**

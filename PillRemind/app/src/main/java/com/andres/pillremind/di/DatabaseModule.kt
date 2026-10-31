@@ -2,6 +2,7 @@ package com.andres.pillremind.di
 
 import android.content.Context
 import androidx.room.Room
+import com.andres.pillremind.data.local.dao.BackupDao
 import com.andres.pillremind.data.local.database.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -52,4 +53,7 @@ object DatabaseModule {
 
     @Provides
     fun provideIntakeDao(db: AppDatabase) = db.intakeDao()
+
+    @Provides
+    fun provideBackupDao(db: AppDatabase): BackupDao = db.backupDao()
 }
