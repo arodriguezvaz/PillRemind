@@ -21,6 +21,40 @@ of the earlier Supabase version. Check the current branch with
 Do not reintroduce Supabase into `master` or `local/sin-nube`. Do not apply the
 local-only cleanup on the archive branches: Supabase is still part of their code.
 
+## Branch naming
+
+Create every working branch from an up-to-date `master`. Do not commit directly to
+`master`. Use one branch per issue or feature; do not mix unrelated changes.
+
+Branch names follow `<tipo>/<numero>-<descripcion-corta>`:
+
+- `tipo`: `feat`, `fix`, `refactor`, `perf`, `test`, `docs` or `chore`.
+- `numero` is mandatory and sequential per type. Use the next value from the
+  counters line below; never reuse a number.
+- `descripcion-corta`: lowercase ASCII letters, digits and hyphens only. No spaces,
+  accents, `ñ`, underscores or CamelCase. Keep it short (roughly 2–5 words).
+- If the work maps to an incident ID (`DAT-02`, `UI-02`, `TST-01`), include it in
+  the description, for example `fix/3-dat-02-intakes`.
+- Existing branches keep their names; this convention applies to new branches.
+- `respaldo/*` and `local/*` are reserved for archived/historical versions. Do not
+  create new ones unless explicitly maintaining an archive.
+
+Examples: `fix/1-navegacion`, `fix/2-datos`, `feat/1-historial-tomas`,
+`refactor/1-top-bar`, `test/1-notificaciones-receivers`, `docs/1-navegacion-html`.
+
+Avoid: `cambios`, `prueba`, `tmp`, `fix/navegacion`, `fix/UI_02`, `Fix/UI-02`.
+
+**Branch counters:** `feat=0`, `fix=0`, `refactor=0`, `perf=0`, `test=0`,
+`docs=1`, `chore=0`. Increment the matching counter when creating a branch and
+commit the update with that branch. Keep at most one active branch per type so two
+branches cannot take the same number.
+
+To check numbered branches that still exist:
+
+```bash
+git branch -a --list 'fix/*'
+```
+
 ## Commands
 
 ```bash
