@@ -86,5 +86,6 @@
     <string name="backup_error_images">No se pudieron restaurar las imágenes</string>
     <string name="backup_error_save">No se pudieron guardar los datos importados</string>
     <string name="backup_error_io">No se pudo acceder al archivo seleccionado</string>
+    <string name="backup_error_export_restarted">La exportación se canceló porque se perdió la contraseña. Vuelve a intentarlo.</string>
     <string name="backup_error_generic">No se pudo completar la operación</string>
 </resources>

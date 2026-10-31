@@ -90,7 +90,6 @@ fun SettingsScreen(
     var showImportSuccessDialog by rememberSaveable { mutableStateOf(false) }
     var importIsEncrypted by rememberSaveable { mutableStateOf(false) }
     var pendingImportUri by rememberSaveable { mutableStateOf<String?>(null) }
-    var pendingExportUri by rememberSaveable { mutableStateOf<String?>(null) }
 
     val busy = backupState is BackupUiState.Working ||
             backupState is BackupUiState.Inspecting
@@ -106,8 +105,9 @@ fun SettingsScreen(
         contract = ActivityResultContracts.CreateDocument("application/octet-stream")
     ) { uri ->
         if (uri != null) {
-            pendingExportUri = uri.toString()
-            showExportDialog = true
+            settingsViewModel.exportBackup(uri)
+        } else {
+            settingsViewModel.cancelPendingExport()
         }
     }
 
@@ -206,11 +206,7 @@ fun SettingsScreen(
                 Spacer(Modifier.height(10.dp))
                 SettingsLinkItem(
                     label = stringResource(R.string.settings_export_data),
-                    onClick = {
-                        if (!busy) {
-                            exportLauncher.launch(settingsViewModel.suggestedBackupFileName())
-                        }
-                    },
+                    onClick = { if (!busy) showExportDialog = true },
                     enabled = !busy
                 )
                 SettingsLinkItem(
@@ -254,17 +250,11 @@ fun SettingsScreen(
 
     if (showExportDialog) {
         ExportBackupDialog(
-            onDismiss = {
-                showExportDialog = false
-                pendingExportUri?.toUri()?.let { settingsViewModel.discardExport(it) }
-                pendingExportUri = null
-            },
+            onDismiss = { showExportDialog = false },
             onConfirm = { password ->
                 showExportDialog = false
-                val uri = pendingExportUri?.toUri()
-                pendingExportUri = null
-                if (uri != null) {
-                    settingsViewModel.exportBackup(uri, password?.toCharArray())
+                if (settingsViewModel.prepareExport(password?.toCharArray())) {
+                    exportLauncher.launch(settingsViewModel.suggestedBackupFileName())
                 }
             }
         )

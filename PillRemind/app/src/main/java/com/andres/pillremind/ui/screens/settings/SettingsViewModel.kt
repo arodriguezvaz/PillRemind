@@ -2,6 +2,7 @@ package com.andres.pillremind.ui.screens.settings
 
 import android.net.Uri
 import androidx.annotation.StringRes
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.R
@@ -67,8 +68,19 @@ sealed interface BackupUiState {
 class SettingsViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val backupRepository: BackupRepository,
-    private val backupFileStore: BackupFileStore
+    private val backupFileStore: BackupFileStore,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    internal companion object {
+        /** Indica que hay una exportación esperando a que el usuario elija el archivo. */
+        const val KEY_PENDING_EXPORT = "pending_export"
+
+        /** Indica que la exportación pendiente debe cifrarse con contraseña. */
+        const val KEY_PENDING_EXPORT_ENCRYPTED = "pending_export_encrypted"
+    }
+
+    private var pendingExportPassword: CharArray? = null
 
     val isDarkMode: StateFlow<Boolean> = sessionManager.isDarkMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -112,13 +124,51 @@ class SettingsViewModel @Inject constructor(
     }
 
     /**
-     * Exporta la copia al documento indicado.
+     * Guarda la contraseña de la próxima exportación antes de abrir el explorador.
+     *
+     * La contraseña se mantiene solo en memoria. El flag de cifrado se guarda en
+     * [SavedStateHandle] para poder cancelar la exportación si el proceso muere
+     * mientras el explorador está abierto.
+     *
+     * @param password Contraseña de cifrado, o `null` para exportar sin cifrar.
+     * @return `true` si la exportación queda preparada.
+     */
+    fun prepareExport(password: CharArray?): Boolean {
+        if (isBusy()) {
+            password?.fill('\u0000')
+            return false
+        }
+
+        clearPendingExport()
+        pendingExportPassword = password
+        savedStateHandle[KEY_PENDING_EXPORT] = true
+        savedStateHandle[KEY_PENDING_EXPORT_ENCRYPTED] = password != null
+        return true
+    }
+
+    /**
+     * Exporta la copia al documento indicado usando la contraseña preparada.
+     *
+     * Si la copia debía ir cifrada y la contraseña se perdió (por ejemplo, por
+     * muerte del proceso con el explorador abierto), se cancela la exportación
+     * y se borra el archivo recién creado.
      *
      * @param uri Documento de destino.
-     * @param password Contraseña de cifrado, o `null` para no cifrar.
      */
-    fun exportBackup(uri: Uri, password: CharArray?) {
+    fun exportBackup(uri: Uri) {
         if (isBusy()) return
+
+        val prepared = savedStateHandle.get<Boolean>(KEY_PENDING_EXPORT) == true
+        val encrypted = savedStateHandle.get<Boolean>(KEY_PENDING_EXPORT_ENCRYPTED) == true
+        val password = pendingExportPassword
+
+        if (!prepared || (encrypted && password == null)) {
+            clearPendingExport()
+            backupFileStore.delete(uri)
+            _backupState.value = BackupUiState.Error(R.string.backup_error_export_restarted)
+            return
+        }
+
         viewModelScope.launch {
             _backupState.value = BackupUiState.Working
             try {
@@ -134,9 +184,16 @@ class SettingsViewModel @Inject constructor(
                 backupFileStore.delete(uri)
                 _backupState.value = BackupUiState.Error(e.userMessageRes())
             } finally {
-                password?.fill('\u0000')
+                clearPendingExport()
             }
         }
+    }
+
+    /**
+     * Descarta la exportación pendiente cuando el usuario cancela el explorador.
+     */
+    fun cancelPendingExport() {
+        clearPendingExport()
     }
 
     /**
@@ -167,21 +224,27 @@ class SettingsViewModel @Inject constructor(
     }
 
     /**
-     * Descarta un archivo de exportación que se creó pero no llegó a escribirse.
-     */
-    fun discardExport(uri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
-            backupFileStore.delete(uri)
-        }
-    }
-
-    /**
      * Marca como consumido el estado actual para no repetir diálogos ni avisos.
      */
     fun consumeBackupState() {
         if (!isBusy()) {
             _backupState.value = BackupUiState.Idle
         }
+    }
+
+    /**
+     * Borra la contraseña pendiente y los flags de exportación.
+     */
+    private fun clearPendingExport() {
+        pendingExportPassword?.fill('\u0000')
+        pendingExportPassword = null
+        savedStateHandle.remove<Boolean>(KEY_PENDING_EXPORT)
+        savedStateHandle.remove<Boolean>(KEY_PENDING_EXPORT_ENCRYPTED)
+    }
+
+    override fun onCleared() {
+        clearPendingExport()
+        super.onCleared()
     }
 
     private fun isBusy(): Boolean =
