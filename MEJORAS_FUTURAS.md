@@ -58,9 +58,13 @@ la deuda técnica se siguen registrando en el audit local `PillRemind/INCIDENCIA
 
 ### Exportar e importar datos
 
-- **Estado:** idea futura.
+- **Estado:** implementada.
 - **Contexto:** la app es local-only y no tiene sincronización ni copia en nube.
-- **Propuesta:** exportar perfiles, medicamentos, horarios y tomas a un archivo
-  local, e importarlos con validación de formato y versión.
-- **Prioridad:** baja/media; útil para cambiar de dispositivo sin depender de
-  backups del sistema.
+- **Implementación:** desde Ajustes se puede exportar e importar un archivo
+  `.pmbackup` (contenedor con cabecera propia y un ZIP interno con `backup.json`
+  e imágenes). Incluye perfiles, medicamentos, horarios, historial y fotos. La
+  importación reemplaza todos los datos actuales.
+- **Cifrado:** opcional con contraseña (AES-256-GCM con clave derivada por PBKDF2).
+  Si se olvida la contraseña, la copia no se puede recuperar.
+- **Compatibilidad:** el formato incluye una versión; las copias de versiones no
+  soportadas se rechazan con un mensaje claro.

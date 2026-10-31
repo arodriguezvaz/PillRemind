@@ -24,6 +24,10 @@ así como recordatorios e notificacións para cada toma.
 Todos os datos (perfís, medicamentos, horarios e tomas) gárdanse nunha base de datos Room no propio dispositivo.
 A aplicación non envía información a servidores externos nin sincroniza datos entre dispositivos.
 
+Desde Axustes pódese exportar e importar unha copia de seguridade local que inclúe perfís, medicamentos,
+horarios, historial e imaxes. A copia pódese protexer cun contrasinal; a importación substitúe todos os
+datos actuais.
+
 ## Sobre a autoría
 
 O autor deste proxecto é Andrés Rodríguez Vázquez, estudante de 2º DAM no IES San Clemente. 
