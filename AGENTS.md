@@ -6,6 +6,10 @@
 - Package is `com.andres.pillremind`. Entrypoints: `MainActivity` (Compose UI) and `PillRemindApp` (Hilt/Application setup).
 - Docs are Spanish/Galician, and code comments, KDoc, and UI strings are Spanish. Keep identifiers in English and match the surrounding style.
 
+## Project context
+
+- PillRemind started as the final project of a DAM (Desarrollo de Aplicaciones Multiplataforma) cycle, but it is maintained as a personal project. Treat it as a real application: prioritize data safety, maintainability and actual usefulness over academic checklists, and do not assume the scope must stop at the coursework.
+
 ## UI strings
 
 - Do not hardcode user-facing text in Compose or other UI code. Add labels, titles, dialog texts, snackbars, error messages and accessibility text to `PillRemind/app/src/main/res/values/strings.xml`, and read them with `stringResource` or `context.getString`.
