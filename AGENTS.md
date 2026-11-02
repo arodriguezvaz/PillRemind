@@ -55,7 +55,7 @@ Examples: `fix/1-navegacion`, `fix/2-datos`, `feat/1-historial-tomas`,
 Avoid: `cambios`, `prueba`, `tmp`, `fix/navegacion`, `fix/UI_02`, `Fix/UI-02`.
 
 **Branch counters:** `feat=2`, `fix=0`, `refactor=0`, `perf=0`, `test=0`,
-`docs=1`, `chore=0`. Increment the matching counter when creating a branch and
+`docs=2`, `chore=0`. Increment the matching counter when creating a branch and
 commit the update with that branch. Keep at most one active branch per type so two
 branches cannot take the same number.
 
@@ -93,6 +93,10 @@ cd PillRemind
 - WorkManager is Hilt-initialized: the default `WorkManagerInitializer` is removed in `AndroidManifest.xml`, and `PillRemindApp` supplies `HiltWorkerFactory`. New workers need `@HiltWorker` + `@AssistedInject`; do not re-add the default initializer.
 - Reminder pipeline: the unique periodic `daily_intake_worker` maintains a rolling 7-day window of intakes, `AlarmScheduler` sets exact alarms (with an inexact fallback), `AlarmReceiver` posts notifications, `BootReceiver` reschedules after boot/update, and `MarkAsTakenReceiver` records the intake. Changes here need on-device verification (exact alarms, notifications, boot behavior, permissions). A local-only known-issues audit may exist at `PillRemind/INCIDENCIAS.md`; it is Git-ignored and must never be committed or published.
 - `SessionManager` stores active user/profile IDs, dark mode, and the last intake-generation date in DataStore. Profile selection is the root navigation destination, and the active profile drives home/medication data.
+
+## Migrations
+
+- The app is not in production yet, so do not spend effort on migrations or backwards compatibility. Room schema changes just bump `AppDatabase.version` and drop local data (see Architecture), and the backup format may bump `BackupFormat.VERSION` without keeping compatibility with older backup files. Add real migrations or format upgrades only when explicitly requested.
 
 ## Docs
 
