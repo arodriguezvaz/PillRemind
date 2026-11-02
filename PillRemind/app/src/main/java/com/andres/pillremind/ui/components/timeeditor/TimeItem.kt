@@ -1,17 +1,19 @@
 package com.andres.pillremind.ui.components.timeeditor
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteOutline
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -20,7 +22,10 @@ import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
 /**
- * Item que muestra una hora y una acción de eliminación opcional.
+ * Fila que muestra una hora y una acción de eliminación opcional.
+ *
+ * Usa la forma de los campos del formulario y un [IconButton] para que el área
+ * táctil de eliminar llegue a 48dp.
  *
  * @param time Hora mostrada (se trunca a minutos para visualización).
  * @param enabled Si es true se muestra el icono de eliminar.
@@ -32,25 +37,33 @@ fun TimeItem(
     enabled: Boolean = true,
     onRemove: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = time.truncatedTo(ChronoUnit.MINUTES).toString())
+            Text(
+                text = time.truncatedTo(ChronoUnit.MINUTES).toString(),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
 
             if (enabled) {
-                Icon(
-                    imageVector = Icons.Rounded.DeleteOutline,
-                    contentDescription = stringResource(R.string.delete_time),
-                    modifier = Modifier.clickable { onRemove() },
-                    tint = MaterialTheme.colorScheme.error
-                )
+                IconButton(onClick = onRemove) {
+                    Icon(
+                        imageVector = Icons.Rounded.DeleteOutline,
+                        contentDescription = stringResource(R.string.delete_time),
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                }
             }
         }
     }

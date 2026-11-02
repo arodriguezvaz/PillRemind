@@ -1,15 +1,14 @@
 package com.andres.pillremind.ui.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.FilterChip
-import androidx.compose.runtime.Composable
-import com.andres.pillremind.domain.model.WeekDay
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,31 +17,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.andres.pillremind.domain.model.WeekDay
 
 /**
- * Grupo horizontal de chips para seleccionar días de la semana.
+ * Grupo de chips para seleccionar días de la semana.
+ *
+ * Usa [FlowRow] para que los siete días se envuelvan en varias líneas cuando no
+ * caben, en lugar de dejar el último chip cortado en un scroll horizontal.
  *
  * @param selectedDays Conjunto de días actualmente seleccionados.
  * @param onSelectionChange Lambda que recibe el nuevo conjunto de días al cambiar la selección.
  * @param enabled Indica si los chips están habilitados para interacción.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun WeekDayChipGroup(
     selectedDays: Set<WeekDay>,
     onSelectionChange: (Set<WeekDay>) -> Unit,
     enabled: Boolean = true
 ) {
-    val allDays = WeekDay.entries
-
-    LazyRow(
-        modifier = Modifier.padding(horizontal = 8.dp)
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(allDays) { day ->
+        WeekDay.entries.forEach { day ->
             val isSelected = selectedDays.contains(day)
 
             FilterChip(
-                modifier = Modifier
-                    .padding(end = 8.dp),
                 selected = isSelected,
                 onClick = {
                     val newSelection = selectedDays.toMutableSet()

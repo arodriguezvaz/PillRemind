@@ -27,6 +27,7 @@ import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.model.nextOccurrences
 import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormField
+import com.andres.pillremind.ui.components.AppReadOnlyField
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.WeekDayChipGroup
 import com.andres.pillremind.ui.components.labelRes
@@ -424,6 +425,92 @@ fun ScheduleEditor(
                 onRemoveTime = { time -> form.times.remove(time) }
             )
         }
+    }
+}
+
+/**
+ * Resumen de solo lectura de la pauta, sin campos deshabilitados.
+ *
+ * @param form Estado editable de la pauta que se quiere mostrar.
+ */
+@Composable
+fun ScheduleReadOnly(form: ScheduleFormState) {
+    val timesText = if (form.times.isEmpty()) {
+        stringResource(R.string.schedule_summary_no_times)
+    } else {
+        form.times.joinToString(", ") { it.toString() }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        AppReadOnlyField(
+            label = stringResource(R.string.schedule_periodicity),
+            value = stringResource(form.periodicity.labelRes()),
+        )
+
+        when (form.periodicity) {
+            SchedulePeriodicity.WEEKLY -> {
+                val selectedDayLabels = mutableListOf<String>()
+                for (day in WeekDay.entries) {
+                    if (day in form.selectedDays) {
+                        selectedDayLabels.add(stringResource(day.labelRes()))
+                    }
+                }
+                AppReadOnlyField(
+                    label = stringResource(R.string.schedule_selected_days),
+                    value = selectedDayLabels.joinToString(", ")
+                        .ifBlank { stringResource(R.string.common_not_specified) },
+                )
+            }
+
+            SchedulePeriodicity.EVERY_N_DAYS -> AppReadOnlyField(
+                label = stringResource(R.string.schedule_interval_days),
+                value = stringResource(
+                    R.string.schedule_summary_every_n_days,
+                    form.intervalDays.toIntOrNull() ?: 0,
+                ),
+            )
+
+            SchedulePeriodicity.MONTHLY_DAY -> AppReadOnlyField(
+                label = stringResource(R.string.schedule_day_of_month),
+                value = stringResource(
+                    R.string.schedule_summary_day_of_month,
+                    form.dayOfMonth.toIntOrNull() ?: 0,
+                ),
+            )
+
+            SchedulePeriodicity.MONTHLY_WEEKDAY -> {
+                val occurrence = occurrenceLabel(form.occurrence)
+                val day = stringResource(form.monthlyWeekDay.labelRes())
+                AppReadOnlyField(
+                    label = stringResource(R.string.schedule_occurrence),
+                    value = stringResource(
+                        R.string.schedule_summary_monthly_weekday,
+                        occurrence,
+                        day,
+                    ),
+                )
+            }
+
+            SchedulePeriodicity.CYCLE -> AppReadOnlyField(
+                label = stringResource(R.string.schedule_cycle_detail),
+                value = stringResource(
+                    R.string.schedule_summary_cycle,
+                    form.onDays.toIntOrNull() ?: 0,
+                    form.offDays.toIntOrNull() ?: 0,
+                ),
+            )
+
+            SchedulePeriodicity.DAILY,
+            SchedulePeriodicity.SINGLE -> Unit
+        }
+
+        AppReadOnlyField(
+            label = stringResource(R.string.horario),
+            value = timesText,
+        )
     }
 }
 

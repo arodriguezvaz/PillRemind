@@ -178,10 +178,20 @@
     <string name="schedule_off_days">Días de descanso</string>
     <string name="schedule_cycle_example">5</string>
     <string name="schedule_single_description">Se tomará una sola vez en la fecha de inicio.</string>
+    <string name="schedule_summary_every_n_days">Cada %1$d días</string>
+    <string name="schedule_summary_day_of_month">Día %1$d del mes</string>
+    <string name="schedule_summary_cycle">%1$d días de toma y %2$d de descanso</string>
+    <string name="schedule_summary_monthly_weekday">%1$s %2$s</string>
+    <string name="schedule_summary_no_times">Sin horas</string>
+    <string name="schedule_selected_days">Días seleccionados</string>
+    <string name="schedule_cycle_detail">Ciclo</string>
 
     <!-- Acciones y fotos -->
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancelar</string>
+    <string name="common_not_specified">Sin dato</string>
+    <string name="common_yes">Sí</string>
+    <string name="common_no">No</string>
     <string name="photo_profile">Foto de perfil</string>
     <string name="photo_edit">Editar foto</string>
     <string name="photo_add">Añadir foto</string>

@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -44,12 +45,14 @@ import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppFormSection
 import com.andres.pillremind.ui.components.AppPhotoPicker
+import com.andres.pillremind.ui.components.AppReadOnlyField
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.screens.main.TopBarState
 import java.io.File
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 /**
@@ -69,6 +72,8 @@ sealed class MedicationMode {
  * es grande o la pantalla es estrecha. Evita que textos como "Selecciona" o
  * las fechas se partan en dos líneas dentro de un campo de una sola línea.
  */
+private val medicationDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
 @Composable
 private fun AdaptiveFieldPair(
     modifier: Modifier = Modifier,
@@ -542,103 +547,65 @@ fun MedicationScreen(
                     photoUri = selectedPhotoUri,
                     onPhotoSelected = { selectedPhotoUri = it },
                     enabled = false,
-                    placeholderIcon = Icons.Default.AddAPhoto,
+                    placeholderIcon = Icons.Default.Person,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
                 AppFormSection(
                     title = stringResource(R.string.medication_data_section),
                     contentSpacing = 0.dp,
                 ) {
-                    AppFormField(label = stringResource(R.string.nombre)) {
-                        AppTextField(
-                            value = name.value,
-                            onValueChange = { name.value = it },
-                            placeholder = stringResource(R.string.medication_name_placeholder),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            enabled = false
-                        )
-                    }
+                    AppReadOnlyField(
+                        label = stringResource(R.string.nombre),
+                        value = name.value,
+                        modifier = Modifier.padding(bottom = 16.dp),
+                    )
                     AdaptiveFieldPair(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
                         first = { fieldModifier ->
-                            AppFormField(
+                            AppReadOnlyField(
                                 label = stringResource(R.string.dosis),
-                                modifier = fieldModifier
-                            ) {
-                                AppTextField(
-                                    value = dose.value,
-                                    onValueChange = { dose.value = it },
-                                    placeholder = stringResource(R.string.medication_dose_placeholder),
-                                    keyboardType = KeyboardType.Decimal,
-                                    enabled = false
-                                )
-                            }
+                                value = dose.value,
+                                modifier = fieldModifier,
+                            )
                         },
                         second = { fieldModifier ->
-                            AppFormField(
+                            AppReadOnlyField(
                                 label = stringResource(R.string.unidad),
-                                modifier = fieldModifier
-                            ) {
-                                AppDropdownField(
-                                    value = unit.value,
-                                    options = unitOptions,
-                                    onOptionSelected = { unit.value = it },
-                                    placeholder = stringResource(R.string.medication_select_placeholder),
-                                    enabled = false
-                                )
-                            }
+                                value = unit.value,
+                                modifier = fieldModifier,
+                            )
                         }
                     )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = isChronicTreatment.value,
-                            onCheckedChange = {
-                                isChronicTreatment.value = it
-                                if (it) endDate.value = null
-                            },
-                            enabled = false
-                        )
-                        Text(
-                            text = stringResource(R.string.medication_chronic_treatment),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
+                    AppReadOnlyField(
+                        label = stringResource(R.string.medication_chronic_treatment),
+                        value = stringResource(
+                            if (isChronicTreatment.value) R.string.common_yes else R.string.common_no
+                        ),
+                        modifier = Modifier.padding(bottom = 16.dp),
+                    )
                     AdaptiveFieldPair(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
                         first = { fieldModifier ->
-                            AppFormField(
+                            AppReadOnlyField(
                                 label = stringResource(R.string.fecha_inicio),
-                                modifier = fieldModifier
-                            ) {
-                                AppDatePickerField(
-                                    value = startDate.value,
-                                    onDateSelected = { startDate.value = it },
-                                    enabled = false
-                                )
-                            }
+                                value = startDate.value
+                                    ?.format(medicationDateFormatter)
+                                    ?: stringResource(R.string.common_not_specified),
+                                modifier = fieldModifier,
+                            )
                         },
                         second = { fieldModifier ->
-                            AppFormField(
+                            AppReadOnlyField(
                                 label = stringResource(R.string.fecha_fin),
-                                modifier = fieldModifier
-                            ) {
-                                AppDatePickerField(
-                                    value = endDate.value,
-                                    onDateSelected = { endDate.value = it },
-                                    enabled = false
-                                )
-                            }
+                                value = endDate.value
+                                    ?.format(medicationDateFormatter)
+                                    ?: stringResource(R.string.common_not_specified),
+                                modifier = fieldModifier,
+                            )
                         }
                     )
                 }
@@ -647,10 +614,7 @@ fun MedicationScreen(
                     title = stringResource(R.string.medication_schedule_section),
                     contentSpacing = 0.dp,
                 ) {
-                    ScheduleEditor(
-                        form = scheduleForm,
-                        enabled = false
-                    )
+                    ScheduleReadOnly(form = scheduleForm)
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(modifier.fillMaxWidth()) {
