@@ -35,6 +35,12 @@
     <string name="seleccion_la_hora">Selecciona la hora</string>
     <string name="date_picker_content_description">Seleccionar fecha</string>
 
+    <!-- Navegación -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_medications">Medicamentos</string>
+    <string name="nav_profile">Perfil</string>
+    <string name="common_back">Volver</string>
+
     <!-- Perfil -->
     <string name="profile_create_title">Crear perfil</string>
     <string name="profile_view_title">Ver perfil</string>

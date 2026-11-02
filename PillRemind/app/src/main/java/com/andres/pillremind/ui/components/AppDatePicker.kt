@@ -104,7 +104,9 @@ fun AppDatePickerField(
             colors = TextFieldDefaults.colors(
                 disabledContainerColor = containerColor,
                 disabledTextColor = contentColor,
-                disabledIndicatorColor = Color.Transparent
+                disabledIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
             ),
             shape = RoundedCornerShape(12.dp),
         )

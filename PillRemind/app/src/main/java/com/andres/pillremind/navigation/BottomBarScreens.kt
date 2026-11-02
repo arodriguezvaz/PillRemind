@@ -1,10 +1,12 @@
 package com.andres.pillremind.navigation
 
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Medication
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.andres.pillremind.R
 
 /**
  * Destinos disponibles en la barra de navegación inferior.
@@ -13,12 +15,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
  * y el icono asociado a una sección principal de la aplicación.
  *
  * @property route Ruta utilizada por Navigation Compose.
- * @property title Texto mostrado en la barra de navegación.
+ * @property titleRes Recurso de texto mostrado en la barra de navegación.
  * @property icon Icono representativo de la sección.
  */
 sealed class BottomBarScreens(
     val route: String,
-    val title: String,
+    @StringRes val titleRes: Int,
     val icon: ImageVector
 ) {
     /**
@@ -26,7 +28,7 @@ sealed class BottomBarScreens(
      */
     object Home : BottomBarScreens(
         route = "home",
-        title = "Home",
+        titleRes = R.string.nav_home,
         icon = Icons.Rounded.Home
     )
 
@@ -34,16 +36,17 @@ sealed class BottomBarScreens(
      * Pantalla de listado y gestión de medicamentos.
      */
     object Medications : BottomBarScreens(
-        route = "medications", "Medications", Icons.Rounded.Medication
+        route = "medications",
+        titleRes = R.string.nav_medications,
+        icon = Icons.Rounded.Medication
     )
-    
+
     /**
      * Pantalla de visualización del perfil activo.
      */
     object Profile : BottomBarScreens(
         route = "profile/see",
-        title = "Profile",
+        titleRes = R.string.nav_profile,
         icon = Icons.Rounded.Person
     )
-
 }

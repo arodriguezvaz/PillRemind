@@ -11,9 +11,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.andres.pillremind.R
 import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
@@ -62,7 +64,10 @@ fun MainScreen(
                 FloatingActionButton(
                     onClick = { navController.navigate(MedicationScreens.MedicationCreateScreen.route) },
                 ) {
-                    Icon(Icons.Rounded.Add, contentDescription = null)
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = stringResource(R.string.medication_add_title)
+                    )
                 }
             }
         }
