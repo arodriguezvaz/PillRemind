@@ -41,11 +41,12 @@ import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
+import com.andres.pillremind.ui.components.AppFormField
+import com.andres.pillremind.ui.components.AppFormSection
 import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
-import com.andres.pillremind.ui.components.FormField
 import com.andres.pillremind.ui.screens.main.TopBarState
 import java.io.File
 import java.time.LocalDate
@@ -218,7 +219,7 @@ fun MedicationScreen(
                     .fillMaxSize()
                     .padding(16.dp)
                     .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 //-----IMAGEN
@@ -230,100 +231,111 @@ fun MedicationScreen(
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
                 //-----------NOMBRE
-                FormField(label = stringResource(R.string.nombre)) {
-                    AppTextField(
-                        value = name.value,
-                        onValueChange = { name.value = it },
-                        placeholder = stringResource(R.string.medication_name_placeholder),
+                AppFormSection(
+                    title = stringResource(R.string.medication_data_section),
+                    contentSpacing = 0.dp,
+                ) {
+                    AppFormField(label = stringResource(R.string.nombre)) {
+                        AppTextField(
+                            value = name.value,
+                            onValueChange = { name.value = it },
+                            placeholder = stringResource(R.string.medication_name_placeholder),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                        )
+                    }
+                    AdaptiveFieldPair(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
+                        first = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.dosis),
+                                modifier = fieldModifier
+                            ) {
+                                AppTextField(
+                                    value = dose.value,
+                                    onValueChange = { dose.value = it },
+                                    placeholder = stringResource(R.string.medication_dose_placeholder),
+                                    keyboardType = KeyboardType.Decimal
+                                )
+                            }
+                        },
+                        second = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.unidad),
+                                modifier = fieldModifier
+                            ) {
+                                AppDropdownField(
+                                    value = unit.value,
+                                    options = unitOptions,
+                                    onOptionSelected = { unit.value = it },
+                                    placeholder = stringResource(R.string.medication_select_placeholder)
+                                )
+                            }
+                        }
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = isChronicTreatment.value,
+                            onCheckedChange = {
+                                isChronicTreatment.value = it
+                                if (it) endDate.value = null
+                            },
+                            enabled = true
+                        )
+                        Text(
+                            text = stringResource(R.string.medication_chronic_treatment),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    AdaptiveFieldPair(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        first = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.fecha_inicio),
+                                modifier = fieldModifier
+                            ) {
+                                AppDatePickerField(
+                                    value = startDate.value,
+                                    onDateSelected = { startDate.value = it },
+                                    enabled = true,
+                                )
+                            }
+                        },
+                        second = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.fecha_fin),
+                                modifier = fieldModifier
+                            ) {
+                                AppDatePickerField(
+                                    value = endDate.value,
+                                    onDateSelected = { endDate.value = it },
+                                    enabled = !isChronicTreatment.value,
+                                    minDate = startDate.value
+                                )
+                            }
+                        }
                     )
                 }
-                AdaptiveFieldPair(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    first = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.dosis),
-                            modifier = fieldModifier
-                        ) {
-                            AppTextField(
-                                value = dose.value,
-                                onValueChange = { dose.value = it },
-                                placeholder = stringResource(R.string.medication_dose_placeholder),
-                                keyboardType = KeyboardType.Decimal
-                            )
-                        }
-                    },
-                    second = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.unidad),
-                            modifier = fieldModifier
-                        ) {
-                            AppDropdownField(
-                                value = unit.value,
-                                options = unitOptions,
-                                onOptionSelected = { unit.value = it },
-                                placeholder = stringResource(R.string.medication_select_placeholder)
-                            )
-                        }
-                    }
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Spacer(modifier = Modifier.height(24.dp))
+                AppFormSection(
+                    title = stringResource(R.string.medication_schedule_section),
+                    contentSpacing = 0.dp,
                 ) {
-                    Checkbox(
-                        checked = isChronicTreatment.value,
-                        onCheckedChange = {
-                            isChronicTreatment.value = it
-                            if (it) endDate.value = null
-                        },
+                    ScheduleEditor(
+                        form = scheduleForm,
                         enabled = true
                     )
-                    Text(
-                        text = stringResource(R.string.medication_chronic_treatment),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
                 }
-                AdaptiveFieldPair(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    first = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.fecha_inicio),
-                            modifier = fieldModifier
-                        ) {
-                            AppDatePickerField(
-                                value = startDate.value,
-                                onDateSelected = { startDate.value = it },
-                                enabled = true,
-                            )
-                        }
-                    },
-                    second = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.fecha_fin),
-                            modifier = fieldModifier
-                        ) {
-                            AppDatePickerField(
-                                value = endDate.value,
-                                onDateSelected = { endDate.value = it },
-                                enabled = !isChronicTreatment.value,
-                                minDate = startDate.value
-                            )
-                        }
-                    }
-                )
-                ScheduleEditor(
-                    form = scheduleForm,
-                    enabled = true
-                )
                 Spacer(modifier = Modifier.height(24.dp))
                 AppButton(
                     text = stringResource(R.string.guardar),
@@ -358,7 +370,7 @@ fun MedicationScreen(
                     .fillMaxSize()
                     .padding(16.dp)
                     .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AppPhotoPicker(
@@ -368,100 +380,111 @@ fun MedicationScreen(
                     placeholderIcon = Icons.Default.AddAPhoto,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
-                FormField(label = stringResource(R.string.nombre)) {
-                    AppTextField(
-                        value = name.value,
-                        onValueChange = { name.value = it },
-                        placeholder = stringResource(R.string.medication_name_placeholder),
+                AppFormSection(
+                    title = stringResource(R.string.medication_data_section),
+                    contentSpacing = 0.dp,
+                ) {
+                    AppFormField(label = stringResource(R.string.nombre)) {
+                        AppTextField(
+                            value = name.value,
+                            onValueChange = { name.value = it },
+                            placeholder = stringResource(R.string.medication_name_placeholder),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                        )
+                    }
+                    AdaptiveFieldPair(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
+                        first = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.dosis),
+                                modifier = fieldModifier
+                            ) {
+                                AppTextField(
+                                    value = dose.value,
+                                    onValueChange = { dose.value = it },
+                                    placeholder = stringResource(R.string.medication_dose_placeholder),
+                                    keyboardType = KeyboardType.Decimal
+                                )
+                            }
+                        },
+                        second = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.unidad),
+                                modifier = fieldModifier
+                            ) {
+                                AppDropdownField(
+                                    value = unit.value,
+                                    options = unitOptions,
+                                    onOptionSelected = { unit.value = it },
+                                    placeholder = stringResource(R.string.medication_select_placeholder)
+                                )
+                            }
+                        }
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = isChronicTreatment.value,
+                            onCheckedChange = {
+                                isChronicTreatment.value = it
+                                if (it) endDate.value = null
+                            },
+                            enabled = true
+                        )
+                        Text(
+                            text = stringResource(R.string.medication_chronic_treatment),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    AdaptiveFieldPair(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        first = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.fecha_inicio),
+                                modifier = fieldModifier
+                            ) {
+                                AppDatePickerField(
+                                    value = startDate.value,
+                                    onDateSelected = { startDate.value = it },
+                                    enabled = true
+                                )
+                            }
+                        },
+                        second = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.fecha_fin),
+                                modifier = fieldModifier
+                            ) {
+                                AppDatePickerField(
+                                    value = endDate.value,
+                                    onDateSelected = { endDate.value = it },
+                                    enabled = !isChronicTreatment.value,
+                                    minDate = startDate.value
+                                )
+                            }
+                        }
                     )
                 }
-                AdaptiveFieldPair(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    first = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.dosis),
-                            modifier = fieldModifier
-                        ) {
-                            AppTextField(
-                                value = dose.value,
-                                onValueChange = { dose.value = it },
-                                placeholder = stringResource(R.string.medication_dose_placeholder),
-                                keyboardType = KeyboardType.Decimal
-                            )
-                        }
-                    },
-                    second = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.unidad),
-                            modifier = fieldModifier
-                        ) {
-                            AppDropdownField(
-                                value = unit.value,
-                                options = unitOptions,
-                                onOptionSelected = { unit.value = it },
-                                placeholder = stringResource(R.string.medication_select_placeholder)
-                            )
-                        }
-                    }
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Spacer(modifier = Modifier.height(24.dp))
+                AppFormSection(
+                    title = stringResource(R.string.medication_schedule_section),
+                    contentSpacing = 0.dp,
                 ) {
-                    Checkbox(
-                        checked = isChronicTreatment.value,
-                        onCheckedChange = {
-                            isChronicTreatment.value = it
-                            if (it) endDate.value = null
-                        },
+                    ScheduleEditor(
+                        form = scheduleForm,
                         enabled = true
                     )
-                    Text(
-                        text = stringResource(R.string.medication_chronic_treatment),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
                 }
-                AdaptiveFieldPair(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    first = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.fecha_inicio),
-                            modifier = fieldModifier
-                        ) {
-                            AppDatePickerField(
-                                value = startDate.value,
-                                onDateSelected = { startDate.value = it },
-                                enabled = true
-                            )
-                        }
-                    },
-                    second = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.fecha_fin),
-                            modifier = fieldModifier
-                        ) {
-                            AppDatePickerField(
-                                value = endDate.value,
-                                onDateSelected = { endDate.value = it },
-                                enabled = !isChronicTreatment.value,
-                                minDate = startDate.value
-                            )
-                        }
-                    }
-                )
-                ScheduleEditor(
-                    form = scheduleForm,
-                    enabled = true
-                )
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(modifier.fillMaxWidth()) {
                     //ARCHIVAR
@@ -512,7 +535,7 @@ fun MedicationScreen(
                     .fillMaxSize()
                     .padding(16.dp)
                     .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AppPhotoPicker(
@@ -522,102 +545,113 @@ fun MedicationScreen(
                     placeholderIcon = Icons.Default.AddAPhoto,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
-                FormField(label = stringResource(R.string.nombre)) {
-                    AppTextField(
-                        value = name.value,
-                        onValueChange = { name.value = it },
-                        placeholder = stringResource(R.string.medication_name_placeholder),
+                AppFormSection(
+                    title = stringResource(R.string.medication_data_section),
+                    contentSpacing = 0.dp,
+                ) {
+                    AppFormField(label = stringResource(R.string.nombre)) {
+                        AppTextField(
+                            value = name.value,
+                            onValueChange = { name.value = it },
+                            placeholder = stringResource(R.string.medication_name_placeholder),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            enabled = false
+                        )
+                    }
+                    AdaptiveFieldPair(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
-                        enabled = false
-                    )
-                }
-                AdaptiveFieldPair(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    first = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.dosis),
-                            modifier = fieldModifier
-                        ) {
-                            AppTextField(
-                                value = dose.value,
-                                onValueChange = { dose.value = it },
-                                placeholder = stringResource(R.string.medication_dose_placeholder),
-                                keyboardType = KeyboardType.Decimal,
-                                enabled = false
-                            )
-                        }
-                    },
-                    second = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.unidad),
-                            modifier = fieldModifier
-                        ) {
-                            AppDropdownField(
-                                value = unit.value,
-                                options = unitOptions,
-                                onOptionSelected = { unit.value = it },
-                                placeholder = stringResource(R.string.medication_select_placeholder),
-                                enabled = false
-                            )
-                        }
-                    }
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = isChronicTreatment.value,
-                        onCheckedChange = {
-                            isChronicTreatment.value = it
-                            if (it) endDate.value = null
+                        first = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.dosis),
+                                modifier = fieldModifier
+                            ) {
+                                AppTextField(
+                                    value = dose.value,
+                                    onValueChange = { dose.value = it },
+                                    placeholder = stringResource(R.string.medication_dose_placeholder),
+                                    keyboardType = KeyboardType.Decimal,
+                                    enabled = false
+                                )
+                            }
                         },
-                        enabled = false
+                        second = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.unidad),
+                                modifier = fieldModifier
+                            ) {
+                                AppDropdownField(
+                                    value = unit.value,
+                                    options = unitOptions,
+                                    onOptionSelected = { unit.value = it },
+                                    placeholder = stringResource(R.string.medication_select_placeholder),
+                                    enabled = false
+                                )
+                            }
+                        }
                     )
-                    Text(
-                        text = stringResource(R.string.medication_chronic_treatment),
-                        style = MaterialTheme.typography.bodyLarge
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = isChronicTreatment.value,
+                            onCheckedChange = {
+                                isChronicTreatment.value = it
+                                if (it) endDate.value = null
+                            },
+                            enabled = false
+                        )
+                        Text(
+                            text = stringResource(R.string.medication_chronic_treatment),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    AdaptiveFieldPair(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        first = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.fecha_inicio),
+                                modifier = fieldModifier
+                            ) {
+                                AppDatePickerField(
+                                    value = startDate.value,
+                                    onDateSelected = { startDate.value = it },
+                                    enabled = false
+                                )
+                            }
+                        },
+                        second = { fieldModifier ->
+                            AppFormField(
+                                label = stringResource(R.string.fecha_fin),
+                                modifier = fieldModifier
+                            ) {
+                                AppDatePickerField(
+                                    value = endDate.value,
+                                    onDateSelected = { endDate.value = it },
+                                    enabled = false
+                                )
+                            }
+                        }
                     )
                 }
-                AdaptiveFieldPair(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    first = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.fecha_inicio),
-                            modifier = fieldModifier
-                        ) {
-                            AppDatePickerField(
-                                value = startDate.value,
-                                onDateSelected = { startDate.value = it },
-                                enabled = false
-                            )
-                        }
-                    },
-                    second = { fieldModifier ->
-                        FormField(
-                            label = stringResource(R.string.fecha_fin),
-                            modifier = fieldModifier
-                        ) {
-                            AppDatePickerField(
-                                value = endDate.value,
-                                onDateSelected = { endDate.value = it },
-                                enabled = false
-                            )
-                        }
-                    }
-                )
-                ScheduleEditor(
-                    form = scheduleForm,
-                    enabled = false
-                )
+                Spacer(modifier = Modifier.height(24.dp))
+                AppFormSection(
+                    title = stringResource(R.string.medication_schedule_section),
+                    contentSpacing = 0.dp,
+                ) {
+                    ScheduleEditor(
+                        form = scheduleForm,
+                        enabled = false
+                    )
+                }
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(modifier.fillMaxWidth()) {
                     //ARCHIVAR

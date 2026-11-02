@@ -6,10 +6,10 @@
     <string name="notification_text">%1$s — no olvides la dosis de %2$s</string>
     <string name="notification_action_take">Tomar</string>
     <string name="nombre">Nombre</string>
-    <string name="fecha_inicio">Fecha inicio:</string>
-    <string name="unidad">Unidad:</string>
-    <string name="dosis">Dosis:</string>
-    <string name="fecha_fin">Fecha fin:</string>
+    <string name="fecha_inicio">Fecha inicio</string>
+    <string name="unidad">Unidad</string>
+    <string name="dosis">Dosis</string>
+    <string name="fecha_fin">Fecha fin</string>
     <string name="ver">Ver</string>
     <string name="editar">Editar</string>
     <string name="eliminar">Eliminar</string>
@@ -27,7 +27,7 @@
     <string name="viernesShort">V</string>
     <string name="sabadoShort">S</string>
     <string name="domingoShort">D</string>
-    <string name="horario">Horario:</string>
+    <string name="horario">Horario</string>
     <string name="guardar">Guardar</string>
     <string name="tomar">Tomar</string>
     <string name="tomado">Tomado</string>
@@ -140,6 +140,8 @@
     <string name="medication_add_title">Añadir medicamento</string>
     <string name="medication_view_title">Ver medicamento</string>
     <string name="medication_edit_title">Editar medicamento</string>
+    <string name="medication_data_section">Datos del medicamento</string>
+    <string name="medication_schedule_section">Pauta</string>
     <string name="medication_name_placeholder">Nombre del medicamento</string>
     <string name="medication_dose_placeholder">500</string>
     <string name="medication_select_placeholder">Selecciona</string>

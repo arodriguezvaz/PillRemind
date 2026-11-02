@@ -26,8 +26,8 @@ import com.andres.pillremind.domain.model.ScheduleRule
 import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.model.nextOccurrences
 import com.andres.pillremind.ui.components.AppDropdownField
+import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppTextField
-import com.andres.pillremind.ui.components.FormField
 import com.andres.pillremind.ui.components.WeekDayChipGroup
 import com.andres.pillremind.ui.components.labelRes
 import com.andres.pillremind.ui.components.timeeditor.TimeListEditor
@@ -264,11 +264,11 @@ fun ScheduleEditor(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         val periodicityLabels = SchedulePeriodicity.entries.map { stringResource(it.labelRes()) }
 
-        FormField(label = stringResource(R.string.schedule_periodicity)) {
+        AppFormField(label = stringResource(R.string.schedule_periodicity)) {
             AppDropdownField(
                 value = stringResource(form.periodicity.labelRes()),
                 options = periodicityLabels,
@@ -286,7 +286,7 @@ fun ScheduleEditor(
         when (form.periodicity) {
             SchedulePeriodicity.DAILY -> Unit
 
-            SchedulePeriodicity.WEEKLY -> FormField(
+            SchedulePeriodicity.WEEKLY -> AppFormField(
                 label = stringResource(R.string.schedule_weekdays)
             ) {
                 WeekDayChipGroup(
@@ -296,7 +296,7 @@ fun ScheduleEditor(
                 )
             }
 
-            SchedulePeriodicity.EVERY_N_DAYS -> FormField(
+            SchedulePeriodicity.EVERY_N_DAYS -> AppFormField(
                 label = stringResource(R.string.schedule_interval_days)
             ) {
                 AppTextField(
@@ -309,7 +309,7 @@ fun ScheduleEditor(
             }
 
             SchedulePeriodicity.MONTHLY_DAY -> {
-                FormField(label = stringResource(R.string.schedule_day_of_month)) {
+                AppFormField(label = stringResource(R.string.schedule_day_of_month)) {
                     AppTextField(
                         value = form.dayOfMonth,
                         onValueChange = { form.dayOfMonth = it },
@@ -339,7 +339,7 @@ fun ScheduleEditor(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    FormField(
+                    AppFormField(
                         label = stringResource(R.string.schedule_occurrence),
                         modifier = Modifier.weight(1f)
                     ) {
@@ -356,7 +356,7 @@ fun ScheduleEditor(
                             enabled = enabled
                         )
                     }
-                    FormField(
+                    AppFormField(
                         label = stringResource(R.string.schedule_weekday),
                         modifier = Modifier.weight(1f)
                     ) {
@@ -381,7 +381,7 @@ fun ScheduleEditor(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    FormField(
+                    AppFormField(
                         label = stringResource(R.string.schedule_on_days),
                         modifier = Modifier.weight(1f)
                     ) {
@@ -393,7 +393,7 @@ fun ScheduleEditor(
                             enabled = enabled
                         )
                     }
-                    FormField(
+                    AppFormField(
                         label = stringResource(R.string.schedule_off_days),
                         modifier = Modifier.weight(1f)
                     ) {
@@ -416,7 +416,7 @@ fun ScheduleEditor(
             )
         }
 
-        FormField(label = stringResource(R.string.horario)) {
+        AppFormField(label = stringResource(R.string.horario)) {
             TimeListEditor(
                 times = form.times,
                 enabled = enabled,

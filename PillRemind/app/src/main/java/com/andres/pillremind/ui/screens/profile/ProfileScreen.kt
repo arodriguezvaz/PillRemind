@@ -30,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,11 +39,12 @@ import com.andres.pillremind.domain.model.Sex
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
+import com.andres.pillremind.ui.components.AppFormField
+import com.andres.pillremind.ui.components.AppFormSection
 import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
-import com.andres.pillremind.ui.components.FormField
 import com.andres.pillremind.ui.components.labelRes
 import com.andres.pillremind.ui.screens.main.TopBarState
 import java.io.File
@@ -426,8 +426,8 @@ private fun ProfileForm(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        ProfileSection(title = stringResource(R.string.profile_personal_data)) {
-            ProfileField(label = stringResource(R.string.nombre)) {
+        AppFormSection(title = stringResource(R.string.profile_personal_data)) {
+            AppFormField(label = stringResource(R.string.nombre)) {
                 AppTextField(
                     value = name,
                     onValueChange = onNameChange,
@@ -441,7 +441,7 @@ private fun ProfileForm(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     if (showBirthDate) {
-                        ProfileField(
+                        AppFormField(
                             label = stringResource(R.string.profile_birth_date),
                             modifier = Modifier.weight(1f)
                         ) {
@@ -461,7 +461,7 @@ private fun ProfileForm(
                         }
                     }
                     if (showSex) {
-                        ProfileField(
+                        AppFormField(
                             label = stringResource(R.string.profile_sex),
                             modifier = Modifier.weight(1f)
                         ) {
@@ -478,9 +478,9 @@ private fun ProfileForm(
         }
 
         if (showBloodType || showAllergies || showMedicalNotes) {
-            ProfileSection(title = stringResource(R.string.profile_medical_info)) {
+            AppFormSection(title = stringResource(R.string.profile_medical_info)) {
                 if (showBloodType) {
-                    ProfileField(label = stringResource(R.string.profile_blood_type)) {
+                    AppFormField(label = stringResource(R.string.profile_blood_type)) {
                         AppDropdownField(
                             value = bloodType?.let { stringResource(it.labelRes()) }
                                 ?: notSpecified,
@@ -491,7 +491,7 @@ private fun ProfileForm(
                     }
                 }
                 if (showAllergies) {
-                    ProfileField(label = stringResource(R.string.profile_allergies)) {
+                    AppFormField(label = stringResource(R.string.profile_allergies)) {
                         AppTextField(
                             value = allergies,
                             onValueChange = onAllergiesChange,
@@ -503,7 +503,7 @@ private fun ProfileForm(
                     }
                 }
                 if (showMedicalNotes) {
-                    ProfileField(label = stringResource(R.string.profile_medical_notes)) {
+                    AppFormField(label = stringResource(R.string.profile_medical_notes)) {
                         AppTextField(
                             value = medicalNotes,
                             onValueChange = onMedicalNotesChange,
@@ -518,8 +518,8 @@ private fun ProfileForm(
         }
 
         if (showHealthCard) {
-            ProfileSection(title = stringResource(R.string.profile_admin_data)) {
-                ProfileField(label = stringResource(R.string.profile_health_card)) {
+            AppFormSection(title = stringResource(R.string.profile_admin_data)) {
+                AppFormField(label = stringResource(R.string.profile_health_card)) {
                     AppTextField(
                         value = healthCardNumber,
                         onValueChange = onHealthCardNumberChange,
@@ -538,39 +538,4 @@ private fun ProfileForm(
 
         actions()
     }
-}
-
-/**
- * Sección del formulario con un título y varios campos.
- */
-@Composable
-private fun ProfileSection(
-    title: String,
-    content: @Composable () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        content()
-    }
-}
-
-/**
- * Campo de formulario con una etiqueta y su contenido.
- */
-@Composable
-private fun ProfileField(
-    label: String,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    FormField(
-        label = label,
-        modifier = modifier,
-        content = content
-    )
 }
