@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.components.timeeditor
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -43,7 +44,8 @@ fun TimeListEditor(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(top = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
 
         times.forEach { time ->

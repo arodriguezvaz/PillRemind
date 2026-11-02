@@ -35,7 +35,6 @@ fun TimeItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
     ) {
         Row(
             modifier = Modifier
