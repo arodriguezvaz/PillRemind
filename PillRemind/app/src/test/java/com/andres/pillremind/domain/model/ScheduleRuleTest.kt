@@ -1,6 +1,9 @@
 package com.andres.pillremind.domain.model
 
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -154,5 +157,28 @@ class ScheduleRuleTest {
         assertThrows(IllegalArgumentException::class.java) {
             ScheduleRule.Cycle(onDays = 1, offDays = -1).requireValid()
         }
+    }
+
+    @Test
+    fun `preview devuelve las proximas tomas ordenadas`() {
+        val rules = listOf(ScheduleRule.EveryNDays(2))
+        val times = listOf(LocalTime.of(20, 0), LocalTime.of(8, 0))
+
+        val result = rules.nextOccurrences(
+            startDate = monday,
+            times = times,
+            from = monday,
+            count = 4
+        )
+
+        assertEquals(
+            listOf(
+                LocalDateTime.of(monday, LocalTime.of(8, 0)),
+                LocalDateTime.of(monday, LocalTime.of(20, 0)),
+                LocalDateTime.of(monday.plusDays(2), LocalTime.of(8, 0)),
+                LocalDateTime.of(monday.plusDays(2), LocalTime.of(20, 0))
+            ),
+            result
+        )
     }
 }

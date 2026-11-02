@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,7 +35,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.andres.pillremind.R
-import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
@@ -45,12 +43,9 @@ import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.FormField
-import com.andres.pillremind.ui.components.WeekDayChipGroup
-import com.andres.pillremind.ui.components.timeeditor.TimeListEditor
 import com.andres.pillremind.ui.screens.main.TopBarState
 import java.io.File
 import java.time.LocalDate
-import java.time.LocalTime
 
 
 /**
@@ -83,8 +78,7 @@ fun MedicationScreen(
     medicationViewModel: MedicationViewModel = hiltViewModel()
 ) {
     val medication by medicationViewModel.medication.collectAsState()
-    val medicationWeekDays by medicationViewModel.weekDays.collectAsState()
-    val medicationTimes by medicationViewModel.times.collectAsState()
+    val medicationSchedules by medicationViewModel.schedules.collectAsState()
 
     //Variables con estado mutable para los campos del formulario
     val name = remember { mutableStateOf("") }
@@ -97,9 +91,15 @@ fun MedicationScreen(
     val isChronicTreatment = remember { mutableStateOf(false) }
     val endDate = remember { mutableStateOf<LocalDate?>(null) }
 
-    val weekDays = remember { mutableStateOf(setOf<WeekDay>()) }
+    val scheduleForm = remember { ScheduleFormState() }
+    var scheduleInitialized by remember { mutableStateOf(false) }
 
-    val times = remember { mutableStateListOf<LocalTime>() }
+    LaunchedEffect(medicationSchedules) {
+        if (!scheduleInitialized && medicationSchedules.isNotEmpty()) {
+            scheduleForm.loadFrom(medicationSchedules)
+            scheduleInitialized = true
+        }
+    }
 
     val unitOptions = listOf(
         "mg",
@@ -148,19 +148,6 @@ fun MedicationScreen(
             isChronicTreatment.value = it.isChronic
         }
     }
-    LaunchedEffect(medicationWeekDays) {
-        if (weekDays.value.isEmpty()) {
-            weekDays.value = medicationWeekDays
-        }
-    }
-
-    LaunchedEffect(medicationTimes) {
-        if (times.isEmpty()) {
-            times.addAll(medicationTimes)
-
-        }
-    }
-
     //Varibale que especifica el modo en el que está la screen
     var currentMode by remember { mutableStateOf(medicationMode) }
 
@@ -170,16 +157,13 @@ fun MedicationScreen(
     }
 
     //Si cambia el modo actualiza el título en la topbar de MainScreen
-    LaunchedEffect(currentMode) {
-        onTopBarChange(
-            TopBarState(
-                title = when (currentMode) {
-                    MedicationMode.Create -> "Añadir medicamento"
-                    MedicationMode.View -> "Ver medicamento"
-                    MedicationMode.Edit -> "Editar medicamento"
-                }
-            )
-        )
+    val topBarTitle = when (currentMode) {
+        MedicationMode.Create -> stringResource(R.string.medication_add_title)
+        MedicationMode.View -> stringResource(R.string.medication_view_title)
+        MedicationMode.Edit -> stringResource(R.string.medication_edit_title)
+    }
+    LaunchedEffect(currentMode, topBarTitle) {
+        onTopBarChange(TopBarState(title = topBarTitle))
     }
     //Si está en la vista de editar y se pulsa el botón de back se vuelve a la vista de ver
     BackHandler(enabled = currentMode == MedicationMode.Edit) {
@@ -191,8 +175,7 @@ fun MedicationScreen(
             dose.value.isNotBlank() &&
             unit.value.isNotBlank() &&
             startDate.value != null &&
-            weekDays.value.isNotEmpty() &&
-            times.isNotEmpty() &&
+            scheduleForm.isValid() &&
             (isChronicTreatment.value || endDate.value != null)
     when (currentMode) {
         //---------CREATE---------
@@ -218,7 +201,7 @@ fun MedicationScreen(
                     AppTextField(
                         value = name.value,
                         onValueChange = { name.value = it },
-                        placeholder = "Nombre del medicamento",
+                        placeholder = stringResource(R.string.medication_name_placeholder),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
@@ -238,7 +221,7 @@ fun MedicationScreen(
                         AppTextField(
                             value = dose.value,
                             onValueChange = { dose.value = it },
-                            placeholder = "500",
+                            placeholder = stringResource(R.string.medication_dose_placeholder),
                             keyboardType = KeyboardType.Decimal
                         )
                     }
@@ -250,7 +233,7 @@ fun MedicationScreen(
                             value = unit.value,
                             options = unitOptions,
                             onOptionSelected = { unit.value = it },
-                            placeholder = "Selecciona"
+                            placeholder = stringResource(R.string.medication_select_placeholder)
                         )
                     }
                 }
@@ -269,7 +252,7 @@ fun MedicationScreen(
                         enabled = true
                     )
                     Text(
-                        text = "Tratamiento crónico",
+                        text = stringResource(R.string.medication_chronic_treatment),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -301,23 +284,11 @@ fun MedicationScreen(
                         )
                     }
                 }
-                FormField(stringResource(R.string.periocidad)) {
-                    WeekDayChipGroup(
-                        selectedDays = weekDays.value,
-                        onSelectionChange = { weekDays.value = it })
-                }
-                FormField(stringResource(R.string.horario)) {
-                    TimeListEditor(
-                        times = times,
-                        enabled = true,
-                        onAddClick = { time ->
-                            times.add(time)
-                        },
-                        onRemoveTime = { time ->
-                            times.remove(time)
-                        }
-                    )
-                }
+                ScheduleEditor(
+                    form = scheduleForm,
+                    startDate = startDate.value,
+                    enabled = true
+                )
                 AppButton(
                     text = stringResource(R.string.guardar),
                     onClick = {
@@ -328,8 +299,8 @@ fun MedicationScreen(
                             unit = unit.value,
                             startDate = startDate.value!!,
                             endDate = endDate.value,
-                            weekDays = weekDays.value,
-                            times = times,
+                            scheduleRules = scheduleForm.rules(),
+                            times = scheduleForm.times,
                             isChronic = isChronicTreatment.value,
                             onSaved = onSaveClicked
                         )
@@ -365,7 +336,7 @@ fun MedicationScreen(
                     AppTextField(
                         value = name.value,
                         onValueChange = { name.value = it },
-                        placeholder = "Nombre del medicamento",
+                        placeholder = stringResource(R.string.medication_name_placeholder),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
@@ -384,7 +355,7 @@ fun MedicationScreen(
                         AppTextField(
                             value = dose.value,
                             onValueChange = { dose.value = it },
-                            placeholder = "500",
+                            placeholder = stringResource(R.string.medication_dose_placeholder),
                             keyboardType = KeyboardType.Decimal
                         )
                     }
@@ -396,7 +367,7 @@ fun MedicationScreen(
                             value = unit.value,
                             options = unitOptions,
                             onOptionSelected = { unit.value = it },
-                            placeholder = "Selecciona"
+                            placeholder = stringResource(R.string.medication_select_placeholder)
                         )
                     }
                 }
@@ -415,7 +386,7 @@ fun MedicationScreen(
                         enabled = true
                     )
                     Text(
-                        text = "Tratamiento crónico",
+                        text = stringResource(R.string.medication_chronic_treatment),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -447,30 +418,18 @@ fun MedicationScreen(
                         )
                     }
                 }
-                FormField(stringResource(R.string.periocidad)) {
-                    WeekDayChipGroup(
-                        selectedDays = weekDays.value,
-                        onSelectionChange = { weekDays.value = it },
-                    )
-                }
-                FormField(stringResource(R.string.horario)) {
-                    TimeListEditor(
-                        times = times,
-                        onAddClick = { time ->
-                            times.add(time)
-                        },
-                        onRemoveTime = { time ->
-                            times.remove(time)
-                        }
-                    )
-                }
+                ScheduleEditor(
+                    form = scheduleForm,
+                    startDate = startDate.value,
+                    enabled = true
+                )
                 Row(modifier.fillMaxWidth()) {
                     //ARCHIVAR
                     AppButton(
                         onClick = {
                             showArchiveDialog = true
                         },
-                        text = "Archivar",
+                        text = stringResource(R.string.medication_archive),
                         size = ButtonSize.Medium,
                         variant = ButtonVariant.Danger,
                         modifier = Modifier.weight(1f)
@@ -488,8 +447,8 @@ fun MedicationScreen(
                                 unit = unit.value,
                                 startDate = startDate.value!!,
                                 endDate = endDate.value,
-                                weekDays = weekDays.value,
-                                times = times,
+                                scheduleRules = scheduleForm.rules(),
+                                times = scheduleForm.times,
                                 isChronic = isChronicTreatment.value,
                                 onSaved = {
                                     currentMode = MedicationMode.View
@@ -527,7 +486,7 @@ fun MedicationScreen(
                     AppTextField(
                         value = name.value,
                         onValueChange = { name.value = it },
-                        placeholder = "Nombre del medicamento",
+                        placeholder = stringResource(R.string.medication_name_placeholder),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
@@ -547,7 +506,7 @@ fun MedicationScreen(
                         AppTextField(
                             value = dose.value,
                             onValueChange = { dose.value = it },
-                            placeholder = "500",
+                            placeholder = stringResource(R.string.medication_dose_placeholder),
                             keyboardType = KeyboardType.Decimal,
                             enabled = false
                         )
@@ -560,7 +519,7 @@ fun MedicationScreen(
                             value = unit.value,
                             options = unitOptions,
                             onOptionSelected = { unit.value = it },
-                            placeholder = "Selecciona",
+                            placeholder = stringResource(R.string.medication_select_placeholder),
                             enabled = false
                         )
                     }
@@ -580,7 +539,7 @@ fun MedicationScreen(
                         enabled = false
                     )
                     Text(
-                        text = "Tratamiento crónico",
+                        text = stringResource(R.string.medication_chronic_treatment),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -611,32 +570,18 @@ fun MedicationScreen(
                         )
                     }
                 }
-                FormField(stringResource(R.string.periocidad)) {
-                    WeekDayChipGroup(
-                        selectedDays = weekDays.value,
-                        onSelectionChange = { weekDays.value = it },
-                        enabled = false
-                    )
-                }
-                FormField(stringResource(R.string.horario)) {
-                    TimeListEditor(
-                        times = times,
-                        enabled = false,
-                        onAddClick = { time ->
-                            times.add(time)
-                        },
-                        onRemoveTime = { time ->
-                            times.remove(time)
-                        }
-                    )
-                }
+                ScheduleEditor(
+                    form = scheduleForm,
+                    startDate = startDate.value,
+                    enabled = false
+                )
                 Row(modifier.fillMaxWidth()) {
                     //ARCHIVAR
                     AppButton(
                         onClick = {
                             showArchiveDialog = true
                         },
-                        text = "Archivar",
+                        text = stringResource(R.string.medication_archive),
                         size = ButtonSize.Medium,
                         variant = ButtonVariant.Danger,
                         modifier = Modifier.weight(1f)
@@ -661,13 +606,10 @@ fun MedicationScreen(
                 showArchiveDialog = false
             },
             title = {
-                Text("Archivar medicamento")
+                Text(stringResource(R.string.medication_archive_title))
             },
             text = {
-                Text(
-                    "Dejará de aparecer en la lista y no generará recordatorios. " +
-                        "Se conservará el historial de tomas."
-                )
+                Text(stringResource(R.string.medication_archive_message))
             },
             confirmButton = {
                 TextButton(
@@ -683,7 +625,7 @@ fun MedicationScreen(
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Archivar")
+                    Text(stringResource(R.string.medication_archive))
                 }
             },
             dismissButton = {
@@ -692,7 +634,7 @@ fun MedicationScreen(
                         showArchiveDialog = false
                     }
                 ) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.common_cancel))
                 }
             }
         )

@@ -25,9 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.andres.pillremind.R
 
 /**
  * Componente para seleccionar o mostrar una imagen de perfil.
@@ -72,7 +74,7 @@ fun AppPhotoPicker(
         if (photoUri != null) {
             AsyncImage(
                 model = photoUri,
-                contentDescription = "Foto de perfil",
+                contentDescription = stringResource(R.string.photo_profile),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
@@ -91,7 +93,7 @@ fun AppPhotoPicker(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar foto",
+                        contentDescription = stringResource(R.string.photo_edit),
                         modifier = Modifier.size(13.dp),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
@@ -100,7 +102,7 @@ fun AppPhotoPicker(
         } else {
             Icon(
                 imageVector = placeholderIcon,
-                contentDescription = "Añadir foto",
+                contentDescription = stringResource(R.string.photo_add),
                 modifier = Modifier.size(size * 0.4f),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )

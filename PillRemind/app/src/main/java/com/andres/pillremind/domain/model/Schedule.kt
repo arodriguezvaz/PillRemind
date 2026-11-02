@@ -1,6 +1,7 @@
 package com.andres.pillremind.domain.model
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
@@ -157,6 +158,40 @@ fun ScheduleRule.requireValid() {
 
         ScheduleRule.Single -> Unit
     }
+}
+
+/**
+ * Calcula las próximas tomas de un conjunto de reglas.
+ *
+ * @param startDate Fecha de inicio del medicamento, usada como ancla.
+ * @param times Horas de toma que se aplican a cada fecha que coincida.
+ * @param from Fecha desde la que buscar. Por defecto, hoy.
+ * @param count Número máximo de tomas a devolver.
+ */
+fun List<ScheduleRule>.nextOccurrences(
+    startDate: LocalDate,
+    times: List<LocalTime>,
+    from: LocalDate = LocalDate.now(),
+    count: Int = 5
+): List<LocalDateTime> {
+    if (isEmpty() || times.isEmpty() || count <= 0) return emptyList()
+
+    val sortedTimes = times.distinct().sorted()
+    val result = mutableListOf<LocalDateTime>()
+    var date = maxOf(from, startDate)
+    val limit = date.plusYears(2)
+
+    while (result.size < count && !date.isAfter(limit)) {
+        if (any { it.occursOn(date, startDate) }) {
+            sortedTimes.forEach { time ->
+                result += LocalDateTime.of(date, time)
+                if (result.size >= count) return result
+            }
+        }
+        date = date.plusDays(1)
+    }
+
+    return result
 }
 
 /**

@@ -82,12 +82,12 @@ fun TimeListEditor(
                         showDialog = false
                     }
                 ) {
-                    Text("OK")
+                    Text(stringResource(R.string.common_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.common_cancel))
                 }
             },
             title = { Text(stringResource(R.string.seleccion_la_hora)) }

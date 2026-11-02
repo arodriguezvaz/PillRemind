@@ -11,7 +11,6 @@ import com.andres.pillremind.data.utils.copyImageToInternalStorage
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.ScheduleRule
-import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
@@ -77,18 +75,6 @@ class MedicationViewModel @Inject constructor(
             emptyList()
         ) ?: MutableStateFlow(emptyList())
 
-    val weekDays: StateFlow<Set<WeekDay>> = schedules
-        .map { list ->
-            list.mapNotNull { schedule ->
-                (schedule.rule as? ScheduleRule.Weekly)?.day
-            }.toSet()
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
-
-    val times: StateFlow<List<LocalTime>> = schedules
-        .map { list -> list.map { it.time }.distinct() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
     /**
      * Crea un nuevo medicamento con sus horarios y programa las alarmas.
      *
@@ -104,7 +90,7 @@ class MedicationViewModel @Inject constructor(
         unit: String,
         startDate: LocalDate,
         endDate: LocalDate? = null,
-        weekDays: Set<WeekDay>,
+        scheduleRules: List<ScheduleRule>,
         times: List<LocalTime>,
         isChronic: Boolean,
         onSaved: () -> Unit = {}
@@ -128,7 +114,7 @@ class MedicationViewModel @Inject constructor(
                 endDate = endDate,
                 isChronic = isChronic
             )
-            val newSchedules = buildSchedules(weekDays, times, medicationId = 0)
+            val newSchedules = buildSchedules(scheduleRules, times, medicationId = 0)
 
             val saved = runCatching {
                 medicationRepository.insertMedicationWithSchedules(medication, newSchedules)
@@ -164,7 +150,7 @@ class MedicationViewModel @Inject constructor(
         unit: String,
         startDate: LocalDate,
         endDate: LocalDate? = null,
-        weekDays: Set<WeekDay>,
+        scheduleRules: List<ScheduleRule>,
         times: List<LocalTime>,
         isChronic: Boolean,
         onSaved: () -> Unit = {}
@@ -195,7 +181,7 @@ class MedicationViewModel @Inject constructor(
                 isChronic = isChronic,
                 updatedAt = now
             )
-            val newSchedules = buildSchedules(weekDays, times, medicationId = id)
+            val newSchedules = buildSchedules(scheduleRules, times, medicationId = id)
 
             val saved = runCatching {
                 medicationRepository.updateMedicationWithSchedules(
@@ -252,14 +238,14 @@ class MedicationViewModel @Inject constructor(
     }
 
     private fun buildSchedules(
-        weekDays: Set<WeekDay>,
+        scheduleRules: List<ScheduleRule>,
         times: List<LocalTime>,
         medicationId: Int
-    ): List<Schedule> = weekDays.flatMap { day ->
+    ): List<Schedule> = scheduleRules.flatMap { rule ->
         times.map { time ->
             Schedule(
                 medicationId = medicationId,
-                rule = ScheduleRule.Weekly(day),
+                rule = rule,
                 time = time
             )
         }

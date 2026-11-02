@@ -20,7 +20,6 @@
     <string name="viernes">Viernes</string>
     <string name="sabado">Sábado</string>
     <string name="domingo">Domingo</string>
-    <string name="periocidad">Periocidad:</string>
     <string name="lunesShort">L</string>
     <string name="martesShort">Ma</string>
     <string name="miercolesShort">Mi</string>
@@ -88,4 +87,57 @@
     <string name="backup_error_io">No se pudo acceder al archivo seleccionado</string>
     <string name="backup_error_export_restarted">La exportación se canceló porque se perdió la contraseña. Vuelve a intentarlo.</string>
     <string name="backup_error_generic">No se pudo completar la operación</string>
+
+    <!-- Medicamentos -->
+    <string name="medication_add_title">Añadir medicamento</string>
+    <string name="medication_view_title">Ver medicamento</string>
+    <string name="medication_edit_title">Editar medicamento</string>
+    <string name="medication_name_placeholder">Nombre del medicamento</string>
+    <string name="medication_dose_placeholder">500</string>
+    <string name="medication_select_placeholder">Selecciona</string>
+    <string name="medication_chronic_treatment">Tratamiento crónico</string>
+    <string name="medication_archive">Archivar</string>
+    <string name="medication_archive_title">Archivar medicamento</string>
+    <string name="medication_archive_message">Dejará de aparecer en la lista y no generará recordatorios. Se conservará el historial de tomas.</string>
+
+    <!-- Pautas -->
+    <string name="schedule_periodicity">Periodicidad</string>
+    <string name="schedule_periodicity_daily">Todos los días</string>
+    <string name="schedule_periodicity_weekly">Días de la semana</string>
+    <string name="schedule_periodicity_every_n_days">Cada N días</string>
+    <string name="schedule_periodicity_monthly_day">Mensual (día del mes)</string>
+    <string name="schedule_periodicity_monthly_weekday">Mensual (día de la semana)</string>
+    <string name="schedule_periodicity_cycle">Ciclo de toma y descanso</string>
+    <string name="schedule_periodicity_single">Toma única</string>
+    <string name="schedule_select">Selecciona</string>
+    <string name="schedule_weekdays">Días de la semana</string>
+    <string name="schedule_interval_days">Intervalo (días)</string>
+    <string name="schedule_interval_example">2</string>
+    <string name="schedule_day_of_month">Día del mes</string>
+    <string name="schedule_day_of_month_example">15</string>
+    <string name="schedule_clamp_last_day">Usar el último día si el mes es más corto</string>
+    <string name="schedule_occurrence">Ocurrencia</string>
+    <string name="schedule_occurrence_first">Primera</string>
+    <string name="schedule_occurrence_second">Segunda</string>
+    <string name="schedule_occurrence_third">Tercera</string>
+    <string name="schedule_occurrence_fourth">Cuarta</string>
+    <string name="schedule_occurrence_fifth">Quinta</string>
+    <string name="schedule_occurrence_last">Última</string>
+    <string name="schedule_weekday">Día de la semana</string>
+    <string name="schedule_on_days">Días de toma</string>
+    <string name="schedule_off_days">Días de descanso</string>
+    <string name="schedule_cycle_example">5</string>
+    <string name="schedule_single_description">Se tomará una sola vez en la fecha de inicio.</string>
+    <string name="schedule_preview_title">Próximas tomas</string>
+    <string name="schedule_preview_empty">Completa la pauta y añade al menos una hora.</string>
+    <string name="schedule_preview_no_upcoming">No hay próximas tomas con esta pauta.</string>
+
+    <!-- Acciones y fotos -->
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancelar</string>
+    <string name="photo_profile">Foto de perfil</string>
+    <string name="photo_edit">Editar foto</string>
+    <string name="photo_add">Añadir foto</string>
+    <string name="delete_time">Eliminar</string>
+    <string name="add_time">Añadir hora</string>
 </resources>
