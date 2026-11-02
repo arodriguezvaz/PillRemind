@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.andres.pillremind.ui.theme.PillRemindTheme
@@ -53,7 +54,15 @@ fun AppTextField(
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth(),
-            placeholder = placeholder?.let { { Text(it) } },
+            placeholder = placeholder?.let {
+                {
+                    Text(
+                        text = it,
+                        maxLines = if (singleLine) 1 else Int.MAX_VALUE,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            },
             singleLine = singleLine,
             minLines = minLines,
             maxLines = maxLines,

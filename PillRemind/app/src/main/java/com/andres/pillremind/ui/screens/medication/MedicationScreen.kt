@@ -4,6 +4,7 @@ package com.andres.pillremind.ui.screens.medication
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -58,6 +60,36 @@ sealed class MedicationMode {
     object Create : MedicationMode()
     object View : MedicationMode()
     object Edit : MedicationMode()
+}
+
+/**
+ * Coloca dos campos en fila cuando hay espacio y los apila cuando la fuente
+ * es grande o la pantalla es estrecha. Evita que textos como "Selecciona" o
+ * las fechas se partan en dos líneas dentro de un campo de una sola línea.
+ */
+@Composable
+private fun AdaptiveFieldPair(
+    modifier: Modifier = Modifier,
+    first: @Composable (Modifier) -> Unit,
+    second: @Composable (Modifier) -> Unit,
+) {
+    val fontScale = LocalDensity.current.fontScale
+
+    BoxWithConstraints(modifier = modifier) {
+        val stacked = fontScale >= 1.3f || maxWidth < 340.dp
+
+        if (stacked) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                first(Modifier.fillMaxWidth())
+                second(Modifier.fillMaxWidth())
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                first(Modifier.weight(1f))
+                second(Modifier.weight(1f))
+            }
+        }
+    }
 }
 
 /**
@@ -207,36 +239,37 @@ fun MedicationScreen(
                             .padding(bottom = 16.dp),
                     )
                 }
-                Row(
+                AdaptiveFieldPair(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    //---------DOSIS
-                    FormField(
-                        label = stringResource(R.string.dosis),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppTextField(
-                            value = dose.value,
-                            onValueChange = { dose.value = it },
-                            placeholder = stringResource(R.string.medication_dose_placeholder),
-                            keyboardType = KeyboardType.Decimal
-                        )
+                    first = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.dosis),
+                            modifier = fieldModifier
+                        ) {
+                            AppTextField(
+                                value = dose.value,
+                                onValueChange = { dose.value = it },
+                                placeholder = stringResource(R.string.medication_dose_placeholder),
+                                keyboardType = KeyboardType.Decimal
+                            )
+                        }
+                    },
+                    second = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.unidad),
+                            modifier = fieldModifier
+                        ) {
+                            AppDropdownField(
+                                value = unit.value,
+                                options = unitOptions,
+                                onOptionSelected = { unit.value = it },
+                                placeholder = stringResource(R.string.medication_select_placeholder)
+                            )
+                        }
                     }
-                    FormField(
-                        label = stringResource(R.string.unidad),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppDropdownField(
-                            value = unit.value,
-                            options = unitOptions,
-                            onOptionSelected = { unit.value = it },
-                            placeholder = stringResource(R.string.medication_select_placeholder)
-                        )
-                    }
-                }
+                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -256,34 +289,36 @@ fun MedicationScreen(
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
-                Row(
+                AdaptiveFieldPair(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FormField(
-                        label = stringResource(R.string.fecha_inicio),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppDatePickerField(
-                            value = startDate.value,
-                            onDateSelected = { startDate.value = it },
-                            enabled = true,
-                        )
+                    first = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.fecha_inicio),
+                            modifier = fieldModifier
+                        ) {
+                            AppDatePickerField(
+                                value = startDate.value,
+                                onDateSelected = { startDate.value = it },
+                                enabled = true,
+                            )
+                        }
+                    },
+                    second = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.fecha_fin),
+                            modifier = fieldModifier
+                        ) {
+                            AppDatePickerField(
+                                value = endDate.value,
+                                onDateSelected = { endDate.value = it },
+                                enabled = !isChronicTreatment.value,
+                                minDate = startDate.value
+                            )
+                        }
                     }
-                    FormField(
-                        label = stringResource(R.string.fecha_fin),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppDatePickerField(
-                            value = endDate.value,
-                            onDateSelected = { endDate.value = it },
-                            enabled = !isChronicTreatment.value,
-                            minDate = startDate.value
-                        )
-                    }
-                }
+                )
                 ScheduleEditor(
                     form = scheduleForm,
                     enabled = true
@@ -341,35 +376,37 @@ fun MedicationScreen(
                             .padding(bottom = 16.dp),
                     )
                 }
-                Row(
+                AdaptiveFieldPair(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FormField(
-                        label = stringResource(R.string.dosis),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppTextField(
-                            value = dose.value,
-                            onValueChange = { dose.value = it },
-                            placeholder = stringResource(R.string.medication_dose_placeholder),
-                            keyboardType = KeyboardType.Decimal
-                        )
+                    first = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.dosis),
+                            modifier = fieldModifier
+                        ) {
+                            AppTextField(
+                                value = dose.value,
+                                onValueChange = { dose.value = it },
+                                placeholder = stringResource(R.string.medication_dose_placeholder),
+                                keyboardType = KeyboardType.Decimal
+                            )
+                        }
+                    },
+                    second = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.unidad),
+                            modifier = fieldModifier
+                        ) {
+                            AppDropdownField(
+                                value = unit.value,
+                                options = unitOptions,
+                                onOptionSelected = { unit.value = it },
+                                placeholder = stringResource(R.string.medication_select_placeholder)
+                            )
+                        }
                     }
-                    FormField(
-                        label = stringResource(R.string.unidad),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppDropdownField(
-                            value = unit.value,
-                            options = unitOptions,
-                            onOptionSelected = { unit.value = it },
-                            placeholder = stringResource(R.string.medication_select_placeholder)
-                        )
-                    }
-                }
+                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -389,34 +426,36 @@ fun MedicationScreen(
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
-                Row(
+                AdaptiveFieldPair(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FormField(
-                        label = stringResource(R.string.fecha_inicio),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppDatePickerField(
-                            value = startDate.value,
-                            onDateSelected = { startDate.value = it },
-                            enabled = true
-                        )
+                    first = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.fecha_inicio),
+                            modifier = fieldModifier
+                        ) {
+                            AppDatePickerField(
+                                value = startDate.value,
+                                onDateSelected = { startDate.value = it },
+                                enabled = true
+                            )
+                        }
+                    },
+                    second = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.fecha_fin),
+                            modifier = fieldModifier
+                        ) {
+                            AppDatePickerField(
+                                value = endDate.value,
+                                onDateSelected = { endDate.value = it },
+                                enabled = !isChronicTreatment.value,
+                                minDate = startDate.value
+                            )
+                        }
                     }
-                    FormField(
-                        label = stringResource(R.string.fecha_fin),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppDatePickerField(
-                            value = endDate.value,
-                            onDateSelected = { endDate.value = it },
-                            enabled = !isChronicTreatment.value,
-                            minDate = startDate.value
-                        )
-                    }
-                }
+                )
                 ScheduleEditor(
                     form = scheduleForm,
                     enabled = true
@@ -491,37 +530,39 @@ fun MedicationScreen(
                         enabled = false
                     )
                 }
-                Row(
+                AdaptiveFieldPair(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FormField(
-                        label = stringResource(R.string.dosis),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppTextField(
-                            value = dose.value,
-                            onValueChange = { dose.value = it },
-                            placeholder = stringResource(R.string.medication_dose_placeholder),
-                            keyboardType = KeyboardType.Decimal,
-                            enabled = false
-                        )
+                    first = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.dosis),
+                            modifier = fieldModifier
+                        ) {
+                            AppTextField(
+                                value = dose.value,
+                                onValueChange = { dose.value = it },
+                                placeholder = stringResource(R.string.medication_dose_placeholder),
+                                keyboardType = KeyboardType.Decimal,
+                                enabled = false
+                            )
+                        }
+                    },
+                    second = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.unidad),
+                            modifier = fieldModifier
+                        ) {
+                            AppDropdownField(
+                                value = unit.value,
+                                options = unitOptions,
+                                onOptionSelected = { unit.value = it },
+                                placeholder = stringResource(R.string.medication_select_placeholder),
+                                enabled = false
+                            )
+                        }
                     }
-                    FormField(
-                        label = stringResource(R.string.unidad),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppDropdownField(
-                            value = unit.value,
-                            options = unitOptions,
-                            onOptionSelected = { unit.value = it },
-                            placeholder = stringResource(R.string.medication_select_placeholder),
-                            enabled = false
-                        )
-                    }
-                }
+                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -541,33 +582,35 @@ fun MedicationScreen(
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
-                Row(
+                AdaptiveFieldPair(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FormField(
-                        label = stringResource(R.string.fecha_inicio),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppDatePickerField(
-                            value = startDate.value,
-                            onDateSelected = { startDate.value = it },
-                            enabled = false
-                        )
+                    first = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.fecha_inicio),
+                            modifier = fieldModifier
+                        ) {
+                            AppDatePickerField(
+                                value = startDate.value,
+                                onDateSelected = { startDate.value = it },
+                                enabled = false
+                            )
+                        }
+                    },
+                    second = { fieldModifier ->
+                        FormField(
+                            label = stringResource(R.string.fecha_fin),
+                            modifier = fieldModifier
+                        ) {
+                            AppDatePickerField(
+                                value = endDate.value,
+                                onDateSelected = { endDate.value = it },
+                                enabled = false
+                            )
+                        }
                     }
-                    FormField(
-                        label = stringResource(R.string.fecha_fin),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        AppDatePickerField(
-                            value = endDate.value,
-                            onDateSelected = { endDate.value = it },
-                            enabled = false
-                        )
-                    }
-                }
+                )
                 ScheduleEditor(
                     form = scheduleForm,
                     enabled = false
