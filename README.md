@@ -19,6 +19,10 @@ dun mesmo dispositivo. A aplicación funciona integramente de forma local: non r
 e os datos gárdanse só no dispositivo. Tamén conta con funcionalidades de modificación e eliminación de medicamentos,
 así como recordatorios e notificacións para cada toma.
 
+Cada perfil pode gardar información médica opcional: data de nacemento, sexo, grupo sanguíneo, alerxias, notas e
+número de tarxeta sanitaria. Estes datos móstranse desde «Ver perfil» e inclúense na copia de seguridade local. O botón
+«Ver adherencia» queda preparado como acceso ás futuras estatísticas de tomas por medicamento.
+
 ## Almacenamento local
 
 Todos os datos (perfís, medicamentos, horarios e tomas) gárdanse nunha base de datos Room no propio dispositivo.

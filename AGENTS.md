@@ -54,7 +54,7 @@ Examples: `fix/1-navegacion`, `fix/2-datos`, `feat/1-historial-tomas`,
 
 Avoid: `cambios`, `prueba`, `tmp`, `fix/navegacion`, `fix/UI_02`, `Fix/UI-02`.
 
-**Branch counters:** `feat=2`, `fix=0`, `refactor=0`, `perf=0`, `test=0`,
+**Branch counters:** `feat=3`, `fix=0`, `refactor=0`, `perf=0`, `test=0`,
 `docs=2`, `chore=1`. Increment the matching counter when creating a branch and
 commit the update with that branch. Keep at most one active branch per type so two
 branches cannot take the same number.
@@ -87,7 +87,7 @@ cd PillRemind
 - Keep `domain` pure Kotlin: no Android resources, no `data.*` imports. UI labels for domain enums belong to `ui/components` (for example, `WeekDayLabels.kt`).
 - The app is local-only: there is no authentication, remote database, sync layer, or network permission. Do not reintroduce Supabase or account fields.
 - New repository: interface in `domain/repository`, implementation in `data/repository`, binding in `di/RepositoryModule`. New entity/DAO: register in `AppDatabase` and provide it through `DatabaseModule`. ViewModels use `@HiltViewModel` and screens obtain them with `hiltViewModel()`.
-- Room is version 4 with `exportSchema = false` and `fallbackToDestructiveMigration(dropAllTables = true)`. No migrations exist; bump `AppDatabase.version` for any schema change and expect local data loss. Foreign-key columns of `profiles`, `medications` and `schedules` have indices.
+- Room is version 6 with `exportSchema = false` and `fallbackToDestructiveMigration(dropAllTables = true)`. No migrations exist; bump `AppDatabase.version` for any schema change and expect local data loss. Foreign-key columns of `profiles`, `medications` and `schedules` have indices.
 - Intakes belong to medications (`medicationId`); `scheduleId` is optional and becomes `NULL` when a schedule is deleted. Each intake stores `medicationNameSnapshot`, `doseSnapshot`, and `unitSnapshot` so history survives medication edits. Medications are archived with `deletedAt` instead of being physically deleted.
 - Local rows use Int primary keys. Tables are `usuarios`, `profiles`, `medications`, `schedules`, and `intakes`; profiles belong to the single local user.
 - WorkManager is Hilt-initialized: the default `WorkManagerInitializer` is removed in `AndroidManifest.xml`, and `PillRemindApp` supplies `HiltWorkerFactory`. New workers need `@HiltWorker` + `@AssistedInject`; do not re-add the default initializer.

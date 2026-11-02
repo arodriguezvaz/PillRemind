@@ -39,7 +39,9 @@ class ProfilesViewModel @Inject constructor(
     val perfiles: StateFlow<List<Profile>> = repository.getProfiles()
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            // Se mantiene la observación activa mientras viva el ViewModel para
+            // que la lista se actualice al volver de crear o editar un perfil.
+            started = SharingStarted.Eagerly,
             initialValue = emptyList()
         )
 }

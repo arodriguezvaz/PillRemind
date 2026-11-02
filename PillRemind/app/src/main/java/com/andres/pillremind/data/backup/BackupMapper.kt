@@ -5,8 +5,10 @@ import com.andres.pillremind.data.local.entity.MedicationEntity
 import com.andres.pillremind.data.local.entity.ProfileEntity
 import com.andres.pillremind.data.local.entity.ScheduleEntity
 import com.andres.pillremind.data.local.entity.UserEntity
+import com.andres.pillremind.domain.model.BloodType
 import com.andres.pillremind.domain.model.ScheduleRule
 import com.andres.pillremind.domain.model.ScheduleType
+import com.andres.pillremind.domain.model.Sex
 import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.model.requireValid
 import java.time.LocalDate
@@ -84,6 +86,12 @@ private fun ProfileEntity.toBackupDto(imagePaths: Map<String, String>): BackupPr
         usuarioId = usuarioId,
         name = name,
         imagePath = imageUrl?.let { imagePaths[it] },
+        birthDate = birthDate?.toString(),
+        sex = sex?.name,
+        bloodType = bloodType?.name,
+        allergies = allergies,
+        medicalNotes = medicalNotes,
+        healthCardNumber = healthCardNumber,
         createdAt = createdAt.toString(),
         updatedAt = updatedAt.toString()
     )
@@ -144,6 +152,12 @@ private fun BackupProfileDto.toEntity(imagePaths: Map<String, String>): ProfileE
         usuarioId = usuarioId,
         name = name,
         imageUrl = resolveImagePath(imagePath, imagePaths),
+        birthDate = birthDate?.let { parseBackupDate(it, "perfil") },
+        sex = parseBackupSex(sex, "perfil"),
+        bloodType = parseBackupBloodType(bloodType, "perfil"),
+        allergies = allergies,
+        medicalNotes = medicalNotes,
+        healthCardNumber = healthCardNumber,
         createdAt = parseBackupDateTime(createdAt, "perfil"),
         updatedAt = parseBackupDateTime(updatedAt, "perfil")
     )
@@ -352,3 +366,41 @@ fun parseBackupWeekDay(value: String, field: String): WeekDay =
             e
         )
     }
+
+/**
+ * Parsea el sexo declarado en un perfil.
+ *
+ * @param value Valor almacenado, o `null` si no se informó.
+ * @param field Nombre del campo, usado en el mensaje de error.
+ */
+fun parseBackupSex(value: String?, field: String): Sex? {
+    if (value == null) return null
+    return try {
+        Sex.valueOf(value)
+    } catch (e: IllegalArgumentException) {
+        throw BackupException(
+            BackupError.INVALID_DATA,
+            "Sexo inválido en $field",
+            e
+        )
+    }
+}
+
+/**
+ * Parsea el grupo sanguíneo declarado en un perfil.
+ *
+ * @param value Valor almacenado, o `null` si no se informó.
+ * @param field Nombre del campo, usado en el mensaje de error.
+ */
+fun parseBackupBloodType(value: String?, field: String): BloodType? {
+    if (value == null) return null
+    return try {
+        BloodType.valueOf(value)
+    } catch (e: IllegalArgumentException) {
+        throw BackupException(
+            BackupError.INVALID_DATA,
+            "Grupo sanguíneo inválido en $field",
+            e
+        )
+    }
+}

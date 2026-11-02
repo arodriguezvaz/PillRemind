@@ -25,6 +25,9 @@ import com.andres.pillremind.ui.theme.PillRemindTheme
  * @param placeholder Texto a mostrar como marcador de posición.
  * @param enabled Indica si el campo de texto está habilitado.
  * @param keyboardType Tipo de teclado que se muestra al editar el campo.
+ * @param singleLine Indica si el campo debe ocupar una sola línea.
+ * @param minLines Número mínimo de líneas visibles cuando no es de una sola línea.
+ * @param maxLines Número máximo de líneas visibles cuando no es de una sola línea.
  */
 @Composable
 fun AppTextField(
@@ -34,6 +37,9 @@ fun AppTextField(
     placeholder: String? = null,
     enabled: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -47,7 +53,9 @@ fun AppTextField(
             modifier = Modifier
                 .fillMaxWidth(),
             placeholder = placeholder?.let { { Text(it) } },
-            singleLine = true,
+            singleLine = singleLine,
+            minLines = minLines,
+            maxLines = maxLines,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surface,

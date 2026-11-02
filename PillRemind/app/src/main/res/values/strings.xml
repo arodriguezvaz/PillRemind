@@ -32,8 +32,50 @@
     <string name="tomar">Tomar</string>
     <string name="tomado">Tomado</string>
     <string name="fecha_hint">dd/mm/yyyy</string>
-    <string name="añadir_perfil">Añadir perfil</string>
     <string name="seleccion_la_hora">Selecciona la hora</string>
+    <string name="date_picker_content_description">Seleccionar fecha</string>
+
+    <!-- Perfil -->
+    <string name="profile_create_title">Crear perfil</string>
+    <string name="profile_view_title">Ver perfil</string>
+    <string name="profile_edit_title">Editar perfil</string>
+    <string name="profile_name_placeholder">Nombre del perfil</string>
+    <string name="profile_personal_data">Datos personales</string>
+    <string name="profile_medical_info">Información médica</string>
+    <string name="profile_admin_data">Datos administrativos</string>
+    <string name="profile_birth_date">Nacimiento</string>
+    <plurals name="profile_age">
+        <item quantity="one">%1$d año</item>
+        <item quantity="other">%1$d años</item>
+    </plurals>
+    <string name="profile_sex">Sexo</string>
+    <string name="profile_sex_female">Mujer</string>
+    <string name="profile_sex_male">Hombre</string>
+    <string name="profile_sex_other">Otro</string>
+    <string name="profile_sex_prefer_not_to_say">Prefiero no decirlo</string>
+    <string name="profile_blood_type">Grupo sanguíneo</string>
+    <string name="profile_blood_a_positive">A+</string>
+    <string name="profile_blood_a_negative">A-</string>
+    <string name="profile_blood_b_positive">B+</string>
+    <string name="profile_blood_b_negative">B-</string>
+    <string name="profile_blood_ab_positive">AB+</string>
+    <string name="profile_blood_ab_negative">AB-</string>
+    <string name="profile_blood_o_positive">O+</string>
+    <string name="profile_blood_o_negative">O-</string>
+    <string name="profile_allergies">Alergias</string>
+    <string name="profile_allergies_placeholder">Medicamentos, alimentos, etc.</string>
+    <string name="profile_medical_notes">Notas médicas / condiciones</string>
+    <string name="profile_medical_notes_placeholder">Condiciones, operaciones, observaciones…</string>
+    <string name="profile_health_card">Nº de tarjeta sanitaria</string>
+    <string name="profile_health_card_placeholder">Número de tarjeta</string>
+    <string name="profile_not_specified_short">Sin dato</string>
+    <string name="profile_privacy_note">Estos datos se guardan solo en este dispositivo.</string>
+    <string name="profile_view_adherence">Ver adherencia</string>
+    <string name="profile_adherence_soon">Próximamente</string>
+    <string name="profile_adherence_placeholder_title">Adherencia</string>
+    <string name="profile_adherence_placeholder_message">Próximamente podrás consultar aquí las estadísticas de tomas por medicamento.</string>
+    <string name="profile_delete_title">Eliminar perfil</string>
+    <string name="profile_delete_message">¿Seguro que quieres eliminar este perfil?</string>
 
     <!-- Ajustes -->
     <string name="settings_title">Ajustes</string>

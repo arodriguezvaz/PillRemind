@@ -64,6 +64,9 @@ object BackupValidator {
             if (profile.name.isBlank()) {
                 throw invalidData("La copia contiene un perfil sin nombre")
             }
+            profile.birthDate?.let { parseBackupDate(it, "perfil") }
+            parseBackupSex(profile.sex, "perfil")
+            parseBackupBloodType(profile.bloodType, "perfil")
             validateImagePath(profile.imagePath, "el perfil ${profile.name}")
             parseBackupDateTime(profile.createdAt, "perfil")
             parseBackupDateTime(profile.updatedAt, "perfil")

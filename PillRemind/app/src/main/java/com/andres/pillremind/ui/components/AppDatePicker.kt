@@ -39,8 +39,11 @@ import java.time.format.DateTimeFormatter
  * @param onDateSelected Lambda llamada con la fecha elegida.
  * @param modifier Modificador opcional para personalizar la vista.
  * @param placeholder Texto mostrado cuando no hay fecha seleccionada.
- * @param enabled Indica si el campo está habilitado para interactuar.
+ * @param enabled Indica si el campo está habilitado para interactuar. Cuando es
+ *   `false` se muestra deshabilitado y oculta el icono del calendario.
  * @param isError Marca visual de error en el campo.
+ * @param minDate Fecha mínima seleccionable, o `null` si no hay límite.
+ * @param maxDate Fecha máxima seleccionable, o `null` si no hay límite.
  */
 @Composable
 fun AppDatePickerField(
@@ -50,18 +53,42 @@ fun AppDatePickerField(
     placeholder: String = stringResource(R.string.fecha_hint),
     enabled: Boolean = true,
     isError: Boolean = false,
-    minDate: LocalDate? = null
+    minDate: LocalDate? = null,
+    maxDate: LocalDate? = null
 ) {
 
     var showDialog by remember { mutableStateOf(false) }
 
     val formattedDate = value?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: ""
 
+    // El TextField interno siempre está deshabilitado para evitar que se pueda
+    // escribir; los colores y el icono dependen de `enabled`.
+    val containerColor = if (enabled) {
+        MaterialTheme.colorScheme.surface
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+    val contentColor = if (enabled) {
+        MaterialTheme.colorScheme.onSurface
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    }
+    val trailingIcon: (@Composable () -> Unit)? = if (enabled) {
+        {
+            Icon(
+                imageVector = Icons.Default.DateRange,
+                contentDescription = stringResource(R.string.date_picker_content_description)
+            )
+        }
+    } else {
+        null
+    }
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         shadowElevation = 8.dp,
-        color = MaterialTheme.colorScheme.surface
+        color = containerColor
     ) {
 
         TextField(
@@ -72,16 +99,11 @@ fun AppDatePickerField(
                 .clickable(enabled) { showDialog = true },
             enabled = false,
             placeholder = { Text(placeholder) },
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Date picker"
-                )
-            },
+            trailingIcon = trailingIcon,
             isError = isError,
             colors = TextFieldDefaults.colors(
-                disabledContainerColor = MaterialTheme.colorScheme.surface,
-                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                disabledContainerColor = containerColor,
+                disabledTextColor = contentColor,
                 disabledIndicatorColor = Color.Transparent
             ),
             shape = RoundedCornerShape(12.dp),
@@ -90,18 +112,26 @@ fun AppDatePickerField(
 
 
     if (showDialog) {
-        val selectableDates = remember(minDate) {
+        val selectableDates = remember(minDate, maxDate) {
             object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    if (minDate == null) return true
                     val date = Instant.ofEpochMilli(utcTimeMillis)
                         .atZone(ZoneId.of("UTC"))
                         .toLocalDate()
-                    return !date.isBefore(minDate)
+                    val afterMin = minDate?.let { !date.isBefore(it) } ?: true
+                    val beforeMax = maxDate?.let { !date.isAfter(it) } ?: true
+                    return afterMin && beforeMax
                 }
             }
         }
-        val datePickerState = rememberDatePickerState(selectableDates = selectableDates)
+        val initialSelectedDateMillis = value
+            ?.atStartOfDay(ZoneId.of("UTC"))
+            ?.toInstant()
+            ?.toEpochMilli()
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = initialSelectedDateMillis,
+            selectableDates = selectableDates
+        )
 
         DatePickerDialog(
             onDismissRequest = { showDialog = false },
@@ -120,12 +150,12 @@ fun AppDatePickerField(
                         showDialog = false
                     }
                 ) {
-                    Text("OK")
+                    Text(stringResource(R.string.common_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.common_cancel))
                 }
             },
 
