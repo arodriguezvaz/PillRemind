@@ -32,7 +32,7 @@ fun AppFormSection(
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.primary,
         )
         Spacer(modifier = Modifier.height(12.dp))
