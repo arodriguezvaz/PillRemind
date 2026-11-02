@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.data.utils.copyImageToInternalStorage
+import com.andres.pillremind.domain.model.BloodType
 import com.andres.pillremind.domain.model.Profile
+import com.andres.pillremind.domain.model.Sex
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +25,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 /**
  * ViewModel para la gestión de perfiles.
@@ -52,9 +56,25 @@ class ProfileViewModel @Inject constructor(
      *
      * @param nombre Nombre del perfil.
      * @param photoUri URI opcional de la imagen del perfil.
+     * @param birthDate Fecha de nacimiento opcional.
+     * @param sex Sexo declarado opcional.
+     * @param bloodType Grupo sanguíneo opcional.
+     * @param allergies Alergias conocidas opcionales.
+     * @param medicalNotes Notas médicas opcionales.
+     * @param healthCardNumber Número de tarjeta sanitaria opcional.
      * @param onSaved Callback ejecutado cuando el perfil ya está guardado.
      */
-    fun addProfile(nombre: String, photoUri: Uri? = null, onSaved: () -> Unit = {}) {
+    fun addProfile(
+        nombre: String,
+        photoUri: Uri? = null,
+        birthDate: LocalDate? = null,
+        sex: Sex? = null,
+        bloodType: BloodType? = null,
+        allergies: String? = null,
+        medicalNotes: String? = null,
+        healthCardNumber: String? = null,
+        onSaved: () -> Unit = {}
+    ) {
         val trimmedNombre = nombre.trim()
         val imagePath = photoUri?.let {
             copyImageToInternalStorage(context, it)
@@ -66,7 +86,13 @@ class ProfileViewModel @Inject constructor(
                     Profile(
                         usuarioId = userId,
                         name = trimmedNombre,
-                        urlImagen = imagePath
+                        urlImagen = imagePath,
+                        birthDate = birthDate,
+                        sex = sex,
+                        bloodType = bloodType,
+                        allergies = allergies.normalizedOrNull(),
+                        medicalNotes = medicalNotes.normalizedOrNull(),
+                        healthCardNumber = healthCardNumber.normalizedOrNull()
                     )
                 )
                 onSaved()
@@ -112,12 +138,24 @@ class ProfileViewModel @Inject constructor(
      * @param nombre Nombre actualizado del perfil.
      * @param newPhotoUri URI nueva del picker.
      * @param currentImagePath Ruta actual guardada en Room.
+     * @param birthDate Fecha de nacimiento opcional.
+     * @param sex Sexo declarado opcional.
+     * @param bloodType Grupo sanguíneo opcional.
+     * @param allergies Alergias conocidas opcionales.
+     * @param medicalNotes Notas médicas opcionales.
+     * @param healthCardNumber Número de tarjeta sanitaria opcional.
      * @param onSaved Callback ejecutado cuando el perfil ya está actualizado.
      */
     fun updateProfile(
         nombre: String,
         newPhotoUri: Uri? = null,
         currentImagePath: String? = null,
+        birthDate: LocalDate? = null,
+        sex: Sex? = null,
+        bloodType: BloodType? = null,
+        allergies: String? = null,
+        medicalNotes: String? = null,
+        healthCardNumber: String? = null,
         onSaved: () -> Unit = {}
     ) {
         val trimmedNombre = nombre.trim()
@@ -125,24 +163,30 @@ class ProfileViewModel @Inject constructor(
 
         viewModelScope.launch {
             val activeProfileId = profileId.firstOrNull() ?: return@launch
-            val userId = activeUserId.firstOrNull() ?: return@launch
+            val currentProfile =
+                profileRepository.getProfileByIdOnce(activeProfileId) ?: return@launch
 
             val imagePath = if (newPhotoUri != null) {
                 // Borrar imagen antigua si existía
-                currentImagePath?.let { File(it).delete() }
+                (currentImagePath ?: currentProfile.urlImagen)?.let { File(it).delete() }
                 // Copiar la nueva al almacenamiento interno
                 copyImageToInternalStorage(context, newPhotoUri)
             } else {
                 // Sin cambio, mantener la ruta actual
-                currentImagePath
+                currentImagePath ?: currentProfile.urlImagen
             }
 
             profileRepository.updateProfile(
-                Profile(
-                    id = activeProfileId,
-                    usuarioId = userId,
+                currentProfile.copy(
                     name = trimmedNombre,
-                    urlImagen = imagePath
+                    urlImagen = imagePath,
+                    birthDate = birthDate,
+                    sex = sex,
+                    bloodType = bloodType,
+                    allergies = allergies.normalizedOrNull(),
+                    medicalNotes = medicalNotes.normalizedOrNull(),
+                    healthCardNumber = healthCardNumber.normalizedOrNull(),
+                    updatedAt = LocalDateTime.now()
                 )
             )
             onSaved()
@@ -164,4 +208,10 @@ class ProfileViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = null
             )
+
+    /**
+     * Normaliza un texto opcional: elimina espacios y convierte los vacíos en `null`.
+     */
+    private fun String?.normalizedOrNull(): String? =
+        this?.trim()?.takeIf { it.isNotEmpty() }
 }

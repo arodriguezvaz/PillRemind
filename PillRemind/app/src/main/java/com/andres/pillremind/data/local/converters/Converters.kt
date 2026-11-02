@@ -1,7 +1,9 @@
 package com.andres.pillremind.data.local.converters
 
 import androidx.room.TypeConverter
+import com.andres.pillremind.domain.model.BloodType
 import com.andres.pillremind.domain.model.ScheduleType
+import com.andres.pillremind.domain.model.Sex
 import com.andres.pillremind.domain.model.WeekDay
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -65,5 +67,27 @@ class Converters {
     @TypeConverter
     fun toScheduleType(value: String): ScheduleType {
         return ScheduleType.valueOf(value)
+    }
+
+    //------Sex-------
+    @TypeConverter
+    fun fromSex(sex: Sex?): String? {
+        return sex?.name
+    }
+
+    @TypeConverter
+    fun toSex(value: String?): Sex? {
+        return value?.let(Sex::valueOf)
+    }
+
+    //------BloodType-------
+    @TypeConverter
+    fun fromBloodType(bloodType: BloodType?): String? {
+        return bloodType?.name
+    }
+
+    @TypeConverter
+    fun toBloodType(value: String?): BloodType? {
+        return value?.let(BloodType::valueOf)
     }
 }

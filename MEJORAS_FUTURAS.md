@@ -31,7 +31,28 @@ la deuda técnica se siguen registrando en el audit local `PillRemind/INCIDENCIA
   centralizan.
 - **Prioridad:** baja; no afecta al funcionamiento de la app.
 
+### Perfil ampliado con información médica
+
+- **Estado:** implementada.
+- **Contexto:** el perfil solo guardaba nombre e imagen.
+- **Implementación:** el formulario permite fecha de nacimiento, sexo, grupo
+  sanguíneo, alergias, notas médicas y número de tarjeta sanitaria, todos
+  opcionales. Los datos se muestran en «Ver perfil» y se incluyen en la copia de
+  seguridad local. La base de datos pasa a la versión 6 y los campos nuevos son
+  opcionales en el formato de copia.
+- **Pendiente:** el botón «Ver adherencia» de «Ver perfil» es un placeholder; la
+  pantalla de estadísticas se implementará en una próxima iteración.
+
 ## Historial y estadísticas
+
+### Pantalla de adherencia por medicamento
+
+- **Estado:** pendiente.
+- **Contexto:** el perfil ya muestra el botón «Ver adherencia» como placeholder.
+- **Propuesta:** pantalla con resumen global y estadísticas por medicamento
+  (tomas registradas, omitidas y porcentaje) para periodos de 7, 30 y 90 días,
+  incluyendo medicamentos archivados.
+- **Prioridad:** media.
 
 ### Pantalla de historial de tomas
 

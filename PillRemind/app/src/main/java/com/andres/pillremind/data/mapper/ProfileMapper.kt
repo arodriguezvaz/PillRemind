@@ -13,6 +13,12 @@ fun ProfileEntity.toDomain(): Profile = Profile(
     usuarioId = usuarioId,
     name = name,
     urlImagen = imageUrl,
+    birthDate = birthDate,
+    sex = sex,
+    bloodType = bloodType,
+    allergies = allergies,
+    medicalNotes = medicalNotes,
+    healthCardNumber = healthCardNumber,
     createdAt = createdAt,
     updatedAt = updatedAt
 )
@@ -27,6 +33,12 @@ fun Profile.toEntity(): ProfileEntity = ProfileEntity(
     usuarioId = usuarioId,
     name = name,
     imageUrl = urlImagen,
+    birthDate = birthDate,
+    sex = sex,
+    bloodType = bloodType,
+    allergies = allergies,
+    medicalNotes = medicalNotes,
+    healthCardNumber = healthCardNumber,
     createdAt = createdAt,
     updatedAt = updatedAt
 )

@@ -56,6 +56,12 @@ data class BackupUserDto(
  * Perfil incluido en la copia.
  *
  * @property imagePath Ruta relativa dentro del ZIP (`images/...`), o `null`.
+ * @property birthDate Fecha de nacimiento ISO, o `null`.
+ * @property sex Sexo declarado, o `null`.
+ * @property bloodType Grupo sanguíneo declarado, o `null`.
+ * @property allergies Alergias conocidas, o `null`.
+ * @property medicalNotes Condiciones o notas médicas, o `null`.
+ * @property healthCardNumber Número de tarjeta sanitaria, o `null`.
  */
 @Serializable
 data class BackupProfileDto(
@@ -63,6 +69,12 @@ data class BackupProfileDto(
     val usuarioId: Int,
     val name: String,
     val imagePath: String? = null,
+    val birthDate: String? = null,
+    val sex: String? = null,
+    val bloodType: String? = null,
+    val allergies: String? = null,
+    val medicalNotes: String? = null,
+    val healthCardNumber: String? = null,
     val createdAt: String,
     val updatedAt: String
 )

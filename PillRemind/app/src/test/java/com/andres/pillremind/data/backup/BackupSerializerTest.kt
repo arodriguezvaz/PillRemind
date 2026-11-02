@@ -1,6 +1,8 @@
 package com.andres.pillremind.data.backup
 
+import com.andres.pillremind.domain.model.BloodType
 import com.andres.pillremind.domain.model.ScheduleType
+import com.andres.pillremind.domain.model.Sex
 import com.andres.pillremind.domain.model.WeekDay
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -122,6 +124,12 @@ class BackupSerializerTest {
         assertEquals(2, entities.intakes.size)
 
         assertEquals("/data/app/files/backup_1.jpg", entities.profiles.first().imageUrl)
+        assertEquals(LocalDate.of(1990, 5, 12), entities.profiles.first().birthDate)
+        assertEquals(Sex.FEMALE, entities.profiles.first().sex)
+        assertEquals(BloodType.O_POSITIVE, entities.profiles.first().bloodType)
+        assertEquals("Penicilina", entities.profiles.first().allergies)
+        assertEquals("Asma", entities.profiles.first().medicalNotes)
+        assertEquals("SIP-123", entities.profiles.first().healthCardNumber)
         assertEquals("/data/app/files/backup_1.jpg", entities.medications.first().imageUrl)
         assertEquals(WeekDay.MONDAY, entities.schedules.first().weekDay)
         assertEquals(ScheduleType.WEEKLY, entities.schedules.first().type)
@@ -187,6 +195,61 @@ class BackupSerializerTest {
         assertThrows(BackupException::class.java) { BackupValidator.validate(backup) }
     }
 
+    @Test
+    fun `acepta una copia antigua sin los datos medicos del perfil`() {
+        val backup = validBackup().copy(
+            profiles = listOf(
+                validBackup().profiles.first().copy(
+                    birthDate = null,
+                    sex = null,
+                    bloodType = null,
+                    allergies = null,
+                    medicalNotes = null,
+                    healthCardNumber = null
+                )
+            )
+        )
+
+        BackupValidator.validate(backup)
+        val entities = backup.toEntities(
+            mapOf("images/img_0001.jpg" to "/data/app/files/backup_1.jpg")
+        )
+
+        assertNull(entities.profiles.first().birthDate)
+        assertNull(entities.profiles.first().sex)
+        assertNull(entities.profiles.first().bloodType)
+        assertNull(entities.profiles.first().allergies)
+        assertNull(entities.profiles.first().medicalNotes)
+        assertNull(entities.profiles.first().healthCardNumber)
+    }
+
+    @Test
+    fun `rechaza una fecha de nacimiento invalida`() {
+        val backup = validBackup().copy(
+            profiles = listOf(validBackup().profiles.first().copy(birthDate = "no-es-una-fecha"))
+        )
+
+        assertThrows(BackupException::class.java) { BackupValidator.validate(backup) }
+    }
+
+    @Test
+    fun `rechaza un sexo invalido`() {
+        val backup = validBackup().copy(
+            profiles = listOf(validBackup().profiles.first().copy(sex = "NO_EXISTE"))
+        )
+
+        assertThrows(BackupException::class.java) { BackupValidator.validate(backup) }
+    }
+
+    @Test
+    fun `rechaza un grupo sanguineo invalido`() {
+        val backup = validBackup().copy(
+            profiles = listOf(validBackup().profiles.first().copy(bloodType = "NO_EXISTE"))
+        )
+
+        assertThrows(BackupException::class.java) { BackupValidator.validate(backup) }
+    }
+
     private fun validBackup(): BackupFileDto = BackupFileDto(
         format = BackupFormat.NAME,
         formatVersion = BackupFormat.VERSION,
@@ -205,6 +268,12 @@ class BackupSerializerTest {
                 usuarioId = 1,
                 name = "Ana",
                 imagePath = "images/img_0001.jpg",
+                birthDate = "1990-05-12",
+                sex = Sex.FEMALE.name,
+                bloodType = BloodType.O_POSITIVE.name,
+                allergies = "Penicilina",
+                medicalNotes = "Asma",
+                healthCardNumber = "SIP-123",
                 createdAt = "2026-10-01T09:00:00",
                 updatedAt = "2026-10-01T09:00:00"
             )
