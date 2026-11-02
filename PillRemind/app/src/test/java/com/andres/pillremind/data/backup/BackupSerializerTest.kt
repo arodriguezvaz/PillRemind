@@ -25,6 +25,40 @@ class BackupSerializerTest {
     }
 
     @Test
+    fun `ida y vuelta conserva horarios recurrentes`() {
+        val original = validBackup().copy(
+            schedules = listOf(
+                BackupScheduleDto(
+                    id = 1,
+                    medicationId = 1,
+                    type = ScheduleType.EVERY_N_DAYS.name,
+                    intervalDays = 2,
+                    time = "08:00"
+                ),
+                BackupScheduleDto(
+                    id = 2,
+                    medicationId = 1,
+                    type = ScheduleType.MONTHLY_WEEKDAY.name,
+                    weekDay = WeekDay.MONDAY.name,
+                    monthWeek = -1,
+                    time = "09:00"
+                )
+            )
+        )
+
+        val restored = BackupSerializer.decode(BackupSerializer.encode(original))
+
+        assertEquals(original, restored)
+    }
+
+    @Test
+    fun `rechaza una copia del formato anterior`() {
+        val backup = validBackup().copy(formatVersion = 1)
+
+        assertThrows(BackupException::class.java) { BackupValidator.validate(backup) }
+    }
+
+    @Test
     fun `rechaza un formato desconocido`() {
         val backup = validBackup().copy(format = "otro-formato")
 

@@ -266,6 +266,96 @@ class IntakeRepositoryImplTest {
     }
 
     @Test
+    fun `createIntakes genera tomas el dia del mes`() = runTest {
+        coEvery { scheduleDao.getAllSchedulesOnce() } returns listOf(
+            ScheduleEntity(
+                id = 10,
+                medicationId = 20,
+                type = ScheduleType.MONTHLY_DAY,
+                dayOfMonth = date.dayOfMonth,
+                time = time
+            )
+        )
+        coEvery { medicationDao.getMedicationsByIdsOnce(any()) } returns listOf(
+            MedicationEntity(
+                id = 20,
+                profileId = 1,
+                name = "Ibuprofeno",
+                dose = 600.0,
+                unit = "mg",
+                startDate = date.minusMonths(1)
+            )
+        )
+        coEvery { intakeDao.insertIntakes(any()) } returns listOf(1L)
+
+        val result = repository.createIntakes(date, date.plusDays(2))
+
+        assertEquals(1, result.size)
+        assertEquals(date, result.single().scheduledAt.toLocalDate())
+    }
+
+    @Test
+    fun `createIntakes respeta los ciclos de toma y descanso`() = runTest {
+        coEvery { scheduleDao.getAllSchedulesOnce() } returns listOf(
+            ScheduleEntity(
+                id = 10,
+                medicationId = 20,
+                type = ScheduleType.CYCLE,
+                onDays = 2,
+                offDays = 1,
+                time = time
+            )
+        )
+        coEvery { medicationDao.getMedicationsByIdsOnce(any()) } returns listOf(
+            MedicationEntity(
+                id = 20,
+                profileId = 1,
+                name = "Ibuprofeno",
+                dose = 600.0,
+                unit = "mg",
+                startDate = date
+            )
+        )
+        coEvery { intakeDao.insertIntakes(any()) } returns listOf(1L, 2L, 3L, 4L)
+
+        val result = repository.createIntakes(date, date.plusDays(4))
+
+        assertEquals(4, result.size)
+        assertEquals(
+            listOf(date, date.plusDays(1), date.plusDays(3), date.plusDays(4)),
+            result.map { it.scheduledAt.toLocalDate() }
+        )
+    }
+
+    @Test
+    fun `createIntakes genera una sola toma`() = runTest {
+        coEvery { scheduleDao.getAllSchedulesOnce() } returns listOf(
+            ScheduleEntity(
+                id = 10,
+                medicationId = 20,
+                type = ScheduleType.SINGLE,
+                time = time
+            )
+        )
+        coEvery { medicationDao.getMedicationsByIdsOnce(any()) } returns listOf(
+            MedicationEntity(
+                id = 20,
+                profileId = 1,
+                name = "Ibuprofeno",
+                dose = 600.0,
+                unit = "mg",
+                startDate = date
+            )
+        )
+        coEvery { intakeDao.insertIntakes(any()) } returns listOf(1L)
+
+        val result = repository.createIntakes(date, date.plusDays(2))
+
+        assertEquals(1, result.size)
+        assertEquals(date, result.single().scheduledAt.toLocalDate())
+    }
+
+    @Test
     fun `getLastGeneratedDate devuelve hoy si no hay fecha guardada`() = runTest {
         every { sessionManager.lastGeneratedDate } returns flowOf(null)
 

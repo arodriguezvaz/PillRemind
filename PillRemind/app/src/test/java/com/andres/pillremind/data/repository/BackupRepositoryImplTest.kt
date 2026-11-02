@@ -11,6 +11,7 @@ import com.andres.pillremind.data.local.entity.ProfileEntity
 import com.andres.pillremind.data.local.entity.ScheduleEntity
 import com.andres.pillremind.data.local.entity.UserEntity
 import com.andres.pillremind.data.local.session.SessionManager
+import com.andres.pillremind.domain.model.ScheduleType
 import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.notifications.ReminderScheduler
 import io.mockk.Runs
@@ -166,6 +167,33 @@ class BackupRepositoryImplTest {
         assertEquals(currentProfile.id, sessionManager.activeProfileId.first())
     }
 
+    @Test
+    fun `exporta e importa horarios recurrentes`() = runTest {
+        val seeded = seedDatabase()
+        database.scheduleDao().insertSchedule(
+            ScheduleEntity(
+                medicationId = seeded.medicationId,
+                type = ScheduleType.EVERY_N_DAYS,
+                intervalDays = 2,
+                time = LocalTime.of(20, 0)
+            )
+        )
+        val exported = ByteArrayOutputStream()
+
+        repository.exportTo(exported, password = null)
+
+        repository.importFrom(
+            input = ByteArrayInputStream(exported.toByteArray()),
+            password = null
+        )
+
+        val schedules = database.backupDao().getSchedulesOnce()
+        assertEquals(2, schedules.size)
+        val recurring = schedules.first { it.type == ScheduleType.EVERY_N_DAYS }
+        assertEquals(2, recurring.intervalDays)
+        assertEquals(LocalTime.of(20, 0), recurring.time)
+    }
+
     private suspend fun seedDatabase(): SeededData {
         val userId = database.userDao()
             .insertUser(UserEntity(createdAt = now, updatedAt = now))
@@ -218,6 +246,7 @@ class BackupRepositoryImplTest {
         return SeededData(
             userId = userId,
             profileId = profileId,
+            medicationId = medicationId,
             imagePath = imageFile.absolutePath
         )
     }
@@ -225,6 +254,7 @@ class BackupRepositoryImplTest {
     private data class SeededData(
         val userId: Int,
         val profileId: Int,
+        val medicationId: Int,
         val imagePath: String
     )
 }
