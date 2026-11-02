@@ -8,6 +8,7 @@ import com.andres.pillremind.data.local.entity.MedicationEntity
 import com.andres.pillremind.data.local.entity.ScheduleEntity
 import com.andres.pillremind.data.local.projections.IntakeWithMedicationRow
 import com.andres.pillremind.data.local.session.SessionManager
+import com.andres.pillremind.domain.model.ScheduleType
 import com.andres.pillremind.domain.model.WeekDay
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -230,6 +231,38 @@ class IntakeRepositoryImplTest {
         val result = repository.createIntakes(date, date)
 
         assertEquals(0, result.size)
+    }
+
+    @Test
+    fun `createIntakes genera tomas cada dos dias`() = runTest {
+        coEvery { scheduleDao.getAllSchedulesOnce() } returns listOf(
+            ScheduleEntity(
+                id = 10,
+                medicationId = 20,
+                type = ScheduleType.EVERY_N_DAYS,
+                intervalDays = 2,
+                time = time
+            )
+        )
+        coEvery { medicationDao.getMedicationsByIdsOnce(any()) } returns listOf(
+            MedicationEntity(
+                id = 20,
+                profileId = 1,
+                name = "Ibuprofeno",
+                dose = 600.0,
+                unit = "mg",
+                startDate = date.minusDays(2)
+            )
+        )
+        coEvery { intakeDao.insertIntakes(any()) } returns listOf(1L, 2L)
+
+        val result = repository.createIntakes(date, date.plusDays(3))
+
+        assertEquals(2, result.size)
+        assertEquals(
+            listOf(date, date.plusDays(2)),
+            result.map { it.scheduledAt.toLocalDate() }
+        )
     }
 
     @Test

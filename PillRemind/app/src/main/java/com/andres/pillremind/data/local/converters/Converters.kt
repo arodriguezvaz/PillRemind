@@ -1,6 +1,7 @@
 package com.andres.pillremind.data.local.converters
 
 import androidx.room.TypeConverter
+import com.andres.pillremind.domain.model.ScheduleType
 import com.andres.pillremind.domain.model.WeekDay
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -53,5 +54,16 @@ class Converters {
     @TypeConverter
     fun toDiaSemana(value: String): WeekDay {
         return WeekDay.valueOf(value)
+    }
+
+    //------ScheduleType-------
+    @TypeConverter
+    fun fromScheduleType(type: ScheduleType): String {
+        return type.name
+    }
+
+    @TypeConverter
+    fun toScheduleType(value: String): ScheduleType {
+        return ScheduleType.valueOf(value)
     }
 }

@@ -10,7 +10,7 @@ object BackupFormat {
     const val NAME = "pillremind-backup"
 
     /** Versión del formato de datos. Se incrementa si cambia el esquema. */
-    const val VERSION = 1
+    const val VERSION = 2
 }
 
 /**
@@ -97,7 +97,14 @@ data class BackupMedicationDto(
 data class BackupScheduleDto(
     val id: Int,
     val medicationId: Int,
-    val weekDay: String,
+    val type: String,
+    val weekDay: String? = null,
+    val intervalDays: Int? = null,
+    val dayOfMonth: Int? = null,
+    val clampToLastDay: Boolean? = null,
+    val monthWeek: Int? = null,
+    val onDays: Int? = null,
+    val offDays: Int? = null,
     val time: String
 )
 

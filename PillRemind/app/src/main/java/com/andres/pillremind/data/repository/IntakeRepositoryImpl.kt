@@ -8,7 +8,7 @@ import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.IntakeWithMedication
-import com.andres.pillremind.domain.model.toWeekDay
+import com.andres.pillremind.domain.model.occursOn
 import com.andres.pillremind.domain.repository.IntakeRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -32,26 +32,23 @@ class IntakeRepositoryImpl @Inject constructor(
     override suspend fun createIntakes(desde: LocalDate, hasta: LocalDate): List<Intake> {
         // Carga los horarios y los medicamentos una sola vez para evitar
         // consultas repetidas por cada día y por cada horario.
-        val horarios = scheduleDao.getAllSchedulesOnce()
+        val horarios = scheduleDao.getAllSchedulesOnce().map { it.toDomain() }
         if (horarios.isEmpty()) return emptyList()
 
         val medicamentos = medicationDao
             .getMedicationsByIdsOnce(horarios.map { it.medicationId }.distinct())
             .associateBy { it.id }
 
-        val horariosPorDia = horarios.groupBy { it.weekDay }
         val tomasAInsertar = mutableListOf<Intake>()
 
         var dia = desde
         while (!dia.isAfter(hasta)) {
-            // Obtiene los horarios correspondientes al día de la semana actual.
-            val horariosDelDia = horariosPorDia[dia.dayOfWeek.toWeekDay()].orEmpty()
-            // Genera la toma únicamente si el medicamento está activo en la fecha actual.
-            for (horario in horariosDelDia) {
+            for (horario in horarios) {
                 val med = medicamentos[horario.medicationId] ?: continue
                 if (med.deletedAt != null) continue
                 if (med.startDate > dia) continue
                 if (med.endDate != null && med.endDate < dia) continue
+                if (!horario.rule.occursOn(dia, med.startDate)) continue
 
                 tomasAInsertar += Intake(
                     medicationId = med.id,

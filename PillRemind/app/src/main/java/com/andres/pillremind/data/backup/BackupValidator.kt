@@ -95,7 +95,7 @@ object BackupValidator {
             if (schedule.medicationId !in medicationIds) {
                 throw invalidData("Un horario referencia un medicamento inexistente")
             }
-            parseBackupWeekDay(schedule.weekDay, "horario")
+            schedule.toRule()
             parseBackupTime(schedule.time, "horario")
         }
 

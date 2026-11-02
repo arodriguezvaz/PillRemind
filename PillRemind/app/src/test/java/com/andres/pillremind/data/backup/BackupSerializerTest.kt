@@ -1,5 +1,6 @@
 package com.andres.pillremind.data.backup
 
+import com.andres.pillremind.domain.model.ScheduleType
 import com.andres.pillremind.domain.model.WeekDay
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -89,6 +90,7 @@ class BackupSerializerTest {
         assertEquals("/data/app/files/backup_1.jpg", entities.profiles.first().imageUrl)
         assertEquals("/data/app/files/backup_1.jpg", entities.medications.first().imageUrl)
         assertEquals(WeekDay.MONDAY, entities.schedules.first().weekDay)
+        assertEquals(ScheduleType.WEEKLY, entities.schedules.first().type)
         assertEquals(LocalTime.of(8, 0), entities.schedules.first().time)
         assertEquals(LocalDate.of(2026, 10, 1), entities.medications.first().startDate)
         assertNull(entities.intakes.first().takenAt)
@@ -99,6 +101,56 @@ class BackupSerializerTest {
 
         val archived = entities.medications[1]
         assertEquals(LocalDateTime.of(2026, 10, 20, 10, 0), archived.deletedAt)
+    }
+
+    @Test
+    fun `mapea horarios recurrentes`() {
+        val backup = validBackup().copy(
+            schedules = listOf(
+                BackupScheduleDto(
+                    id = 1,
+                    medicationId = 1,
+                    type = ScheduleType.EVERY_N_DAYS.name,
+                    intervalDays = 2,
+                    time = "08:00"
+                ),
+                BackupScheduleDto(
+                    id = 2,
+                    medicationId = 1,
+                    type = ScheduleType.MONTHLY_DAY.name,
+                    dayOfMonth = 31,
+                    clampToLastDay = true,
+                    time = "09:00"
+                )
+            )
+        )
+
+        BackupValidator.validate(backup)
+        val entities = backup.toEntities(
+            mapOf("images/img_0001.jpg" to "/data/app/files/backup_1.jpg")
+        )
+
+        assertEquals(ScheduleType.EVERY_N_DAYS, entities.schedules[0].type)
+        assertEquals(2, entities.schedules[0].intervalDays)
+        assertEquals(ScheduleType.MONTHLY_DAY, entities.schedules[1].type)
+        assertEquals(31, entities.schedules[1].dayOfMonth)
+        assertEquals(true, entities.schedules[1].clampToLastDay)
+    }
+
+    @Test
+    fun `rechaza un horario recurrente sin sus datos`() {
+        val backup = validBackup().copy(
+            schedules = listOf(
+                BackupScheduleDto(
+                    id = 1,
+                    medicationId = 1,
+                    type = ScheduleType.EVERY_N_DAYS.name,
+                    time = "08:00"
+                )
+            )
+        )
+
+        assertThrows(BackupException::class.java) { BackupValidator.validate(backup) }
     }
 
     private fun validBackup(): BackupFileDto = BackupFileDto(
@@ -153,6 +205,7 @@ class BackupSerializerTest {
             BackupScheduleDto(
                 id = 1,
                 medicationId = 1,
+                type = ScheduleType.WEEKLY.name,
                 weekDay = WeekDay.MONDAY.name,
                 time = "08:00"
             )

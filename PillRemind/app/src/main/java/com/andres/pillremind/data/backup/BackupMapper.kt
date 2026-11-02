@@ -5,7 +5,10 @@ import com.andres.pillremind.data.local.entity.MedicationEntity
 import com.andres.pillremind.data.local.entity.ProfileEntity
 import com.andres.pillremind.data.local.entity.ScheduleEntity
 import com.andres.pillremind.data.local.entity.UserEntity
+import com.andres.pillremind.domain.model.ScheduleRule
+import com.andres.pillremind.domain.model.ScheduleType
 import com.andres.pillremind.domain.model.WeekDay
+import com.andres.pillremind.domain.model.requireValid
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -105,7 +108,14 @@ private fun MedicationEntity.toBackupDto(imagePaths: Map<String, String>): Backu
 private fun ScheduleEntity.toBackupDto(): BackupScheduleDto = BackupScheduleDto(
     id = id,
     medicationId = medicationId,
-    weekDay = weekDay.name,
+    type = type.name,
+    weekDay = weekDay?.name,
+    intervalDays = intervalDays,
+    dayOfMonth = dayOfMonth,
+    clampToLastDay = clampToLastDay,
+    monthWeek = monthWeek,
+    onDays = onDays,
+    offDays = offDays,
     time = time.toString()
 )
 
@@ -155,12 +165,95 @@ private fun BackupMedicationDto.toEntity(imagePaths: Map<String, String>): Medic
         deletedAt = deletedAt?.let { parseBackupDateTime(it, "medicamento") }
     )
 
-private fun BackupScheduleDto.toEntity(): ScheduleEntity = ScheduleEntity(
-    id = id,
-    medicationId = medicationId,
-    weekDay = parseBackupWeekDay(weekDay, "horario"),
-    time = parseBackupTime(time, "horario")
-)
+private fun BackupScheduleDto.toEntity(): ScheduleEntity {
+    val rule = toRule()
+    return ScheduleEntity(
+        id = id,
+        medicationId = medicationId,
+        type = rule.type,
+        weekDay = (rule as? ScheduleRule.Weekly)?.day
+            ?: (rule as? ScheduleRule.MonthlyWeekday)?.day,
+        intervalDays = (rule as? ScheduleRule.EveryNDays)?.intervalDays,
+        dayOfMonth = (rule as? ScheduleRule.MonthlyDay)?.dayOfMonth,
+        clampToLastDay = (rule as? ScheduleRule.MonthlyDay)?.clampToLastDay,
+        monthWeek = (rule as? ScheduleRule.MonthlyWeekday)?.occurrence,
+        onDays = (rule as? ScheduleRule.Cycle)?.onDays,
+        offDays = (rule as? ScheduleRule.Cycle)?.offDays,
+        time = parseBackupTime(time, "horario")
+    )
+}
+
+/**
+ * Reconstruye la regla de recurrencia del horario importado.
+ */
+internal fun BackupScheduleDto.toRule(): ScheduleRule {
+    val scheduleType = parseBackupScheduleType(type, "horario")
+    val rule = when (scheduleType) {
+        ScheduleType.WEEKLY -> ScheduleRule.Weekly(
+            day = weekDay?.let { parseBackupWeekDay(it, "horario") }
+                ?: throw BackupException(
+                    BackupError.INVALID_DATA,
+                    "Falta el día de la semana en un horario"
+                )
+        )
+
+        ScheduleType.EVERY_N_DAYS -> ScheduleRule.EveryNDays(
+            intervalDays = intervalDays
+                ?: throw BackupException(
+                    BackupError.INVALID_DATA,
+                    "Falta el intervalo de días en un horario"
+                )
+        )
+
+        ScheduleType.MONTHLY_DAY -> ScheduleRule.MonthlyDay(
+            dayOfMonth = dayOfMonth
+                ?: throw BackupException(
+                    BackupError.INVALID_DATA,
+                    "Falta el día del mes en un horario"
+                ),
+            clampToLastDay = clampToLastDay ?: true
+        )
+
+        ScheduleType.MONTHLY_WEEKDAY -> ScheduleRule.MonthlyWeekday(
+            occurrence = monthWeek
+                ?: throw BackupException(
+                    BackupError.INVALID_DATA,
+                    "Falta la ocurrencia mensual en un horario"
+                ),
+            day = weekDay?.let { parseBackupWeekDay(it, "horario") }
+                ?: throw BackupException(
+                    BackupError.INVALID_DATA,
+                    "Falta el día de la semana en un horario mensual"
+                )
+        )
+
+        ScheduleType.CYCLE -> ScheduleRule.Cycle(
+            onDays = onDays
+                ?: throw BackupException(
+                    BackupError.INVALID_DATA,
+                    "Faltan los días de toma del ciclo"
+                ),
+            offDays = offDays
+                ?: throw BackupException(
+                    BackupError.INVALID_DATA,
+                    "Faltan los días de descanso del ciclo"
+                )
+        )
+
+        ScheduleType.SINGLE -> ScheduleRule.Single
+    }
+
+    try {
+        rule.requireValid()
+    } catch (e: IllegalArgumentException) {
+        throw BackupException(
+            BackupError.INVALID_DATA,
+            e.message ?: "Horario inválido",
+            e
+        )
+    }
+    return rule
+}
 
 private fun BackupIntakeDto.toEntity(): IntakeEntity = IntakeEntity(
     id = id,
@@ -228,6 +321,20 @@ fun parseBackupTime(value: String, field: String): LocalTime =
         throw BackupException(
             BackupError.INVALID_DATA,
             "Hora inválida en $field",
+            e
+        )
+    }
+
+/**
+ * Parsea el tipo de regla de un horario.
+ */
+fun parseBackupScheduleType(value: String, field: String): ScheduleType =
+    try {
+        ScheduleType.valueOf(value)
+    } catch (e: IllegalArgumentException) {
+        throw BackupException(
+            BackupError.INVALID_DATA,
+            "Tipo de horario inválido en $field",
             e
         )
     }

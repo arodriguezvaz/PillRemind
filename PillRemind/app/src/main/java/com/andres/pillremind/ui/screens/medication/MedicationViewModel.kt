@@ -10,6 +10,7 @@ import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.data.utils.copyImageToInternalStorage
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Schedule
+import com.andres.pillremind.domain.model.ScheduleRule
 import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
@@ -77,7 +78,11 @@ class MedicationViewModel @Inject constructor(
         ) ?: MutableStateFlow(emptyList())
 
     val weekDays: StateFlow<Set<WeekDay>> = schedules
-        .map { list -> list.map { it.weekDay }.toSet() }
+        .map { list ->
+            list.mapNotNull { schedule ->
+                (schedule.rule as? ScheduleRule.Weekly)?.day
+            }.toSet()
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptySet())
 
     val times: StateFlow<List<LocalTime>> = schedules
@@ -254,7 +259,7 @@ class MedicationViewModel @Inject constructor(
         times.map { time ->
             Schedule(
                 medicationId = medicationId,
-                weekDay = day,
+                rule = ScheduleRule.Weekly(day),
                 time = time
             )
         }
