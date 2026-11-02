@@ -31,10 +31,7 @@ import com.andres.pillremind.ui.components.FormField
 import com.andres.pillremind.ui.components.WeekDayChipGroup
 import com.andres.pillremind.ui.components.labelRes
 import com.andres.pillremind.ui.components.timeeditor.TimeListEditor
-import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 /**
  * Periodicidad seleccionable en el formulario de medicamentos.
@@ -251,22 +248,17 @@ class ScheduleFormState {
     }
 }
 
-private val previewFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("EEE d MMM · HH:mm", Locale.forLanguageTag("es-ES"))
-
 private val occurrenceValues = listOf(1, 2, 3, 4, 5, -1)
 
 /**
  * Editor de la pauta de toma: periodicidad, días y horas.
  *
  * @param form Estado editable de la pauta.
- * @param startDate Fecha de inicio del medicamento, usada por la vista previa.
  * @param enabled Indica si se puede editar.
  */
 @Composable
 fun ScheduleEditor(
     form: ScheduleFormState,
-    startDate: LocalDate?,
     enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -343,33 +335,44 @@ fun ScheduleEditor(
                 val occurrenceLabels = occurrenceValues.map { occurrenceLabel(it) }
                 val weekdayLabels = WeekDay.entries.map { stringResource(it.labelRes()) }
 
-                FormField(label = stringResource(R.string.schedule_occurrence)) {
-                    AppDropdownField(
-                        value = occurrenceLabel(form.occurrence),
-                        options = occurrenceLabels,
-                        onOptionSelected = { selected ->
-                            val index = occurrenceLabels.indexOf(selected)
-                            if (index >= 0) {
-                                form.occurrence = occurrenceValues[index]
-                            }
-                        },
-                        placeholder = stringResource(R.string.schedule_select),
-                        enabled = enabled
-                    )
-                }
-                FormField(label = stringResource(R.string.schedule_weekday)) {
-                    AppDropdownField(
-                        value = stringResource(form.monthlyWeekDay.labelRes()),
-                        options = weekdayLabels,
-                        onOptionSelected = { selected ->
-                            val index = weekdayLabels.indexOf(selected)
-                            if (index >= 0) {
-                                form.monthlyWeekDay = WeekDay.entries[index]
-                            }
-                        },
-                        placeholder = stringResource(R.string.schedule_select),
-                        enabled = enabled
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    FormField(
+                        label = stringResource(R.string.schedule_occurrence),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppDropdownField(
+                            value = occurrenceLabel(form.occurrence),
+                            options = occurrenceLabels,
+                            onOptionSelected = { selected ->
+                                val index = occurrenceLabels.indexOf(selected)
+                                if (index >= 0) {
+                                    form.occurrence = occurrenceValues[index]
+                                }
+                            },
+                            placeholder = stringResource(R.string.schedule_select),
+                            enabled = enabled
+                        )
+                    }
+                    FormField(
+                        label = stringResource(R.string.schedule_weekday),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        AppDropdownField(
+                            value = stringResource(form.monthlyWeekDay.labelRes()),
+                            options = weekdayLabels,
+                            onOptionSelected = { selected ->
+                                val index = weekdayLabels.indexOf(selected)
+                                if (index >= 0) {
+                                    form.monthlyWeekDay = WeekDay.entries[index]
+                                }
+                            },
+                            placeholder = stringResource(R.string.schedule_select),
+                            enabled = enabled
+                        )
+                    }
                 }
             }
 
@@ -420,37 +423,6 @@ fun ScheduleEditor(
                 onAddClick = { time -> form.times.add(time) },
                 onRemoveTime = { time -> form.times.remove(time) }
             )
-        }
-
-        val preview = if (form.isValid() && startDate != null) {
-            form.rules().nextOccurrences(
-                startDate = startDate,
-                times = form.times,
-                count = 5
-            )
-        } else {
-            emptyList()
-        }
-
-        FormField(label = stringResource(R.string.schedule_preview_title)) {
-            if (preview.isEmpty()) {
-                Text(
-                    text = stringResource(
-                        if (form.isValid()) {
-                            R.string.schedule_preview_no_upcoming
-                        } else {
-                            R.string.schedule_preview_empty
-                        }
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else {
-                Text(
-                    text = preview.joinToString("\n") { it.format(previewFormatter) },
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
         }
     }
 }

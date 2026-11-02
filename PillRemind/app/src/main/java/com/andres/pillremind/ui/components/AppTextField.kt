@@ -36,7 +36,7 @@ fun AppTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth(0.9f),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         shadowElevation = 8.dp,
         color = MaterialTheme.colorScheme.surface

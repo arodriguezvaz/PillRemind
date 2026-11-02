@@ -286,7 +286,6 @@ fun MedicationScreen(
                 }
                 ScheduleEditor(
                     form = scheduleForm,
-                    startDate = startDate.value,
                     enabled = true
                 )
                 AppButton(
@@ -420,7 +419,6 @@ fun MedicationScreen(
                 }
                 ScheduleEditor(
                     form = scheduleForm,
-                    startDate = startDate.value,
                     enabled = true
                 )
                 Row(modifier.fillMaxWidth()) {
@@ -572,7 +570,6 @@ fun MedicationScreen(
                 }
                 ScheduleEditor(
                     form = scheduleForm,
-                    startDate = startDate.value,
                     enabled = false
                 )
                 Row(modifier.fillMaxWidth()) {

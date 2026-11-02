@@ -128,9 +128,6 @@
     <string name="schedule_off_days">Días de descanso</string>
     <string name="schedule_cycle_example">5</string>
     <string name="schedule_single_description">Se tomará una sola vez en la fecha de inicio.</string>
-    <string name="schedule_preview_title">Próximas tomas</string>
-    <string name="schedule_preview_empty">Completa la pauta y añade al menos una hora.</string>
-    <string name="schedule_preview_no_upcoming">No hay próximas tomas con esta pauta.</string>
 
     <!-- Acciones y fotos -->
     <string name="common_ok">OK</string>
