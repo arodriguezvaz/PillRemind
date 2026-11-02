@@ -13,19 +13,19 @@ import androidx.compose.ui.unit.dp
 /**
  * Campo de formulario con una etiqueta y su contenido.
  *
- * La etiqueta usa el color primario del tema y el rol [MaterialTheme.typography.labelLarge].
- * El color es un token del tema, no un estilo tipográfico, para que se adapte a claro/oscuro.
+ * La etiqueta usa el rol [MaterialTheme.typography.labelLarge] y el color de texto
+ * principal del tema. Así queda en negro en claro y en blanco en oscuro.
  *
  * @param label Etiqueta del campo.
  * @param modifier Modificador para el contenedor.
- * @param labelColor Color de la etiqueta; por defecto, el primario del tema.
+ * @param labelColor Color de la etiqueta; por defecto, el color de texto principal.
  * @param content Contenido del campo (normalmente un [AppTextField] o similar).
  */
 @Composable
 fun AppFormField(
     label: String,
     modifier: Modifier = Modifier,
-    labelColor: Color = MaterialTheme.colorScheme.primary,
+    labelColor: Color = MaterialTheme.colorScheme.onSurface,
     content: @Composable () -> Unit,
 ) {
     Column(modifier = modifier) {
