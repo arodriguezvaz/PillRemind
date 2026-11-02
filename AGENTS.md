@@ -55,7 +55,7 @@ Examples: `fix/1-navegacion`, `fix/2-datos`, `feat/1-historial-tomas`,
 Avoid: `cambios`, `prueba`, `tmp`, `fix/navegacion`, `fix/UI_02`, `Fix/UI-02`.
 
 **Branch counters:** `feat=2`, `fix=0`, `refactor=0`, `perf=0`, `test=0`,
-`docs=2`, `chore=0`. Increment the matching counter when creating a branch and
+`docs=2`, `chore=1`. Increment the matching counter when creating a branch and
 commit the update with that branch. Keep at most one active branch per type so two
 branches cannot take the same number.
 

@@ -1,0 +1,6 @@
+# Índice local de CodeGraph (específico de cada máquina)
+.codegraph/
+
+# Skills de agentes instaladas con autoskills (locales, no forman parte del proyecto)
+.agents/
+skills-lock.json
