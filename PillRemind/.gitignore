@@ -18,3 +18,6 @@ local.properties
 # Local generated index and private known-issues audit
 .codegraph/
 /INCIDENCIAS.md
+
+# Diseños locales de pen.dev (no se versionan)
+/design/
