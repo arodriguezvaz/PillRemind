@@ -435,12 +435,6 @@ fun ScheduleEditor(
  */
 @Composable
 fun ScheduleReadOnly(form: ScheduleFormState) {
-    val timesText = if (form.times.isEmpty()) {
-        stringResource(R.string.schedule_summary_no_times)
-    } else {
-        form.times.joinToString(", ") { it.toString() }
-    }
-
     Column(modifier = Modifier.fillMaxWidth()) {
         AppInfoRow(
             label = stringResource(R.string.schedule_periodicity),
@@ -457,8 +451,7 @@ fun ScheduleReadOnly(form: ScheduleFormState) {
                 }
                 AppInfoRow(
                     label = stringResource(R.string.schedule_selected_days),
-                    value = selectedDayLabels.joinToString(", ")
-                        .ifBlank { stringResource(R.string.common_not_specified) },
+                    value = selectedDayLabels.joinToString(", "),
                 )
             }
 
@@ -506,7 +499,7 @@ fun ScheduleReadOnly(form: ScheduleFormState) {
 
         AppInfoRow(
             label = stringResource(R.string.horario),
-            value = timesText,
+            value = form.times.joinToString(", ") { it.toString() },
         )
     }
 }

@@ -20,15 +20,17 @@ import androidx.compose.ui.unit.sp
  * con el mismo tamaño para que la fila se lea de un vistazo.
  *
  * @param label Etiqueta de la fila.
- * @param value Valor mostrado.
+ * @param value Valor mostrado; si es nulo o está vacío, la fila no se muestra.
  * @param modifier Modificador para la fila.
  */
 @Composable
 fun AppInfoRow(
     label: String,
-    value: String,
+    value: String?,
     modifier: Modifier = Modifier,
 ) {
+    val displayValue = value?.takeIf { it.isNotBlank() } ?: return
+
     val labelStyle = SpanStyle(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontWeight = FontWeight.Medium,
@@ -44,7 +46,7 @@ fun AppInfoRow(
                 append("$label: ")
             }
             withStyle(valueStyle) {
-                append(value)
+                append(displayValue)
             }
         },
         modifier = modifier

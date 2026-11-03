@@ -570,15 +570,11 @@ fun MedicationScreen(
                     )
                     AppInfoRow(
                         label = stringResource(R.string.fecha_inicio),
-                        value = startDate.value
-                            ?.format(medicationDateFormatter)
-                            ?: stringResource(R.string.common_not_specified),
+                        value = startDate.value?.format(medicationDateFormatter),
                     )
                     AppInfoRow(
                         label = stringResource(R.string.fecha_fin),
-                        value = endDate.value
-                            ?.format(medicationDateFormatter)
-                            ?: stringResource(R.string.common_not_specified),
+                        value = endDate.value?.format(medicationDateFormatter),
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
