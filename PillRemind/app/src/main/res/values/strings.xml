@@ -96,9 +96,11 @@
     <string name="settings_backup_in_progress">Procesando copia de seguridad…</string>
     <string name="settings_backup_privacy_warning">El archivo contiene datos de salud. Si no lo proteges con contraseña, cualquiera que lo tenga podrá leerlo.</string>
     <string name="settings_legal_title">Legal</string>
-    <string name="settings_privacy_policy">Política de Privacidad</string>
-    <string name="settings_terms">Términos y condiciones de uso</string>
-    <string name="settings_legal_notice">Aviso Legal</string>
+    <string name="settings_privacy_policy">Política de privacidad</string>
+    <string name="settings_privacy_policy_body">PillRemind funciona íntegramente en este dispositivo. No recopila, transmite ni comparte datos personales o de salud, no requiere una cuenta y no se conecta a internet.\n\nLos perfiles, medicamentos, horarios, tomas e imágenes se guardan en una base de datos local. Esa información solo sale del dispositivo si tú exportas una copia de seguridad y eliges dónde guardarla o con quién compartirla. La copia puede contener datos de salud: protégela con contraseña y guárdala en un lugar seguro.\n\nAl desinstalar la aplicación o borrar sus datos se elimina toda la información almacenada. Las copias de seguridad que hayas exportado no se eliminan y quedan bajo tu control.\n\nLos permisos de notificaciones y alarmas exactas se usan únicamente para avisarte de las tomas programadas.</string>
+    <string name="settings_legal_notice">Aviso legal</string>
+    <string name="settings_legal_notice_body">Titular y desarrollador: Andrés Rodríguez Vázquez.\n\nPillRemind es un proyecto personal de código abierto distribuido bajo la licencia MIT. El código fuente está disponible en github.com/arodriguezvaz/PillRemind.\n\nLa aplicación es una herramienta de apoyo para recordar la medicación. No es un producto sanitario, no emite diagnósticos ni recomendaciones médicas y no sustituye la consulta con un profesional sanitario. Ante cualquier duda sobre un tratamiento, consulta con tu médico o farmacéutico.\n\nLa aplicación se ofrece «tal cual», sin garantías de disponibilidad o funcionamiento ininterrumpido, conforme al texto de la licencia MIT.</string>
+    <string name="settings_legal_close">Cerrar</string>
 
     <!-- Copia de seguridad -->
     <string name="backup_export_success">Copia exportada correctamente</string>
