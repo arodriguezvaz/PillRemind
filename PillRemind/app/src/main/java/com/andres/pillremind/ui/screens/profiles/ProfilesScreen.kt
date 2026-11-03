@@ -1,5 +1,4 @@
 package com.andres.pillremind.ui.screens.profiles
-import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppSpacing
 
 import androidx.compose.foundation.layout.Arrangement
@@ -13,10 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Profile
+import com.andres.pillremind.ui.components.AppFab
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.PerfilCard
 import com.andres.pillremind.ui.screens.main.MainTopBar
@@ -82,15 +79,7 @@ fun ProfilesScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddClicked,
-                elevation = FloatingActionButtonDefaults.elevation(
-                    defaultElevation = AppElevation,
-                    pressedElevation = AppElevation,
-                ),
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            ) {
+            AppFab(onClick = onAddClicked) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
                     contentDescription = stringResource(R.string.profiles_add),

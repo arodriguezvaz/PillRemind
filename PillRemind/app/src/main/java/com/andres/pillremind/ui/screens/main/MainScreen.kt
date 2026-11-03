@@ -3,8 +3,6 @@ package com.andres.pillremind.ui.screens.main
 import android.annotation.SuppressLint
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -20,7 +18,7 @@ import com.andres.pillremind.R
 import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
-import com.andres.pillremind.ui.theme.AppElevation
+import com.andres.pillremind.ui.components.AppFab
 
 /**
  * Pantalla principal de la aplicación.
@@ -64,12 +62,8 @@ fun MainScreen(
         bottomBar = { MainBottomBar(navController = navController) },
         floatingActionButton = {
             if (showFab) {
-                FloatingActionButton(
+                AppFab(
                     onClick = { navController.navigate(MedicationScreens.MedicationCreateScreen.route) },
-                    elevation = FloatingActionButtonDefaults.elevation(
-                        defaultElevation = AppElevation,
-                        pressedElevation = AppElevation,
-                    ),
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Add,
