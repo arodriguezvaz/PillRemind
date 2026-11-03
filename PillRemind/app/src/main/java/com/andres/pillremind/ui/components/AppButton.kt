@@ -1,4 +1,5 @@
 package com.andres.pillremind.ui.components
+import com.andres.pillremind.ui.theme.AppElevation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -77,8 +78,8 @@ fun AppButton(
             contentColor = contentColor,
         ),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 8.dp,
+            defaultElevation = AppElevation,
+            pressedElevation = AppElevation,
             disabledElevation = 0.dp,
         ),
         contentPadding = PaddingValues(

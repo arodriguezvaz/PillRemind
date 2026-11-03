@@ -1,4 +1,5 @@
 package com.andres.pillremind.ui.components
+import com.andres.pillremind.ui.theme.AppElevation
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,7 +47,7 @@ fun AppDropdownField(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        shadowElevation = 8.dp,
+        shadowElevation = AppElevation,
         color = MaterialTheme.colorScheme.surface
     ) {
         ExposedDropdownMenuBox(

@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -265,6 +266,50 @@ class ScheduleFormState {
         }
     }
 }
+
+/**
+ * Saver para conservar el estado editable de la pauta al rotar la pantalla.
+ */
+val ScheduleFormStateSaver = listSaver<ScheduleFormState, Any>(
+    save = { form ->
+        listOf(
+            form.periodicity.name,
+            form.selectedDays.joinToString(",") { it.name },
+            form.intervalDays,
+            form.dayOfMonth,
+            form.clampToLastDay,
+            form.occurrence,
+            form.monthlyWeekDay.name,
+            form.onDays,
+            form.offDays,
+            form.times.joinToString(",") { it.toString() },
+        )
+    },
+    restore = { values ->
+        ScheduleFormState().apply {
+            periodicity = SchedulePeriodicity.valueOf(values[0] as String)
+            selectedDays = (values[1] as String)
+                .split(",")
+                .filter { it.isNotBlank() }
+                .map { WeekDay.valueOf(it) }
+                .toSet()
+            intervalDays = values[2] as String
+            dayOfMonth = values[3] as String
+            clampToLastDay = values[4] as Boolean
+            occurrence = values[5] as Int
+            monthlyWeekDay = WeekDay.valueOf(values[6] as String)
+            onDays = values[7] as String
+            offDays = values[8] as String
+            times.clear()
+            times.addAll(
+                (values[9] as String)
+                    .split(",")
+                    .filter { it.isNotBlank() }
+                    .map(LocalTime::parse)
+            )
+        }
+    }
+)
 
 private val occurrenceValues = listOf(1, 2, 3, 4, 5, -1)
 

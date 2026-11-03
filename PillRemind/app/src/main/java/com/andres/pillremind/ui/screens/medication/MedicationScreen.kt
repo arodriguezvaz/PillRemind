@@ -30,6 +30,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -121,18 +123,21 @@ fun MedicationScreen(
     val medicationSchedules by medicationViewModel.schedules.collectAsState()
 
     //Variables con estado mutable para los campos del formulario
-    val name = remember { mutableStateOf("") }
-    var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
+    val name = rememberSaveable { mutableStateOf("") }
+    var selectedPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var currentImagePath by rememberSaveable { mutableStateOf<String?>(null) }
+    var newPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
-    val dose = remember { mutableStateOf("") }
-    val unit = remember { mutableStateOf("") }
+    val dose = rememberSaveable { mutableStateOf("") }
+    val unit = rememberSaveable { mutableStateOf("") }
 
-    val startDate = remember { mutableStateOf<LocalDate?>(null) }
-    val isChronicTreatment = remember { mutableStateOf(false) }
-    val endDate = remember { mutableStateOf<LocalDate?>(null) }
+    val startDate = rememberSaveable { mutableStateOf<LocalDate?>(null) }
+    val isChronicTreatment = rememberSaveable { mutableStateOf(false) }
+    val endDate = rememberSaveable { mutableStateOf<LocalDate?>(null) }
 
-    val scheduleForm = remember { ScheduleFormState() }
-    var scheduleInitialized by remember { mutableStateOf(false) }
+    val scheduleForm = rememberSaveable(saver = ScheduleFormStateSaver) { ScheduleFormState() }
+    var scheduleInitialized by rememberSaveable { mutableStateOf(false) }
+    var formInitialized by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(medicationSchedules) {
         if (!scheduleInitialized && medicationSchedules.isNotEmpty()) {
@@ -178,18 +183,40 @@ fun MedicationScreen(
     )
     //Si medication no es null actualiza las variables con los valores de medication
     LaunchedEffect(medication) {
-        medication?.let {
-            name.value = it.name
-            selectedPhotoUri = it.imageUrl?.let(Uri::parse)
-            dose.value = it.dose.toString()
-            unit.value = it.unit
-            startDate.value = it.startDate
-            endDate.value = it.endDate
-            isChronicTreatment.value = it.isChronic
+        if (!formInitialized && (medication != null || medicationMode == MedicationMode.Create)) {
+            medication?.let {
+                name.value = it.name
+                selectedPhotoUri = it.imageUrl?.let(Uri::parse)
+                currentImagePath = it.imageUrl
+                dose.value = it.dose.toString()
+                unit.value = it.unit
+                startDate.value = it.startDate
+                endDate.value = it.endDate
+                isChronicTreatment.value = it.isChronic
+            }
+            formInitialized = true
         }
     }
+    val modeSaver = Saver<MedicationMode, String>(
+        save = { mode ->
+            when (mode) {
+                MedicationMode.Create -> "create"
+                MedicationMode.View -> "view"
+                MedicationMode.Edit -> "edit"
+            }
+        },
+        restore = { value ->
+            when (value) {
+                "create" -> MedicationMode.Create
+                "view" -> MedicationMode.View
+                else -> MedicationMode.Edit
+            }
+        }
+    )
     //Varibale que especifica el modo en el que está la screen
-    var currentMode by remember { mutableStateOf(medicationMode) }
+    var currentMode by rememberSaveable(stateSaver = modeSaver) {
+        mutableStateOf(medicationMode)
+    }
 
     //Variable que si es true muestra el diálogo de eliminación
     var showArchiveDialog by remember {
@@ -217,6 +244,19 @@ fun MedicationScreen(
             startDate.value != null &&
             scheduleForm.isValid() &&
             (isChronicTreatment.value || endDate.value != null)
+
+    val missingFields = mutableListOf<String>()
+    if (name.value.isBlank()) missingFields.add(stringResource(R.string.nombre))
+    if (dose.value.toDoubleOrNull() == null) missingFields.add(stringResource(R.string.dosis))
+    if (unit.value.isBlank()) missingFields.add(stringResource(R.string.unidad))
+    if (startDate.value == null) missingFields.add(stringResource(R.string.fecha_inicio))
+    if (!isChronicTreatment.value && endDate.value == null) {
+        missingFields.add(stringResource(R.string.fecha_fin))
+    }
+    if (!scheduleForm.isValid()) {
+        missingFields.add(stringResource(R.string.medication_missing_schedule))
+    }
+
     when (currentMode) {
         //---------CREATE---------
         MedicationMode.Create -> {
@@ -362,15 +402,23 @@ fun MedicationScreen(
                     size = ButtonSize.Large,
                     enabled = isFormValid
                 )
+                if (!isFormValid) {
+                    Text(
+                        text = stringResource(
+                            R.string.save_missing_fields,
+                            missingFields.joinToString(", ")
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                    )
+                }
             }
         }
         //----------EDIT-----------
         MedicationMode.Edit -> {
-            var currentImagePath by remember { mutableStateOf(medication?.imageUrl) }
-            var newPhotoUri by remember { mutableStateOf<Uri?>(null) }
-            LaunchedEffect(medication) {
-                currentImagePath = medication?.imageUrl
-            }
             Column(
                 modifier = modifier
                     .fillMaxSize()
@@ -528,6 +576,19 @@ fun MedicationScreen(
                         size = ButtonSize.Medium,
                         modifier = Modifier.weight(1f),
                         enabled = isFormValid
+                    )
+                }
+                if (!isFormValid) {
+                    Text(
+                        text = stringResource(
+                            R.string.save_missing_fields,
+                            missingFields.joinToString(", ")
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
                     )
                 }
             }

@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
-import com.andres.pillremind.ui.components.AppTextField
+import com.andres.pillremind.ui.components.AppSearchField
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.MedicationCard
 import com.andres.pillremind.ui.screens.main.TopBarState
@@ -42,19 +42,21 @@ fun MedicationsScreen(
 
     val medications by medicationsViewModel.medications.collectAsStateWithLifecycle()
     val searchQuery by medicationsViewModel.searchQuery.collectAsStateWithLifecycle()
+    val title = stringResource(R.string.nav_medications)
+    val query = searchQuery.trim()
 
-    LaunchedEffect(Unit) {
-        onTopBarChange(TopBarState(title = "Medicamentos"))
+    LaunchedEffect(title) {
+        onTopBarChange(TopBarState(title = title))
     }
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        AppTextField(
+        AppSearchField(
             value = searchQuery,
             onValueChange = { medicationsViewModel.onSearchQueryChange(it) },
-            placeholder = "Buscar medicamento...",
+            placeholder = stringResource(R.string.medication_search_placeholder),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp)
@@ -66,7 +68,13 @@ fun MedicationsScreen(
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                BlankCard("No hay medicamentos aún")
+                BlankCard(
+                    if (query.isBlank()) {
+                        stringResource(R.string.medication_empty)
+                    } else {
+                        stringResource(R.string.medication_search_no_results, query)
+                    }
+                )
             }
         } else {
             LazyColumn(

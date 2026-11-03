@@ -1,4 +1,5 @@
 package com.andres.pillremind.ui.components
+import com.andres.pillremind.ui.theme.AppElevation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -94,7 +95,7 @@ private fun WeekDayChip(
         shape = MaterialTheme.shapes.medium,
         color = containerColor,
         contentColor = contentColor,
-        shadowElevation = 8.dp,
+        shadowElevation = AppElevation,
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),

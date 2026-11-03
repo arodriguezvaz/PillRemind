@@ -40,6 +40,7 @@
     <string name="nav_medications">Medicamentos</string>
     <string name="nav_profile">Perfil</string>
     <string name="common_back">Volver</string>
+    <string name="home_title_today">Hoy, %1$s</string>
 
     <!-- Perfil -->
     <string name="profile_create_title">Crear perfil</string>
@@ -138,6 +139,12 @@
 
     <!-- Medicamentos -->
     <string name="medication_add_title">Añadir medicamento</string>
+    <string name="medication_search_placeholder">Buscar medicamento…</string>
+    <string name="medication_empty">No hay medicamentos aún</string>
+    <string name="medication_search_no_results">No hay resultados para «%1$s»</string>
+    <string name="save_missing_fields">Faltan: %1$s</string>
+    <string name="medication_missing_schedule">pauta y al menos una hora</string>
+    <string name="profile_save_name_required">Escribe un nombre para guardar</string>
     <string name="medication_view_title">Ver medicamento</string>
     <string name="medication_edit_title">Editar medicamento</string>
     <string name="medication_data_section">Datos del medicamento</string>
@@ -192,6 +199,7 @@
     <string name="common_not_specified">Sin dato</string>
     <string name="common_yes">Sí</string>
     <string name="common_no">No</string>
+    <string name="search_clear">Limpiar búsqueda</string>
     <string name="photo_profile">Foto de perfil</string>
     <string name="photo_edit">Editar foto</string>
     <string name="photo_add">Añadir foto</string>

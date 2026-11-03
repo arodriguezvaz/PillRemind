@@ -1,4 +1,5 @@
 package com.andres.pillremind.ui.components
+import com.andres.pillremind.ui.theme.AppElevation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -88,7 +89,7 @@ fun AppDatePickerField(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        shadowElevation = 8.dp,
+        shadowElevation = AppElevation,
         color = containerColor
     ) {
 

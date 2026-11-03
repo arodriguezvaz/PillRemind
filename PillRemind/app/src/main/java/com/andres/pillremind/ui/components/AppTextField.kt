@@ -1,10 +1,12 @@
 package com.andres.pillremind.ui.components
+import com.andres.pillremind.ui.theme.AppElevation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -13,6 +15,8 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +34,9 @@ import com.andres.pillremind.ui.theme.PillRemindTheme
  * @param singleLine Indica si el campo debe ocupar una sola línea.
  * @param minLines Número mínimo de líneas visibles cuando no es de una sola línea.
  * @param maxLines Número máximo de líneas visibles cuando no es de una sola línea.
+ * @param leadingIcon Icono opcional a la izquierda.
+ * @param trailingIcon Contenido opcional a la derecha.
+ * @param imeAction Acción del teclado (buscar, siguiente, etc.).
  */
 @Composable
 fun AppTextField(
@@ -42,11 +49,14 @@ fun AppTextField(
     singleLine: Boolean = true,
     minLines: Int = 1,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    leadingIcon: ImageVector? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
+    imeAction: ImeAction = ImeAction.Default,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        shadowElevation = 8.dp,
+        shadowElevation = AppElevation,
         color = MaterialTheme.colorScheme.surface
     ) {
         TextField(
@@ -66,7 +76,19 @@ fun AppTextField(
             singleLine = singleLine,
             minLines = minLines,
             maxLines = maxLines,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            leadingIcon = leadingIcon?.let { icon ->
+                {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                    )
+                }
+            },
+            trailingIcon = trailingIcon,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = keyboardType,
+                imeAction = imeAction,
+            ),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surface,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,
