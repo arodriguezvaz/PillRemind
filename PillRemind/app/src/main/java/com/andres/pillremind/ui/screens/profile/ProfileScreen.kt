@@ -4,18 +4,15 @@ import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -41,7 +38,9 @@ import com.andres.pillremind.domain.model.Sex
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
+import com.andres.pillremind.ui.components.AppFormActionBar
 import com.andres.pillremind.ui.components.AppFormField
+import com.andres.pillremind.ui.components.AppFormScaffold
 import com.andres.pillremind.ui.components.AppFormSection
 import com.andres.pillremind.ui.components.AppInfoCard
 import com.andres.pillremind.ui.components.AppInfoRow
@@ -49,7 +48,6 @@ import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppReadOnlyField
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
-import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.labelRes
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
@@ -179,10 +177,10 @@ fun ProfileScreen(
                 onMedicalNotesChange = { medicalNotes.value = it },
                 healthCardNumber = healthCardNumber.value,
                 onHealthCardNumberChange = { healthCardNumber.value = it },
-                actions = {
-                    AppButton(
-                        text = stringResource(R.string.guardar),
-                        onClick = {
+                actionBar = {
+                    AppFormActionBar(
+                        primaryText = stringResource(R.string.guardar),
+                        onPrimaryClick = {
                             profileViewModel.addProfile(
                                 nombre = name.value,
                                 photoUri = selectedPhotoUri,
@@ -195,17 +193,13 @@ fun ProfileScreen(
                                 onSaved = onSaveClicked
                             )
                         },
-                        size = ButtonSize.Large,
-                        enabled = name.value.isNotBlank()
+                        primaryEnabled = name.value.isNotBlank(),
+                        supportingText = if (name.value.isBlank()) {
+                            stringResource(R.string.profile_save_name_required)
+                        } else {
+                            null
+                        },
                     )
-                    if (name.value.isBlank()) {
-                        Text(
-                            text = stringResource(R.string.profile_save_name_required),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = AppSpacing.xs)
-                        )
-                    }
                 }
             )
         }
@@ -230,10 +224,10 @@ fun ProfileScreen(
                 onMedicalNotesChange = { medicalNotes.value = it },
                 healthCardNumber = healthCardNumber.value,
                 onHealthCardNumberChange = { healthCardNumber.value = it },
-                actions = {
-                    AppButton(
-                        text = stringResource(R.string.guardar),
-                        onClick = {
+                actionBar = {
+                    AppFormActionBar(
+                        primaryText = stringResource(R.string.guardar),
+                        onPrimaryClick = {
                             profileViewModel.updateProfile(
                                 nombre = name.value,
                                 newPhotoUri = newPhotoUri,
@@ -250,17 +244,13 @@ fun ProfileScreen(
                                 }
                             )
                         },
-                        size = ButtonSize.Large,
-                        enabled = name.value.isNotBlank()
+                        primaryEnabled = name.value.isNotBlank(),
+                        supportingText = if (name.value.isBlank()) {
+                            stringResource(R.string.profile_save_name_required)
+                        } else {
+                            null
+                        },
                     )
-                    if (name.value.isBlank()) {
-                        Text(
-                            text = stringResource(R.string.profile_save_name_required),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = AppSpacing.xs)
-                        )
-                    }
                 }
             )
         }
@@ -286,7 +276,7 @@ fun ProfileScreen(
                 onMedicalNotesChange = {},
                 healthCardNumber = healthCardNumber.value,
                 onHealthCardNumberChange = {},
-                actions = {
+                footer = {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(AppSpacing.xxs),
@@ -303,24 +293,15 @@ fun ProfileScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        AppButton(
-                            onClick = { perfil?.let { showDeleteDialog = true } },
-                            text = stringResource(R.string.eliminar),
-                            size = ButtonSize.Medium,
-                            variant = ButtonVariant.Danger,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Spacer(modifier = Modifier.width(AppSpacing.md))
-                        AppButton(
-                            onClick = { currentMode = ProfileMode.Edit },
-                            text = stringResource(R.string.editar),
-                            size = ButtonSize.Medium,
-                            variant = ButtonVariant.Primary,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
+                },
+                actionBar = {
+                    AppFormActionBar(
+                        primaryText = stringResource(R.string.editar),
+                        onPrimaryClick = { currentMode = ProfileMode.Edit },
+                        secondaryIcon = Icons.Rounded.Delete,
+                        secondaryContentDescription = stringResource(R.string.eliminar),
+                        onSecondaryClick = { perfil?.let { showDeleteDialog = true } },
+                    )
                 }
             )
         }
@@ -395,7 +376,8 @@ private fun ProfileForm(
     onMedicalNotesChange: (String) -> Unit,
     healthCardNumber: String,
     onHealthCardNumberChange: (String) -> Unit,
-    actions: @Composable () -> Unit
+    actionBar: @Composable () -> Unit,
+    footer: @Composable ColumnScope.() -> Unit = {},
 ) {
     val notSpecified = stringResource(R.string.profile_not_specified_short)
 
@@ -463,13 +445,11 @@ private fun ProfileForm(
     val showMedicalNotes = !hideEmptyFields || medicalNotes.isNotBlank()
     val showHealthCard = !hideEmptyFields || healthCardNumber.isNotBlank()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .imePadding()
-            .padding(AppSpacing.md),
-        verticalArrangement = Arrangement.spacedBy(AppSpacing.lg)
+    AppFormScaffold(
+        modifier = modifier,
+        scrollState = rememberScrollState(),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
+        actionBar = actionBar,
     ) {
         AppPhotoPicker(
             photoUri = photoUri,
@@ -685,6 +665,6 @@ private fun ProfileForm(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        actions()
+        footer()
     }
 }

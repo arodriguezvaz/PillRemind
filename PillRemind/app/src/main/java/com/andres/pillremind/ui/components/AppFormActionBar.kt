@@ -1,0 +1,114 @@
+package com.andres.pillremind.ui.components
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.andres.pillremind.ui.theme.AppElevation
+import com.andres.pillremind.ui.theme.AppSpacing
+
+/**
+ * Barra fija con las acciones de un formulario.
+ *
+ * La acción principal ocupa todo el ancho disponible y la secundaria se muestra
+ * como un botón compacto con icono a su derecha; así "Guardar" mantiene el
+ * protagonismo y las acciones destructivas (archivar, eliminar) quedan
+ * separadas y menos expuestas a pulsaciones accidentales.
+ *
+ * @param primaryText Texto de la acción principal.
+ * @param onPrimaryClick Acción que se ejecuta al pulsar el botón principal.
+ * @param modifier Modificador para personalizar el layout de la barra.
+ * @param primaryEnabled Indica si la acción principal está habilitada.
+ * @param supportingText Aviso opcional sobre el estado del formulario, como los
+ *   campos que faltan por completar.
+ * @param secondaryIcon Icono de la acción secundaria; si es null no se muestra.
+ * @param secondaryContentDescription Descripción accesible de la acción secundaria.
+ * @param onSecondaryClick Acción que se ejecuta al pulsar el botón secundario.
+ */
+@Composable
+fun AppFormActionBar(
+    primaryText: String,
+    onPrimaryClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    primaryEnabled: Boolean = true,
+    supportingText: String? = null,
+    secondaryIcon: ImageVector? = null,
+    secondaryContentDescription: String? = null,
+    onSecondaryClick: (() -> Unit)? = null,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        shadowElevation = AppElevation,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.ime.exclude(WindowInsets.navigationBars))
+                .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm)
+        ) {
+            if (supportingText != null) {
+                Text(
+                    text = supportingText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = AppSpacing.xs)
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AppButton(
+                    text = primaryText,
+                    onClick = onPrimaryClick,
+                    modifier = Modifier.weight(1f),
+                    size = ButtonSize.Large,
+                    enabled = primaryEnabled,
+                )
+                if (secondaryIcon != null && onSecondaryClick != null) {
+                    Spacer(modifier = Modifier.width(AppSpacing.md))
+                    FilledTonalIconButton(
+                        onClick = onSecondaryClick,
+                        modifier = Modifier.size(56.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        colors = IconButtonDefaults.filledTonalIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.error,
+                        ),
+                    ) {
+                        Icon(
+                            imageVector = secondaryIcon,
+                            contentDescription = secondaryContentDescription,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
