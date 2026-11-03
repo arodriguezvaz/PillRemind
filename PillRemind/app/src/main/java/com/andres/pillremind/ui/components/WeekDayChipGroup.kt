@@ -39,7 +39,7 @@ fun WeekDayChipGroup(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         WeekDay.entries.forEach { day ->
             val isSelected = selectedDays.contains(day)
@@ -91,7 +91,7 @@ private fun WeekDayChip(
         modifier = modifier
             .aspectRatio(1f)
             .alpha(if (enabled) 1f else 0.5f),
-        shape = MaterialTheme.shapes.extraSmall,
+        shape = MaterialTheme.shapes.medium,
         color = containerColor,
         contentColor = contentColor,
         shadowElevation = 8.dp,
