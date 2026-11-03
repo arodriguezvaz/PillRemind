@@ -3,9 +3,9 @@ package com.andres.pillremind.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -89,12 +89,12 @@ private fun WeekDayChip(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier
-            .height(40.dp)
+            .aspectRatio(1f)
             .alpha(if (enabled) 1f else 0.5f),
-        shape = MaterialTheme.shapes.small,
+        shape = MaterialTheme.shapes.extraSmall,
         color = containerColor,
         contentColor = contentColor,
-        shadowElevation = 2.dp,
+        shadowElevation = 8.dp,
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
