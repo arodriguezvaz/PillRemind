@@ -61,7 +61,9 @@ fun AppDatePickerField(
 
     var showDialog by remember { mutableStateOf(false) }
 
-    val formattedDate = value?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: ""
+    val formattedDate = value?.format(
+        DateTimeFormatter.ofPattern(stringResource(R.string.common_date_pattern))
+    ) ?: ""
 
     // El TextField interno siempre está deshabilitado para evitar que se pueda
     // escribir; los colores y el icono dependen de `enabled`.

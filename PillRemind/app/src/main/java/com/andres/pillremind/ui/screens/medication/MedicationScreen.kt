@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -75,8 +76,6 @@ sealed class MedicationMode {
  * es grande o la pantalla es estrecha. Evita que textos como "Selecciona" o
  * las fechas se partan en dos líneas dentro de un campo de una sola línea.
  */
-private val medicationDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-
 @Composable
 private fun AdaptiveFieldPair(
     modifier: Modifier = Modifier,
@@ -122,6 +121,12 @@ fun MedicationScreen(
     val medication by medicationViewModel.medication.collectAsState()
     val medicationSchedules by medicationViewModel.schedules.collectAsState()
 
+    val unitOptions = stringArrayResource(R.array.medication_units).toList()
+    val datePattern = stringResource(R.string.common_date_pattern)
+    val medicationDateFormatter = remember(datePattern) {
+        DateTimeFormatter.ofPattern(datePattern)
+    }
+
     //Variables con estado mutable para los campos del formulario
     val name = rememberSaveable { mutableStateOf("") }
     var selectedPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
@@ -146,41 +151,6 @@ fun MedicationScreen(
         }
     }
 
-    val unitOptions = listOf(
-        "mg",
-        "g",
-        "mcg",
-        "kg",
-
-        "ml",
-        "l",
-
-        "comprimidos",
-        "cápsulas",
-        "pastillas",
-        "tabletas",
-
-        "gotas",
-        "sobres",
-        "ampollas",
-        "viales",
-
-        "inyecciones",
-        "dosis",
-        "puffs",
-        "sprays",
-
-        "UI",
-        "mEq",
-        "mmol",
-
-        "parches",
-        "supositorios",
-        "óvulos",
-
-        "cucharadas",
-        "cucharaditas"
-    )
     //Si medication no es null actualiza las variables con los valores de medication
     LaunchedEffect(medication) {
         if (!formInitialized && (medication != null || medicationMode == MedicationMode.Create)) {
@@ -274,6 +244,7 @@ fun MedicationScreen(
                     onPhotoSelected = { selectedPhotoUri = it },
                     enabled = true,
                     placeholderIcon = Icons.Default.AddAPhoto,
+                    photoDescriptionRes = R.string.photo_medication,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
                 //-----------NOMBRE
@@ -432,6 +403,7 @@ fun MedicationScreen(
                     onPhotoSelected = { newPhotoUri = it },
                     enabled = true,
                     placeholderIcon = Icons.Default.AddAPhoto,
+                    photoDescriptionRes = R.string.photo_medication,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
                 AppFormSection(
@@ -610,6 +582,7 @@ fun MedicationScreen(
                     onPhotoSelected = { selectedPhotoUri = it },
                     enabled = false,
                     placeholderIcon = Icons.Default.Person,
+                    photoDescriptionRes = R.string.photo_medication,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
                 AppInfoCard(title = stringResource(R.string.medication_data_section)) {

@@ -57,16 +57,18 @@ fun MainTopBar(
             }
         },
         title = {
+            val logoFirstPart = stringResource(R.string.brand_pill)
+            val logoSecondPart = stringResource(R.string.brand_remind)
             Column {
                 if (state.showLogo) {
                     Text(
                         buildAnnotatedString {
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("PILL")
+                                append(logoFirstPart)
                             }
 
                             withStyle(SpanStyle(fontWeight = FontWeight.Normal)) {
-                                append("REMIND")
+                                append(logoSecondPart)
                             }
                         },
                         style = MaterialTheme.typography.titleLarge

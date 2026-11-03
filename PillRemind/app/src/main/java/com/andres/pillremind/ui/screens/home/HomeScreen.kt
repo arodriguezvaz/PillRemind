@@ -43,8 +43,9 @@ fun HomeScreen(
 
     val todayIntakes by homeViewModel.todayIntakes.collectAsState()
     val today = LocalDate.now()
-    val formattedDate = remember(today) {
-        today.format(DateTimeFormatter.ofPattern("d 'de' MMMM", Locale.forLanguageTag("es")))
+    val datePattern = stringResource(R.string.home_date_pattern)
+    val formattedDate = remember(today, datePattern) {
+        today.format(DateTimeFormatter.ofPattern(datePattern, Locale.forLanguageTag("es")))
     }
     val title = stringResource(R.string.home_title_today, formattedDate)
     LaunchedEffect(title) {
@@ -67,7 +68,7 @@ fun HomeScreen(
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                BlankCard("No hay medicamentos para tomar hoy")
+                BlankCard(stringResource(R.string.home_empty_today))
             }
         } else {
             LazyColumn(

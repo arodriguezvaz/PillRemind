@@ -22,9 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Profile
 
 /**
@@ -33,7 +35,7 @@ import com.andres.pillremind.domain.model.Profile
  * @param profile Datos del perfil a mostrar.
  * @param gestionar Lambda ejecutada al pulsar el botón de gestión.
  * @param modifier Modificador opcional para personalizar el layout.
- * @param buttonText Texto del botón (por defecto "Gestionar").
+ * @param buttonText Texto del botón; si es `null`, se usa el texto de gestionar.
  * @param buttonVariant Variante visual del botón.
  */
 @Composable
@@ -41,7 +43,7 @@ fun PerfilCard(
     profile: Profile,
     gestionar: () -> Unit,
     modifier: Modifier = Modifier,
-    buttonText: String = "Gestionar",
+    buttonText: String? = null,
     buttonVariant: ButtonVariant = ButtonVariant.Primary,
 ) {
     Card(
@@ -72,7 +74,10 @@ fun PerfilCard(
                     if (!profile.urlImagen.isNullOrEmpty()) {
                         AsyncImage(
                             model = profile.urlImagen,
-                            contentDescription = "Foto de ${profile.name}",
+                            contentDescription = stringResource(
+                                R.string.profile_photo_description,
+                                profile.name
+                            ),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
@@ -90,7 +95,7 @@ fun PerfilCard(
             }
 
             AppButton(
-                text = buttonText,
+                text = buttonText ?: stringResource(R.string.profile_manage),
                 onClick = gestionar,
                 variant = buttonVariant,
                 size = ButtonSize.Small,
@@ -112,7 +117,7 @@ private fun DefaultAvatar() {
     ) {
         Icon(
             imageVector = Icons.Rounded.Person,
-            contentDescription = "Profile avatar",
+            contentDescription = stringResource(R.string.profile_avatar_description),
             tint = MaterialTheme.colorScheme.onPrimaryContainer
         )
     }
