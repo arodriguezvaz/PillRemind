@@ -1,6 +1,5 @@
 package com.andres.pillremind.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -84,11 +83,6 @@ private fun WeekDayChip(
     } else {
         MaterialTheme.colorScheme.onSurface
     }
-    val border = if (selected) {
-        null
-    } else {
-        BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-    }
 
     Surface(
         selected = selected,
@@ -100,7 +94,7 @@ private fun WeekDayChip(
         shape = MaterialTheme.shapes.small,
         color = containerColor,
         contentColor = contentColor,
-        border = border,
+        shadowElevation = 2.dp,
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
