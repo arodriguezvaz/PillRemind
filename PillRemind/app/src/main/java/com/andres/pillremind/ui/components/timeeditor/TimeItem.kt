@@ -1,4 +1,5 @@
 package com.andres.pillremind.ui.components.timeeditor
+import com.andres.pillremind.ui.theme.AppElevation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +44,7 @@ fun TimeItem(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 8.dp,
+        shadowElevation = AppElevation,
     ) {
         Row(
             modifier = Modifier

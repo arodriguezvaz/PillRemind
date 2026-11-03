@@ -1,4 +1,5 @@
 package com.andres.pillremind.ui.screens.profiles
+import com.andres.pillremind.ui.theme.AppElevation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -85,8 +86,8 @@ fun ProfilesScreen(
             FloatingActionButton(
                 onClick = onAddClicked,
                 elevation = FloatingActionButtonDefaults.elevation(
-                    defaultElevation = 4.dp,
-                    pressedElevation = 6.dp,
+                    defaultElevation = AppElevation,
+                    pressedElevation = AppElevation,
                 ),
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,

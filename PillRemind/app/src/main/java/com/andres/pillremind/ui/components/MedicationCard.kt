@@ -1,4 +1,5 @@
 package com.andres.pillremind.ui.components
+import com.andres.pillremind.ui.theme.AppElevation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,7 +48,7 @@ fun MedicationCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppElevation),
     ) {
         Row(
             modifier = Modifier

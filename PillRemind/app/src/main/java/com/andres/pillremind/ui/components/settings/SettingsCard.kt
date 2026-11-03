@@ -1,4 +1,5 @@
 package com.andres.pillremind.ui.components.settings
+import com.andres.pillremind.ui.theme.AppElevation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -33,7 +34,7 @@ fun SettingsCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
-        elevation = CardDefaults.cardElevation(0.dp)
+        elevation = CardDefaults.cardElevation(AppElevation)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             title?.let {

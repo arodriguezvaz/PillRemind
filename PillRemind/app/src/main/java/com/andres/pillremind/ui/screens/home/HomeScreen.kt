@@ -12,14 +12,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.visualState
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.IntakeCard
 import com.andres.pillremind.ui.screens.main.TopBarState
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * Pantalla principal que muestra la lista de medicamentos del perfil activo.
@@ -36,10 +42,15 @@ fun HomeScreen(
 ) {
 
     val todayIntakes by homeViewModel.todayIntakes.collectAsState()
-    LaunchedEffect(Unit) {
+    val today = LocalDate.now()
+    val formattedDate = remember(today) {
+        today.format(DateTimeFormatter.ofPattern("d 'de' MMMM", Locale.forLanguageTag("es")))
+    }
+    val title = stringResource(R.string.home_title_today, formattedDate)
+    LaunchedEffect(title) {
         onTopBarChange(
             TopBarState(
-                title = "Medicamentos",
+                title = title,
                 showLogo = true
             )
         )

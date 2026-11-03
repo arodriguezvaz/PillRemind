@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import com.andres.pillremind.R
 import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
+import com.andres.pillremind.ui.theme.AppElevation
 
 /**
  * Pantalla principal de la aplicación.
@@ -39,8 +41,9 @@ fun MainScreen(
     val currentRoute = navBackStackEntry?.destination?.route
     val showFab =
         currentRoute == BottomBarScreens.Home.route || currentRoute == BottomBarScreens.Medications.route
+    val initialTitle = stringResource(R.string.nav_home)
     var topBarState by remember {
-        mutableStateOf(TopBarState(title = "Medicamentos", showLogo = true))
+        mutableStateOf(TopBarState(title = initialTitle, showLogo = true))
     }
     val topLevelRoutes = remember {
         setOf(
@@ -63,6 +66,10 @@ fun MainScreen(
             if (showFab) {
                 FloatingActionButton(
                     onClick = { navController.navigate(MedicationScreens.MedicationCreateScreen.route) },
+                    elevation = FloatingActionButtonDefaults.elevation(
+                        defaultElevation = AppElevation,
+                        pressedElevation = AppElevation,
+                    ),
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Add,

@@ -26,6 +26,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +44,8 @@ import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppFormSection
+import com.andres.pillremind.ui.components.AppInfoCard
+import com.andres.pillremind.ui.components.AppInfoRow
 import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppReadOnlyField
 import com.andres.pillremind.ui.components.AppTextField
@@ -88,21 +92,40 @@ fun ProfileScreen(
     onTopBarChange: (TopBarState) -> Unit = {},
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val name = remember { mutableStateOf("") }
-    val birthDate = remember { mutableStateOf<LocalDate?>(null) }
-    val sex = remember { mutableStateOf<Sex?>(null) }
-    val bloodType = remember { mutableStateOf<BloodType?>(null) }
-    val allergies = remember { mutableStateOf("") }
-    val medicalNotes = remember { mutableStateOf("") }
-    val healthCardNumber = remember { mutableStateOf("") }
+    val name = rememberSaveable { mutableStateOf("") }
+    val birthDate = rememberSaveable { mutableStateOf<LocalDate?>(null) }
+    val sex = rememberSaveable { mutableStateOf<Sex?>(null) }
+    val bloodType = rememberSaveable { mutableStateOf<BloodType?>(null) }
+    val allergies = rememberSaveable { mutableStateOf("") }
+    val medicalNotes = rememberSaveable { mutableStateOf("") }
+    val healthCardNumber = rememberSaveable { mutableStateOf("") }
 
     val perfil by profileViewModel.profile.collectAsStateWithLifecycle()
-    var selectedPhotoUri by remember { mutableStateOf<Uri?>(null) }
-    var currentImagePath by remember { mutableStateOf(perfil?.urlImagen) }
-    var newPhotoUri by remember { mutableStateOf<Uri?>(null) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var showAdherencePlaceholder by remember { mutableStateOf(false) }
-    var currentMode by remember { mutableStateOf(profileMode) }
+    var selectedPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var currentImagePath by rememberSaveable { mutableStateOf<String?>(null) }
+    var newPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+    var showAdherencePlaceholder by rememberSaveable { mutableStateOf(false) }
+    var formInitialized by rememberSaveable { mutableStateOf(false) }
+    val modeSaver = Saver<ProfileMode, String>(
+        save = { mode ->
+            when (mode) {
+                ProfileMode.Create -> "create"
+                ProfileMode.View -> "view"
+                ProfileMode.Edit -> "edit"
+            }
+        },
+        restore = { value ->
+            when (value) {
+                "create" -> ProfileMode.Create
+                "view" -> ProfileMode.View
+                else -> ProfileMode.Edit
+            }
+        }
+    )
+    var currentMode by rememberSaveable(stateSaver = modeSaver) {
+        mutableStateOf(profileMode)
+    }
 
     val topBarTitle = when (currentMode) {
         ProfileMode.Create -> stringResource(R.string.profile_create_title)
@@ -119,16 +142,19 @@ fun ProfileScreen(
     }
 
     LaunchedEffect(perfil) {
-        perfil?.let {
-            name.value = it.name
-            selectedPhotoUri = it.urlImagen?.let(Uri::parse)
-            currentImagePath = it.urlImagen
-            birthDate.value = it.birthDate
-            sex.value = it.sex
-            bloodType.value = it.bloodType
-            allergies.value = it.allergies.orEmpty()
-            medicalNotes.value = it.medicalNotes.orEmpty()
-            healthCardNumber.value = it.healthCardNumber.orEmpty()
+        if (!formInitialized && (perfil != null || profileMode == ProfileMode.Create)) {
+            perfil?.let {
+                name.value = it.name
+                selectedPhotoUri = it.urlImagen?.let(Uri::parse)
+                currentImagePath = it.urlImagen
+                birthDate.value = it.birthDate
+                sex.value = it.sex
+                bloodType.value = it.bloodType
+                allergies.value = it.allergies.orEmpty()
+                medicalNotes.value = it.medicalNotes.orEmpty()
+                healthCardNumber.value = it.healthCardNumber.orEmpty()
+            }
+            formInitialized = true
         }
     }
 
@@ -172,6 +198,14 @@ fun ProfileScreen(
                         size = ButtonSize.Large,
                         enabled = name.value.isNotBlank()
                     )
+                    if (name.value.isBlank()) {
+                        Text(
+                            text = stringResource(R.string.profile_save_name_required),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
                 }
             )
         }
@@ -219,6 +253,14 @@ fun ProfileScreen(
                         size = ButtonSize.Large,
                         enabled = name.value.isNotBlank()
                     )
+                    if (name.value.isBlank()) {
+                        Text(
+                            text = stringResource(R.string.profile_save_name_required),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
                 }
             )
         }
@@ -409,6 +451,8 @@ private fun ProfileForm(
         birthDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
         ageText,
     ).joinToString(" · ")
+    val sexValue = sex?.let { stringResource(it.labelRes()) } ?: notSpecified
+    val bloodTypeValue = bloodType?.let { stringResource(it.labelRes()) } ?: notSpecified
 
     val showBirthDate = !hideEmptyFields || birthDate != null
     val showSex = !hideEmptyFields || sex != null
@@ -433,7 +477,59 @@ private fun ProfileForm(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        AppFormSection(title = stringResource(R.string.profile_personal_data)) {
+        if (!enabled) {
+            AppInfoCard(title = stringResource(R.string.profile_personal_data)) {
+                AppInfoRow(
+                    label = stringResource(R.string.nombre),
+                    value = name,
+                )
+                if (showBirthDate) {
+                    AppInfoRow(
+                        label = stringResource(R.string.profile_birth_date),
+                        value = birthDateDisplay,
+                    )
+                }
+                if (showSex) {
+                    AppInfoRow(
+                        label = stringResource(R.string.profile_sex),
+                        value = sexValue,
+                    )
+                }
+            }
+
+            if (showBloodType || showAllergies || showMedicalNotes) {
+                AppInfoCard(title = stringResource(R.string.profile_medical_info)) {
+                    if (showBloodType) {
+                        AppInfoRow(
+                            label = stringResource(R.string.profile_blood_type),
+                            value = bloodTypeValue,
+                        )
+                    }
+                    if (showAllergies) {
+                        AppInfoRow(
+                            label = stringResource(R.string.profile_allergies),
+                            value = allergies,
+                        )
+                    }
+                    if (showMedicalNotes) {
+                        AppInfoRow(
+                            label = stringResource(R.string.profile_medical_notes),
+                            value = medicalNotes,
+                        )
+                    }
+                }
+            }
+
+            if (showHealthCard) {
+                AppInfoCard(title = stringResource(R.string.profile_admin_data)) {
+                    AppInfoRow(
+                        label = stringResource(R.string.profile_health_card),
+                        value = healthCardNumber,
+                    )
+                }
+            }
+        } else {
+            AppFormSection(title = stringResource(R.string.profile_personal_data)) {
             if (enabled) {
                 AppFormField(label = stringResource(R.string.nombre)) {
                     AppTextField(
@@ -481,7 +577,6 @@ private fun ProfileForm(
                         }
                     }
                     if (showSex) {
-                        val sexValue = sex?.let { stringResource(it.labelRes()) } ?: notSpecified
                         if (enabled) {
                             AppFormField(
                                 label = stringResource(R.string.profile_sex),
@@ -508,8 +603,6 @@ private fun ProfileForm(
         if (showBloodType || showAllergies || showMedicalNotes) {
             AppFormSection(title = stringResource(R.string.profile_medical_info)) {
                 if (showBloodType) {
-                    val bloodTypeValue = bloodType?.let { stringResource(it.labelRes()) }
-                        ?: notSpecified
                     if (enabled) {
                         AppFormField(label = stringResource(R.string.profile_blood_type)) {
                             AppDropdownField(
@@ -581,6 +674,7 @@ private fun ProfileForm(
                     )
                 }
             }
+        }
         }
 
         Text(
