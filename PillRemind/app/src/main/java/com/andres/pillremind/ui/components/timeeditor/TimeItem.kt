@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.components.timeeditor
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,19 +22,21 @@ import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
 /**
- * Fila que muestra una hora y una acción de eliminación opcional.
+ * Fila que muestra una hora y las acciones de edición y eliminación.
  *
  * Usa la forma de los campos del formulario y un [IconButton] para que el área
- * táctil de eliminar llegue a 48dp.
+ * táctil de eliminar llegue a 48dp. Toda la fila es pulsable para editar la hora.
  *
  * @param time Hora mostrada (se trunca a minutos para visualización).
- * @param enabled Si es true se muestra el icono de eliminar.
+ * @param enabled Si es true la fila permite editar y muestra el icono de eliminar.
+ * @param onClick Callback ejecutado cuando se pulsa la fila para editar la hora.
  * @param onRemove Callback ejecutado cuando se solicita eliminar este tiempo.
  */
 @Composable
 fun TimeItem(
     time: LocalTime,
     enabled: Boolean = true,
+    onClick: () -> Unit,
     onRemove: () -> Unit
 ) {
     Surface(
@@ -45,6 +48,11 @@ fun TimeItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable(
+                    enabled = enabled,
+                    onClickLabel = stringResource(R.string.edit_time),
+                    onClick = onClick,
+                )
                 .padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,

@@ -196,5 +196,6 @@
     <string name="photo_edit">Editar foto</string>
     <string name="photo_add">Añadir foto</string>
     <string name="delete_time">Eliminar</string>
+    <string name="edit_time">Editar hora</string>
     <string name="add_time">Añadir hora</string>
 </resources>

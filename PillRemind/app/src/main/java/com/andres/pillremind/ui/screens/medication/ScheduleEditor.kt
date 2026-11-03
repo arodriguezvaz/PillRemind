@@ -145,6 +145,23 @@ class ScheduleFormState {
     }
 
     /**
+     * Reemplaza la hora de la posición [index].
+     *
+     * Si la nueva hora ya existe en otra posición, se descarta la entrada
+     * editada para no duplicar tomas.
+     */
+    fun updateTime(index: Int, time: LocalTime) {
+        if (index !in times.indices) return
+
+        val existingIndex = times.indexOf(time)
+        if (existingIndex != -1 && existingIndex != index) {
+            times.removeAt(index)
+        } else {
+            times[index] = time
+        }
+    }
+
+    /**
      * Carga la pauta de un medicamento existente.
      *
      * Si hubiera una mezcla de tipos (por ejemplo, tras importar una copia
@@ -422,7 +439,8 @@ fun ScheduleEditor(
                 times = form.times,
                 enabled = enabled,
                 onAddClick = { time -> form.times.add(time) },
-                onRemoveTime = { time -> form.times.remove(time) }
+                onRemoveTime = { time -> form.times.remove(time) },
+                onUpdateTime = { index, time -> form.updateTime(index, time) }
             )
         }
     }
