@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppSpacing
 
 /**
@@ -34,6 +34,10 @@ import com.andres.pillremind.ui.theme.AppSpacing
  * como un botón compacto con icono a su derecha; así "Guardar" mantiene el
  * protagonismo y las acciones destructivas (archivar, eliminar) quedan
  * separadas y menos expuestas a pulsaciones accidentales.
+ *
+ * La barra usa el mismo fondo que el resto de la app y se separa del contenido
+ * con una línea fina, sin sombra, para no ensuciar la barra de navegación del
+ * sistema.
  *
  * @param primaryText Texto de la acción principal.
  * @param onPrimaryClick Acción que se ejecuta al pulsar el botón principal.
@@ -58,54 +62,59 @@ fun AppFormActionBar(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        shadowElevation = AppElevation,
+        color = MaterialTheme.colorScheme.background,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .windowInsetsPadding(WindowInsets.ime.exclude(WindowInsets.navigationBars))
-                .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm)
         ) {
-            if (supportingText != null) {
-                Text(
-                    text = supportingText,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = AppSpacing.xs)
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm)
             ) {
-                AppButton(
-                    text = primaryText,
-                    onClick = onPrimaryClick,
-                    modifier = Modifier.weight(1f),
-                    size = ButtonSize.Large,
-                    enabled = primaryEnabled,
-                )
-                if (secondaryIcon != null && onSecondaryClick != null) {
-                    Spacer(modifier = Modifier.width(AppSpacing.md))
-                    FilledTonalIconButton(
-                        onClick = onSecondaryClick,
-                        modifier = Modifier.size(56.dp),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = IconButtonDefaults.filledTonalIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.error,
-                        ),
-                    ) {
-                        Icon(
-                            imageVector = secondaryIcon,
-                            contentDescription = secondaryContentDescription,
-                            modifier = Modifier.size(24.dp),
-                        )
+                if (supportingText != null) {
+                    Text(
+                        text = supportingText,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = AppSpacing.xs)
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    AppButton(
+                        text = primaryText,
+                        onClick = onPrimaryClick,
+                        modifier = Modifier.weight(1f),
+                        size = ButtonSize.Large,
+                        enabled = primaryEnabled,
+                    )
+                    if (secondaryIcon != null && onSecondaryClick != null) {
+                        Spacer(modifier = Modifier.width(AppSpacing.md))
+                        FilledTonalIconButton(
+                            onClick = onSecondaryClick,
+                            modifier = Modifier.size(56.dp),
+                            shape = MaterialTheme.shapes.medium,
+                            colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.error,
+                            ),
+                        ) {
+                            Icon(
+                                imageVector = secondaryIcon,
+                                contentDescription = secondaryContentDescription,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
                     }
                 }
             }
