@@ -12,7 +12,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.andres.pillremind.ui.theme.PillRemindTheme
@@ -52,7 +54,15 @@ fun AppTextField(
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth(),
-            placeholder = placeholder?.let { { Text(it) } },
+            placeholder = placeholder?.let {
+                {
+                    Text(
+                        text = it,
+                        maxLines = if (singleLine) 1 else Int.MAX_VALUE,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            },
             singleLine = singleLine,
             minLines = minLines,
             maxLines = maxLines,
@@ -60,7 +70,10 @@ fun AppTextField(
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surface,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
             ),
             shape = RoundedCornerShape(12.dp),
             enabled = enabled

@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,16 +40,19 @@ import com.andres.pillremind.domain.model.Sex
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
+import com.andres.pillremind.ui.components.AppFormField
+import com.andres.pillremind.ui.components.AppFormSection
 import com.andres.pillremind.ui.components.AppPhotoPicker
+import com.andres.pillremind.ui.components.AppReadOnlyField
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
-import com.andres.pillremind.ui.components.FormField
 import com.andres.pillremind.ui.components.labelRes
 import com.andres.pillremind.ui.screens.main.TopBarState
 import java.io.File
 import java.time.LocalDate
 import java.time.Period
+import java.time.format.DateTimeFormatter
 
 /**
  * Representa los distintos modos de uso de la pantalla de perfil.
@@ -402,6 +405,10 @@ private fun ProfileForm(
         val age = Period.between(date, LocalDate.now()).years.coerceAtLeast(0)
         pluralStringResource(R.plurals.profile_age, age, age)
     }
+    val birthDateDisplay = listOfNotNull(
+        birthDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+        ageText,
+    ).joinToString(" · ")
 
     val showBirthDate = !hideEmptyFields || birthDate != null
     val showSex = !hideEmptyFields || sex != null
@@ -422,17 +429,23 @@ private fun ProfileForm(
             photoUri = photoUri,
             onPhotoSelected = { uri -> onPhotoSelected(uri) },
             enabled = enabled,
-            placeholderIcon = Icons.Default.AddAPhoto,
+            placeholderIcon = if (enabled) Icons.Default.AddAPhoto else Icons.Default.Person,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        ProfileSection(title = stringResource(R.string.profile_personal_data)) {
-            ProfileField(label = stringResource(R.string.nombre)) {
-                AppTextField(
+        AppFormSection(title = stringResource(R.string.profile_personal_data)) {
+            if (enabled) {
+                AppFormField(label = stringResource(R.string.nombre)) {
+                    AppTextField(
+                        value = name,
+                        onValueChange = onNameChange,
+                        placeholder = stringResource(R.string.profile_name_placeholder),
+                    )
+                }
+            } else {
+                AppReadOnlyField(
+                    label = stringResource(R.string.nombre),
                     value = name,
-                    onValueChange = onNameChange,
-                    placeholder = stringResource(R.string.profile_name_placeholder),
-                    enabled = enabled
                 )
             }
             if (showBirthDate || showSex) {
@@ -441,35 +454,50 @@ private fun ProfileForm(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     if (showBirthDate) {
-                        ProfileField(
-                            label = stringResource(R.string.profile_birth_date),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            AppDatePickerField(
-                                value = birthDate,
-                                onDateSelected = onBirthDateChange,
-                                enabled = enabled,
-                                maxDate = LocalDate.now()
-                            )
-                            ageText?.let {
-                                Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                        if (enabled) {
+                            AppFormField(
+                                label = stringResource(R.string.profile_birth_date),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                AppDatePickerField(
+                                    value = birthDate,
+                                    onDateSelected = onBirthDateChange,
+                                    maxDate = LocalDate.now()
                                 )
+                                ageText?.let {
+                                    Text(
+                                        text = it,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
+                        } else {
+                            AppReadOnlyField(
+                                label = stringResource(R.string.profile_birth_date),
+                                value = birthDateDisplay,
+                                modifier = Modifier.weight(1f),
+                            )
                         }
                     }
                     if (showSex) {
-                        ProfileField(
-                            label = stringResource(R.string.profile_sex),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            AppDropdownField(
-                                value = sex?.let { stringResource(it.labelRes()) } ?: notSpecified,
-                                options = sexOptions,
-                                onOptionSelected = { label -> onSexChange(sexByLabel[label]) },
-                                enabled = enabled
+                        val sexValue = sex?.let { stringResource(it.labelRes()) } ?: notSpecified
+                        if (enabled) {
+                            AppFormField(
+                                label = stringResource(R.string.profile_sex),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                AppDropdownField(
+                                    value = sexValue,
+                                    options = sexOptions,
+                                    onOptionSelected = { label -> onSexChange(sexByLabel[label]) },
+                                )
+                            }
+                        } else {
+                            AppReadOnlyField(
+                                label = stringResource(R.string.profile_sex),
+                                value = sexValue,
+                                modifier = Modifier.weight(1f),
                             )
                         }
                     }
@@ -478,39 +506,58 @@ private fun ProfileForm(
         }
 
         if (showBloodType || showAllergies || showMedicalNotes) {
-            ProfileSection(title = stringResource(R.string.profile_medical_info)) {
+            AppFormSection(title = stringResource(R.string.profile_medical_info)) {
                 if (showBloodType) {
-                    ProfileField(label = stringResource(R.string.profile_blood_type)) {
-                        AppDropdownField(
-                            value = bloodType?.let { stringResource(it.labelRes()) }
-                                ?: notSpecified,
-                            options = bloodOptions,
-                            onOptionSelected = { label -> onBloodTypeChange(bloodByLabel[label]) },
-                            enabled = enabled
+                    val bloodTypeValue = bloodType?.let { stringResource(it.labelRes()) }
+                        ?: notSpecified
+                    if (enabled) {
+                        AppFormField(label = stringResource(R.string.profile_blood_type)) {
+                            AppDropdownField(
+                                value = bloodTypeValue,
+                                options = bloodOptions,
+                                onOptionSelected = { label -> onBloodTypeChange(bloodByLabel[label]) },
+                            )
+                        }
+                    } else {
+                        AppReadOnlyField(
+                            label = stringResource(R.string.profile_blood_type),
+                            value = bloodTypeValue,
                         )
                     }
                 }
                 if (showAllergies) {
-                    ProfileField(label = stringResource(R.string.profile_allergies)) {
-                        AppTextField(
+                    if (enabled) {
+                        AppFormField(label = stringResource(R.string.profile_allergies)) {
+                            AppTextField(
+                                value = allergies,
+                                onValueChange = onAllergiesChange,
+                                placeholder = stringResource(R.string.profile_allergies_placeholder),
+                                singleLine = false,
+                                minLines = 2
+                            )
+                        }
+                    } else {
+                        AppReadOnlyField(
+                            label = stringResource(R.string.profile_allergies),
                             value = allergies,
-                            onValueChange = onAllergiesChange,
-                            placeholder = stringResource(R.string.profile_allergies_placeholder),
-                            enabled = enabled,
-                            singleLine = false,
-                            minLines = 2
                         )
                     }
                 }
                 if (showMedicalNotes) {
-                    ProfileField(label = stringResource(R.string.profile_medical_notes)) {
-                        AppTextField(
+                    if (enabled) {
+                        AppFormField(label = stringResource(R.string.profile_medical_notes)) {
+                            AppTextField(
+                                value = medicalNotes,
+                                onValueChange = onMedicalNotesChange,
+                                placeholder = stringResource(R.string.profile_medical_notes_placeholder),
+                                singleLine = false,
+                                minLines = 3
+                            )
+                        }
+                    } else {
+                        AppReadOnlyField(
+                            label = stringResource(R.string.profile_medical_notes),
                             value = medicalNotes,
-                            onValueChange = onMedicalNotesChange,
-                            placeholder = stringResource(R.string.profile_medical_notes_placeholder),
-                            enabled = enabled,
-                            singleLine = false,
-                            minLines = 3
                         )
                     }
                 }
@@ -518,13 +565,19 @@ private fun ProfileForm(
         }
 
         if (showHealthCard) {
-            ProfileSection(title = stringResource(R.string.profile_admin_data)) {
-                ProfileField(label = stringResource(R.string.profile_health_card)) {
-                    AppTextField(
+            AppFormSection(title = stringResource(R.string.profile_admin_data)) {
+                if (enabled) {
+                    AppFormField(label = stringResource(R.string.profile_health_card)) {
+                        AppTextField(
+                            value = healthCardNumber,
+                            onValueChange = onHealthCardNumberChange,
+                            placeholder = stringResource(R.string.profile_health_card_placeholder),
+                        )
+                    }
+                } else {
+                    AppReadOnlyField(
+                        label = stringResource(R.string.profile_health_card),
                         value = healthCardNumber,
-                        onValueChange = onHealthCardNumberChange,
-                        placeholder = stringResource(R.string.profile_health_card_placeholder),
-                        enabled = enabled
                     )
                 }
             }
@@ -538,39 +591,4 @@ private fun ProfileForm(
 
         actions()
     }
-}
-
-/**
- * Sección del formulario con un título y varios campos.
- */
-@Composable
-private fun ProfileSection(
-    title: String,
-    content: @Composable () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        content()
-    }
-}
-
-/**
- * Campo de formulario con una etiqueta y su contenido.
- */
-@Composable
-private fun ProfileField(
-    label: String,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    FormField(
-        label = label,
-        modifier = modifier,
-        content = content
-    )
 }

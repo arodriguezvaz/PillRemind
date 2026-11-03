@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.andres.pillremind.R
 import java.time.Instant
@@ -98,13 +99,22 @@ fun AppDatePickerField(
                 .fillMaxWidth()
                 .clickable(enabled) { showDialog = true },
             enabled = false,
-            placeholder = { Text(placeholder) },
+            singleLine = true,
+            placeholder = {
+                Text(
+                    text = placeholder,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            },
             trailingIcon = trailingIcon,
             isError = isError,
             colors = TextFieldDefaults.colors(
                 disabledContainerColor = containerColor,
                 disabledTextColor = contentColor,
-                disabledIndicatorColor = Color.Transparent
+                disabledIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
             ),
             shape = RoundedCornerShape(12.dp),
         )

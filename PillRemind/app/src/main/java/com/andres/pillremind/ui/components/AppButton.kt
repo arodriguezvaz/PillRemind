@@ -1,6 +1,7 @@
 package com.andres.pillremind.ui.components
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -8,11 +9,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 /**
@@ -24,10 +27,12 @@ import androidx.compose.ui.unit.dp
  * @param text Texto que se mostrará dentro del botón.
  * @param onClick Lambda ejecutada al pulsar el botón.
  * @param modifier Modificador para personalizar el layout del botón.
- * @param variant Variante visual del botón (Primary, Secondary, Ghost, Danger).
+ * @param variant Variante visual del botón (Primary, Secondary, Tonal, Ghost, Danger).
  * @param size Tamaño visual del botón (Small, Medium, Large).
  * @param enabled Indica si el botón está habilitado.
  * @param isLoading Si es true se muestra un indicador de progreso en lugar del texto.
+ * @param leadingIcon Icono opcional a la izquierda del texto. Es decorativo: el
+ *   texto del botón ya describe la acción.
  */
 @Composable
 fun AppButton(
@@ -38,10 +43,12 @@ fun AppButton(
     size: ButtonSize = ButtonSize.Medium,
     enabled: Boolean = true,
     isLoading: Boolean = false,
+    leadingIcon: ImageVector? = null,
 ) {
     val (containerColor, contentColor) = when (variant) {
         ButtonVariant.Primary -> MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary
         ButtonVariant.Secondary -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
+        ButtonVariant.Tonal -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
         ButtonVariant.Ghost -> Color.Transparent to MaterialTheme.colorScheme.primary
         ButtonVariant.Danger -> MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError
     }
@@ -69,6 +76,11 @@ fun AppButton(
             containerColor = containerColor,
             contentColor = contentColor,
         ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 8.dp,
+            disabledElevation = 0.dp,
+        ),
         contentPadding = PaddingValues(
             horizontal = horizontalPadding,
             vertical = verticalPadding,
@@ -82,6 +94,14 @@ fun AppButton(
                 strokeWidth = 2.dp,
             )
         } else {
+            leadingIcon?.let { icon ->
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
             Text(text = text, style = textStyle, maxLines = 1)
         }
     }
@@ -90,7 +110,7 @@ fun AppButton(
 /**
  * Variantes visuales para [AppButton].
  */
-enum class ButtonVariant { Primary, Secondary, Ghost, Danger }
+enum class ButtonVariant { Primary, Secondary, Tonal, Ghost, Danger }
 
 /**
  * Tamaños predefinidos para [AppButton].

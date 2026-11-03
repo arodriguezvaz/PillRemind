@@ -1,51 +1,31 @@
 package com.andres.pillremind.ui.components.timeeditor
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.andres.pillremind.R
+import com.andres.pillremind.ui.components.AppButton
+import com.andres.pillremind.ui.components.ButtonSize
+import com.andres.pillremind.ui.components.ButtonVariant
 
 /**
- * Composable que representa una card "Añadir" para añadir una nueva hora.
+ * Acción para añadir una nueva hora a la pauta.
  *
- * Al pulsarla se ejecuta la lambda [onClick] que normalmente abrirá un TimePickerDialog.
+ * Usa el botón tonal de la aplicación para que se lea como una acción
+ * disponible y no como una card deshabilitada.
  *
- * @param onClick Lambda ejecutada al pulsar la card.
+ * @param onClick Acción ejecutada al pulsar el botón.
  */
 @Composable
 fun AddTimeItem(
     onClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clickable { onClick() }
-
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = stringResource(R.string.add_time),
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
+    AppButton(
+        text = stringResource(R.string.add_time),
+        onClick = onClick,
+        variant = ButtonVariant.Tonal,
+        size = ButtonSize.Large,
+        leadingIcon = Icons.Rounded.Add,
+    )
 }

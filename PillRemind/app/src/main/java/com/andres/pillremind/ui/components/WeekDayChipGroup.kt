@@ -1,26 +1,31 @@
 package com.andres.pillremind.ui.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material3.FilterChip
-import androidx.compose.runtime.Composable
-import com.andres.pillremind.domain.model.WeekDay
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.andres.pillremind.domain.model.WeekDay
 
 /**
- * Grupo horizontal de chips para seleccionar días de la semana.
+ * Grupo de chips para seleccionar días de la semana.
+ *
+ * Los siete días comparten el ancho disponible en una sola fila. Se usan chips
+ * compactos para que quepan todos sin scroll ni cortes.
  *
  * @param selectedDays Conjunto de días actualmente seleccionados.
  * @param onSelectionChange Lambda que recibe el nuevo conjunto de días al cambiar la selección.
@@ -32,18 +37,18 @@ fun WeekDayChipGroup(
     onSelectionChange: (Set<WeekDay>) -> Unit,
     enabled: Boolean = true
 ) {
-    val allDays = WeekDay.entries
-
-    LazyRow(
-        modifier = Modifier.padding(horizontal = 8.dp)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(allDays) { day ->
+        WeekDay.entries.forEach { day ->
             val isSelected = selectedDays.contains(day)
 
-            FilterChip(
-                modifier = Modifier
-                    .padding(end = 8.dp),
+            WeekDayChip(
+                modifier = Modifier.weight(1f),
+                label = stringResource(day.shortNameRes()),
                 selected = isSelected,
+                enabled = enabled,
                 onClick = {
                     val newSelection = selectedDays.toMutableSet()
 
@@ -54,23 +59,57 @@ fun WeekDayChipGroup(
                     }
 
                     onSelectionChange(newSelection)
-                },
-                label = {
-                    Text(text = stringResource(id = day.shortNameRes()))
-                },
-                enabled = enabled,
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                    disabledSelectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                    disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+                }
             )
         }
     }
 }
 
-@Preview(showBackground = true)
+@Composable
+private fun WeekDayChip(
+    label: String,
+    selected: Boolean,
+    enabled: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val containerColor = if (selected) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+    val contentColor = if (selected) {
+        MaterialTheme.colorScheme.onPrimary
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
+
+    Surface(
+        selected = selected,
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier
+            .aspectRatio(1f)
+            .alpha(if (enabled) 1f else 0.5f),
+        shape = MaterialTheme.shapes.medium,
+        color = containerColor,
+        contentColor = contentColor,
+        shadowElevation = 8.dp,
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
 @Composable
 fun WeekDayChipGroupPreview() {
     var selectedDays by remember {

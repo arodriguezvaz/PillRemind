@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.components.timeeditor
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,14 +21,16 @@ import androidx.compose.ui.unit.dp
 import com.andres.pillremind.R
 import java.time.LocalTime
 import java.util.Calendar
+
 /**
- * Editor de lista de horas; muestra `TimeItem`s y permite añadir nuevas horas
- * mediante un selector de tiempo.
+ * Editor de lista de horas; muestra `TimeItem`s y permite añadir, editar o
+ * eliminar horas mediante un selector de tiempo.
  *
  * @param times Lista de `LocalTime` a mostrar.
  * @param onAddClick Lambda llamada con la hora seleccionada para añadir.
  * @param onRemoveTime Lambda llamada para eliminar una hora.
- * @param enabled Indica si el editor permite añadir/eliminar horas.
+ * @param onUpdateTime Lambda llamada con la posición y la nueva hora al editar.
+ * @param enabled Indica si el editor permite añadir, editar o eliminar horas.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,64 +38,107 @@ fun TimeListEditor(
     times: List<LocalTime>,
     onAddClick: (LocalTime) -> Unit,
     onRemoveTime: (LocalTime) -> Unit,
+    onUpdateTime: (index: Int, time: LocalTime) -> Unit,
     enabled: Boolean = true
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var showAddDialog by remember { mutableStateOf(false) }
+    var editingIndex by remember { mutableStateOf<Int?>(null) }
     val currentTime = Calendar.getInstance()
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(top = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
 
-        times.forEach { time ->
+        times.forEachIndexed { index, time ->
             TimeItem(
                 time = time,
                 enabled = enabled,
+                onClick = { editingIndex = index },
                 onRemove = { onRemoveTime(time) }
             )
         }
 
         if (enabled) {
             AddTimeItem(
-                onClick = { showDialog = true }
+                onClick = { showAddDialog = true }
             )
         }
     }
 
-    if (showDialog) {
-
-        val timePickerState = rememberTimePickerState(
-            initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
-            initialMinute = currentTime.get(Calendar.MINUTE),
-            is24Hour = true,
+    if (showAddDialog) {
+        TimePickerDialogContent(
+            initialTime = LocalTime.of(
+                currentTime.get(Calendar.HOUR_OF_DAY),
+                currentTime.get(Calendar.MINUTE)
+            ),
+            onDismiss = { showAddDialog = false },
+            onConfirm = { time ->
+                onAddClick(time)
+                showAddDialog = false
+            }
         )
+    }
 
-        TimePickerDialog(
-            onDismissRequest = { showDialog = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val time = LocalTime.of(
+    val editIndex = editingIndex
+    val editTime = editIndex?.let { times.getOrNull(it) }
+    if (editIndex != null && editTime != null) {
+        TimePickerDialogContent(
+            initialTime = editTime,
+            onDismiss = { editingIndex = null },
+            onConfirm = { time ->
+                onUpdateTime(editIndex, time)
+                editingIndex = null
+            }
+        )
+    }
+}
+
+/**
+ * Selector de hora reutilizable para añadir o editar una entrada de la lista.
+ *
+ * @param initialTime Hora con la que se abre el selector.
+ * @param onDismiss Acción ejecutada al cancelar.
+ * @param onConfirm Acción ejecutada con la hora elegida.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TimePickerDialogContent(
+    initialTime: LocalTime,
+    onDismiss: () -> Unit,
+    onConfirm: (LocalTime) -> Unit
+) {
+    val timePickerState = rememberTimePickerState(
+        initialHour = initialTime.hour,
+        initialMinute = initialTime.minute,
+        is24Hour = true,
+    )
+
+    TimePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirm(
+                        LocalTime.of(
                             timePickerState.hour,
                             timePickerState.minute
                         )
-                        onAddClick(time)
-                        showDialog = false
-                    }
-                ) {
-                    Text(stringResource(R.string.common_ok))
+                    )
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text(stringResource(R.string.common_cancel))
-                }
-            },
-            title = { Text(stringResource(R.string.seleccion_la_hora)) }
-        ) {
-            TimePicker(state = timePickerState)
-        }
+            ) {
+                Text(stringResource(R.string.common_ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.common_cancel))
+            }
+        },
+        title = { Text(stringResource(R.string.seleccion_la_hora)) }
+    ) {
+        TimePicker(state = timePickerState)
     }
 }

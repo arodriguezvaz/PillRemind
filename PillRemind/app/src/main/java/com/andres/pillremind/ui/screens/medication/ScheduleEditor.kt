@@ -26,8 +26,9 @@ import com.andres.pillremind.domain.model.ScheduleRule
 import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.model.nextOccurrences
 import com.andres.pillremind.ui.components.AppDropdownField
+import com.andres.pillremind.ui.components.AppFormField
+import com.andres.pillremind.ui.components.AppInfoRow
 import com.andres.pillremind.ui.components.AppTextField
-import com.andres.pillremind.ui.components.FormField
 import com.andres.pillremind.ui.components.WeekDayChipGroup
 import com.andres.pillremind.ui.components.labelRes
 import com.andres.pillremind.ui.components.timeeditor.TimeListEditor
@@ -140,6 +141,23 @@ class ScheduleFormState {
                 val off = offDays.toIntOrNull()
                 on != null && off != null && on >= 1 && off >= 0
             }
+        }
+    }
+
+    /**
+     * Reemplaza la hora de la posición [index].
+     *
+     * Si la nueva hora ya existe en otra posición, se descarta la entrada
+     * editada para no duplicar tomas.
+     */
+    fun updateTime(index: Int, time: LocalTime) {
+        if (index !in times.indices) return
+
+        val existingIndex = times.indexOf(time)
+        if (existingIndex != -1 && existingIndex != index) {
+            times.removeAt(index)
+        } else {
+            times[index] = time
         }
     }
 
@@ -264,11 +282,11 @@ fun ScheduleEditor(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         val periodicityLabels = SchedulePeriodicity.entries.map { stringResource(it.labelRes()) }
 
-        FormField(label = stringResource(R.string.schedule_periodicity)) {
+        AppFormField(label = stringResource(R.string.schedule_periodicity)) {
             AppDropdownField(
                 value = stringResource(form.periodicity.labelRes()),
                 options = periodicityLabels,
@@ -286,7 +304,7 @@ fun ScheduleEditor(
         when (form.periodicity) {
             SchedulePeriodicity.DAILY -> Unit
 
-            SchedulePeriodicity.WEEKLY -> FormField(
+            SchedulePeriodicity.WEEKLY -> AppFormField(
                 label = stringResource(R.string.schedule_weekdays)
             ) {
                 WeekDayChipGroup(
@@ -296,7 +314,7 @@ fun ScheduleEditor(
                 )
             }
 
-            SchedulePeriodicity.EVERY_N_DAYS -> FormField(
+            SchedulePeriodicity.EVERY_N_DAYS -> AppFormField(
                 label = stringResource(R.string.schedule_interval_days)
             ) {
                 AppTextField(
@@ -309,7 +327,7 @@ fun ScheduleEditor(
             }
 
             SchedulePeriodicity.MONTHLY_DAY -> {
-                FormField(label = stringResource(R.string.schedule_day_of_month)) {
+                AppFormField(label = stringResource(R.string.schedule_day_of_month)) {
                     AppTextField(
                         value = form.dayOfMonth,
                         onValueChange = { form.dayOfMonth = it },
@@ -339,7 +357,7 @@ fun ScheduleEditor(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    FormField(
+                    AppFormField(
                         label = stringResource(R.string.schedule_occurrence),
                         modifier = Modifier.weight(1f)
                     ) {
@@ -356,7 +374,7 @@ fun ScheduleEditor(
                             enabled = enabled
                         )
                     }
-                    FormField(
+                    AppFormField(
                         label = stringResource(R.string.schedule_weekday),
                         modifier = Modifier.weight(1f)
                     ) {
@@ -381,7 +399,7 @@ fun ScheduleEditor(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    FormField(
+                    AppFormField(
                         label = stringResource(R.string.schedule_on_days),
                         modifier = Modifier.weight(1f)
                     ) {
@@ -393,7 +411,7 @@ fun ScheduleEditor(
                             enabled = enabled
                         )
                     }
-                    FormField(
+                    AppFormField(
                         label = stringResource(R.string.schedule_off_days),
                         modifier = Modifier.weight(1f)
                     ) {
@@ -416,14 +434,91 @@ fun ScheduleEditor(
             )
         }
 
-        FormField(label = stringResource(R.string.horario)) {
+        AppFormField(label = stringResource(R.string.horario)) {
             TimeListEditor(
                 times = form.times,
                 enabled = enabled,
                 onAddClick = { time -> form.times.add(time) },
-                onRemoveTime = { time -> form.times.remove(time) }
+                onRemoveTime = { time -> form.times.remove(time) },
+                onUpdateTime = { index, time -> form.updateTime(index, time) }
             )
         }
+    }
+}
+
+/**
+ * Resumen de solo lectura de la pauta, sin campos deshabilitados.
+ *
+ * @param form Estado editable de la pauta que se quiere mostrar.
+ */
+@Composable
+fun ScheduleReadOnly(form: ScheduleFormState) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        AppInfoRow(
+            label = stringResource(R.string.schedule_periodicity),
+            value = stringResource(form.periodicity.labelRes()),
+        )
+
+        when (form.periodicity) {
+            SchedulePeriodicity.WEEKLY -> {
+                val selectedDayLabels = mutableListOf<String>()
+                for (day in WeekDay.entries) {
+                    if (day in form.selectedDays) {
+                        selectedDayLabels.add(stringResource(day.labelRes()))
+                    }
+                }
+                AppInfoRow(
+                    label = stringResource(R.string.schedule_selected_days),
+                    value = selectedDayLabels.joinToString(", "),
+                )
+            }
+
+            SchedulePeriodicity.EVERY_N_DAYS -> AppInfoRow(
+                label = stringResource(R.string.schedule_interval_days),
+                value = stringResource(
+                    R.string.schedule_summary_every_n_days,
+                    form.intervalDays.toIntOrNull() ?: 0,
+                ),
+            )
+
+            SchedulePeriodicity.MONTHLY_DAY -> AppInfoRow(
+                label = stringResource(R.string.schedule_day_of_month),
+                value = stringResource(
+                    R.string.schedule_summary_day_of_month,
+                    form.dayOfMonth.toIntOrNull() ?: 0,
+                ),
+            )
+
+            SchedulePeriodicity.MONTHLY_WEEKDAY -> {
+                val occurrence = occurrenceLabel(form.occurrence)
+                val day = stringResource(form.monthlyWeekDay.labelRes())
+                AppInfoRow(
+                    label = stringResource(R.string.schedule_occurrence),
+                    value = stringResource(
+                        R.string.schedule_summary_monthly_weekday,
+                        occurrence,
+                        day,
+                    ),
+                )
+            }
+
+            SchedulePeriodicity.CYCLE -> AppInfoRow(
+                label = stringResource(R.string.schedule_cycle_detail),
+                value = stringResource(
+                    R.string.schedule_summary_cycle,
+                    form.onDays.toIntOrNull() ?: 0,
+                    form.offDays.toIntOrNull() ?: 0,
+                ),
+            )
+
+            SchedulePeriodicity.DAILY,
+            SchedulePeriodicity.SINGLE -> Unit
+        }
+
+        AppInfoRow(
+            label = stringResource(R.string.horario),
+            value = form.times.joinToString(", ") { it.toString() },
+        )
     }
 }
 

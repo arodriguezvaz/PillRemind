@@ -6,10 +6,10 @@
     <string name="notification_text">%1$s — no olvides la dosis de %2$s</string>
     <string name="notification_action_take">Tomar</string>
     <string name="nombre">Nombre</string>
-    <string name="fecha_inicio">Fecha inicio:</string>
-    <string name="unidad">Unidad:</string>
-    <string name="dosis">Dosis:</string>
-    <string name="fecha_fin">Fecha fin:</string>
+    <string name="fecha_inicio">Fecha inicio</string>
+    <string name="unidad">Unidad</string>
+    <string name="dosis">Dosis</string>
+    <string name="fecha_fin">Fecha fin</string>
     <string name="ver">Ver</string>
     <string name="editar">Editar</string>
     <string name="eliminar">Eliminar</string>
@@ -27,13 +27,19 @@
     <string name="viernesShort">V</string>
     <string name="sabadoShort">S</string>
     <string name="domingoShort">D</string>
-    <string name="horario">Horario:</string>
+    <string name="horario">Horario</string>
     <string name="guardar">Guardar</string>
     <string name="tomar">Tomar</string>
     <string name="tomado">Tomado</string>
     <string name="fecha_hint">dd/mm/yyyy</string>
     <string name="seleccion_la_hora">Selecciona la hora</string>
     <string name="date_picker_content_description">Seleccionar fecha</string>
+
+    <!-- Navegación -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_medications">Medicamentos</string>
+    <string name="nav_profile">Perfil</string>
+    <string name="common_back">Volver</string>
 
     <!-- Perfil -->
     <string name="profile_create_title">Crear perfil</string>
@@ -134,6 +140,8 @@
     <string name="medication_add_title">Añadir medicamento</string>
     <string name="medication_view_title">Ver medicamento</string>
     <string name="medication_edit_title">Editar medicamento</string>
+    <string name="medication_data_section">Datos del medicamento</string>
+    <string name="medication_schedule_section">Pauta</string>
     <string name="medication_name_placeholder">Nombre del medicamento</string>
     <string name="medication_dose_placeholder">500</string>
     <string name="medication_select_placeholder">Selecciona</string>
@@ -170,13 +178,24 @@
     <string name="schedule_off_days">Días de descanso</string>
     <string name="schedule_cycle_example">5</string>
     <string name="schedule_single_description">Se tomará una sola vez en la fecha de inicio.</string>
+    <string name="schedule_summary_every_n_days">Cada %1$d días</string>
+    <string name="schedule_summary_day_of_month">Día %1$d del mes</string>
+    <string name="schedule_summary_cycle">%1$d días de toma y %2$d de descanso</string>
+    <string name="schedule_summary_monthly_weekday">%1$s %2$s</string>
+    <string name="schedule_summary_no_times">Sin horas</string>
+    <string name="schedule_selected_days">Días seleccionados</string>
+    <string name="schedule_cycle_detail">Ciclo</string>
 
     <!-- Acciones y fotos -->
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancelar</string>
+    <string name="common_not_specified">Sin dato</string>
+    <string name="common_yes">Sí</string>
+    <string name="common_no">No</string>
     <string name="photo_profile">Foto de perfil</string>
     <string name="photo_edit">Editar foto</string>
     <string name="photo_add">Añadir foto</string>
     <string name="delete_time">Eliminar</string>
+    <string name="edit_time">Editar hora</string>
     <string name="add_time">Añadir hora</string>
 </resources>
