@@ -8,6 +8,7 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -90,6 +91,7 @@ fun SettingsScreen(
     var showImportSuccessDialog by rememberSaveable { mutableStateOf(false) }
     var importIsEncrypted by rememberSaveable { mutableStateOf(false) }
     var pendingImportUri by rememberSaveable { mutableStateOf<String?>(null) }
+    var legalDocument by rememberSaveable { mutableStateOf<LegalDocument?>(null) }
 
     val busy = backupState is BackupUiState.Working ||
             backupState is BackupUiState.Inspecting
@@ -241,9 +243,14 @@ fun SettingsScreen(
 
             // Tarjeta legal
             SettingsCard(title = stringResource(R.string.settings_legal_title)) {
-                SettingsLinkItem(stringResource(R.string.settings_privacy_policy), { /* abrir url */ })
-                SettingsLinkItem(stringResource(R.string.settings_terms), { /* abrir url */ })
-                SettingsLinkItem(stringResource(R.string.settings_legal_notice), { /* abrir url */ })
+                SettingsLinkItem(
+                    label = stringResource(R.string.settings_privacy_policy),
+                    onClick = { legalDocument = LegalDocument.PrivacyPolicy }
+                )
+                SettingsLinkItem(
+                    label = stringResource(R.string.settings_legal_notice),
+                    onClick = { legalDocument = LegalDocument.LegalNotice }
+                )
             }
         }
     }
@@ -340,6 +347,61 @@ fun SettingsScreen(
             }
         )
     }
+
+    legalDocument?.let { document ->
+        LegalDocumentDialog(
+            title = stringResource(document.titleRes),
+            body = stringResource(document.bodyRes),
+            onDismiss = { legalDocument = null }
+        )
+    }
+}
+
+/**
+ * Documentos legales que se muestran dentro de la app.
+ *
+ * Se mantienen en local para que funcionen sin conexión y no dependan de una
+ * página externa.
+ *
+ * @property titleRes Título del documento.
+ * @property bodyRes Texto completo del documento.
+ */
+private enum class LegalDocument(
+    @param:StringRes val titleRes: Int,
+    @param:StringRes val bodyRes: Int
+) {
+    PrivacyPolicy(R.string.settings_privacy_policy, R.string.settings_privacy_policy_body),
+    LegalNotice(R.string.settings_legal_notice, R.string.settings_legal_notice_body)
+}
+
+/**
+ * Diálogo de lectura para un documento legal.
+ *
+ * @param title Título mostrado en la cabecera.
+ * @param body Texto completo del documento.
+ * @param onDismiss Acción al cerrar el diálogo.
+ */
+@Composable
+private fun LegalDocumentDialog(
+    title: String,
+    body: String,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            Text(
+                text = body,
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.settings_legal_close))
+            }
+        }
+    )
 }
 
 /**

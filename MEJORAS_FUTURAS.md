@@ -22,14 +22,14 @@ la deuda técnica se siguen registrando en el audit local `PillRemind/INCIDENCIA
 
 ### UI-03 · Completar los enlaces legales de Ajustes
 
-- **Estado:** aplazada.
-- **Contexto:** `SettingsScreen` muestra política de privacidad, términos, aviso
-  legal, etc., pero las acciones son `/* abrir url */`.
-- **Propuesta:** definir las URLs definitivas y abrirlas con el navegador, o
-  retirar los enlaces que no vayan a publicarse.
-- **Zonas afectadas:** `SettingsScreen` y recursos de texto si los enlaces se
-  centralizan.
-- **Prioridad:** baja; no afecta al funcionamiento de la app.
+- **Estado:** implementada.
+- **Contexto:** `SettingsScreen` mostraba política de privacidad, términos y
+  aviso legal, pero las acciones eran `/* abrir url */`.
+- **Implementación:** la política de privacidad y el aviso legal abren un diálogo
+  local con el texto correspondiente, por lo que funcionan sin conexión. Se
+  retiraron los términos y condiciones, que no aportaban nada a una app local sin
+  cuentas ni compras.
+- **Zonas afectadas:** `SettingsScreen` y recursos de texto.
 
 ### Perfil ampliado con información médica
 
