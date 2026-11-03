@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.andres.pillremind.ui.theme.AppSpacing
 
 /**
  * Sección de formulario con un título y un bloque de campos.
@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 fun AppFormSection(
     title: String,
     modifier: Modifier = Modifier,
-    contentSpacing: Dp = 12.dp,
+    contentSpacing: Dp = AppSpacing.sm,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -35,7 +35,7 @@ fun AppFormSection(
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.primary,
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(AppSpacing.sm))
         Column(
             verticalArrangement = Arrangement.spacedBy(contentSpacing),
             content = content,

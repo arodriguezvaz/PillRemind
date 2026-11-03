@@ -16,13 +16,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.visualState
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.IntakeCard
 import com.andres.pillremind.ui.screens.main.TopBarState
+import com.andres.pillremind.ui.theme.AppSpacing
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -59,7 +59,7 @@ fun HomeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(AppSpacing.md)
     ) {
 
         if (todayIntakes.isEmpty()) {
@@ -73,8 +73,8 @@ fun HomeScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(), // importante
-                contentPadding = PaddingValues(vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(vertical = AppSpacing.sm),
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
             ) {
                 items(
                     items = todayIntakes,

@@ -58,6 +58,7 @@ import com.andres.pillremind.ui.components.settings.SettingsLinkItem
 import com.andres.pillremind.ui.components.settings.SettingsToggleItem
 import com.andres.pillremind.ui.screens.main.MainTopBar
 import com.andres.pillremind.ui.screens.main.TopBarState
+import com.andres.pillremind.ui.theme.AppSpacing
 
 /**
  * Pantalla de ajustes de la aplicación.
@@ -168,8 +169,8 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(horizontal = AppSpacing.md),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)
         ) {
 
             // Tarjeta de apariencia
@@ -189,7 +190,7 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(AppSpacing.sm))
                     AppButton(
                         text = stringResource(R.string.settings_allow_exact_alarms),
                         onClick = { openExactAlarmSettings(context) },
@@ -217,10 +218,10 @@ fun SettingsScreen(
                     enabled = !busy
                 )
                 if (busy) {
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(AppSpacing.xs))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)
                     ) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(18.dp),
@@ -426,7 +427,7 @@ private fun ExportBackupDialog(
         text = {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)
             ) {
                 Text(
                     stringResource(R.string.backup_export_description)
@@ -528,7 +529,7 @@ private fun ImportPasswordDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.backup_password_title)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
                 Text(stringResource(R.string.backup_password_description))
                 OutlinedTextField(
                     value = password,

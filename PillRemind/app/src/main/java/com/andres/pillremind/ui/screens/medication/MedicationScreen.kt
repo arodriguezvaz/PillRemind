@@ -54,6 +54,7 @@ import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.screens.main.TopBarState
+import com.andres.pillremind.ui.theme.AppSpacing
 import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -88,12 +89,12 @@ private fun AdaptiveFieldPair(
         val stacked = fontScale >= 1.3f || maxWidth < 340.dp
 
         if (stacked) {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
                 first(Modifier.fillMaxWidth())
                 second(Modifier.fillMaxWidth())
             }
         } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
                 first(Modifier.weight(1f))
                 second(Modifier.weight(1f))
             }
@@ -233,7 +234,7 @@ fun MedicationScreen(
             Column(
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(AppSpacing.md)
                     .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -245,7 +246,7 @@ fun MedicationScreen(
                     enabled = true,
                     placeholderIcon = Icons.Default.AddAPhoto,
                     photoDescriptionRes = R.string.photo_medication,
-                    modifier = Modifier.padding(bottom = 24.dp)
+                    modifier = Modifier.padding(bottom = AppSpacing.xl)
                 )
                 //-----------NOMBRE
                 AppFormSection(
@@ -259,13 +260,13 @@ fun MedicationScreen(
                             placeholder = stringResource(R.string.medication_name_placeholder),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 16.dp),
+                                .padding(bottom = AppSpacing.md),
                         )
                     }
                     AdaptiveFieldPair(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 16.dp),
+                            .padding(bottom = AppSpacing.md),
                         first = { fieldModifier ->
                             AppFormField(
                                 label = stringResource(R.string.dosis),
@@ -296,7 +297,7 @@ fun MedicationScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 16.dp),
+                            .padding(bottom = AppSpacing.md),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
@@ -315,7 +316,7 @@ fun MedicationScreen(
                     AdaptiveFieldPair(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 16.dp),
+                            .padding(bottom = AppSpacing.md),
                         first = { fieldModifier ->
                             AppFormField(
                                 label = stringResource(R.string.fecha_inicio),
@@ -343,7 +344,7 @@ fun MedicationScreen(
                         }
                     )
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.xl))
                 AppFormSection(
                     title = stringResource(R.string.medication_schedule_section),
                     contentSpacing = 0.dp,
@@ -353,7 +354,7 @@ fun MedicationScreen(
                         enabled = true
                     )
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.xl))
                 AppButton(
                     text = stringResource(R.string.guardar),
                     onClick = {
@@ -383,7 +384,7 @@ fun MedicationScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 8.dp)
+                            .padding(top = AppSpacing.xs)
                     )
                 }
             }
@@ -393,7 +394,7 @@ fun MedicationScreen(
             Column(
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(AppSpacing.md)
                     .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -404,7 +405,7 @@ fun MedicationScreen(
                     enabled = true,
                     placeholderIcon = Icons.Default.AddAPhoto,
                     photoDescriptionRes = R.string.photo_medication,
-                    modifier = Modifier.padding(bottom = 24.dp)
+                    modifier = Modifier.padding(bottom = AppSpacing.xl)
                 )
                 AppFormSection(
                     title = stringResource(R.string.medication_data_section),
@@ -417,13 +418,13 @@ fun MedicationScreen(
                             placeholder = stringResource(R.string.medication_name_placeholder),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 16.dp),
+                                .padding(bottom = AppSpacing.md),
                         )
                     }
                     AdaptiveFieldPair(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 16.dp),
+                            .padding(bottom = AppSpacing.md),
                         first = { fieldModifier ->
                             AppFormField(
                                 label = stringResource(R.string.dosis),
@@ -454,7 +455,7 @@ fun MedicationScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 16.dp),
+                            .padding(bottom = AppSpacing.md),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
@@ -473,7 +474,7 @@ fun MedicationScreen(
                     AdaptiveFieldPair(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 16.dp),
+                            .padding(bottom = AppSpacing.md),
                         first = { fieldModifier ->
                             AppFormField(
                                 label = stringResource(R.string.fecha_inicio),
@@ -501,7 +502,7 @@ fun MedicationScreen(
                         }
                     )
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.xl))
                 AppFormSection(
                     title = stringResource(R.string.medication_schedule_section),
                     contentSpacing = 0.dp,
@@ -511,7 +512,7 @@ fun MedicationScreen(
                         enabled = true
                     )
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.xl))
                 Row(modifier.fillMaxWidth()) {
                     //ARCHIVAR
                     AppButton(
@@ -523,7 +524,7 @@ fun MedicationScreen(
                         variant = ButtonVariant.Danger,
                         modifier = Modifier.weight(1f)
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(AppSpacing.md))
                     //GUARDAR -- ACTUALIZAR
                     AppButton(
                         text = stringResource(R.string.guardar),
@@ -560,7 +561,7 @@ fun MedicationScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 8.dp)
+                            .padding(top = AppSpacing.xs)
                     )
                 }
             }
@@ -572,7 +573,7 @@ fun MedicationScreen(
             Column(
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(AppSpacing.md)
                     .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -583,7 +584,7 @@ fun MedicationScreen(
                     enabled = false,
                     placeholderIcon = Icons.Default.Person,
                     photoDescriptionRes = R.string.photo_medication,
-                    modifier = Modifier.padding(bottom = 24.dp)
+                    modifier = Modifier.padding(bottom = AppSpacing.xl)
                 )
                 AppInfoCard(title = stringResource(R.string.medication_data_section)) {
                     AppInfoRow(
@@ -611,11 +612,11 @@ fun MedicationScreen(
                         value = endDate.value?.format(medicationDateFormatter),
                     )
                 }
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.md))
                 AppInfoCard(title = stringResource(R.string.medication_schedule_section)) {
                     ScheduleReadOnly(form = scheduleForm)
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.xl))
                 Row(modifier.fillMaxWidth()) {
                     //ARCHIVAR
                     AppButton(
@@ -627,7 +628,7 @@ fun MedicationScreen(
                         variant = ButtonVariant.Danger,
                         modifier = Modifier.weight(1f)
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(AppSpacing.md))
                     //EDITAR
                     AppButton(
                         onClick = { currentMode = MedicationMode.Edit },

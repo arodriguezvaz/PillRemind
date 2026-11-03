@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
+import com.andres.pillremind.ui.theme.AppSpacing
 
 /**
  * Campo de formulario con una etiqueta y su contenido.
@@ -37,7 +37,7 @@ fun AppFormField(
             style = labelStyle,
             color = labelColor,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(AppSpacing.xs))
         content()
     }
 }

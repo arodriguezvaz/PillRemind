@@ -1,5 +1,7 @@
 package com.andres.pillremind.ui.components
 import com.andres.pillremind.ui.theme.AppElevation
+import com.andres.pillremind.ui.theme.AppImageShape
+import com.andres.pillremind.ui.theme.AppSpacing
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Card
@@ -48,7 +49,7 @@ fun PerfilCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
@@ -57,19 +58,19 @@ fun PerfilCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
                 modifier = Modifier.weight(1f)
             ) {
                 Box(
                     modifier = Modifier
                         .size(64.dp)
-                        .clip(RoundedCornerShape(14.dp)),
+                        .clip(AppImageShape),
                 ) {
                     if (!profile.urlImagen.isNullOrEmpty()) {
                         AsyncImage(
@@ -111,7 +112,7 @@ private fun DefaultAvatar() {
             .size(64.dp)
             .background(
                 color = MaterialTheme.colorScheme.primaryContainer,
-                shape = RoundedCornerShape(14.dp)
+                shape = AppImageShape
             ),
         contentAlignment = Alignment.Center
     ) {

@@ -17,8 +17,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.andres.pillremind.R
+import com.andres.pillremind.ui.theme.AppSpacing
 import java.time.LocalTime
 import java.util.Calendar
 
@@ -48,8 +48,8 @@ fun TimeListEditor(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .padding(top = AppSpacing.xs),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
     ) {
 
         times.forEachIndexed { index, time ->

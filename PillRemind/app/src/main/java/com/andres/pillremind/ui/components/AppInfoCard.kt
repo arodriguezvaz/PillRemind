@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.components
 import com.andres.pillremind.ui.theme.AppElevation
+import com.andres.pillremind.ui.theme.AppSpacing
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -42,19 +43,19 @@ fun AppInfoCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(AppSpacing.md),
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppSpacing.xs))
             HorizontalDivider(
                 thickness = 1.dp,
                 color = MaterialTheme.colorScheme.outlineVariant,
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(AppSpacing.sm))
             content()
         }
     }

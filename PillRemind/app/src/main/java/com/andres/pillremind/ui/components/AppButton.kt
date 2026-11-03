@@ -1,12 +1,12 @@
 package com.andres.pillremind.ui.components
 import com.andres.pillremind.ui.theme.AppElevation
+import com.andres.pillremind.ui.theme.AppSpacing
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -72,7 +72,7 @@ fun AppButton(
         } else {
             modifier.fillMaxWidth()
         },
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = contentColor,
@@ -101,7 +101,7 @@ fun AppButton(
                     contentDescription = null,
                     modifier = Modifier.size(18.dp),
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(AppSpacing.xs))
             }
             Text(text = text, style = textStyle, maxLines = 1)
         }

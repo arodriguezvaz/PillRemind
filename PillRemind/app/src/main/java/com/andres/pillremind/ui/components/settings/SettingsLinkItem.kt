@@ -7,7 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.andres.pillremind.ui.theme.AppSpacing
 
 /**
  * Elemento clicable de ajustes tipo enlace.
@@ -37,6 +37,6 @@ fun SettingsLinkItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable(enabled = enabled, onClick = onClick)
-            .padding(vertical = 4.dp)
+            .padding(vertical = AppSpacing.xxs)
     )
 }

@@ -4,7 +4,6 @@ import com.andres.pillremind.ui.theme.AppElevation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,7 +19,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
 /**
@@ -55,7 +54,7 @@ fun AppTextField(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         shadowElevation = AppElevation,
         color = MaterialTheme.colorScheme.surface
     ) {
@@ -97,7 +96,7 @@ fun AppTextField(
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent,
             ),
-            shape = RoundedCornerShape(12.dp),
+            shape = MaterialTheme.shapes.medium,
             enabled = enabled
         )
     }
@@ -110,7 +109,7 @@ fun AppTextFieldPreview() {
     PillRemindTheme {
 
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(AppSpacing.md)
         ) {
             AppTextField(
                 value = "Dalsy",

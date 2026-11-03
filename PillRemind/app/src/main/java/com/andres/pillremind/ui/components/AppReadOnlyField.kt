@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.andres.pillremind.ui.theme.AppSpacing
 
 /**
  * Campo de solo lectura: muestra la etiqueta y el valor como texto, sin el
@@ -41,7 +41,7 @@ fun AppReadOnlyField(
             text = value,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = AppSpacing.xs),
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontSize = 18.sp,
                 lineHeight = 26.sp,

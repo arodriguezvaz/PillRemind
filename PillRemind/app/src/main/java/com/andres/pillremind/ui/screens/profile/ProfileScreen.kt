@@ -33,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
@@ -53,6 +52,7 @@ import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.labelRes
 import com.andres.pillremind.ui.screens.main.TopBarState
+import com.andres.pillremind.ui.theme.AppSpacing
 import java.io.File
 import java.time.LocalDate
 import java.time.Period
@@ -203,7 +203,7 @@ fun ProfileScreen(
                             text = stringResource(R.string.profile_save_name_required),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 8.dp)
+                            modifier = Modifier.padding(top = AppSpacing.xs)
                         )
                     }
                 }
@@ -258,7 +258,7 @@ fun ProfileScreen(
                             text = stringResource(R.string.profile_save_name_required),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 8.dp)
+                            modifier = Modifier.padding(top = AppSpacing.xs)
                         )
                     }
                 }
@@ -289,7 +289,7 @@ fun ProfileScreen(
                 actions = {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(AppSpacing.xxs),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         AppButton(
@@ -312,7 +312,7 @@ fun ProfileScreen(
                             variant = ButtonVariant.Danger,
                             modifier = Modifier.weight(1f)
                         )
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(AppSpacing.md))
                         AppButton(
                             onClick = { currentMode = ProfileMode.Edit },
                             text = stringResource(R.string.editar),
@@ -468,8 +468,8 @@ private fun ProfileForm(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .imePadding()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .padding(AppSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.lg)
     ) {
         AppPhotoPicker(
             photoUri = photoUri,
@@ -549,7 +549,7 @@ private fun ProfileForm(
             if (showBirthDate || showSex) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)
                 ) {
                     if (showBirthDate) {
                         if (enabled) {
