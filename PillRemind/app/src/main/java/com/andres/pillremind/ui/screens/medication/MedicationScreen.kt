@@ -39,7 +39,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.andres.pillremind.R
-import com.andres.pillremind.ui.components.AppBottomActions
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
@@ -537,16 +536,15 @@ fun MedicationScreen(
         MedicationMode.View -> {
 
 
-            Column(modifier = modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .verticalScroll(scrollState)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    AppPhotoPicker(
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AppPhotoPicker(
                     photoUri = selectedPhotoUri,
                     onPhotoSelected = { selectedPhotoUri = it },
                     enabled = false,
@@ -583,9 +581,9 @@ fun MedicationScreen(
                 AppInfoCard(title = stringResource(R.string.medication_schedule_section)) {
                     ScheduleReadOnly(form = scheduleForm)
                 }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-                AppBottomActions {
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(modifier.fillMaxWidth()) {
+                    //ARCHIVAR
                     AppButton(
                         onClick = {
                             showArchiveDialog = true
@@ -596,12 +594,14 @@ fun MedicationScreen(
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
+                    //EDITAR
                     AppButton(
                         onClick = { currentMode = MedicationMode.Edit },
                         text = stringResource(R.string.editar),
                         size = ButtonSize.Medium,
                         variant = ButtonVariant.Primary,
                         modifier = Modifier.weight(1f)
+
                     )
                 }
             }

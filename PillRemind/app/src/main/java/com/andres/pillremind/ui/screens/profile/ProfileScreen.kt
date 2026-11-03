@@ -5,7 +5,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,7 +37,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.BloodType
 import com.andres.pillremind.domain.model.Sex
-import com.andres.pillremind.ui.components.AppBottomActions
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
@@ -263,23 +261,24 @@ fun ProfileScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                },
-                bottomActions = {
-                    AppButton(
-                        onClick = { perfil?.let { showDeleteDialog = true } },
-                        text = stringResource(R.string.eliminar),
-                        size = ButtonSize.Medium,
-                        variant = ButtonVariant.Danger,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    AppButton(
-                        onClick = { currentMode = ProfileMode.Edit },
-                        text = stringResource(R.string.editar),
-                        size = ButtonSize.Medium,
-                        variant = ButtonVariant.Primary,
-                        modifier = Modifier.weight(1f)
-                    )
+
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        AppButton(
+                            onClick = { perfil?.let { showDeleteDialog = true } },
+                            text = stringResource(R.string.eliminar),
+                            size = ButtonSize.Medium,
+                            variant = ButtonVariant.Danger,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        AppButton(
+                            onClick = { currentMode = ProfileMode.Edit },
+                            text = stringResource(R.string.editar),
+                            size = ButtonSize.Medium,
+                            variant = ButtonVariant.Primary,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             )
         }
@@ -354,8 +353,7 @@ private fun ProfileForm(
     onMedicalNotesChange: (String) -> Unit,
     healthCardNumber: String,
     onHealthCardNumberChange: (String) -> Unit,
-    actions: @Composable () -> Unit,
-    bottomActions: (@Composable RowScope.() -> Unit)? = null,
+    actions: @Composable () -> Unit
 ) {
     val notSpecified = stringResource(R.string.profile_not_specified_short)
 
@@ -419,16 +417,15 @@ private fun ProfileForm(
     val showMedicalNotes = !hideEmptyFields || medicalNotes.isNotBlank()
     val showHealthCard = !hideEmptyFields || healthCardNumber.isNotBlank()
 
-    Column(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .imePadding()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            AppPhotoPicker(
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        AppPhotoPicker(
             photoUri = photoUri,
             onPhotoSelected = { uri -> onPhotoSelected(uri) },
             enabled = enabled,
@@ -593,7 +590,5 @@ private fun ProfileForm(
         )
 
         actions()
-        }
-        bottomActions?.let { AppBottomActions(content = it) }
     }
 }
