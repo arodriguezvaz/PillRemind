@@ -76,6 +76,11 @@ fun AppButton(
             containerColor = containerColor,
             contentColor = contentColor,
         ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 8.dp,
+            disabledElevation = 0.dp,
+        ),
         contentPadding = PaddingValues(
             horizontal = horizontalPadding,
             vertical = verticalPadding,
