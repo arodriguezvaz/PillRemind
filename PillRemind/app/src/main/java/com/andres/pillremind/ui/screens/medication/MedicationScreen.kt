@@ -44,8 +44,9 @@ import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppFormSection
+import com.andres.pillremind.ui.components.AppInfoCard
+import com.andres.pillremind.ui.components.AppInfoRow
 import com.andres.pillremind.ui.components.AppPhotoPicker
-import com.andres.pillremind.ui.components.AppReadOnlyField
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
@@ -550,70 +551,38 @@ fun MedicationScreen(
                     placeholderIcon = Icons.Default.Person,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
-                AppFormSection(
-                    title = stringResource(R.string.medication_data_section),
-                    contentSpacing = 0.dp,
-                ) {
-                    AppReadOnlyField(
+                AppInfoCard(title = stringResource(R.string.medication_data_section)) {
+                    AppInfoRow(
                         label = stringResource(R.string.nombre),
                         value = name.value,
-                        modifier = Modifier.padding(bottom = 16.dp),
                     )
-                    AdaptiveFieldPair(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        first = { fieldModifier ->
-                            AppReadOnlyField(
-                                label = stringResource(R.string.dosis),
-                                value = dose.value,
-                                modifier = fieldModifier,
-                            )
-                        },
-                        second = { fieldModifier ->
-                            AppReadOnlyField(
-                                label = stringResource(R.string.unidad),
-                                value = unit.value,
-                                modifier = fieldModifier,
-                            )
-                        }
+                    AppInfoRow(
+                        label = stringResource(R.string.dosis),
+                        value = listOf(dose.value, unit.value)
+                            .filter { it.isNotBlank() }
+                            .joinToString(" "),
                     )
-                    AppReadOnlyField(
+                    AppInfoRow(
                         label = stringResource(R.string.medication_chronic_treatment),
                         value = stringResource(
                             if (isChronicTreatment.value) R.string.common_yes else R.string.common_no
                         ),
-                        modifier = Modifier.padding(bottom = 16.dp),
                     )
-                    AdaptiveFieldPair(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        first = { fieldModifier ->
-                            AppReadOnlyField(
-                                label = stringResource(R.string.fecha_inicio),
-                                value = startDate.value
-                                    ?.format(medicationDateFormatter)
-                                    ?: stringResource(R.string.common_not_specified),
-                                modifier = fieldModifier,
-                            )
-                        },
-                        second = { fieldModifier ->
-                            AppReadOnlyField(
-                                label = stringResource(R.string.fecha_fin),
-                                value = endDate.value
-                                    ?.format(medicationDateFormatter)
-                                    ?: stringResource(R.string.common_not_specified),
-                                modifier = fieldModifier,
-                            )
-                        }
+                    AppInfoRow(
+                        label = stringResource(R.string.fecha_inicio),
+                        value = startDate.value
+                            ?.format(medicationDateFormatter)
+                            ?: stringResource(R.string.common_not_specified),
+                    )
+                    AppInfoRow(
+                        label = stringResource(R.string.fecha_fin),
+                        value = endDate.value
+                            ?.format(medicationDateFormatter)
+                            ?: stringResource(R.string.common_not_specified),
                     )
                 }
-                Spacer(modifier = Modifier.height(24.dp))
-                AppFormSection(
-                    title = stringResource(R.string.medication_schedule_section),
-                    contentSpacing = 0.dp,
-                ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                AppInfoCard(title = stringResource(R.string.medication_schedule_section)) {
                     ScheduleReadOnly(form = scheduleForm)
                 }
                 Spacer(modifier = Modifier.height(24.dp))

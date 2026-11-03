@@ -27,7 +27,7 @@ import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.model.nextOccurrences
 import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormField
-import com.andres.pillremind.ui.components.AppReadOnlyField
+import com.andres.pillremind.ui.components.AppInfoRow
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.WeekDayChipGroup
 import com.andres.pillremind.ui.components.labelRes
@@ -441,11 +441,8 @@ fun ScheduleReadOnly(form: ScheduleFormState) {
         form.times.joinToString(", ") { it.toString() }
     }
 
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        AppReadOnlyField(
+    Column(modifier = Modifier.fillMaxWidth()) {
+        AppInfoRow(
             label = stringResource(R.string.schedule_periodicity),
             value = stringResource(form.periodicity.labelRes()),
         )
@@ -458,14 +455,14 @@ fun ScheduleReadOnly(form: ScheduleFormState) {
                         selectedDayLabels.add(stringResource(day.labelRes()))
                     }
                 }
-                AppReadOnlyField(
+                AppInfoRow(
                     label = stringResource(R.string.schedule_selected_days),
                     value = selectedDayLabels.joinToString(", ")
                         .ifBlank { stringResource(R.string.common_not_specified) },
                 )
             }
 
-            SchedulePeriodicity.EVERY_N_DAYS -> AppReadOnlyField(
+            SchedulePeriodicity.EVERY_N_DAYS -> AppInfoRow(
                 label = stringResource(R.string.schedule_interval_days),
                 value = stringResource(
                     R.string.schedule_summary_every_n_days,
@@ -473,7 +470,7 @@ fun ScheduleReadOnly(form: ScheduleFormState) {
                 ),
             )
 
-            SchedulePeriodicity.MONTHLY_DAY -> AppReadOnlyField(
+            SchedulePeriodicity.MONTHLY_DAY -> AppInfoRow(
                 label = stringResource(R.string.schedule_day_of_month),
                 value = stringResource(
                     R.string.schedule_summary_day_of_month,
@@ -484,7 +481,7 @@ fun ScheduleReadOnly(form: ScheduleFormState) {
             SchedulePeriodicity.MONTHLY_WEEKDAY -> {
                 val occurrence = occurrenceLabel(form.occurrence)
                 val day = stringResource(form.monthlyWeekDay.labelRes())
-                AppReadOnlyField(
+                AppInfoRow(
                     label = stringResource(R.string.schedule_occurrence),
                     value = stringResource(
                         R.string.schedule_summary_monthly_weekday,
@@ -494,7 +491,7 @@ fun ScheduleReadOnly(form: ScheduleFormState) {
                 )
             }
 
-            SchedulePeriodicity.CYCLE -> AppReadOnlyField(
+            SchedulePeriodicity.CYCLE -> AppInfoRow(
                 label = stringResource(R.string.schedule_cycle_detail),
                 value = stringResource(
                     R.string.schedule_summary_cycle,
@@ -507,7 +504,7 @@ fun ScheduleReadOnly(form: ScheduleFormState) {
             SchedulePeriodicity.SINGLE -> Unit
         }
 
-        AppReadOnlyField(
+        AppInfoRow(
             label = stringResource(R.string.horario),
             value = timesText,
         )
