@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.components
 import com.andres.pillremind.ui.theme.AppElevation
+import com.andres.pillremind.ui.theme.AppSpacing
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.andres.pillremind.domain.model.WeekDay
 
 /**
@@ -40,7 +40,7 @@ fun WeekDayChipGroup(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
     ) {
         WeekDay.entries.forEach { day ->
             val isSelected = selectedDays.contains(day)

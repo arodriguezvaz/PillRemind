@@ -1,6 +1,7 @@
 package com.andres.pillremind.ui.components
 import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppImageShape
+import com.andres.pillremind.ui.theme.AppSpacing
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,14 +56,14 @@ fun MedicationCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
             ) {
                 Box(
                     modifier = Modifier

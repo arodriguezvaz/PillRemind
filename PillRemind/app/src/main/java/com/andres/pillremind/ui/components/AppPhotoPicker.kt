@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.andres.pillremind.R
 import com.andres.pillremind.ui.theme.AppImageShape
+import com.andres.pillremind.ui.theme.AppSpacing
 
 /**
  * Componente para seleccionar o mostrar una imagen de perfil.
@@ -87,7 +88,7 @@ fun AppPhotoPicker(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .offset(x = 2.dp, y = 2.dp)
-                        .padding(4.dp)
+                        .padding(AppSpacing.xxs)
                         .size(26.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surface)

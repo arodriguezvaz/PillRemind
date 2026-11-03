@@ -19,7 +19,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
 /**
@@ -109,7 +109,7 @@ fun AppTextFieldPreview() {
     PillRemindTheme {
 
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(AppSpacing.md)
         ) {
             AppTextField(
                 value = "Dalsy",

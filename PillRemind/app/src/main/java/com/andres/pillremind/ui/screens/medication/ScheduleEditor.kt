@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.ScheduleRule
@@ -33,6 +32,7 @@ import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.WeekDayChipGroup
 import com.andres.pillremind.ui.components.labelRes
 import com.andres.pillremind.ui.components.timeeditor.TimeListEditor
+import com.andres.pillremind.ui.theme.AppSpacing
 import java.time.LocalTime
 
 /**
@@ -327,7 +327,7 @@ fun ScheduleEditor(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)
     ) {
         val periodicityLabels = SchedulePeriodicity.entries.map { stringResource(it.labelRes()) }
 
@@ -400,7 +400,7 @@ fun ScheduleEditor(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)
                 ) {
                     AppFormField(
                         label = stringResource(R.string.schedule_occurrence),
@@ -442,7 +442,7 @@ fun ScheduleEditor(
             SchedulePeriodicity.CYCLE -> {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)
                 ) {
                     AppFormField(
                         label = stringResource(R.string.schedule_on_days),
@@ -475,7 +475,7 @@ fun ScheduleEditor(
                 text = stringResource(R.string.schedule_single_description),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = AppSpacing.xs)
             )
         }
 

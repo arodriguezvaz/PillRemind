@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.components
 import com.andres.pillremind.ui.theme.AppElevation
+import com.andres.pillremind.ui.theme.AppSpacing
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 /**
  * Card genérica para mostrar un estado vacío o mensaje centrado.
@@ -39,7 +39,7 @@ fun BlankCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 32.dp), // altura visual
+                .padding(vertical = AppSpacing.xxl), // altura visual
             contentAlignment = Alignment.Center
         ) {
             Text(

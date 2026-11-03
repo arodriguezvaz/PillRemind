@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.components.timeeditor
 import com.andres.pillremind.ui.theme.AppElevation
+import com.andres.pillremind.ui.theme.AppSpacing
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.andres.pillremind.R
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
@@ -54,7 +54,12 @@ fun TimeItem(
                     onClickLabel = stringResource(R.string.edit_time),
                     onClick = onClick,
                 )
-                .padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+                .padding(
+                    start = AppSpacing.md,
+                    end = AppSpacing.xxs,
+                    top = AppSpacing.xxs,
+                    bottom = AppSpacing.xxs,
+                ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {

@@ -1,6 +1,7 @@
 package com.andres.pillremind.ui.components
 import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppImageShape
+import com.andres.pillremind.ui.theme.AppSpacing
 
 
 import androidx.compose.foundation.background
@@ -68,14 +69,14 @@ fun IntakeCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Row(
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
             ) {
                 Box(
                     modifier = Modifier
