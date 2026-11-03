@@ -18,3 +18,12 @@ val AppShapes = Shapes(
     large = RoundedCornerShape(20.dp),
     extraLarge = RoundedCornerShape(28.dp),
 )
+
+/**
+ * Radio común de las imágenes de la aplicación.
+ *
+ * Se usa en las miniaturas de 64dp de las tarjetas y en el selector de foto de
+ * 96dp. No forma parte de [AppShapes] porque no es un contenedor, sino el
+ * recorte de una imagen.
+ */
+val AppImageShape = RoundedCornerShape(14.dp)
