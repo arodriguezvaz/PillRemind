@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,6 +44,7 @@ import com.andres.pillremind.R
  * @param enabled Indica si el selector está habilitado.
  * @param size Tamaño del componente.
  * @param placeholderIcon Icono mostrado cuando no hay imagen seleccionada.
+ * @param photoDescriptionRes Recurso que describe la imagen según su contexto.
  */
 @Composable
 fun AppPhotoPicker(
@@ -52,6 +54,7 @@ fun AppPhotoPicker(
     enabled: Boolean = true,
     size: Dp = 96.dp,
     placeholderIcon: ImageVector = Icons.Default.AddAPhoto,
+    @StringRes photoDescriptionRes: Int = R.string.photo_profile,
 ) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -74,7 +77,7 @@ fun AppPhotoPicker(
         if (photoUri != null) {
             AsyncImage(
                 model = photoUri,
-                contentDescription = stringResource(R.string.photo_profile),
+                contentDescription = stringResource(photoDescriptionRes),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
@@ -102,7 +105,9 @@ fun AppPhotoPicker(
         } else {
             Icon(
                 imageVector = placeholderIcon,
-                contentDescription = stringResource(R.string.photo_add),
+                contentDescription = stringResource(
+                    if (enabled) R.string.photo_add else R.string.photo_none
+                ),
                 modifier = Modifier.size(size * 0.4f),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )

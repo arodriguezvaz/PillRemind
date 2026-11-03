@@ -6,12 +6,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.andres.pillremind.R
 
 /**
  * Fila de información de solo lectura con etiqueta y valor en la misma línea.
@@ -39,11 +41,12 @@ fun AppInfoRow(
         color = MaterialTheme.colorScheme.onSurface,
         fontWeight = FontWeight.Medium,
     )
+    val formattedLabel = stringResource(R.string.common_info_row_format, label)
 
     Text(
         text = buildAnnotatedString {
             withStyle(labelStyle) {
-                append("$label: ")
+                append(formattedLabel)
             }
             withStyle(valueStyle) {
                 append(displayValue)

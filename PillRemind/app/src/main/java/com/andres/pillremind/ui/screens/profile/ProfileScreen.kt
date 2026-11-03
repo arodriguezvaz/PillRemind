@@ -448,7 +448,9 @@ private fun ProfileForm(
         pluralStringResource(R.plurals.profile_age, age, age)
     }
     val birthDateDisplay = listOfNotNull(
-        birthDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+        birthDate?.format(
+            DateTimeFormatter.ofPattern(stringResource(R.string.common_date_pattern))
+        ),
         ageText,
     ).joinToString(" · ")
     val sexValue = sex?.let { stringResource(it.labelRes()) } ?: notSpecified

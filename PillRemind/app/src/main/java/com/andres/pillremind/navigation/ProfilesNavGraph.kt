@@ -7,11 +7,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.andres.pillremind.R
 import com.andres.pillremind.ui.screens.main.MainTopBar
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.screens.profile.ProfileMode
@@ -57,8 +59,9 @@ fun NavGraphBuilder.profileSelectionGraph(
         }
         //Pantalla de selección de creación de perfil
         composable(ProfilesScreen.ProfileCreateScreen.route) {
+            val createProfileTitle = stringResource(R.string.profile_create_title)
             var topBarState by remember {
-                mutableStateOf(TopBarState(title = "Crear perfil"))
+                mutableStateOf(TopBarState(title = createProfileTitle))
             }
             Scaffold(
                 topBar = {

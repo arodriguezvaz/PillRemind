@@ -18,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Medication
 import java.time.LocalDate
 
@@ -70,7 +72,10 @@ fun MedicationCard(
                     if (!medication.imageUrl.isNullOrEmpty()) {
                         AsyncImage(
                             model = medication.imageUrl,
-                            contentDescription = "Foto de ${medication.name}",
+                            contentDescription = stringResource(
+                                R.string.medication_photo_description,
+                                medication.name
+                            ),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )

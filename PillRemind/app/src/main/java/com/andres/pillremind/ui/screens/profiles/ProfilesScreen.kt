@@ -20,15 +20,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.PerfilCard
@@ -62,17 +61,17 @@ fun ProfilesScreen(
         profilesViewModel.clearActiveProfile()
     }
     val perfiles by profilesViewModel.perfiles.collectAsStateWithLifecycle()
-    var topBarState by remember {
-        mutableStateOf(
-            TopBarState(
-                "Perfiles", true, actions = listOf(
-                    TopBarAction(
-                        icon = Icons.Rounded.Settings,
-                        contentDescription = "Ajustes",
-                        onClick = { onSettingClicked() }
-                    )
-                )))
-    }
+    val topBarState = TopBarState(
+        title = stringResource(R.string.profiles_title),
+        showLogo = true,
+        actions = listOf(
+            TopBarAction(
+                icon = Icons.Rounded.Settings,
+                contentDescription = stringResource(R.string.settings_title),
+                onClick = { onSettingClicked() }
+            )
+        )
+    )
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -94,7 +93,7 @@ fun ProfilesScreen(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
-                    contentDescription = "Agregar profile",
+                    contentDescription = stringResource(R.string.profiles_add),
                 )
             }
         }
@@ -110,7 +109,7 @@ fun ProfilesScreen(
                 Box(
                     contentAlignment = Alignment.Center
                 ) {
-                    BlankCard("No hay perfiles creados todavía :(")
+                    BlankCard(stringResource(R.string.profiles_empty))
                 }
             } else {
                 LazyColumn(

@@ -55,6 +55,7 @@ fun IntakeCard(
         IntakeVisualState.DELAYED -> Pair(stringResource(R.string.tomar), ButtonVariant.Danger)
         IntakeVisualState.PENDING -> Pair(stringResource(R.string.tomar), ButtonVariant.Primary)
     }
+    val timeFormatter = DateTimeFormatter.ofPattern(stringResource(R.string.common_time_pattern))
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -84,7 +85,10 @@ fun IntakeCard(
                     if (!intake.imageUrl.isNullOrEmpty()) {
                         AsyncImage(
                             model = intake.imageUrl,
-                            contentDescription = "Foto de ${intake.medicationName}",
+                            contentDescription = stringResource(
+                                R.string.medication_photo_description,
+                                intake.medicationName
+                            ),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
@@ -103,9 +107,7 @@ fun IntakeCard(
                     )
                     Text(
                         text = "${intake.dose} ${intake.unit} · ${
-                            intake.scheduledAt.format(
-                                DateTimeFormatter.ofPattern("HH:mm")
-                            )
+                            intake.scheduledAt.format(timeFormatter)
                         }",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -140,7 +142,7 @@ fun DefaultPill() {
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_pill),
-            contentDescription = "Pill icon",
+            contentDescription = stringResource(R.string.medication_icon_description),
             tint = MaterialTheme.colorScheme.onPrimaryContainer
         )
     }
