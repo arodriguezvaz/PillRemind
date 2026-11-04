@@ -12,12 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -42,17 +42,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.andres.pillremind.R
-import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
+import com.andres.pillremind.ui.components.AppFormActions
 import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppFormSection
 import com.andres.pillremind.ui.components.AppInfoCard
 import com.andres.pillremind.ui.components.AppInfoRow
 import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppTextField
-import com.andres.pillremind.ui.components.ButtonSize
-import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
 import java.io.File
@@ -228,6 +226,12 @@ fun MedicationScreen(
         missingFields.add(stringResource(R.string.medication_missing_schedule))
     }
 
+    val missingFieldsMessage = if (isFormValid) {
+        null
+    } else {
+        stringResource(R.string.save_missing_fields, missingFields.joinToString(", "))
+    }
+
     when (currentMode) {
         //---------CREATE---------
         MedicationMode.Create -> {
@@ -355,9 +359,9 @@ fun MedicationScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(AppSpacing.xl))
-                AppButton(
-                    text = stringResource(R.string.guardar),
-                    onClick = {
+                AppFormActions(
+                    primaryText = stringResource(R.string.guardar),
+                    onPrimaryClick = {
                         medicationViewModel.addMedication(
                             nombre = name.value,
                             photoUri = selectedPhotoUri,
@@ -371,22 +375,9 @@ fun MedicationScreen(
                             onSaved = onSaveClicked
                         )
                     },
-                    size = ButtonSize.Large,
-                    enabled = isFormValid
+                    primaryEnabled = isFormValid,
+                    supportingText = missingFieldsMessage,
                 )
-                if (!isFormValid) {
-                    Text(
-                        text = stringResource(
-                            R.string.save_missing_fields,
-                            missingFields.joinToString(", ")
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = AppSpacing.xs)
-                    )
-                }
             }
         }
         //----------EDIT-----------
@@ -513,63 +504,36 @@ fun MedicationScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(AppSpacing.xl))
-                Row(modifier.fillMaxWidth()) {
-                    //ARCHIVAR
-                    AppButton(
-                        onClick = {
-                            showArchiveDialog = true
-                        },
-                        text = stringResource(R.string.medication_archive),
-                        size = ButtonSize.Medium,
-                        variant = ButtonVariant.Danger,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.width(AppSpacing.md))
-                    //GUARDAR -- ACTUALIZAR
-                    AppButton(
-                        text = stringResource(R.string.guardar),
-                        onClick = {
-                            medicationViewModel.updateMedication(
-                                name = name.value,
-                                newPhotoUri = newPhotoUri,
-                                currentImagePath = currentImagePath,
-                                dose = dose.value.toDoubleOrNull() ?: 0.0,
-                                unit = unit.value,
-                                startDate = startDate.value!!,
-                                endDate = endDate.value,
-                                scheduleRules = scheduleForm.rules(),
-                                times = scheduleForm.times,
-                                isChronic = isChronicTreatment.value,
-                                onSaved = {
-                                    currentMode = MedicationMode.View
-                                    onSaveClicked()
-                                }
-                            )
-                        },
-                        size = ButtonSize.Medium,
-                        modifier = Modifier.weight(1f),
-                        enabled = isFormValid
-                    )
-                }
-                if (!isFormValid) {
-                    Text(
-                        text = stringResource(
-                            R.string.save_missing_fields,
-                            missingFields.joinToString(", ")
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = AppSpacing.xs)
-                    )
-                }
+                AppFormActions(
+                    primaryText = stringResource(R.string.guardar),
+                    onPrimaryClick = {
+                        medicationViewModel.updateMedication(
+                            name = name.value,
+                            newPhotoUri = newPhotoUri,
+                            currentImagePath = currentImagePath,
+                            dose = dose.value.toDoubleOrNull() ?: 0.0,
+                            unit = unit.value,
+                            startDate = startDate.value!!,
+                            endDate = endDate.value,
+                            scheduleRules = scheduleForm.rules(),
+                            times = scheduleForm.times,
+                            isChronic = isChronicTreatment.value,
+                            onSaved = {
+                                currentMode = MedicationMode.View
+                                onSaveClicked()
+                            }
+                        )
+                    },
+                    primaryEnabled = isFormValid,
+                    supportingText = missingFieldsMessage,
+                    secondaryIcon = Icons.Rounded.Archive,
+                    secondaryContentDescription = stringResource(R.string.medication_archive),
+                    onSecondaryClick = { showArchiveDialog = true },
+                )
             }
         }
         //-------------SEE---------------
         MedicationMode.View -> {
-
-
             Column(
                 modifier = modifier
                     .fillMaxSize()
@@ -617,28 +581,13 @@ fun MedicationScreen(
                     ScheduleReadOnly(form = scheduleForm)
                 }
                 Spacer(modifier = Modifier.height(AppSpacing.xl))
-                Row(modifier.fillMaxWidth()) {
-                    //ARCHIVAR
-                    AppButton(
-                        onClick = {
-                            showArchiveDialog = true
-                        },
-                        text = stringResource(R.string.medication_archive),
-                        size = ButtonSize.Medium,
-                        variant = ButtonVariant.Danger,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.width(AppSpacing.md))
-                    //EDITAR
-                    AppButton(
-                        onClick = { currentMode = MedicationMode.Edit },
-                        text = stringResource(R.string.editar),
-                        size = ButtonSize.Medium,
-                        variant = ButtonVariant.Primary,
-                        modifier = Modifier.weight(1f)
-
-                    )
-                }
+                AppFormActions(
+                    primaryText = stringResource(R.string.editar),
+                    onPrimaryClick = { currentMode = MedicationMode.Edit },
+                    secondaryIcon = Icons.Rounded.Archive,
+                    secondaryContentDescription = stringResource(R.string.medication_archive),
+                    onSecondaryClick = { showArchiveDialog = true },
+                )
             }
         }
     }

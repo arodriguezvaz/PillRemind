@@ -80,7 +80,7 @@ fun AppButton(
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = AppElevation,
             pressedElevation = AppElevation,
-            disabledElevation = 0.dp,
+            disabledElevation = AppElevation,
         ),
         contentPadding = PaddingValues(
             horizontal = horizontalPadding,
