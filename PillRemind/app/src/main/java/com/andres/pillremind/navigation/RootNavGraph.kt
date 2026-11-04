@@ -1,5 +1,7 @@
 package com.andres.pillremind.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -16,6 +18,9 @@ import com.andres.pillremind.ui.screens.main.MainScreen
  * usuario selecciona o crea un perfil. Una vez seleccionado un perfil,
  * se navega al destino principal [Graph.MAIN].
  *
+ * Los cambios de destino son inmediatos: se desactivan las transiciones de
+ * Navigation Compose para que la entrada a la pantalla principal no parezca lenta.
+ *
  * @param navController Controlador encargado de gestionar la navegación
  * entre los diferentes destinos.
  */
@@ -24,8 +29,12 @@ fun RootNavigationGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         route = Graph.ROOT,
-        startDestination = Graph.PROFILE_SELECTION
-
+        startDestination = Graph.PROFILE_SELECTION,
+        // Sin fundido: la entrada a la pantalla principal debe ser inmediata.
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
     ) {
 
         profileSelectionGraph(navController)
