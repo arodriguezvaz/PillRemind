@@ -33,20 +33,24 @@ import com.andres.pillremind.ui.screens.profile.ProfileScreen
  * Los cambios de destino son inmediatos: se desactivan las transiciones de
  * Navigation Compose para que moverse entre secciones no parezca lento.
  *
+ * Los títulos estáticos de la top bar se derivan de la ruta en `MainScreen`.
+ * Solo los destinos con estado dinámico (perfil o medicamento en
+ * creación/edición) publican un override.
+ *
  * @param navController Controlador de navegación utilizado dentro del grafo principal.
  * @param rootNavController Controlador de navegación raíz utilizado para realizar
  * navegaciones fuera de este grafo, como volver a la selección de perfiles.
  * @param paddingValues Espaciado proporcionado por el contenedor padre para evitar
  * solapamientos con otros componentes de la interfaz.
- * @param onTopBarChange Callback utilizado para actualizar el estado de la barra
- * superior según la pantalla mostrada.
+ * @param onTopBarChange Callback para publicar overrides de la barra superior.
+ * Recibe la ruta del destino que lo publica y su estado.
  */
 @Composable
 fun MainNavigationGraph(
     navController: NavHostController,
     rootNavController: NavHostController,
     paddingValues: PaddingValues,
-    onTopBarChange: (TopBarState) -> Unit
+    onTopBarChange: (route: String, state: TopBarState) -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -60,7 +64,7 @@ fun MainNavigationGraph(
     ) {
         //Home screen donde se ven las tomas del día
         composable(BottomBarScreens.Home.route) {
-            HomeScreen(onTopBarChange = onTopBarChange)
+            HomeScreen()
         }
         composable(BottomBarScreens.Medications.route) {
             MedicationsScreen(
@@ -69,9 +73,7 @@ fun MainNavigationGraph(
                         MedicationScreens.MedicationSeeScreen.createRoute(id)
                     )
                 },
-                onTopBarChange = onTopBarChange,
-
-                )
+            )
         }
 
         composable(BottomBarScreens.Profile.route) {
@@ -86,12 +88,30 @@ fun MainNavigationGraph(
                         }
                     }
                 },
-                onTopBarChange = onTopBarChange,
+                onTopBarChange = topBarChangeFor(
+                    BottomBarScreens.Profile.route,
+                    onTopBarChange
+                ),
             )
         }
         medicationNavGraph(navController, onTopBarChange)
     }
 }
+
+/**
+ * Vincula un override de la top bar con la ruta del destino que lo publica.
+ *
+ * Solo se usa en pantallas con estado dinámico (perfil o medicamento en
+ * creación/edición). Los títulos estáticos se resuelven en `MainScreen` a
+ * partir de la ruta actual.
+ *
+ * @param route Ruta del destino que informa el estado.
+ * @param onTopBarChange Callback general que recibe la ruta y el estado.
+ */
+private fun topBarChangeFor(
+    route: String,
+    onTopBarChange: (route: String, state: TopBarState) -> Unit
+): (TopBarState) -> Unit = { state -> onTopBarChange(route, state) }
 
 /**
  * Añade al grafo de navegación los destinos relacionados con la gestión
@@ -106,12 +126,12 @@ fun MainNavigationGraph(
  *
  * @param navController Controlador utilizado para gestionar la navegación
  * entre los destinos de este subgrafo.
- * @param onTopBarChange Callback utilizado para actualizar el estado de la
- * barra superior según la pantalla mostrada.
+ * @param onTopBarChange Callback para publicar overrides de la barra superior.
+ * Recibe la ruta del destino que lo publica y su estado.
  */
 fun NavGraphBuilder.medicationNavGraph(
     navController: NavHostController,
-    onTopBarChange: (TopBarState) -> Unit
+    onTopBarChange: (route: String, state: TopBarState) -> Unit
 ) {
     navigation(
         route = Graph.MEDICATION,
@@ -128,14 +148,20 @@ fun NavGraphBuilder.medicationNavGraph(
                 onArchivedClicked = {
                     navController.popBackStack()
                 },
-                onTopBarChange = onTopBarChange,
+                onTopBarChange = topBarChangeFor(
+                    MedicationScreens.MedicationSeeScreen.route,
+                    onTopBarChange
+                ),
             )
         }
         composable(route = MedicationScreens.MedicationCreateScreen.route) {
             MedicationScreen(
                 onSaveClicked = { navController.popBackStack() },
                 medicationMode = MedicationMode.Create,
-                onTopBarChange = onTopBarChange
+                onTopBarChange = topBarChangeFor(
+                    MedicationScreens.MedicationCreateScreen.route,
+                    onTopBarChange
+                )
             )
         }
     }

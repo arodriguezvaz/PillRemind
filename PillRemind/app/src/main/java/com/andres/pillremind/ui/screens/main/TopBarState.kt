@@ -17,6 +17,24 @@ data class TopBarState(
 )
 
 /**
+ * Selecciona el estado de la barra superior que corresponde a la ruta actual.
+ *
+ * `MainScreen` calcula el estado por defecto de cada ruta; el mapa solo
+ * contiene los overrides de pantallas con título dinámico (perfil o
+ * medicamento en creación/edición). Guardarlos por ruta evita que el título
+ * de una pantalla anterior se quede visible al volver a otra pestaña.
+ *
+ * @param currentRoute Ruta del destino visible.
+ * @param statesByRoute Overrides publicados por cada destino.
+ * @param fallback Estado por defecto de la ruta actual.
+ */
+internal fun resolveTopBarState(
+    currentRoute: String?,
+    statesByRoute: Map<String, TopBarState>,
+    fallback: TopBarState
+): TopBarState = currentRoute?.let(statesByRoute::get) ?: fallback
+
+/**
  * Representa una acción que se puede realizar en la barra superior.
  * @property icon Icono de la acción.
  * @property contentDescription Descripción del icono.

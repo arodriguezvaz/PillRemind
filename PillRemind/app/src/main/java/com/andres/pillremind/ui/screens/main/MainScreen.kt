@@ -7,9 +7,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -19,6 +18,7 @@ import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
 import com.andres.pillremind.ui.components.AppFab
+import com.andres.pillremind.ui.screens.home.homeTopBarTitle
 
 /**
  * Pantalla principal de la aplicación.
@@ -39,10 +39,36 @@ fun MainScreen(
     val currentRoute = navBackStackEntry?.destination?.route
     val showFab =
         currentRoute == BottomBarScreens.Home.route || currentRoute == BottomBarScreens.Medications.route
-    val initialTitle = stringResource(R.string.nav_home)
-    var topBarState by remember {
-        mutableStateOf(TopBarState(title = initialTitle, showLogo = true))
+
+    val defaultTopBarState = when (currentRoute) {
+        BottomBarScreens.Home.route -> TopBarState(
+            title = homeTopBarTitle(),
+            showLogo = true
+        )
+        BottomBarScreens.Medications.route -> TopBarState(
+            title = stringResource(R.string.nav_medications)
+        )
+        BottomBarScreens.Profile.route -> TopBarState(
+            title = stringResource(R.string.profile_view_title)
+        )
+        MedicationScreens.MedicationSeeScreen.route -> TopBarState(
+            title = stringResource(R.string.medication_view_title)
+        )
+        MedicationScreens.MedicationCreateScreen.route -> TopBarState(
+            title = stringResource(R.string.medication_add_title)
+        )
+        else -> TopBarState(title = homeTopBarTitle(), showLogo = true)
     }
+
+    // Los títulos estáticos se derivan de la ruta actual. El mapa solo guarda
+    // overrides de pantallas con estado dinámico (perfil o medicamento en
+    // creación/edición), siempre bajo la ruta que los publica.
+    val topBarStates = remember { mutableStateMapOf<String, TopBarState>() }
+    val topBarState = resolveTopBarState(
+        currentRoute = currentRoute,
+        statesByRoute = topBarStates,
+        fallback = defaultTopBarState
+    )
     val topLevelRoutes = remember {
         setOf(
             BottomBarScreens.Home.route,
@@ -78,7 +104,7 @@ fun MainScreen(
             navController = navController,
             rootNavController = rootNavController,
             paddingValues = paddingValues,
-            onTopBarChange = { topBarState = it }
+            onTopBarChange = { route, state -> topBarStates[route] = state }
         )
     }
 }
