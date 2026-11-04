@@ -10,6 +10,7 @@
 ## Android skills
 
 - Load the matching `android-*` skill with the `skill` tool before writing or reviewing code (Kotlin, Compose, architecture, coroutines, Hilt, testing, Gradle); several can apply to the same change.
+- Load `pillremind-design` (`.opencode/skills/pillremind-design/SKILL.md`) before creating or modifying any screen, tab or component; it holds the design tokens, component catalog and new-tab recipe.
 - The skills live in `.agents/` (installed with autoskills and Git-ignored), so a fresh clone may not have them: when missing, this file and the code are the reference.
 - If a skill contradicts this file, this file wins: the app is local-only, with no auth, network or `INTERNET` permission.
 
