@@ -5,6 +5,7 @@ import com.andres.pillremind.ui.theme.AppSpacing
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Medication
+import com.andres.pillremind.domain.model.isFinished
 import java.time.LocalDate
 
 /**
@@ -85,13 +87,22 @@ fun MedicationCard(
                     }
                 }
 
-                Text(
-                    text = medication.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = medication.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                    if (medication.isFinished()) {
+                        Text(
+                            text = stringResource(R.string.medication_finished),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
 
             AppButton(

@@ -24,19 +24,31 @@ interface MedicationRepository {
     ): Long
 
     /**
-     * Elimina un medicamento de la base de datos.
-     * @param medication Medicamento a eliminar
-     */
-    suspend fun deleteMedication(medication: Medication)
-
-    /**
      * Archiva un medicamento sin borrar su historial de tomas.
+     *
+     * Los horarios se conservan para poder recuperar la pauta si el usuario
+     * restaura el medicamento. Mientras esté archivado no se generan tomas.
      */
     suspend fun softDeleteMedication(
         medicationId: Int,
         deletedAt: LocalDateTime,
         deleteFutureFrom: LocalDateTime
     )
+
+    /**
+     * Recupera un medicamento archivado.
+     *
+     * @param medicationId ID del medicamento.
+     * @param restoredAt Momento de la restauración.
+     */
+    suspend fun restoreMedication(medicationId: Int, restoredAt: LocalDateTime)
+
+    /**
+     * Borra definitivamente un medicamento y todo su historial.
+     *
+     * @param medicationId ID del medicamento.
+     */
+    suspend fun deleteMedicationPermanently(medicationId: Int)
 
     /**
      * Actualiza un medicamento en la base de datos
@@ -70,4 +82,15 @@ interface MedicationRepository {
      * @param profileId ID del perfil
      */
     fun getMedications(profileId: Int): Flow<List<Medication>>
+
+    /**
+     * Observa los medicamentos archivados de un perfil.
+     */
+    fun getArchivedMedications(profileId: Int): Flow<List<Medication>>
+
+    /**
+     * Obtiene una sola vez todos los medicamentos de un perfil, incluidos los
+     * archivados. Se usa para limpiar imágenes antes de borrar el perfil.
+     */
+    suspend fun getMedicationsOnce(profileId: Int): List<Medication>
 }

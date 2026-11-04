@@ -44,9 +44,11 @@ data class IntakeWithMedication(
  *
  * @return Estado visual de la toma.
  */
-fun IntakeWithMedication.visualState(): IntakeVisualState {
+fun IntakeWithMedication.visualState(
+    now: LocalDateTime = LocalDateTime.now()
+): IntakeVisualState {
     if (takenAt != null) return IntakeVisualState.TAKEN
-    return if (LocalDateTime.now() > scheduledAt.plusMinutes(15))
+    return if (now > scheduledAt.plusMinutes(15))
         IntakeVisualState.DELAYED
     else
         IntakeVisualState.PENDING

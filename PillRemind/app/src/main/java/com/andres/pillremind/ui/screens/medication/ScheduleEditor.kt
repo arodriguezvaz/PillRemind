@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -24,7 +25,6 @@ import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.ScheduleRule
 import com.andres.pillremind.domain.model.WeekDay
-import com.andres.pillremind.domain.model.nextOccurrences
 import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppInfoRow
@@ -143,6 +143,17 @@ class ScheduleFormState {
                 on != null && off != null && on >= 1 && off >= 0
             }
         }
+    }
+
+    /**
+     * Añade una hora si no existe todavía.
+     *
+     * @return `true` si se añadió; `false` si ya estaba en la lista.
+     */
+    fun addTime(time: LocalTime): Boolean {
+        if (time in times) return false
+        times.add(time)
+        return true
     }
 
     /**
@@ -325,6 +336,8 @@ fun ScheduleEditor(
     enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
+    var duplicateTime by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)
@@ -483,10 +496,24 @@ fun ScheduleEditor(
             TimeListEditor(
                 times = form.times,
                 enabled = enabled,
-                onAddClick = { time -> form.times.add(time) },
-                onRemoveTime = { time -> form.times.remove(time) },
-                onUpdateTime = { index, time -> form.updateTime(index, time) }
+                onAddClick = { time -> duplicateTime = !form.addTime(time) },
+                onRemoveTime = { time ->
+                    form.times.remove(time)
+                    duplicateTime = false
+                },
+                onUpdateTime = { index, time ->
+                    form.updateTime(index, time)
+                    duplicateTime = false
+                }
             )
+            if (enabled && duplicateTime) {
+                Text(
+                    text = stringResource(R.string.schedule_duplicate_time),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = AppSpacing.xs)
+                )
+            }
         }
     }
 }

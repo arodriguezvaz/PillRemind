@@ -5,6 +5,8 @@
     <string name="notification_title">Hora de tomar %1$s</string>
     <string name="notification_text">%1$s — no olvides la dosis de %2$s</string>
     <string name="notification_action_take">Tomar</string>
+    <string name="notification_private_title">Recordatorio de medicación</string>
+    <string name="notification_private_text">Tienes una toma pendiente</string>
 
     <!-- Bienvenida -->
     <string name="onboarding_tagline">Tu medicación, a tiempo</string>
@@ -66,6 +68,8 @@
     <string name="home_title_today">Hoy, %1$s</string>
     <string name="home_date_pattern">d \'de\' MMMM</string>
     <string name="home_empty_today">No hay medicamentos para tomar hoy</string>
+    <string name="home_reminders_error">No se pudieron actualizar los recordatorios.</string>
+    <string name="home_reminders_retry">Reintentar</string>
 
     <!-- Perfil -->
     <string name="profiles_title">Perfiles</string>
@@ -109,11 +113,25 @@
     <string name="profile_photo_description">Foto de perfil de %1$s</string>
     <string name="profile_avatar_description">Avatar del perfil</string>
     <string name="profile_view_adherence">Ver adherencia</string>
-    <string name="profile_adherence_soon">Próximamente</string>
-    <string name="profile_adherence_placeholder_title">Adherencia</string>
-    <string name="profile_adherence_placeholder_message">Próximamente podrás consultar aquí las estadísticas de tomas por medicamento.</string>
+
+    <!-- Adherencia -->
+    <string name="adherence_title">Adherencia</string>
+    <string name="adherence_summary_title">Resumen</string>
+    <string name="adherence_period_seven">7 días</string>
+    <string name="adherence_period_thirty">30 días</string>
+    <string name="adherence_period_ninety">90 días</string>
+    <string name="adherence_percent_value">%1$d %%</string>
+    <string name="adherence_no_percent">—</string>
+    <string name="adherence_counts">%1$d tomadas · %2$d omitidas · %3$d pendientes</string>
+    <string name="adherence_summary_no_data">Todavía no hay tomas en este periodo.</string>
+    <string name="adherence_empty">No hay medicamentos para calcular la adherencia.</string>
+    <string name="adherence_archived">Archivado</string>
     <string name="profile_delete_title">Eliminar perfil</string>
-    <string name="profile_delete_message">¿Seguro que quieres eliminar este perfil?</string>
+    <string name="profile_delete_message">Se eliminarán también sus medicamentos, horarios y todo el historial de tomas. Esta acción no se puede deshacer.</string>
+    <string name="profile_delete_error">No se pudo eliminar el perfil. Inténtalo de nuevo.</string>
+    <string name="profile_save_error">No se pudo guardar el perfil. Inténtalo de nuevo.</string>
+    <string name="profile_image_error">No se pudo guardar la foto del perfil. Inténtalo de nuevo.</string>
+    <string name="profile_save_error_title">No se pudo guardar</string>
 
     <!-- Ajustes -->
     <string name="settings_title">Ajustes</string>
@@ -186,6 +204,21 @@
     <string name="medication_search_placeholder">Buscar medicamento…</string>
     <string name="medication_empty">No hay medicamentos aún</string>
     <string name="medication_search_no_results">No hay resultados para «%1$s»</string>
+    <string name="medication_finished">Finalizado</string>
+    <string name="medication_archived_title">Archivados</string>
+    <string name="medication_archived_count">Archivados (%1$d)</string>
+    <string name="archived_info">Los medicamentos archivados no generan recordatorios. Puedes recuperarlos o borrarlos definitivamente.</string>
+    <string name="archived_empty">No hay medicamentos archivados.</string>
+    <string name="archived_date">Archivado el %1$s</string>
+    <string name="archived_restore">Restaurar</string>
+    <string name="archived_delete">Eliminar</string>
+    <string name="archived_restore_title">Restaurar medicamento</string>
+    <string name="archived_restore_message">Volverá a aparecer en la lista y se generarán recordatorios a partir de hoy. Si la pauta se perdió, tendrás que añadirla al editar el medicamento.</string>
+    <string name="archived_delete_title">Eliminar definitivamente</string>
+    <string name="archived_delete_message">Se borrarán el medicamento, sus horarios y todo su historial de tomas. Esta acción no se puede deshacer.</string>
+    <string name="archived_error_title">No se pudo completar la acción</string>
+    <string name="medication_restore_error">No se pudo restaurar el medicamento. Inténtalo de nuevo.</string>
+    <string name="medication_delete_error">No se pudo eliminar el medicamento. Inténtalo de nuevo.</string>
     <string name="save_missing_fields">Faltan: %1$s</string>
     <string name="medication_missing_schedule">pauta y al menos una hora</string>
     <string name="profile_save_name_required">Escribe un nombre para guardar</string>
@@ -200,6 +233,12 @@
     <string name="medication_archive">Archivar</string>
     <string name="medication_archive_title">Archivar medicamento</string>
     <string name="medication_archive_message">Dejará de aparecer en la lista y no generará recordatorios. Se conservará el historial de tomas.</string>
+    <string name="medication_save_error">No se pudo guardar el medicamento. Inténtalo de nuevo.</string>
+    <string name="medication_update_error">No se pudo actualizar el medicamento. Inténtalo de nuevo.</string>
+    <string name="medication_archive_error">No se pudo archivar el medicamento. Inténtalo de nuevo.</string>
+    <string name="medication_image_error">No se pudo guardar la foto del medicamento. Inténtalo de nuevo.</string>
+    <string name="medication_save_error_title">No se pudo guardar</string>
+    <string name="medication_end_before_start">La fecha de fin debe ser igual o posterior a la fecha de inicio.</string>
     <string name="medication_photo_description">Foto del medicamento %1$s</string>
     <string name="medication_icon_description">Icono de medicamento</string>
     <string-array name="medication_units">
@@ -266,6 +305,7 @@
     <string name="schedule_summary_no_times">Sin horas</string>
     <string name="schedule_selected_days">Días seleccionados</string>
     <string name="schedule_cycle_detail">Ciclo</string>
+    <string name="schedule_duplicate_time">Esa hora ya está añadida.</string>
 
     <!-- Acciones y fotos -->
     <string name="common_ok">OK</string>

@@ -128,6 +128,15 @@ class AlarmNotificationHandler @Inject constructor(
         )
         // Construye la notificación mostrando la información de la toma pendiente
         // e incorpora una acción rápida para registrar la medicación como tomada.
+        val publicNotification = NotificationCompat.Builder(context, NotificationChannels.REMINDERS)
+            .setSmallIcon(R.drawable.ic_pill)
+            .setContentTitle(context.getString(R.string.notification_private_title))
+            .setContentText(context.getString(R.string.notification_private_text))
+            .setContentIntent(contentPendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .build()
+
         val notification = NotificationCompat.Builder(context, NotificationChannels.REMINDERS)
             .setSmallIcon(R.drawable.ic_pill)
             .setContentTitle(context.getString(R.string.notification_title, medicationName))
@@ -140,6 +149,8 @@ class AlarmNotificationHandler @Inject constructor(
             )
             .setContentIntent(contentPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setPublicVersion(publicNotification)
             .setAutoCancel(true)
             .addAction(
                 R.drawable.ic_pill,

@@ -38,11 +38,13 @@ import com.andres.pillremind.ui.theme.AppSpacing
  * @param onPrimaryClick Acción que se ejecuta al pulsar el botón principal.
  * @param modifier Modificador para personalizar el layout.
  * @param primaryEnabled Indica si la acción principal está habilitada.
+ * @param primaryLoading Muestra el indicador de carga y bloquea pulsaciones repetidas.
  * @param supportingText Aviso opcional sobre el estado del formulario, como los
  *   campos que faltan por completar.
  * @param secondaryIcon Icono de la acción secundaria; si es null no se muestra.
  * @param secondaryContentDescription Descripción accesible de la acción secundaria.
  * @param secondaryContentColor Color del icono de la acción secundaria.
+ * @param secondaryEnabled Indica si la acción secundaria está habilitada.
  * @param onSecondaryClick Acción que se ejecuta al pulsar el botón secundario.
  */
 @Composable
@@ -51,10 +53,12 @@ fun AppFormActions(
     onPrimaryClick: () -> Unit,
     modifier: Modifier = Modifier,
     primaryEnabled: Boolean = true,
+    primaryLoading: Boolean = false,
     supportingText: String? = null,
     secondaryIcon: ImageVector? = null,
     secondaryContentDescription: String? = null,
     secondaryContentColor: Color = MaterialTheme.colorScheme.primary,
+    secondaryEnabled: Boolean = true,
     onSecondaryClick: (() -> Unit)? = null,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -70,6 +74,7 @@ fun AppFormActions(
                 modifier = Modifier.weight(1f),
                 size = ButtonSize.Large,
                 enabled = primaryEnabled,
+                isLoading = primaryLoading,
             )
             if (secondaryIcon != null && onSecondaryClick != null) {
                 Spacer(modifier = Modifier.width(AppSpacing.md))
@@ -78,6 +83,7 @@ fun AppFormActions(
                     modifier = Modifier
                         .fillMaxHeight()
                         .aspectRatio(1f),
+                    enabled = secondaryEnabled && !primaryLoading,
                     shape = MaterialTheme.shapes.medium,
                     color = MaterialTheme.colorScheme.surface,
                     contentColor = secondaryContentColor,

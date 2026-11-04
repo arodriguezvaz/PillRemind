@@ -41,6 +41,8 @@ class BootRescheduleHandler @Inject constructor(
         fun isRescheduleAction(action: String?): Boolean =
             action == Intent.ACTION_BOOT_COMPLETED ||
                 action == Intent.ACTION_MY_PACKAGE_REPLACED ||
+                action == Intent.ACTION_TIME_CHANGED ||
+                action == Intent.ACTION_TIMEZONE_CHANGED ||
                 action == ACTION_EXACT_ALARM_PERMISSION_CHANGED
     }
 

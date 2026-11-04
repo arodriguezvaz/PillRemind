@@ -82,6 +82,7 @@ sealed class ProfileMode {
  * @param onSaveClicked Callback ejecutado al guardar cambios.
  * @param profileMode Modo inicial de la pantalla (crear, ver o editar).
  * @param onDeletedClicked Callback ejecutado tras eliminar el perfil.
+ * @param onAdherenceClicked Callback ejecutado al consultar la adherencia.
  * @param onTopBarChange Callback para modificar la TopBar.
  * @param profileViewModel ViewModel encargado de la lógica del perfil.
  */
@@ -91,6 +92,7 @@ fun ProfileScreen(
     onSaveClicked: () -> Unit = {},
     profileMode: ProfileMode = ProfileMode.Create,
     onDeletedClicked: () -> Unit = {},
+    onAdherenceClicked: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -103,11 +105,12 @@ fun ProfileScreen(
     val healthCardNumber = rememberSaveable { mutableStateOf("") }
 
     val perfil by profileViewModel.profile.collectAsStateWithLifecycle()
+    val isSaving by profileViewModel.isSaving.collectAsStateWithLifecycle()
+    val saveErrorRes by profileViewModel.errorRes.collectAsStateWithLifecycle()
     var selectedPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var currentImagePath by rememberSaveable { mutableStateOf<String?>(null) }
     var newPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-    var showAdherencePlaceholder by rememberSaveable { mutableStateOf(false) }
     var formInitialized by rememberSaveable { mutableStateOf(false) }
     val modeSaver = Saver<ProfileMode, String>(
         save = { mode ->
@@ -211,7 +214,8 @@ fun ProfileScreen(
                                 onSaved = onSaveClicked
                             )
                         },
-                        primaryEnabled = name.value.isNotBlank(),
+                        primaryEnabled = name.value.isNotBlank() && !isSaving,
+                        primaryLoading = isSaving,
                         supportingText = if (name.value.isBlank()) {
                             stringResource(R.string.profile_save_name_required)
                         } else {
@@ -262,7 +266,8 @@ fun ProfileScreen(
                                 }
                             )
                         },
-                        primaryEnabled = name.value.isNotBlank(),
+                        primaryEnabled = name.value.isNotBlank() && !isSaving,
+                        primaryLoading = isSaving,
                         supportingText = if (name.value.isBlank()) {
                             stringResource(R.string.profile_save_name_required)
                         } else {
@@ -302,21 +307,18 @@ fun ProfileScreen(
                     ) {
                         AppButton(
                             text = stringResource(R.string.profile_view_adherence),
-                            onClick = { showAdherencePlaceholder = true },
+                            onClick = onAdherenceClicked,
                             size = ButtonSize.Large
-                        )
-                        Text(
-                            text = stringResource(R.string.profile_adherence_soon),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     AppFormActions(
                         primaryText = stringResource(R.string.editar),
                         onPrimaryClick = { currentMode = ProfileMode.Edit },
+                        primaryEnabled = !isSaving,
                         secondaryIcon = Icons.Rounded.Delete,
                         secondaryContentDescription = stringResource(R.string.eliminar),
                         secondaryContentColor = MaterialTheme.colorScheme.error,
+                        secondaryEnabled = !isSaving,
                         onSecondaryClick = { perfil?.let { showDeleteDialog = true } },
                     )
                 }
@@ -352,13 +354,13 @@ fun ProfileScreen(
         )
     }
 
-    if (showAdherencePlaceholder) {
+    saveErrorRes?.let { messageRes ->
         AlertDialog(
-            onDismissRequest = { showAdherencePlaceholder = false },
-            title = { Text(stringResource(R.string.profile_adherence_placeholder_title)) },
-            text = { Text(stringResource(R.string.profile_adherence_placeholder_message)) },
+            onDismissRequest = profileViewModel::clearError,
+            title = { Text(stringResource(R.string.profile_save_error_title)) },
+            text = { Text(stringResource(messageRes)) },
             confirmButton = {
-                TextButton(onClick = { showAdherencePlaceholder = false }) {
+                TextButton(onClick = profileViewModel::clearError) {
                     Text(stringResource(R.string.common_ok))
                 }
             }

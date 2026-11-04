@@ -2,6 +2,7 @@ package com.andres.pillremind.domain.repository
 
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.IntakeWithMedication
+import com.andres.pillremind.domain.model.MedicationAdherence
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -62,10 +63,20 @@ interface IntakeRepository {
     suspend fun getFutureIntakesByProfileId(profileId: Int, date: LocalDateTime): List<Intake>
 
     /**
-     * Elimina las tomas futuras de una medicación
-     * @param medicationId ID de la medicación
-     * @param date a partir de la que eliiminar las tomas
+     * Obtiene los IDs de todas las tomas de un medicamento para cancelar sus
+     * notificaciones visibles.
      */
-    suspend fun deleteFutureIntakesByMedicationId(medicationId: Int, date: LocalDateTime)
+    suspend fun getIntakeIdsByMedicationId(medicationId: Int): List<Int>
+
+    /**
+     * Observa las estadísticas de adherencia por medicamento dentro de un
+     * periodo, incluidos los medicamentos archivados.
+     */
+    fun getAdherence(
+        profileId: Int,
+        from: LocalDateTime,
+        to: LocalDateTime,
+        now: LocalDateTime
+    ): Flow<List<MedicationAdherence>>
 }
 

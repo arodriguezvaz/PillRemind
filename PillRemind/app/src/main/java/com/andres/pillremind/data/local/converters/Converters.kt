@@ -8,6 +8,7 @@ import com.andres.pillremind.domain.model.WeekDay
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 
 /**
  *Clase que contiene los converters para convertir tipos de datos no soportados por Room
@@ -15,14 +16,16 @@ import java.time.LocalTime
 class Converters {
 
     // -------- LocalDateTime --------
+    // Se guarda con precisión de minutos para que el índice único de tomas
+    // compare exactamente la misma hora venga de la app o de una importación.
     @TypeConverter
     fun fromLocalDateTime(value: LocalDateTime?): String? {
-        return value?.toString()
+        return value?.truncatedTo(ChronoUnit.MINUTES)?.toString()
     }
 
     @TypeConverter
     fun toLocalDateTime(value: String?): LocalDateTime? {
-        return value?.let { LocalDateTime.parse(it) }
+        return value?.let { LocalDateTime.parse(it).truncatedTo(ChronoUnit.MINUTES) }
     }
 
     //-------LocalDate-----------

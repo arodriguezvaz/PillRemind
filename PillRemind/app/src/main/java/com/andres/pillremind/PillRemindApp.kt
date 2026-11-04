@@ -99,6 +99,7 @@ class PillRemindApp : Application(), Configuration.Provider {
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = getString(R.string.notification_channel_description)
+            lockscreenVisibility = android.app.Notification.VISIBILITY_PRIVATE
         }
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)

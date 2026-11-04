@@ -1,6 +1,5 @@
 package com.andres.pillremind.ui.screens.main
 
-import android.annotation.SuppressLint
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
@@ -17,6 +16,7 @@ import com.andres.pillremind.R
 import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
+import com.andres.pillremind.navigation.ProfileScreens
 import com.andres.pillremind.ui.components.AppFab
 import com.andres.pillremind.ui.screens.home.homeTopBarTitle
 
@@ -29,7 +29,6 @@ import com.andres.pillremind.ui.screens.home.homeTopBarTitle
  * @param navController Controlador de navegación interno de la barra inferior.
  * @param rootNavController Controlador de navegación raíz usado por el grafo principal.
  */
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(
     navController: NavHostController = rememberNavController(),
@@ -51,11 +50,17 @@ fun MainScreen(
         BottomBarScreens.Profile.route -> TopBarState(
             title = stringResource(R.string.profile_view_title)
         )
+        ProfileScreens.Adherence.route -> TopBarState(
+            title = stringResource(R.string.adherence_title)
+        )
         MedicationScreens.MedicationSeeScreen.route -> TopBarState(
             title = stringResource(R.string.medication_view_title)
         )
         MedicationScreens.MedicationCreateScreen.route -> TopBarState(
             title = stringResource(R.string.medication_add_title)
+        )
+        MedicationScreens.ArchivedMedicationsScreen.route -> TopBarState(
+            title = stringResource(R.string.medication_archived_title)
         )
         else -> TopBarState(title = homeTopBarTitle(), showLogo = true)
     }
