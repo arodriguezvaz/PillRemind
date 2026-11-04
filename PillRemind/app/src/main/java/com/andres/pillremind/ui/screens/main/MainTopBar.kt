@@ -27,10 +27,12 @@ import com.andres.pillremind.R
  * Muestra el título actual, el logo opcional, acciones configurables
  * y un botón de navegación hacia atrás cuando la pantalla lo permite.
  *
- * La visibilidad del botón "back" depende de la ruta actual del NavController
- * y de si existe una pantalla anterior en la pila de navegación.
+ * Si [TopBarState.navigationAction] está definida, se muestra esa acción en
+ * lugar del botón "back" por defecto. En caso contrario, la visibilidad del
+ * botón "back" depende de la ruta actual del NavController y de si existe una
+ * pantalla anterior en la pila de navegación.
  *
- * @param state Estado de la TopBar (título, logo y acciones).
+ * @param state Estado de la TopBar (título, logo, acciones y acción de navegación).
  * @param navController Controlador de navegación para gestionar el back stack.
  * @param topLevelRoutes Rutas principales que no muestran flecha de retroceso.
  */
@@ -47,12 +49,24 @@ fun MainTopBar(
         navController.previousBackStackEntry != null
     TopAppBar(
         navigationIcon = {
-            if (canGoBack) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.common_back)
-                    )
+            val navigationAction = state.navigationAction
+            when {
+                navigationAction != null -> {
+                    IconButton(onClick = navigationAction.onClick) {
+                        Icon(
+                            imageVector = navigationAction.icon,
+                            contentDescription = navigationAction.contentDescription
+                        )
+                    }
+                }
+
+                canGoBack -> {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.common_back)
+                        )
+                    }
                 }
             }
         },
