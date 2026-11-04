@@ -1,16 +1,20 @@
 package com.andres.pillremind
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.collectAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.navigation.RootNavigationGraph
+import com.andres.pillremind.ui.screens.onboarding.OnboardingRoute
 import com.andres.pillremind.ui.theme.PillRemindTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -18,42 +22,39 @@ import javax.inject.Inject
 /**
  * Actividad principal de la aplicación.
  *
- * Se encarga de inicializar la interfaz Compose y solicitar el permiso de
- * notificaciones. El permiso de alarmas exactas se gestiona desde Ajustes para
- * no interrumpir al usuario con una redirección automática.
+ * Muestra la bienvenida de primer arranque hasta que el usuario la completa y,
+ * a partir de ahí, el grafo de navegación normal. Los permisos de
+ * notificaciones y alarmas exactas se solicitan desde esa bienvenida y desde
+ * Ajustes, nunca de forma automática en cada arranque.
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var sessionManager: SessionManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        requestNotificationPermissionIfNeeded()
-
         setContent {
-            val isDarkMode by sessionManager.isDarkMode.collectAsState(initial = false)
+            val isDarkMode by sessionManager.isDarkMode
+                .collectAsStateWithLifecycle(initialValue = false)
             PillRemindTheme(darkTheme = isDarkMode) {
-                RootNavigationGraph(navController = rememberNavController())
-            }
-        }
-    }
+                val onboardingCompleted by sessionManager.onboardingCompleted
+                    .collectAsStateWithLifecycle(initialValue = null)
 
-    // Lanzador para el permiso de notificaciones (Android 13+)
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { /* isGranted -> puedes reaccionar aquí si quieres */ }
+                when (onboardingCompleted) {
+                    // Mientras DataStore responde se evita mostrar la bienvenida
+                    // a usuarios que ya la completaron.
+                    null -> Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background),
+                    )
 
-    /**
-     * Solicita el permiso de notificaciones en Android 13 o superior si no está concedido.
-     */
-    private fun requestNotificationPermissionIfNeeded() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
-                != android.content.pm.PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    false -> OnboardingRoute()
+                    true -> RootNavigationGraph(navController = rememberNavController())
+                }
             }
         }
     }

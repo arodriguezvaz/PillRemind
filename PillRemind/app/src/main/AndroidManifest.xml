@@ -6,6 +6,13 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Necesario para comprobar si el sistema ofrece la pantalla de alarmas exactas. -->
+    <queries>
+        <intent>
+            <action android:name="android.settings.REQUEST_SCHEDULE_EXACT_ALARM" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:name=".PillRemindApp"

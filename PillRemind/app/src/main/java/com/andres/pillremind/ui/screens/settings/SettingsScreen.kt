@@ -1,13 +1,9 @@
 package com.andres.pillremind.ui.screens.settings
 
-import android.app.AlarmManager
-import android.content.Context
-import android.content.Intent
 import android.os.Build
-import android.provider.Settings
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -51,6 +48,16 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.andres.pillremind.R
+import com.andres.pillremind.notifications.ExactAlarmStatus
+import com.andres.pillremind.notifications.NotificationAction
+import com.andres.pillremind.notifications.NotificationStatus
+import com.andres.pillremind.notifications.POST_NOTIFICATIONS_PERMISSION
+import com.andres.pillremind.notifications.ReminderPermissions
+import com.andres.pillremind.notifications.appDetailsIntent
+import com.andres.pillremind.notifications.exactAlarmSettingsIntent
+import com.andres.pillremind.notifications.notificationSettingsIntent
+import com.andres.pillremind.notifications.resolveNotificationAction
+import com.andres.pillremind.notifications.shouldShowNotificationRationale
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.settings.SettingsCard
@@ -63,9 +70,9 @@ import com.andres.pillremind.ui.theme.AppSpacing
 /**
  * Pantalla de ajustes de la aplicación.
  *
- * Permite gestionar el modo oscuro, el estado del permiso de alarmas exactas y
- * la exportación e importación de una copia de seguridad local. Los datos de la
- * aplicación son siempre locales.
+ * Permite gestionar el modo oscuro, el estado de los permisos de
+ * notificaciones y alarmas exactas, y la exportación e importación de una copia
+ * de seguridad local. Los datos de la aplicación son siempre locales.
  *
  * @param navController Controlador de navegación para volver a la pantalla anterior.
  * @param topLevelRoutes Rutas principales que no muestran flecha de retroceso.
@@ -82,9 +89,55 @@ fun SettingsScreen(
     val backupState by settingsViewModel.backupState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
+    val activity = LocalActivity.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var exactAlarmsAllowed by remember { mutableStateOf(canScheduleExactAlarms(context)) }
+    val reminderPermissions = remember(context) { ReminderPermissions(context) }
+    var notificationStatus by remember {
+        mutableStateOf(reminderPermissions.notificationStatus())
+    }
+    var exactAlarmStatus by remember {
+        mutableStateOf(reminderPermissions.exactAlarmStatus())
+    }
+    var notificationRationale by remember {
+        mutableStateOf(shouldShowNotificationRationale(activity))
+    }
+    var notificationRequested by rememberSaveable { mutableStateOf(false) }
+    val notificationAction = resolveNotificationAction(
+        status = notificationStatus,
+        requested = notificationRequested,
+        showRationale = notificationRationale,
+    )
+
+    val notificationLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) {
+        notificationRequested = true
+        notificationStatus = reminderPermissions.notificationStatus()
+        notificationRationale = shouldShowNotificationRationale(activity)
+    }
+
+    val notificationStatusRes = when (notificationStatus) {
+        NotificationStatus.GRANTED -> R.string.settings_notifications_granted
+        NotificationStatus.REQUESTABLE -> R.string.settings_notifications_pending
+        NotificationStatus.BLOCKED -> R.string.settings_notifications_blocked
+    }
+    val notificationActionLabelRes: Int? = when (notificationAction) {
+        NotificationAction.REQUEST -> R.string.settings_notifications_allow
+        NotificationAction.OPEN_SETTINGS -> R.string.settings_notifications_open_settings
+        NotificationAction.NONE -> null
+    }
+    val exactAlarmStatusRes = when (exactAlarmStatus) {
+        ExactAlarmStatus.GRANTED -> R.string.settings_exact_alarms_granted
+        ExactAlarmStatus.PENDING -> R.string.settings_exact_alarms_disabled
+        ExactAlarmStatus.UNAVAILABLE -> R.string.onboarding_status_unavailable
+        ExactAlarmStatus.NOT_REQUIRED -> R.string.onboarding_status_not_required
+    }
+    val exactAlarmActionLabelRes: Int? = when (exactAlarmStatus) {
+        ExactAlarmStatus.PENDING -> R.string.settings_allow_exact_alarms
+        ExactAlarmStatus.UNAVAILABLE -> R.string.settings_open_app_settings
+        else -> null
+    }
 
     var showExportDialog by rememberSaveable { mutableStateOf(false) }
     var showImportConfirmation by rememberSaveable { mutableStateOf(false) }
@@ -149,9 +202,11 @@ fun SettingsScreen(
         }
     }
 
-    // Al volver de los ajustes del sistema se refresca el estado del permiso.
+    // Al volver de los ajustes del sistema se refrescan ambos permisos.
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        exactAlarmsAllowed = canScheduleExactAlarms(context)
+        notificationStatus = reminderPermissions.notificationStatus()
+        exactAlarmStatus = reminderPermissions.exactAlarmStatus()
+        notificationRationale = shouldShowNotificationRationale(activity)
     }
 
     Scaffold(
@@ -182,19 +237,47 @@ fun SettingsScreen(
                 )
             }
 
-            // Aviso de alarmas exactas: no se abre Ajustes automáticamente.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !exactAlarmsAllowed) {
-                SettingsCard(title = stringResource(R.string.settings_reminders_title)) {
-                    Text(
-                        text = stringResource(R.string.settings_exact_alarms_disabled),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(Modifier.height(AppSpacing.sm))
-                    AppButton(
-                        text = stringResource(R.string.settings_allow_exact_alarms),
-                        onClick = { openExactAlarmSettings(context) },
-                        size = ButtonSize.Large
+            // Estado de los permisos de recordatorios.
+            SettingsCard(title = stringResource(R.string.settings_reminders_title)) {
+                ReminderPermissionRow(
+                    title = stringResource(R.string.settings_notifications_title),
+                    description = stringResource(R.string.settings_notifications_description),
+                    statusText = stringResource(notificationStatusRes),
+                    actionLabel = notificationActionLabelRes?.let { stringResource(it) },
+                    onAction = {
+                        when (notificationAction) {
+                            NotificationAction.REQUEST ->
+                                notificationLauncher.launch(POST_NOTIFICATIONS_PERMISSION)
+
+                            NotificationAction.OPEN_SETTINGS ->
+                                runCatching {
+                                    context.startActivity(notificationSettingsIntent(context))
+                                }
+
+                            NotificationAction.NONE -> Unit
+                        }
+                    },
+                )
+
+                if (exactAlarmStatus != ExactAlarmStatus.NOT_REQUIRED) {
+                    Spacer(Modifier.height(AppSpacing.md))
+                    ReminderPermissionRow(
+                        title = stringResource(R.string.settings_exact_alarms_title),
+                        description = stringResource(R.string.settings_exact_alarms_description),
+                        statusText = stringResource(exactAlarmStatusRes),
+                        actionLabel = exactAlarmActionLabelRes?.let { stringResource(it) },
+                        onAction = {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                val intent = exactAlarmSettingsIntent(context)
+                                val opened = intent != null &&
+                                    runCatching { context.startActivity(intent) }.isSuccess
+                                if (!opened) {
+                                    runCatching {
+                                        context.startActivity(appDetailsIntent(context))
+                                    }
+                                }
+                            }
+                        },
                     )
                 }
             }
@@ -573,31 +656,45 @@ private fun ImportPasswordDialog(
 }
 
 /**
- * Comprueba si la app puede programar alarmas exactas.
+ * Fila con el estado y la acción de un permiso de recordatorios.
  *
- * En Android 11 y anteriores el permiso no existe, así que se considera concedido.
+ * @param title Nombre del permiso.
+ * @param description Explicación breve de para qué se usa.
+ * @param statusText Estado actual ya traducido.
+ * @param actionLabel Texto del botón, o `null` si no hace falta acción.
+ * @param onAction Acción para solicitar el permiso o abrir los ajustes.
  */
-private fun canScheduleExactAlarms(context: Context): Boolean {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
-    return context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()
-}
-
-/**
- * Abre la pantalla del sistema para conceder el permiso de alarmas exactas.
- */
-@RequiresApi(Build.VERSION_CODES.S)
-private fun openExactAlarmSettings(context: Context) {
-    val packageUri = "package:${context.packageName}".toUri()
-    val exactAlarmIntent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, packageUri)
-
-    runCatching { context.startActivity(exactAlarmIntent) }
-        .onFailure {
-            // Algunos fabricantes no exponen la pantalla anterior; se usa la ficha
-            // de la app como alternativa.
-            runCatching {
-                context.startActivity(
-                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
-                )
-            }
-        }
+@Composable
+private fun ReminderPermissionRow(
+    title: String,
+    description: String,
+    statusText: String,
+    actionLabel: String?,
+    onAction: () -> Unit,
+) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleSmall,
+        fontWeight = FontWeight.Bold,
+    )
+    Spacer(Modifier.height(AppSpacing.xxs))
+    Text(
+        text = statusText,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Spacer(Modifier.height(AppSpacing.xxs))
+    Text(
+        text = description,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    actionLabel?.let { label ->
+        Spacer(Modifier.height(AppSpacing.sm))
+        AppButton(
+            text = label,
+            onClick = onAction,
+            size = ButtonSize.Large,
+        )
+    }
 }
