@@ -4,3 +4,10 @@
 # Skills de agentes instaladas con autoskills (locales, no forman parte del proyecto)
 .agents/
 skills-lock.json
+
+# Binarios de compilación y credenciales locales (no versionar)
+*.apk
+*.aab
+*.jks
+*.keystore
+google-services.json
