@@ -42,6 +42,7 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
         val ACTIVE_USER_ID = intPreferencesKey("active_user_id")
         val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
         val LAST_GENERATED_DATE = stringPreferencesKey("ultima_generacion")
+        val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
     }
 
     val isDarkMode: Flow<Boolean> = context.dataStore.data
@@ -99,6 +100,26 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
         .map { preferences ->
             preferences[Keys.LAST_GENERATED_DATE]?.let { LocalDate.parse(it) }
         }
+
+    /**
+     * Indica si el usuario ya ha completado la pantalla de bienvenida.
+     *
+     * Por defecto devuelve `false`, de modo que la bienvenida se muestra en el
+     * primer arranque y una única vez.
+     */
+    val onboardingCompleted: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[Keys.ONBOARDING_COMPLETED] ?: false
+        }
+
+    /**
+     * Guarda que el usuario ya ha completado la bienvenida.
+     */
+    suspend fun completeOnboarding() {
+        context.dataStore.edit { preferences ->
+            preferences[Keys.ONBOARDING_COMPLETED] = true
+        }
+    }
 
     /**
      * Guarda la preferencia de modo oscuro.

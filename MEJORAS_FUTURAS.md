@@ -7,18 +7,30 @@ la deuda técnica se siguen registrando en el audit local `PillRemind/INCIDENCIA
 
 ### UI-04 · Gestionar el resultado del permiso de notificaciones
 
-- **Estado:** aplazada.
-- **Contexto:** `MainActivity` solicita `POST_NOTIFICATIONS`, pero el callback de
-  `requestPermissionLauncher` está vacío.
-- **Problema:** si el usuario deniega el permiso, la app no le explica que no
-  recibirá recordatorios visibles y puede pensar que la app está fallando.
-- **Propuesta:**
-  - mostrar un aviso en Ajustes o un snackbar cuando el permiso esté denegado;
-  - ofrecer un acceso directo a los ajustes de notificaciones de la app;
-  - no volver a solicitar el permiso automáticamente en cada arranque.
-- **Zonas afectadas:** `MainActivity`, `SettingsScreen`, `SettingsViewModel` o un
-  componente reutilizable de permisos.
-- **Prioridad:** baja/media; no bloquea el flujo actual.
+- **Estado:** implementada.
+- **Contexto:** `MainActivity` solicitaba `POST_NOTIFICATIONS` al arrancar y el
+  callback de `requestPermissionLauncher` estaba vacío.
+- **Implementación:** se eliminó la petición automática. La bienvenida de primer
+  arranque solicita las notificaciones y, si el usuario las deniega, le explica
+  que no recibirá recordatorios y le ofrece abrir los ajustes del sistema.
+  Ajustes muestra el estado de notificaciones y alarmas exactas con accesos
+  directos para corregirlos.
+- **Zonas afectadas:** `MainActivity`, `OnboardingScreen`, `OnboardingViewModel`,
+  `ReminderPermissions`, `SettingsScreen`.
+
+### Bienvenida de primer arranque
+
+- **Estado:** implementada.
+- **Contexto:** la app abría directamente la selección de perfiles y pedía las
+  notificaciones sin explicar para qué se usaban.
+- **Implementación:** pantalla única con la marca, las funciones principales y
+  dos tarjetas de permiso con su estado. Las notificaciones son obligatorias;
+  las alarmas exactas también, salvo que el dispositivo no permita concederlas,
+  en cuyo caso se ofrece continuar con un aviso de que los avisos pueden
+  retrasarse. El flag se guarda en DataStore y la bienvenida no vuelve a
+  aparecer.
+- **Zonas afectadas:** `SessionManager`, `MainActivity`, `OnboardingScreen`,
+  `OnboardingViewModel` y `ReminderPermissions`.
 
 ### UI-03 · Completar los enlaces legales de Ajustes
 
