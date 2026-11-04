@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -75,8 +76,8 @@ fun AppFormActions(
                 Surface(
                     onClick = onSecondaryClick,
                     modifier = Modifier
-                        .width(56.dp)
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .aspectRatio(1f),
                     shape = MaterialTheme.shapes.medium,
                     color = MaterialTheme.colorScheme.surface,
                     contentColor = secondaryContentColor,
