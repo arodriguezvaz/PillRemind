@@ -75,13 +75,11 @@ import com.andres.pillremind.ui.theme.AppSpacing
  * de seguridad local. Los datos de la aplicación son siempre locales.
  *
  * @param navController Controlador de navegación para volver a la pantalla anterior.
- * @param topLevelRoutes Rutas principales que no muestran flecha de retroceso.
  * @param settingsViewModel ViewModel encargado de la lógica de ajustes.
  */
 @Composable
 fun SettingsScreen(
     navController: NavHostController,
-    topLevelRoutes: Set<String>,
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
 
@@ -213,8 +211,8 @@ fun SettingsScreen(
         topBar = {
             MainTopBar(
                 state = TopBarState(title = stringResource(R.string.settings_title)),
-                navController = navController,
-                topLevelRoutes = topLevelRoutes
+                canGoBack = navController.previousBackStackEntry != null,
+                onBack = { navController.popBackStack() }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }

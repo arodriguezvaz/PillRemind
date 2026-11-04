@@ -5,9 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.visualState
@@ -26,13 +31,13 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
- * Título de la top bar de la pantalla de inicio, con la fecha del día.
+ * Fecha que encabeza la pantalla de inicio.
  *
- * Lo comparten [HomeScreen] y `MainScreen` para que el título se derive de la
- * ruta actual y no dependa de que la pantalla vuelva a componerse.
+ * Vive en el contenido, no en la top bar: la barra usa una sola línea y la
+ * fecha puede envolver a cualquier escala de fuente.
  */
 @Composable
-fun homeTopBarTitle(): String {
+private fun homeDateTitle(): String {
     val today = LocalDate.now()
     val datePattern = stringResource(R.string.home_date_pattern)
     val formattedDate = remember(today, datePattern) {
@@ -60,18 +65,26 @@ fun HomeScreen(
             .fillMaxSize()
             .padding(AppSpacing.md)
     ) {
+        Text(
+            text = homeDateTitle(),
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier
+                .padding(bottom = AppSpacing.sm)
+                .semantics { heading() }
+        )
 
         if (todayIntakes.isEmpty()) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .weight(1f)
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 BlankCard(stringResource(R.string.home_empty_today))
             }
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(), // importante
+                modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(vertical = AppSpacing.sm),
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
             ) {
