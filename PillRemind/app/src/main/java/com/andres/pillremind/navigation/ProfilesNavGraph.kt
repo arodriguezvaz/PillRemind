@@ -50,11 +50,9 @@ fun NavGraphBuilder.profileSelectionGraph(
                     sessionViewModel.setActiveProfile(perfil.id)
                     navController.navigate(Graph.MAIN)
                 },
-                navController = navController,
                 onSettingClicked = {
                     navController.navigate(ProfilesScreen.SettingsScreen.route)
-                },
-                topLevelRoutes = setOf(ProfilesScreen.ProfileSelectionScreen.route)
+                }
             )
         }
         //Pantalla de selección de creación de perfil
@@ -67,8 +65,8 @@ fun NavGraphBuilder.profileSelectionGraph(
                 topBar = {
                     MainTopBar(
                         state = topBarState,
-                        navController = navController,
-                        topLevelRoutes = setOf(ProfilesScreen.ProfileSelectionScreen.route)
+                        canGoBack = navController.previousBackStackEntry != null,
+                        onBack = { navController.popBackStack() }
                     )
                 }
             ) { paddingValues ->
@@ -89,10 +87,7 @@ fun NavGraphBuilder.profileSelectionGraph(
         }
         //Pantalla de configuración de la aplicación
         composable(ProfilesScreen.SettingsScreen.route) {
-            SettingsScreen(
-                navController = navController,
-                topLevelRoutes = setOf(ProfilesScreen.ProfileSelectionScreen.route)
-            )
+            SettingsScreen(navController = navController)
         }
     }
 }

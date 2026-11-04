@@ -39,9 +39,9 @@ la pantalla. Una pestaña nueva:
 - **No** tiene un `LaunchedEffect` para el título.
 - Añade su ruta al `when` de `TopBarState` en `MainScreen`.
 
-Si `MainScreen` todavía usa el patrón legado `onTopBarChange` +
-`LaunchedEffect`, aplica primero `top-bar.md`. Ese patrón puede dejar el título
-de la pantalla anterior al restaurar estado o cambiar de pestaña.
+`MainScreen` ya usa el patrón derivado de la ruta. Si en tu rama todavía tiene
+el estado global antiguo, aplica primero `top-bar.md`; no añadas otro
+`onTopBarChange`.
 
 ## 1. Strings
 
@@ -159,7 +159,7 @@ Añade la ruta al resolver de `TopBarState`:
 ```kotlin
 val defaultTopBarState = when (currentRoute) {
     BottomBarScreens.Home.route -> TopBarState(
-        title = homeTopBarTitle(),
+        title = "",          // la fecha vive en el contenido de Home
         showLogo = true,
     )
     BottomBarScreens.Medications.route -> TopBarState(
@@ -169,14 +169,16 @@ val defaultTopBarState = when (currentRoute) {
         title = stringResource(R.string.nav_history),
     )
     BottomBarScreens.Profile.route -> TopBarState(
-        title = stringResource(R.string.nav_profile),
+        title = stringResource(R.string.profile_view_title),
     )
     else -> TopBarState(title = stringResource(R.string.nav_home))
 }
 ```
 
 `currentRoute` sale de `navController.currentBackStackEntryAsState()`. Si
-`MainScreen` aún no lo tiene, adóptalo siguiendo `top-bar.md`.
+`MainScreen` aún no lo tiene, adóptalo siguiendo `top-bar.md`. La fecha de
+Inicio no va en la barra: `HomeScreen` la pinta como cabecera con
+`homeDateTitle()`.
 
 ### FAB: cuidado
 
@@ -351,6 +353,7 @@ Checklist específica de pestaña:
 |---|---|
 | Olvidar `topLevelRoutes` | Aparece flecha atrás en una pestaña principal. |
 | Usar `onTopBarChange` + `LaunchedEffect` | El título puede quedarse en la pantalla anterior al restaurar estado o cambiar de pestaña. |
+| Pasar `NavHostController` a `MainTopBar` | El componente deja de ser presentacional y duplica la lectura de la ruta. |
 | Olvidar la ruta en el `when` de `TopBarState` | La pestaña muestra el título por defecto. |
 | Añadir la ruta a `showFab` | El FAB abre la creación de medicamento. |
 | Añadir un `Scaffold` dentro de `MainScreen` | Doble barra, doble padding o contenido tapado. |

@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.ui.components.AppFab
@@ -40,18 +39,14 @@ import com.andres.pillremind.ui.screens.main.TopBarState
  * @param modifier Modificador opcional para la pantalla.
  * @param profilesViewModel ViewModel que gestiona la lógica de perfiles.
  * @param onSettingClicked Callback que se ejecuta al pulsar el botón de ajustes.
- * @param navController Controlador de navegación para la pantalla principal.
- * @param topLevelRoutes Rutas principales que no muestran flecha de retroceso.
  */
 @Composable
 fun ProfilesScreen(
     onAddClicked: () -> Unit,
     onProfileSelected: (Profile) -> Unit,
     modifier: Modifier = Modifier,
-    navController: NavHostController,
     profilesViewModel: ProfilesViewModel = hiltViewModel(),
     onSettingClicked: () -> Unit,
-    topLevelRoutes: Set<String>,
 ) {
 
     LaunchedEffect(Unit) {
@@ -74,8 +69,7 @@ fun ProfilesScreen(
         topBar = {
             MainTopBar(
                 state = topBarState,
-                navController = navController,
-                topLevelRoutes = topLevelRoutes
+                canGoBack = false
             )
         },
         floatingActionButton = {

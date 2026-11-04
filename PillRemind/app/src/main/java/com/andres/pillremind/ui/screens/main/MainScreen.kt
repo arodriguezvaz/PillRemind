@@ -18,7 +18,6 @@ import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
 import com.andres.pillremind.navigation.ProfileScreens
 import com.andres.pillremind.ui.components.AppFab
-import com.andres.pillremind.ui.screens.home.homeTopBarTitle
 
 /**
  * Pantalla principal de la aplicación.
@@ -38,10 +37,21 @@ fun MainScreen(
     val currentRoute = navBackStackEntry?.destination?.route
     val showFab =
         currentRoute == BottomBarScreens.Home.route || currentRoute == BottomBarScreens.Medications.route
+    val topLevelRoutes = remember {
+        setOf(
+            BottomBarScreens.Home.route,
+            BottomBarScreens.Medications.route,
+            BottomBarScreens.Profile.route
+        )
+    }
+    val canGoBack = currentRoute !in topLevelRoutes &&
+        navController.previousBackStackEntry != null
 
     val defaultTopBarState = when (currentRoute) {
         BottomBarScreens.Home.route -> TopBarState(
-            title = homeTopBarTitle(),
+            // En Inicio la barra muestra el logo y la fecha vive en el
+            // contenido de HomeScreen, para no apilar dos líneas.
+            title = "",
             showLogo = true
         )
         BottomBarScreens.Medications.route -> TopBarState(
@@ -62,7 +72,7 @@ fun MainScreen(
         MedicationScreens.ArchivedMedicationsScreen.route -> TopBarState(
             title = stringResource(R.string.medication_archived_title)
         )
-        else -> TopBarState(title = homeTopBarTitle(), showLogo = true)
+        else -> TopBarState(title = stringResource(R.string.nav_home))
     }
 
     // Los títulos estáticos se derivan de la ruta actual. El mapa solo guarda
@@ -74,20 +84,13 @@ fun MainScreen(
         statesByRoute = topBarStates,
         fallback = defaultTopBarState
     )
-    val topLevelRoutes = remember {
-        setOf(
-            BottomBarScreens.Home.route,
-            BottomBarScreens.Medications.route,
-            BottomBarScreens.Profile.route
-        )
-    }
 
     Scaffold(
         topBar = {
             MainTopBar(
                 state = topBarState,
-                navController = navController,
-                topLevelRoutes = topLevelRoutes
+                canGoBack = canGoBack,
+                onBack = { navController.popBackStack() }
             )
         },
         bottomBar = { MainBottomBar(navController = navController) },
