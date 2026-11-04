@@ -8,6 +8,10 @@ description: Úsala al crear o modificar pantallas, pestañas, componentes o est
 Sistema visual y convenciones de interfaz de la app. Léela antes de tocar
 `PillRemind/app/src/main/java/com/andres/pillremind/ui/` o la navegación.
 
+Esta skill no repite las skills `android-*`: recoge solo las decisiones de UI
+propias de PillRemind (tokens, componentes, pantallas, top bar y navegación
+visual).
+
 ## Fuentes de verdad
 
 | Tema | Archivo |
@@ -21,10 +25,14 @@ Sistema visual y convenciones de interfaz de la app. Léela antes de tocar
 | Componentes | `ui/components/` y `ui/components/settings/` |
 | Pantallas | `ui/screens/` |
 | Navegación | `navigation/` |
+| Top bar | `ui/screens/main/` (`MainScreen`, `TopBarState`, `MainTopBar`) |
 | Textos | `app/src/main/res/values/strings.xml` |
 
-Si el código y esta skill discrepan, manda el código. Si el cambio es
-intencionado, actualiza la skill en el mismo cambio.
+Si el código y esta skill discrepan, manda el código. La excepción es la top
+bar: el patrón `onTopBarChange` + `LaunchedEffect` que aún existe en pantallas
+antiguas es legado; para pestañas nuevas manda el patrón derivado de la ruta
+(`references/top-bar.md`). Si el cambio es intencionado, actualiza la skill en
+el mismo cambio.
 
 ## Principios
 
@@ -127,9 +135,11 @@ Catálogo detallado en `references/components.md`.
   secciones con `AppFormSection`; cierre con `AppFormActions`.
 - **Card:** `Card(shape = MaterialTheme.shapes.large,
   colors = surface, elevation = AppElevation)`.
-- **Navegación:** `MainScreen` aporta `MainTopBar` y `MainBottomBar`. Cada
-  pantalla informa su `TopBarState` con `onTopBarChange` dentro de un
-  `LaunchedEffect`.
+- **Navegación:** `MainScreen` deriva `TopBarState` de la ruta actual
+  (`currentBackStackEntryAsState()`) y de un `when` de rutas. La pantalla no
+  empuja su título. El patrón `onTopBarChange` + `LaunchedEffect` es legado y
+  puede dejar la top bar desincronizada; no lo uses en pestañas nuevas. Detalle
+  en `references/top-bar.md`.
 - **Ajustes:** una `SettingsCard` por bloque, con `SettingsToggleItem` o
   `SettingsLinkItem` dentro.
 - **Detalle:** si la pantalla vive fuera de `MainScreen` y necesita su propio
@@ -145,7 +155,10 @@ strings, FAB, esqueleto de pantalla y checklist.
 Reglas rápidas:
 
 - Una pestaña de primer nivel se añade a `BottomBarScreens`, `MainBottomBar`,
-  `MainNavigationGraph` y `MainScreen.topLevelRoutes`.
+  `MainNavigationGraph`, `MainScreen.topLevelRoutes` y al resolver de
+  `TopBarState` de `MainScreen`.
+- No añadas `onTopBarChange` ni un `LaunchedEffect` para el título: la ruta
+  nueva va al `when` de `MainScreen` (`references/top-bar.md`).
 - El FAB de `MainScreen` está cableado a la creación de medicamentos. No añadas
   una ruta nueva a `showFab` si su acción no es esa. Si la pestaña necesita
   crear, generaliza el FAB de `MainScreen` con una acción por ruta o abre la
@@ -188,7 +201,8 @@ JAVA_HOME=/opt/android-studio/jbr ./gradlew assembleDebug
 - [ ] `AppSpacing` en paddings, spacers y separaciones.
 - [ ] Textos en `strings.xml` y `contentDescription` correctos.
 - [ ] Comprobado en claro y oscuro, y con texto grande.
-- [ ] La pantalla informa su `TopBarState` si vive en `MainScreen`.
+- [ ] La pestaña nueva está en el resolver de `TopBarState` de `MainScreen`;
+      no usa `onTopBarChange` ni un `LaunchedEffect` para el título.
 - [ ] Si es pestaña, seguí `references/new-tab.md`.
 - [ ] Componente nuevo: KDoc + `@Preview`.
 - [ ] `assembleDebug` compila.
@@ -199,4 +213,6 @@ JAVA_HOME=/opt/android-studio/jbr ./gradlew assembleDebug
   espaciado y elevación.
 - `references/components.md`: ficha y uso de cada componente.
 - `references/screens.md`: estructura de las pantallas actuales.
+- `references/top-bar.md`: top bar derivada de la ruta y migración del patrón
+  legado.
 - `references/new-tab.md`: receta completa para añadir una pestaña.
