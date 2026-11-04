@@ -34,3 +34,14 @@ data class Medication(
     val updatedAt: LocalDateTime = LocalDateTime.now(),
     val deletedAt: LocalDateTime? = null
 )
+
+/**
+ * Indica si el tratamiento ya terminó.
+ *
+ * Un medicamento crónico no se considera terminado aunque tenga una fecha de
+ * fin antigua, porque la app no lo trata como un tratamiento cerrado.
+ *
+ * @param today Fecha usada como referencia.
+ */
+fun Medication.isFinished(today: LocalDate = LocalDate.now()): Boolean =
+    !isChronic && endDate != null && endDate.isBefore(today)

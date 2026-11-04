@@ -6,12 +6,14 @@ import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.repository.MedicationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 
@@ -25,6 +27,7 @@ import kotlinx.coroutines.flow.stateIn
  * @property sessionManager Gestor de sesión que expone el perfil activo.
  */
 @HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
 class MedicationsViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
     sessionManager: SessionManager
@@ -51,5 +54,18 @@ class MedicationsViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
+
+    /**
+     * Número de medicamentos archivados del perfil activo.
+     */
+    val archivedCount = profileId.flatMapLatest { id ->
+        if (id != null) medicationRepository.getArchivedMedications(id)
+        else flowOf(emptyList())
+    }.map { archived -> archived.size }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0
+        )
 
 }

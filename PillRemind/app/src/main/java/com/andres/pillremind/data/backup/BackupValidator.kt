@@ -48,7 +48,6 @@ object BackupValidator {
         val userIds = file.users.map { it.id }.toSet()
         val profileIds = file.profiles.map { it.id }.toSet()
         val medicationIds = file.medications.map { it.id }.toSet()
-        val scheduleIds = file.schedules.map { it.id }.toSet()
 
         file.users.forEach { user ->
             requirePositiveId(user.id, "usuario")
@@ -82,17 +81,23 @@ object BackupValidator {
             if (medication.name.isBlank()) {
                 throw invalidData("La copia contiene un medicamento sin nombre")
             }
-            if (!medication.dose.isFinite()) {
+            if (!medication.dose.isFinite() || medication.dose <= 0.0) {
                 throw invalidData("La dosis de ${medication.name} no es válida")
             }
             validateImagePath(medication.imagePath, "el medicamento ${medication.name}")
-            parseBackupDate(medication.startDate, "medicamento")
-            medication.endDate?.let { parseBackupDate(it, "medicamento") }
+            val startDate = parseBackupDate(medication.startDate, "medicamento")
+            val endDate = medication.endDate?.let { parseBackupDate(it, "medicamento") }
+            if (endDate != null && endDate.isBefore(startDate)) {
+                throw invalidData(
+                    "El medicamento ${medication.name} termina antes de empezar"
+                )
+            }
             parseBackupDateTime(medication.createdAt, "medicamento")
             parseBackupDateTime(medication.updatedAt, "medicamento")
             medication.deletedAt?.let { parseBackupDateTime(it, "medicamento") }
         }
 
+        val scheduleMedicationById = file.schedules.associate { it.id to it.medicationId }
         file.schedules.forEach { schedule ->
             requirePositiveId(schedule.id, "horario")
             if (schedule.medicationId !in medicationIds) {
@@ -109,11 +114,15 @@ object BackupValidator {
                 throw invalidData("Una toma referencia un medicamento inexistente")
             }
             intake.scheduleId?.let { scheduleId ->
-                if (scheduleId !in scheduleIds) {
-                    throw invalidData("Una toma referencia un horario inexistente")
+                val scheduleMedicationId = scheduleMedicationById[scheduleId]
+                    ?: throw invalidData("Una toma referencia un horario inexistente")
+                if (scheduleMedicationId != intake.medicationId) {
+                    throw invalidData(
+                        "Una toma referencia el horario de otro medicamento"
+                    )
                 }
             }
-            if (!intake.doseSnapshot.isFinite()) {
+            if (!intake.doseSnapshot.isFinite() || intake.doseSnapshot < 0.0) {
                 throw invalidData("Una toma contiene una dosis no válida")
             }
             val scheduledAt = parseBackupDateTime(intake.scheduledAt, "toma")

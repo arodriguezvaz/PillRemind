@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +41,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
+import com.andres.pillremind.domain.model.parseDose
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormActions
@@ -119,8 +120,10 @@ fun MedicationScreen(
     onTopBarChange: (TopBarState) -> Unit = {},
     medicationViewModel: MedicationViewModel = hiltViewModel()
 ) {
-    val medication by medicationViewModel.medication.collectAsState()
-    val medicationSchedules by medicationViewModel.schedules.collectAsState()
+    val medication by medicationViewModel.medication.collectAsStateWithLifecycle()
+    val medicationSchedules by medicationViewModel.schedules.collectAsStateWithLifecycle()
+    val isSaving by medicationViewModel.isSaving.collectAsStateWithLifecycle()
+    val saveErrorRes by medicationViewModel.errorRes.collectAsStateWithLifecycle()
 
     val unitOptions = stringArrayResource(R.array.medication_units).toList()
     val datePattern = stringResource(R.string.common_date_pattern)
@@ -223,16 +226,21 @@ fun MedicationScreen(
     }
 
     val scrollState = rememberScrollState()
+    val doseValue = parseDose(dose.value)
+    val dateRangeInvalid = startDate.value != null &&
+        endDate.value != null &&
+        endDate.value!!.isBefore(startDate.value!!)
     val isFormValid = name.value.isNotBlank() &&
-            dose.value.isNotBlank() &&
+            doseValue != null &&
             unit.value.isNotBlank() &&
             startDate.value != null &&
+            !dateRangeInvalid &&
             scheduleForm.isValid() &&
             (isChronicTreatment.value || endDate.value != null)
 
     val missingFields = mutableListOf<String>()
     if (name.value.isBlank()) missingFields.add(stringResource(R.string.nombre))
-    if (dose.value.toDoubleOrNull() == null) missingFields.add(stringResource(R.string.dosis))
+    if (doseValue == null) missingFields.add(stringResource(R.string.dosis))
     if (unit.value.isBlank()) missingFields.add(stringResource(R.string.unidad))
     if (startDate.value == null) missingFields.add(stringResource(R.string.fecha_inicio))
     if (!isChronicTreatment.value && endDate.value == null) {
@@ -242,10 +250,10 @@ fun MedicationScreen(
         missingFields.add(stringResource(R.string.medication_missing_schedule))
     }
 
-    val missingFieldsMessage = if (isFormValid) {
-        null
-    } else {
-        stringResource(R.string.save_missing_fields, missingFields.joinToString(", "))
+    val missingFieldsMessage = when {
+        isFormValid -> null
+        dateRangeInvalid -> stringResource(R.string.medication_end_before_start)
+        else -> stringResource(R.string.save_missing_fields, missingFields.joinToString(", "))
     }
 
     when (currentMode) {
@@ -346,6 +354,7 @@ fun MedicationScreen(
                                     value = startDate.value,
                                     onDateSelected = { startDate.value = it },
                                     enabled = true,
+                                    maxDate = endDate.value,
                                 )
                             }
                         },
@@ -378,12 +387,13 @@ fun MedicationScreen(
                 AppFormActions(
                     primaryText = stringResource(R.string.guardar),
                     onPrimaryClick = {
+                        val validDose = doseValue ?: return@AppFormActions
                         medicationViewModel.addMedication(
                             nombre = name.value,
                             photoUri = selectedPhotoUri,
-                            dose = dose.value.toDoubleOrNull() ?: 0.0,
+                            dose = validDose,
                             unit = unit.value,
-                            startDate = startDate.value!!,
+                            startDate = startDate.value ?: return@AppFormActions,
                             endDate = endDate.value,
                             scheduleRules = scheduleForm.rules(),
                             times = scheduleForm.times,
@@ -391,7 +401,8 @@ fun MedicationScreen(
                             onSaved = onSaveClicked
                         )
                     },
-                    primaryEnabled = isFormValid,
+                    primaryEnabled = isFormValid && !isSaving,
+                    primaryLoading = isSaving,
                     supportingText = missingFieldsMessage,
                 )
             }
@@ -490,7 +501,8 @@ fun MedicationScreen(
                                 AppDatePickerField(
                                     value = startDate.value,
                                     onDateSelected = { startDate.value = it },
-                                    enabled = true
+                                    enabled = true,
+                                    maxDate = endDate.value,
                                 )
                             }
                         },
@@ -523,13 +535,14 @@ fun MedicationScreen(
                 AppFormActions(
                     primaryText = stringResource(R.string.guardar),
                     onPrimaryClick = {
+                        val validDose = doseValue ?: return@AppFormActions
                         medicationViewModel.updateMedication(
                             name = name.value,
                             newPhotoUri = newPhotoUri,
                             currentImagePath = currentImagePath,
-                            dose = dose.value.toDoubleOrNull() ?: 0.0,
+                            dose = validDose,
                             unit = unit.value,
-                            startDate = startDate.value!!,
+                            startDate = startDate.value ?: return@AppFormActions,
                             endDate = endDate.value,
                             scheduleRules = scheduleForm.rules(),
                             times = scheduleForm.times,
@@ -540,7 +553,8 @@ fun MedicationScreen(
                             }
                         )
                     },
-                    primaryEnabled = isFormValid,
+                    primaryEnabled = isFormValid && !isSaving,
+                    primaryLoading = isSaving,
                     supportingText = missingFieldsMessage,
                     secondaryIcon = Icons.Rounded.Archive,
                     secondaryContentDescription = stringResource(R.string.medication_archive),
@@ -642,6 +656,19 @@ fun MedicationScreen(
                     }
                 ) {
                     Text(stringResource(R.string.common_cancel))
+                }
+            }
+        )
+    }
+
+    saveErrorRes?.let { messageRes ->
+        AlertDialog(
+            onDismissRequest = medicationViewModel::clearError,
+            title = { Text(stringResource(R.string.medication_save_error_title)) },
+            text = { Text(stringResource(messageRes)) },
+            confirmButton = {
+                TextButton(onClick = medicationViewModel::clearError) {
+                    Text(stringResource(R.string.common_ok))
                 }
             }
         )

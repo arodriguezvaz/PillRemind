@@ -151,9 +151,12 @@ fun AppDatePickerField(
                     onClick = {
                         val selectedMillis = datePickerState.selectedDateMillis
                         if (selectedMillis != null) {
+                            // DatePicker representa los días como medianoche UTC.
+                            // Se usa la misma zona al leer y al escribir para que
+                            // el día seleccionado no cambie según la zona local.
                             val selectedDate =
                                 Instant.ofEpochMilli(selectedMillis)
-                                    .atZone(ZoneId.systemDefault())
+                                    .atZone(ZoneId.of("UTC"))
                                     .toLocalDate()
 
                             onDateSelected(selectedDate)
