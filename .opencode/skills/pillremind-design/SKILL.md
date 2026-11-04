@@ -154,8 +154,8 @@ Reglas rápidas:
   `MainScreen`).
 - No añadas una pestaña de detalle a la barra inferior: usa un destino anidado.
 - La barra inferior solo se muestra cuando la ruta actual coincide exactamente
-  con una ruta de `BottomBarScreens`; comprueba este comportamiento si usas un
-  subgrafo.
+  con una ruta de `BottomBarScreens`; si usas un subgrafo, comprueba también que
+  no aparezca la flecha atrás en su pantalla inicial.
 
 ## Strings y accesibilidad
 
