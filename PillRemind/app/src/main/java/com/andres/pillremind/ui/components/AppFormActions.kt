@@ -15,9 +15,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppSpacing
 
 /**
@@ -36,6 +39,7 @@ import com.andres.pillremind.ui.theme.AppSpacing
  *   campos que faltan por completar.
  * @param secondaryIcon Icono de la acción secundaria; si es null no se muestra.
  * @param secondaryContentDescription Descripción accesible de la acción secundaria.
+ * @param secondaryContentColor Color del icono de la acción secundaria.
  * @param onSecondaryClick Acción que se ejecuta al pulsar el botón secundario.
  */
 @Composable
@@ -47,6 +51,7 @@ fun AppFormActions(
     supportingText: String? = null,
     secondaryIcon: ImageVector? = null,
     secondaryContentDescription: String? = null,
+    secondaryContentColor: Color = MaterialTheme.colorScheme.primary,
     onSecondaryClick: (() -> Unit)? = null,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -65,11 +70,16 @@ fun AppFormActions(
                 Spacer(modifier = Modifier.width(AppSpacing.md))
                 FilledTonalIconButton(
                     onClick = onSecondaryClick,
-                    modifier = Modifier.size(56.dp),
+                    modifier = Modifier
+                        .size(56.dp)
+                        .shadow(
+                            elevation = AppElevation,
+                            shape = MaterialTheme.shapes.medium,
+                        ),
                     shape = MaterialTheme.shapes.medium,
                     colors = IconButtonDefaults.filledTonalIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.error,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = secondaryContentColor,
                     ),
                 ) {
                     Icon(

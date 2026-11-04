@@ -300,6 +300,7 @@ fun ProfileScreen(
                         onPrimaryClick = { currentMode = ProfileMode.Edit },
                         secondaryIcon = Icons.Rounded.Delete,
                         secondaryContentDescription = stringResource(R.string.eliminar),
+                        secondaryContentColor = MaterialTheme.colorScheme.error,
                         onSecondaryClick = { perfil?.let { showDeleteDialog = true } },
                     )
                 }
