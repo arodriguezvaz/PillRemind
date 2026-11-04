@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
@@ -51,6 +52,7 @@ import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.labelRes
+import com.andres.pillremind.ui.screens.main.TopBarAction
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
 import java.io.File
@@ -132,9 +134,23 @@ fun ProfileScreen(
         ProfileMode.View -> stringResource(R.string.profile_view_title)
         ProfileMode.Edit -> stringResource(R.string.profile_edit_title)
     }
+    val backContentDescription = stringResource(R.string.common_back)
 
-    LaunchedEffect(topBarTitle) {
-        onTopBarChange(TopBarState(title = topBarTitle))
+    LaunchedEffect(currentMode, topBarTitle) {
+        onTopBarChange(
+            TopBarState(
+                title = topBarTitle,
+                navigationAction = if (currentMode == ProfileMode.Edit) {
+                    TopBarAction(
+                        icon = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = backContentDescription,
+                        onClick = { currentMode = ProfileMode.View }
+                    )
+                } else {
+                    null
+                }
+            )
+        )
     }
 
     BackHandler(enabled = currentMode == ProfileMode.Edit) {

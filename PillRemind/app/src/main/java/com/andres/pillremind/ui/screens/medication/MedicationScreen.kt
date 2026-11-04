@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
@@ -53,6 +54,7 @@ import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
+import com.andres.pillremind.ui.screens.main.TopBarAction
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
 import java.io.File
@@ -200,8 +202,22 @@ fun MedicationScreen(
         MedicationMode.View -> stringResource(R.string.medication_view_title)
         MedicationMode.Edit -> stringResource(R.string.medication_edit_title)
     }
+    val backContentDescription = stringResource(R.string.common_back)
     LaunchedEffect(currentMode, topBarTitle) {
-        onTopBarChange(TopBarState(title = topBarTitle))
+        onTopBarChange(
+            TopBarState(
+                title = topBarTitle,
+                navigationAction = if (currentMode == MedicationMode.Edit) {
+                    TopBarAction(
+                        icon = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = backContentDescription,
+                        onClick = { currentMode = MedicationMode.View }
+                    )
+                } else {
+                    null
+                }
+            )
+        )
     }
     //Si está en la vista de editar y se pulsa el botón de back se vuelve a la vista de ver
     BackHandler(enabled = currentMode == MedicationMode.Edit) {
