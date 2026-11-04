@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +20,6 @@ import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppSearchField
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.MedicationCard
-import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
 
 /**
@@ -29,25 +27,19 @@ import com.andres.pillremind.ui.theme.AppSpacing
  *
  * @param modifier Modificador opcional para la pantalla.
  * @param onMedicationClick Callback que recibe el id del medicamento seleccionado.
- * @param onTopBarChange Callback para actualizar el estado de la TopBar.
  * @param medicationsViewModel ViewModel que gestiona la lógica de medicamentos.
  */
 @Composable
 fun MedicationsScreen(
     modifier: Modifier = Modifier,
     onMedicationClick: (medicationId: Int) -> Unit,
-    onTopBarChange: (TopBarState) -> Unit = {},
     medicationsViewModel: MedicationsViewModel = hiltViewModel()
 ) {
 
     val medications by medicationsViewModel.medications.collectAsStateWithLifecycle()
     val searchQuery by medicationsViewModel.searchQuery.collectAsStateWithLifecycle()
-    val title = stringResource(R.string.nav_medications)
     val query = searchQuery.trim()
 
-    LaunchedEffect(title) {
-        onTopBarChange(TopBarState(title = title))
-    }
     Column(
         modifier = modifier
             .fillMaxSize()

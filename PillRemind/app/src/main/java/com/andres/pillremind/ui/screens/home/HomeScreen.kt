@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -21,41 +20,41 @@ import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.visualState
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.IntakeCard
-import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
- * Pantalla principal que muestra la lista de medicamentos del perfil activo.
+ * Título de la top bar de la pantalla de inicio, con la fecha del día.
  *
- * Obtiene el [HomeViewModel] vía Hilt y observa la lista de medicamentos.
+ * Lo comparten [HomeScreen] y `MainScreen` para que el título se derive de la
+ * ruta actual y no dependa de que la pantalla vuelva a componerse.
+ */
+@Composable
+fun homeTopBarTitle(): String {
+    val today = LocalDate.now()
+    val datePattern = stringResource(R.string.home_date_pattern)
+    val formattedDate = remember(today, datePattern) {
+        today.format(DateTimeFormatter.ofPattern(datePattern, Locale.forLanguageTag("es")))
+    }
+    return stringResource(R.string.home_title_today, formattedDate)
+}
+
+/**
+ * Pantalla principal que muestra las tomas del día.
+ *
+ * Obtiene el [HomeViewModel] vía Hilt y observa la lista de tomas.
  *
  * @param modifier Modificador opcional para la pantalla.
  */
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    onTopBarChange: (TopBarState) -> Unit = {},
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
     val todayIntakes by homeViewModel.todayIntakes.collectAsState()
-    val today = LocalDate.now()
-    val datePattern = stringResource(R.string.home_date_pattern)
-    val formattedDate = remember(today, datePattern) {
-        today.format(DateTimeFormatter.ofPattern(datePattern, Locale.forLanguageTag("es")))
-    }
-    val title = stringResource(R.string.home_title_today, formattedDate)
-    LaunchedEffect(title) {
-        onTopBarChange(
-            TopBarState(
-                title = title,
-                showLogo = true
-            )
-        )
-    }
     Column(
         modifier = modifier
             .fillMaxSize()
