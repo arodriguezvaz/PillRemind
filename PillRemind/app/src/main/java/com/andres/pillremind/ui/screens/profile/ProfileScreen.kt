@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
@@ -38,9 +41,8 @@ import com.andres.pillremind.domain.model.Sex
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
-import com.andres.pillremind.ui.components.AppFormActionBar
+import com.andres.pillremind.ui.components.AppFormActions
 import com.andres.pillremind.ui.components.AppFormField
-import com.andres.pillremind.ui.components.AppFormScaffold
 import com.andres.pillremind.ui.components.AppFormSection
 import com.andres.pillremind.ui.components.AppInfoCard
 import com.andres.pillremind.ui.components.AppInfoRow
@@ -177,8 +179,8 @@ fun ProfileScreen(
                 onMedicalNotesChange = { medicalNotes.value = it },
                 healthCardNumber = healthCardNumber.value,
                 onHealthCardNumberChange = { healthCardNumber.value = it },
-                actionBar = {
-                    AppFormActionBar(
+                footer = {
+                    AppFormActions(
                         primaryText = stringResource(R.string.guardar),
                         onPrimaryClick = {
                             profileViewModel.addProfile(
@@ -224,8 +226,8 @@ fun ProfileScreen(
                 onMedicalNotesChange = { medicalNotes.value = it },
                 healthCardNumber = healthCardNumber.value,
                 onHealthCardNumberChange = { healthCardNumber.value = it },
-                actionBar = {
-                    AppFormActionBar(
+                footer = {
+                    AppFormActions(
                         primaryText = stringResource(R.string.guardar),
                         onPrimaryClick = {
                             profileViewModel.updateProfile(
@@ -293,9 +295,7 @@ fun ProfileScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                },
-                actionBar = {
-                    AppFormActionBar(
+                    AppFormActions(
                         primaryText = stringResource(R.string.editar),
                         onPrimaryClick = { currentMode = ProfileMode.Edit },
                         secondaryIcon = Icons.Rounded.Delete,
@@ -376,7 +376,6 @@ private fun ProfileForm(
     onMedicalNotesChange: (String) -> Unit,
     healthCardNumber: String,
     onHealthCardNumberChange: (String) -> Unit,
-    actionBar: @Composable () -> Unit,
     footer: @Composable ColumnScope.() -> Unit = {},
 ) {
     val notSpecified = stringResource(R.string.profile_not_specified_short)
@@ -445,11 +444,13 @@ private fun ProfileForm(
     val showMedicalNotes = !hideEmptyFields || medicalNotes.isNotBlank()
     val showHealthCard = !hideEmptyFields || healthCardNumber.isNotBlank()
 
-    AppFormScaffold(
-        modifier = modifier,
-        scrollState = rememberScrollState(),
-        verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
-        actionBar = actionBar,
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+            .padding(AppSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.lg)
     ) {
         AppPhotoPicker(
             photoUri = photoUri,

@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
@@ -42,9 +44,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDropdownField
-import com.andres.pillremind.ui.components.AppFormActionBar
+import com.andres.pillremind.ui.components.AppFormActions
 import com.andres.pillremind.ui.components.AppFormField
-import com.andres.pillremind.ui.components.AppFormScaffold
 import com.andres.pillremind.ui.components.AppFormSection
 import com.andres.pillremind.ui.components.AppInfoCard
 import com.andres.pillremind.ui.components.AppInfoRow
@@ -234,31 +235,13 @@ fun MedicationScreen(
     when (currentMode) {
         //---------CREATE---------
         MedicationMode.Create -> {
-            AppFormScaffold(
-                modifier = modifier,
-                scrollState = scrollState,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                actionBar = {
-                    AppFormActionBar(
-                        primaryText = stringResource(R.string.guardar),
-                        onPrimaryClick = {
-                            medicationViewModel.addMedication(
-                                nombre = name.value,
-                                photoUri = selectedPhotoUri,
-                                dose = dose.value.toDoubleOrNull() ?: 0.0,
-                                unit = unit.value,
-                                startDate = startDate.value!!,
-                                endDate = endDate.value,
-                                scheduleRules = scheduleForm.rules(),
-                                times = scheduleForm.times,
-                                isChronic = isChronicTreatment.value,
-                                onSaved = onSaveClicked
-                            )
-                        },
-                        primaryEnabled = isFormValid,
-                        supportingText = missingFieldsMessage,
-                    )
-                }
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(AppSpacing.md)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 //-----IMAGEN
                 AppPhotoPicker(
@@ -375,42 +358,37 @@ fun MedicationScreen(
                         enabled = true
                     )
                 }
+                Spacer(modifier = Modifier.height(AppSpacing.xl))
+                AppFormActions(
+                    primaryText = stringResource(R.string.guardar),
+                    onPrimaryClick = {
+                        medicationViewModel.addMedication(
+                            nombre = name.value,
+                            photoUri = selectedPhotoUri,
+                            dose = dose.value.toDoubleOrNull() ?: 0.0,
+                            unit = unit.value,
+                            startDate = startDate.value!!,
+                            endDate = endDate.value,
+                            scheduleRules = scheduleForm.rules(),
+                            times = scheduleForm.times,
+                            isChronic = isChronicTreatment.value,
+                            onSaved = onSaveClicked
+                        )
+                    },
+                    primaryEnabled = isFormValid,
+                    supportingText = missingFieldsMessage,
+                )
             }
         }
         //----------EDIT-----------
         MedicationMode.Edit -> {
-            AppFormScaffold(
-                modifier = modifier,
-                scrollState = scrollState,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                actionBar = {
-                    AppFormActionBar(
-                        primaryText = stringResource(R.string.guardar),
-                        onPrimaryClick = {
-                            medicationViewModel.updateMedication(
-                                name = name.value,
-                                newPhotoUri = newPhotoUri,
-                                currentImagePath = currentImagePath,
-                                dose = dose.value.toDoubleOrNull() ?: 0.0,
-                                unit = unit.value,
-                                startDate = startDate.value!!,
-                                endDate = endDate.value,
-                                scheduleRules = scheduleForm.rules(),
-                                times = scheduleForm.times,
-                                isChronic = isChronicTreatment.value,
-                                onSaved = {
-                                    currentMode = MedicationMode.View
-                                    onSaveClicked()
-                                }
-                            )
-                        },
-                        primaryEnabled = isFormValid,
-                        supportingText = missingFieldsMessage,
-                        secondaryIcon = Icons.Rounded.Archive,
-                        secondaryContentDescription = stringResource(R.string.medication_archive),
-                        onSecondaryClick = { showArchiveDialog = true },
-                    )
-                }
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(AppSpacing.md)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AppPhotoPicker(
                     photoUri = newPhotoUri ?: currentImagePath?.let { Uri.fromFile(File(it)) },
@@ -525,23 +503,44 @@ fun MedicationScreen(
                         enabled = true
                     )
                 }
+                Spacer(modifier = Modifier.height(AppSpacing.xl))
+                AppFormActions(
+                    primaryText = stringResource(R.string.guardar),
+                    onPrimaryClick = {
+                        medicationViewModel.updateMedication(
+                            name = name.value,
+                            newPhotoUri = newPhotoUri,
+                            currentImagePath = currentImagePath,
+                            dose = dose.value.toDoubleOrNull() ?: 0.0,
+                            unit = unit.value,
+                            startDate = startDate.value!!,
+                            endDate = endDate.value,
+                            scheduleRules = scheduleForm.rules(),
+                            times = scheduleForm.times,
+                            isChronic = isChronicTreatment.value,
+                            onSaved = {
+                                currentMode = MedicationMode.View
+                                onSaveClicked()
+                            }
+                        )
+                    },
+                    primaryEnabled = isFormValid,
+                    supportingText = missingFieldsMessage,
+                    secondaryIcon = Icons.Rounded.Archive,
+                    secondaryContentDescription = stringResource(R.string.medication_archive),
+                    onSecondaryClick = { showArchiveDialog = true },
+                )
             }
         }
         //-------------SEE---------------
         MedicationMode.View -> {
-            AppFormScaffold(
-                modifier = modifier,
-                scrollState = scrollState,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                actionBar = {
-                    AppFormActionBar(
-                        primaryText = stringResource(R.string.editar),
-                        onPrimaryClick = { currentMode = MedicationMode.Edit },
-                        secondaryIcon = Icons.Rounded.Archive,
-                        secondaryContentDescription = stringResource(R.string.medication_archive),
-                        onSecondaryClick = { showArchiveDialog = true },
-                    )
-                }
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(AppSpacing.md)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AppPhotoPicker(
                     photoUri = selectedPhotoUri,
@@ -581,6 +580,14 @@ fun MedicationScreen(
                 AppInfoCard(title = stringResource(R.string.medication_schedule_section)) {
                     ScheduleReadOnly(form = scheduleForm)
                 }
+                Spacer(modifier = Modifier.height(AppSpacing.xl))
+                AppFormActions(
+                    primaryText = stringResource(R.string.editar),
+                    onPrimaryClick = { currentMode = MedicationMode.Edit },
+                    secondaryIcon = Icons.Rounded.Archive,
+                    secondaryContentDescription = stringResource(R.string.medication_archive),
+                    onSecondaryClick = { showArchiveDialog = true },
+                )
             }
         }
     }
