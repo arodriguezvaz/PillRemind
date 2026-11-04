@@ -1,5 +1,7 @@
 package com.andres.pillremind.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -28,6 +30,9 @@ import com.andres.pillremind.ui.screens.profile.ProfileScreen
  * El grafo se inicializa mostrando la pantalla de inicio y permite navegar
  * entre las secciones principales de la aplicación: inicio, medicamentos y perfil.
  *
+ * Los cambios de destino son inmediatos: se desactivan las transiciones de
+ * Navigation Compose para que moverse entre secciones no parezca lento.
+ *
  * @param navController Controlador de navegación utilizado dentro del grafo principal.
  * @param rootNavController Controlador de navegación raíz utilizado para realizar
  * navegaciones fuera de este grafo, como volver a la selección de perfiles.
@@ -46,7 +51,12 @@ fun MainNavigationGraph(
     NavHost(
         navController = navController,
         startDestination = BottomBarScreens.Home.route,
-        modifier = Modifier.padding(paddingValues)
+        modifier = Modifier.padding(paddingValues),
+        // Sin fundido: el cambio entre secciones debe ser inmediato.
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
     ) {
         //Home screen donde se ven las tomas del día
         composable(BottomBarScreens.Home.route) {
