@@ -116,6 +116,11 @@ sealed class HistoryScreens(val route: String) {
 }
 ```
 
+Al abrir un detalle, la barra inferior se oculta porque la ruta actual ya no
+coincide con `BottomBarScreens`; es el comportamiento actual, igual que en la
+ficha de medicamento. El detalle muestra flecha atrás y vuelve a la pestaña con
+`popBackStack()`.
+
 ## 5. `MainScreen`
 
 En `ui/screens/main/MainScreen.kt`:
@@ -165,9 +170,11 @@ tendrías dos top bars y doble padding. El patrón `ProfilesScreen`
 
 `MainBottomBar` solo se muestra cuando la ruta actual coincide exactamente con
 una ruta de `BottomBarScreens`. Si conviertes la pestaña en un subgrafo, la
-barra puede desaparecer en la pantalla inicial del subgrafo. Para una pestaña
-simple, usa un `composable` raíz; reserva `navigation(...)` para flujos con
-varias pantallas y verifica la barra inferior en cada destino.
+barra puede desaparecer en la pantalla inicial del subgrafo y, como la ruta
+actual será la del hijo, `topLevelRoutes` (que contiene la ruta del grafo) no la
+reconocerá y puede aparecer la flecha atrás. Para una pestaña simple, usa un
+`composable` raíz; reserva `navigation(...)` para flujos con varias pantallas y
+verifica la barra inferior y la flecha atrás en cada destino.
 
 ## 6. Esqueleto de la pantalla
 
