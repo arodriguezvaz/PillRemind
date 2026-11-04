@@ -1,8 +1,8 @@
 # Añadir una pestaña nueva
 
-Receta para una pestaña de primer nivel en la barra inferior. Si la pantalla es
-un detalle (ficha, edición, creación), no la añadas a la barra: créala como
-destino aparte y vuelve a la pestaña con `popBackStack()`.
+Receta para una pestaña de primer nivel en la barra inferior de PillRemind. Si
+la pantalla es un detalle (ficha, edición, creación), no la añadas a la barra:
+créala como destino aparte y vuelve a la pestaña con `popBackStack()`.
 
 ## Decisión previa
 
@@ -25,10 +25,23 @@ existente.
 | `navigation/BottomBarScreens.kt` | Nuevo `object` con ruta, título e icono |
 | `ui/screens/main/MainBottomBar.kt` | Añadir la pestaña a `screens` |
 | `navigation/MainNavGraph.kt` | `composable` de la pestaña |
-| `ui/screens/main/MainScreen.kt` | Añadir la ruta a `topLevelRoutes` |
+| `ui/screens/main/MainScreen.kt` | Ruta en `topLevelRoutes` y en el resolver de `TopBarState` |
 | `ui/screens/<feature>/<Feature>Screen.kt` | Pantalla nueva |
 | `ui/screens/<feature>/<Feature>ViewModel.kt` | Estado y acciones |
 | `navigation/<Feature>NavGraph.kt` | Solo si hay detalles o creación |
+
+## Top bar: la ruta es la fuente de verdad
+
+La top bar de `MainScreen` se resuelve con la ruta actual, no con un efecto de
+la pantalla. Una pestaña nueva:
+
+- **No** recibe `onTopBarChange`.
+- **No** tiene un `LaunchedEffect` para el título.
+- Añade su ruta al `when` de `TopBarState` en `MainScreen`.
+
+Si `MainScreen` todavía usa el patrón legado `onTopBarChange` +
+`LaunchedEffect`, aplica primero `top-bar.md`. Ese patrón puede dejar el título
+de la pantalla anterior al restaurar estado o cambiar de pestaña.
 
 ## 1. Strings
 
@@ -88,13 +101,15 @@ En `navigation/MainNavGraph.kt`, añade el destino dentro del `NavHost`:
 
 ```kotlin
 composable(BottomBarScreens.History.route) {
-    HistoryScreen(onTopBarChange = onTopBarChange)
+    HistoryScreen(
+        onHistoryClick = { id ->
+            navController.navigate(HistoryScreens.Detail.createRoute(id))
+        },
+    )
 }
 ```
 
-- Pasa siempre `onTopBarChange` para que `MainTopBar` muestre el título.
-- Si la pantalla necesita navegar a un detalle, recibe un callback
-  (`onHistoryClick`) y navega con `navController.navigate(...)`.
+- La pantalla solo recibe callbacks de navegación, no `onTopBarChange`.
 - Para un detalle:
 
 ```kotlin
@@ -102,7 +117,7 @@ composable(
     route = HistoryScreens.Detail.route,
     arguments = listOf(navArgument("itemId") { type = NavType.IntType }),
 ) {
-    HistoryDetailScreen(onTopBarChange = onTopBarChange)
+    HistoryDetailScreen()
 }
 ```
 
@@ -138,6 +153,30 @@ val topLevelRoutes = remember {
 
 Esto evita que la pestaña muestre flecha atrás. Las rutas de detalle **no** van
 en `topLevelRoutes`: así muestran flecha y vuelven a la pestaña.
+
+Añade la ruta al resolver de `TopBarState`:
+
+```kotlin
+val defaultTopBarState = when (currentRoute) {
+    BottomBarScreens.Home.route -> TopBarState(
+        title = homeTopBarTitle(),
+        showLogo = true,
+    )
+    BottomBarScreens.Medications.route -> TopBarState(
+        title = stringResource(R.string.nav_medications),
+    )
+    BottomBarScreens.History.route -> TopBarState(
+        title = stringResource(R.string.nav_history),
+    )
+    BottomBarScreens.Profile.route -> TopBarState(
+        title = stringResource(R.string.nav_profile),
+    )
+    else -> TopBarState(title = stringResource(R.string.nav_home))
+}
+```
+
+`currentRoute` sale de `navController.currentBackStackEntryAsState()`. Si
+`MainScreen` aún no lo tiene, adóptalo siguiendo `top-bar.md`.
 
 ### FAB: cuidado
 
@@ -186,18 +225,14 @@ Crea `ui/screens/history/HistoryScreen.kt`. Si la pantalla vive dentro del
 @Composable
 fun HistoryScreen(
     modifier: Modifier = Modifier,
-    onTopBarChange: (TopBarState) -> Unit = {},
+    onHistoryClick: (Int) -> Unit = {},
     historyViewModel: HistoryViewModel = hiltViewModel(),
 ) {
     val uiState by historyViewModel.uiState.collectAsStateWithLifecycle()
-    val title = stringResource(R.string.nav_history)
-
-    LaunchedEffect(title) {
-        onTopBarChange(TopBarState(title = title))
-    }
 
     HistoryContent(
         uiState = uiState,
+        onHistoryClick = onHistoryClick,
         modifier = modifier,
     )
 }
@@ -205,6 +240,7 @@ fun HistoryScreen(
 @Composable
 private fun HistoryContent(
     uiState: HistoryUiState,
+    onHistoryClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -226,7 +262,10 @@ private fun HistoryContent(
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
             ) {
                 items(uiState.items, key = { it.id }) { item ->
-                    HistoryCard(item = item)
+                    HistoryCard(
+                        item = item,
+                        onClick = { onHistoryClick(item.id) },
+                    )
                 }
             }
         }
@@ -238,8 +277,7 @@ Reglas del esqueleto:
 
 - `HistoryScreen` obtiene el ViewModel con `hiltViewModel()`.
 - `HistoryContent` es stateless y se puede previsualizar.
-- `LaunchedEffect(title)` actualiza la top bar; sin él se queda el título
-  anterior.
+- El título **no** se empuja desde aquí: lo resuelve `MainScreen` por ruta.
 - El margen de pantalla es `AppSpacing.md`.
 - La lista usa `spacedBy(AppSpacing.sm)` y `key` estable.
 - El estado vacío es `BlankCard` centrada.
@@ -247,33 +285,18 @@ Reglas del esqueleto:
   `verticalScroll + imePadding + padding(AppSpacing.md)`, `AppFormSection` y
   `AppFormActions`.
 
-## 7. ViewModel
+## 7. Estado
 
-```kotlin
-@HiltViewModel
-class HistoryViewModel @Inject constructor(
-    private val repository: HistoryRepository,
-) : ViewModel() {
+Para esta app, el contrato mínimo es:
 
-    val uiState: StateFlow<HistoryUiState> = repository.observe()
-        .map { HistoryUiState(items = it) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = HistoryUiState(),
-        )
-}
+- `@HiltViewModel` con dependencias inyectadas.
+- Estado expuesto como `StateFlow`.
+- La pantalla lo consume con `collectAsStateWithLifecycle()`.
+- Errores como `@StringRes Int`, no textos literales.
+- Sin navegación en el ViewModel: la pantalla recibe callbacks.
 
-data class HistoryUiState(
-    val items: List<HistoryItem> = emptyList(),
-    val isLoading: Boolean = false,
-    @StringRes val errorRes: Int? = null,
-)
-```
-
-- Expón `StateFlow` y consume con `collectAsStateWithLifecycle()`.
-- Los errores se exponen como `@StringRes Int`, no como texto literal.
-- No pongas lógica de navegación en el ViewModel: la pantalla recibe callbacks.
+No repitas aquí patrones genéricos de Compose o Hilt: para eso están las
+skills `android-*`.
 
 ## 8. Previews
 
@@ -288,7 +311,10 @@ data class HistoryUiState(
 @Composable
 private fun HistoryContentPreview() {
     PillRemindTheme {
-        HistoryContent(uiState = HistoryUiState())
+        HistoryContent(
+            uiState = HistoryUiState(),
+            onHistoryClick = {},
+        )
     }
 }
 ```
@@ -309,11 +335,12 @@ Checklist específica de pestaña:
 - [ ] `nav_<feature>` existe en `strings.xml`.
 - [ ] `BottomBarScreens` tiene ruta, `titleRes` e icono.
 - [ ] `MainBottomBar` incluye la pestaña.
-- [ ] `MainNavigationGraph` tiene su `composable` y pasa `onTopBarChange`.
+- [ ] `MainNavigationGraph` tiene su `composable` y no pasa `onTopBarChange`.
 - [ ] `MainScreen.topLevelRoutes` incluye la ruta raíz.
+- [ ] `MainScreen` resuelve el título de la ruta en su `when` de `TopBarState`.
+- [ ] La pantalla no usa `onTopBarChange` ni un `LaunchedEffect` para el título.
 - [ ] No se añadió a `showFab` sin cambiar la acción del FAB.
 - [ ] La pestaña no añade un `Scaffold` propio si ya vive en `MainScreen`.
-- [ ] El título se actualiza con `LaunchedEffect`.
 - [ ] La barra inferior sigue visible en la pestaña.
 - [ ] Claro/oscuro y texto grande comprobados.
 - [ ] `assembleDebug` compila.
@@ -323,7 +350,8 @@ Checklist específica de pestaña:
 | Error | Síntoma |
 |---|---|
 | Olvidar `topLevelRoutes` | Aparece flecha atrás en una pestaña principal. |
-| Olvidar `LaunchedEffect` | La top bar conserva el título de la pantalla anterior. |
+| Usar `onTopBarChange` + `LaunchedEffect` | El título puede quedarse en la pantalla anterior al restaurar estado o cambiar de pestaña. |
+| Olvidar la ruta en el `when` de `TopBarState` | La pestaña muestra el título por defecto. |
 | Añadir la ruta a `showFab` | El FAB abre la creación de medicamento. |
 | Añadir un `Scaffold` dentro de `MainScreen` | Doble barra, doble padding o contenido tapado. |
 | Usar `collectAsState()` en código nuevo | El estado no respeta el ciclo de vida. |
