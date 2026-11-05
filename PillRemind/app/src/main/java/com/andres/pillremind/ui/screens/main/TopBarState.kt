@@ -4,8 +4,7 @@ package com.andres.pillremind.ui.screens.main
  * Representa el estado de la barra superior.
  *
  * @property title Título que se mostrará en la topbar.
- * @property showLogo Si es true, se muestra el logo de la app junto al título,
- *   en la misma línea. El logo es decorativo para accesibilidad.
+ * @property showLogo Si es true, se mostrará el logo de la app encima del título.
  * @property actions Acciones que se muestran en la barra superior.
  * @property navigationAction Acción mostrada como icono de navegación. Si es
  *   null, se mantiene el comportamiento de retroceso por defecto.

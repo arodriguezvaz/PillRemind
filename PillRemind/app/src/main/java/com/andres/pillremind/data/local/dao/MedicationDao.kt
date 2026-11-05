@@ -1,6 +1,7 @@
 package com.andres.pillremind.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -31,6 +32,14 @@ interface MedicationDao {
     suspend fun updateMedication(medication: MedicationEntity)
 
     /**
+     * Elimina un medicamento existente.
+     *
+     * @param medication Entidad del medicamento a eliminar.
+     */
+    @Delete
+    suspend fun deleteMedication(medication: MedicationEntity)
+
+    /**
      * Observa un medicamento por su ID.
      *
      * @param id ID del medicamento.
@@ -47,40 +56,6 @@ interface MedicationDao {
      */
     @Query("SELECT * FROM medications WHERE profileId = :profileId AND deletedAt IS NULL")
     fun getMedications(profileId: Int): Flow<List<MedicationEntity>>
-
-    /**
-     * Observa los medicamentos archivados de un perfil, del más reciente al
-     * más antiguo.
-     */
-    @Query(
-        """
-    SELECT * FROM medications
-    WHERE profileId = :profileId AND deletedAt IS NOT NULL
-    ORDER BY deletedAt DESC
-    """
-    )
-    fun getArchivedMedications(profileId: Int): Flow<List<MedicationEntity>>
-
-    /**
-     * Devuelve todos los medicamentos de un perfil, incluidos los archivados.
-     *
-     * Se usa antes de borrar un perfil para poder limpiar sus imágenes.
-     */
-    @Query("SELECT * FROM medications WHERE profileId = :profileId")
-    suspend fun getMedicationsOnce(profileId: Int): List<MedicationEntity>
-
-    /**
-     * Recupera un medicamento archivado sin tocar sus horarios ni su historial.
-     */
-    @Query("UPDATE medications SET deletedAt = NULL, updatedAt = :updatedAt WHERE id = :medicationId")
-    suspend fun restoreMedication(medicationId: Int, updatedAt: LocalDateTime)
-
-    /**
-     * Borra definitivamente un medicamento. Las tomas y horarios asociados se
-     * eliminan en cascada.
-     */
-    @Query("DELETE FROM medications WHERE id = :medicationId")
-    suspend fun deleteMedicationById(medicationId: Int)
 
     /**
      * Marca un medicamento como archivado sin borrar su historial.

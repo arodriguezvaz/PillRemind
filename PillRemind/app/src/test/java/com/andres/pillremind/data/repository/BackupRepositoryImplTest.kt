@@ -13,7 +13,6 @@ import com.andres.pillremind.data.local.entity.UserEntity
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.ScheduleType
 import com.andres.pillremind.domain.model.WeekDay
-import com.andres.pillremind.notifications.ReminderNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -77,7 +76,6 @@ class BackupRepositoryImplTest {
             imageStore = BackupImageStore(context),
             sessionManager = sessionManager,
             reminderScheduler = reminderScheduler,
-            notifications = ReminderNotifications(context),
             context = context
         )
     }

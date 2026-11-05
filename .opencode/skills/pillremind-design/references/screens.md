@@ -28,17 +28,14 @@ El grafo raíz está en `navigation/RootNavGraph.kt`; el de la barra inferior, e
 ### `MainScreen` (`screens/main/MainScreen.kt`)
 
 - `Scaffold` con:
-  - `topBar = MainTopBar(state = ..., canGoBack = ..., onBack = ...)`, sin
-    `NavHostController`. `MainScreen` deriva el estado de la ruta actual
-    (`currentBackStackEntryAsState()` + `when`); los overrides por ruta solo
-    existen para Perfil/Medicamento en creación/edición.
+  - `topBar = MainTopBar`, alimentada por `TopBarState`. El patrón correcto es
+    derivarlo de la ruta actual (`currentBackStackEntryAsState()` + `when`); el
+    código antiguo todavía puede empujarlo con `onTopBarChange`.
   - `bottomBar = MainBottomBar` (Home, Medications, Profile).
   - FAB solo en Home y Medicamentos, con `AppFab`; su `onClick` siempre navega a
     `MedicationScreens.MedicationCreateScreen`.
-- `topLevelRoutes` contiene las rutas de Home, Medications y Profile.
-  `MainScreen` calcula `canGoBack` (ruta fuera de ese conjunto y
-  `previousBackStackEntry != null`) y pasa `{ navController.popBackStack() }` a
-  `MainTopBar`.
+- `topLevelRoutes` contiene las rutas de Home, Medications y Profile. Las rutas
+  que no están en ese conjunto muestran flecha atrás si hay historial.
 - Pasa `paddingValues` a `MainNavigationGraph`, que aplica
   `Modifier.padding(paddingValues)` al `NavHost`.
 
@@ -66,13 +63,10 @@ La fuente de verdad es la ruta actual. `MainScreen` deriva `TopBarState` con
 `currentBackStackEntryAsState()` y un `when` de rutas. Las pestañas nuevas no
 usan `onTopBarChange`: solo añaden su ruta al `when`.
 
-`MainTopBar` es presentacional: recibe `state`, `canGoBack` y `onBack`; no
-`NavHostController` ni `topLevelRoutes`. El título usa `maxLines = 1` +
-elipsis; el logo es decorativo y comparte línea con el título.
-
-Perfil y Medicamento conservan `onTopBarChange` + `LaunchedEffect` como override
-por ruta para sus modos Create/Edit. Es una transición hasta que el modo viva en
-la ruta; no lo copies en código nuevo. Detalle en `top-bar.md`.
+El patrón antiguo (`onTopBarChange` + `LaunchedEffect` en cada pantalla) sigue
+en algunas pantallas como legado. Puede dejar el título de la pantalla anterior
+al restaurar estado o cambiar de pestaña; no lo copies en código nuevo. La
+migración y el patrón correcto están en `top-bar.md`.
 
 ## Home
 
@@ -87,11 +81,10 @@ Column(fillMaxSize + padding(AppSpacing.md))
 └── o BlankCard(home_empty_today) centrada
 ```
 
-- La top bar muestra el logo (`showLogo = true`, título vacío). La fecha
-  (`home_title_today` formateada en español) va como cabecera del contenido con
-  `homeDateTitle()` + `heading()`.
-- Column: cabecera + `LazyColumn(weight(1f))` o `BlankCard` centrada con
-  `weight(1f)`.
+- Título de la top bar: `home_title_today` con la fecha formateada en español;
+  `showLogo = true`.
+- Hoy lo empuja con `onTopBarChange` (legado). Lo correcto es mover la fecha al
+  resolver de `TopBarState` de `MainScreen` (`top-bar.md`).
 - Usa `collectAsState()` (código heredado). En código nuevo, usa
   `collectAsStateWithLifecycle()`.
 
@@ -109,8 +102,8 @@ Column(fillMaxSize + padding(AppSpacing.md))
 - Estado vacío: `BlankCard(medication_empty)` o
   `BlankCard(medication_search_no_results, query)`.
 - Cada item lleva `key = { it.id }`.
-- El título se deriva de la ruta en `MainScreen`; `MedicationsScreen` no
-  recibe `onTopBarChange`.
+- Hoy empuja el título con `onTopBarChange` (legado); lo correcto es resolverlo
+  por ruta en `MainScreen`.
 
 ## Ficha de medicamento
 
@@ -126,16 +119,16 @@ Column(fillMaxSize + padding(AppSpacing.md))
 - En `View`: `AppInfoCard` + `AppInfoRow` para datos y pauta.
 - La acción secundaria de `AppFormActions` sirve para archivar o eliminar; en
   `ProfileScreen` se marca con `secondaryContentColor = error`.
-- `LaunchedEffect(currentMode, topBarTitle)` publica el override de la top bar
-  solo en Create/Edit; el modo View se deriva de la ruta. En Edit muestra
-  `navigationAction` para volver a View y `BackHandler` hace lo mismo.
+- `LaunchedEffect(currentMode, topBarTitle)` actualiza la top bar (patrón
+  legado, pendiente de migrar); en modo Edit muestra `navigationAction` para
+  volver a View y `BackHandler` hace lo mismo.
 
 ## Perfiles
 
 `ProfilesScreen.kt`
 
-- `Scaffold` propio con `MainTopBar(state = ..., canGoBack = false)` (es la
-  raíz del grafo de perfiles) y FAB de añadir perfil con `AppFab`.
+- `Scaffold` propio con `MainTopBar` (acción de ajustes) y FAB de añadir perfil
+  con `AppFab`.
 - Lista:
   `LazyColumn(contentPadding = horizontal 16dp + vertical 12dp, spacedBy 12dp)`.
 - `PerfilCard` por perfil; estado vacío `BlankCard(profiles_empty)`.
@@ -157,15 +150,14 @@ Column(fillMaxSize + padding(AppSpacing.md))
   5. `AppFormActions` al final (`guardar` o `editar` + eliminar).
 - En `View`: `AppInfoCard` + `AppInfoRow` para las tres secciones.
 - El diálogo de eliminación usa `AlertDialog` con textos de `strings.xml`.
-- En `MainScreen` (modo View) el título se deriva de la ruta; en Edit,
-  `onTopBarChange` publica el override con `navigationAction` (`top-bar.md`).
+- En `MainScreen` (modo View) hoy empuja el título con `onTopBarChange`
+  (legado); la ruta debe resolverlo en `MainScreen` (`top-bar.md`).
 
 ## Ajustes
 
 `SettingsScreen.kt`
 
-- `Scaffold` con `MainTopBar(state = ..., canGoBack = previousBackStackEntry != null,
-  onBack = { navController.popBackStack() })` y `SnackbarHost`.
+- `Scaffold` con `MainTopBar` y `SnackbarHost`.
 - Column con scroll:
   `padding(horizontal = AppSpacing.md)` y `spacedBy(AppSpacing.sm)`.
 - Bloques:
@@ -197,8 +189,8 @@ Column(fillMaxSize + padding(AppSpacing.md))
 2. Añade la ruta al resolver de `TopBarState` de `MainScreen`; no uses
    `onTopBarChange` ni un `LaunchedEffect` para el título.
 3. Si la pantalla vive fuera de `MainScreen` y necesita su propio `Scaffold`
-   (por ejemplo, un FAB local), reutiliza `MainTopBar` con `state`,
-   `canGoBack` y `onBack`.
+   (por ejemplo, un FAB local), reutiliza `MainTopBar` y pásale
+   `topLevelRoutes`.
 4. Usa `AppSpacing` para el margen y las separaciones.
 5. Usa `BlankCard` para el estado vacío, centrada.
 6. Si hay formulario, divide con `AppFormSection`, cierra con `AppFormActions`

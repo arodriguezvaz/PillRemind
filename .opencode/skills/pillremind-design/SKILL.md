@@ -28,9 +28,9 @@ visual).
 | Top bar | `ui/screens/main/` (`MainScreen`, `TopBarState`, `MainTopBar`) |
 | Textos | `app/src/main/res/values/strings.xml` |
 
-Si el código y esta skill discrepan, manda el código. En la top bar, el patrón
-derivado de la ruta es la fuente de verdad; `onTopBarChange` solo se conserva
-como override en Perfil/Medicamento mientras su modo no viva en la ruta
+Si el código y esta skill discrepan, manda el código. La excepción es la top
+bar: el patrón `onTopBarChange` + `LaunchedEffect` que aún existe en pantallas
+antiguas es legado; para pestañas nuevas manda el patrón derivado de la ruta
 (`references/top-bar.md`). Si el cambio es intencionado, actualiza la skill en
 el mismo cambio.
 
@@ -136,17 +136,15 @@ Catálogo detallado en `references/components.md`.
 - **Card:** `Card(shape = MaterialTheme.shapes.large,
   colors = surface, elevation = AppElevation)`.
 - **Navegación:** `MainScreen` deriva `TopBarState` de la ruta actual
-  (`currentBackStackEntryAsState()` + `when`). Los títulos dinámicos
-  (Perfil/Medicamento en creación/edición) se publican como override por ruta;
-  no uses `onTopBarChange` en pestañas nuevas. `MainTopBar` es presentacional
-  (`state`, `canGoBack`, `onBack`), sin `NavHostController`. Detalle en
-  `references/top-bar.md`.
+  (`currentBackStackEntryAsState()`) y de un `when` de rutas. La pantalla no
+  empuja su título. El patrón `onTopBarChange` + `LaunchedEffect` es legado y
+  puede dejar la top bar desincronizada; no lo uses en pestañas nuevas. Detalle
+  en `references/top-bar.md`.
 - **Ajustes:** una `SettingsCard` por bloque, con `SettingsToggleItem` o
   `SettingsLinkItem` dentro.
 - **Detalle:** si la pantalla vive fuera de `MainScreen` y necesita su propio
-  `Scaffold`, reutiliza `MainTopBar` con `state`, `canGoBack` y `onBack` (patrón
-  `ProfilesScreen` / `SettingsScreen`). Dentro de `MainScreen` no añadas otro
-  `Scaffold`.
+  `Scaffold`, reutiliza `MainTopBar` y pásale `topLevelRoutes` (patrón
+  `ProfilesScreen`). Dentro de `MainScreen` no añadas otro `Scaffold`.
 
 ## Pestaña nueva
 
@@ -205,7 +203,6 @@ JAVA_HOME=/opt/android-studio/jbr ./gradlew assembleDebug
 - [ ] Comprobado en claro y oscuro, y con texto grande.
 - [ ] La pestaña nueva está en el resolver de `TopBarState` de `MainScreen`;
       no usa `onTopBarChange` ni un `LaunchedEffect` para el título.
-- [ ] `MainTopBar` recibe `state`, `canGoBack` y `onBack`; no `NavHostController`.
 - [ ] Si es pestaña, seguí `references/new-tab.md`.
 - [ ] Componente nuevo: KDoc + `@Preview`.
 - [ ] `assembleDebug` compila.
@@ -216,6 +213,6 @@ JAVA_HOME=/opt/android-studio/jbr ./gradlew assembleDebug
   espaciado y elevación.
 - `references/components.md`: ficha y uso de cada componente.
 - `references/screens.md`: estructura de las pantallas actuales.
-- `references/top-bar.md`: contrato de la top bar, estado derivado de la ruta
-  y overrides de los modos dinámicos.
+- `references/top-bar.md`: top bar derivada de la ruta y migración del patrón
+  legado.
 - `references/new-tab.md`: receta completa para añadir una pestaña.

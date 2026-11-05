@@ -2,119 +2,94 @@
 
 ## Regla
 
-`MainScreen` es el único dueño de `TopBarState`. Los títulos estáticos se
-derivan de la ruta actual (`currentBackStackEntryAsState()` + `when`); los
-títulos dinámicos (perfil o medicamento en creación/edición) se publican desde
-la pantalla y se guardan por ruta.
+La top bar de `MainScreen` se deriva de la ruta actual. La pantalla no empuja su
+título.
 
-`MainTopBar` es presentacional: recibe `state`, `canGoBack` y `onBack`. No
-recibe `NavHostController` ni `topLevelRoutes`.
+## Patrón actual (legado)
 
-## Estado derivado de la ruta
+`MainScreen` guarda un `TopBarState` y cada pantalla lo actualiza así:
+
+```kotlin
+LaunchedEffect(title) {
+    onTopBarChange(TopBarState(title = title))
+}
+```
+
+Funciona en el caso fácil, pero el título no depende de la navegación: depende
+de que el efecto de la pantalla se ejecute. Con `saveState/restoreState` y
+cambios de pestaña, la composición puede restaurarse sin que el efecto vuelva a
+ejecutarse y la top bar conserva el título anterior. Añadir `LaunchedEffect` no
+lo arregla: el efecto forma parte del problema. No bases la corrección en que
+hoy las transiciones estén desactivadas; el problema es el estado empujado, no
+la duración de la transición.
+
+## Patrón recomendado
+
+`MainScreen` ya observa `currentBackStackEntryAsState()`. Deriva el estado de la
+ruta:
 
 ```kotlin
 val navBackStackEntry by navController.currentBackStackEntryAsState()
 val currentRoute = navBackStackEntry?.destination?.route
 
-val topLevelRoutes = remember {
-    setOf(
-        BottomBarScreens.Home.route,
-        BottomBarScreens.Medications.route,
-        BottomBarScreens.Profile.route,
-    )
-}
-val canGoBack = currentRoute !in topLevelRoutes &&
-    navController.previousBackStackEntry != null
-
 val defaultTopBarState = when (currentRoute) {
     BottomBarScreens.Home.route -> TopBarState(
-        title = "",          // la fecha vive en el contenido de Home
+        title = homeTopBarTitle(),
         showLogo = true,
     )
     BottomBarScreens.Medications.route -> TopBarState(
         title = stringResource(R.string.nav_medications),
     )
     BottomBarScreens.Profile.route -> TopBarState(
-        title = stringResource(R.string.profile_view_title),
+        title = stringResource(R.string.nav_profile),
     )
-    MedicationScreens.MedicationSeeScreen.route -> TopBarState(
-        title = stringResource(R.string.medication_view_title),
-    )
-    MedicationScreens.MedicationCreateScreen.route -> TopBarState(
-        title = stringResource(R.string.medication_add_title),
+    BottomBarScreens.History.route -> TopBarState(
+        title = stringResource(R.string.nav_history),
     )
     else -> TopBarState(title = stringResource(R.string.nav_home))
 }
-
-val topBarStates = remember { mutableStateMapOf<String, TopBarState>() }
-val topBarState = resolveTopBarState(
-    currentRoute = currentRoute,
-    statesByRoute = topBarStates,
-    fallback = defaultTopBarState,
-)
 ```
 
-Los overrides solo se usan en pantallas con estado dinámico:
+`homeTopBarTitle()` es el título con la fecha que hoy calcula `HomeScreen`.
+Extráelo a una función de `ui/screens/home` o `ui/screens/main` para que
+`MainScreen` y la pantalla compartan el mismo texto:
 
 ```kotlin
-composable(BottomBarScreens.Profile.route) {
-    ProfileScreen(
-        onTopBarChange = topBarChangeFor(BottomBarScreens.Profile.route, onTopBarChange),
-    )
+@Composable
+fun homeTopBarTitle(): String {
+    val today = LocalDate.now()
+    val pattern = stringResource(R.string.home_date_pattern)
+    val formatted = remember(today, pattern) {
+        today.format(
+            DateTimeFormatter.ofPattern(pattern, Locale.forLanguageTag("es"))
+        )
+    }
+    return stringResource(R.string.home_title_today, formatted)
 }
 ```
 
-`ProfileScreen` y `MedicationScreen` publican su modo con `LaunchedEffect`; es
-una transición hasta que el modo viva en la ruta (`profile/edit`,
-`medication/edit/{id}`). No lo copies en pestañas nuevas.
+En `MainScreen`, sustituye el `var topBarState by remember { ... }` por
+`defaultTopBarState` (o por `override ?: defaultTopBarState` si conservas el
+patrón legado). El `Scaffold` sigue recibiendo `topBarState`.
 
-El patrón antiguo (un único `TopBarState` global + `LaunchedEffect` en cada
-pantalla) es el que provocaba el título pegado: con `saveState/restoreState` la
-composición puede reutilizarse y el efecto no se ejecuta. No lo reintroduzcas;
-tampoco bases la corrección en que hoy no haya transición.
+Si una pantalla antigua sigue necesitando un título dinámico por modo
+(medicamento/perfil en creación, edición o vista), mantén `onTopBarChange` como
+override solo para esa ruta y migra el modo a la ruta cuando puedas. No lo uses
+en pestañas nuevas. Las rutas de detalle que no estén en el `when` caen en el
+`else`; si aún se titulan con `onTopBarChange`, conserva ese override hasta
+migrarlas.
 
-## Contrato de MainTopBar
-
-```kotlin
-MainTopBar(
-    state = topBarState,
-    canGoBack = canGoBack,
-    onBack = { navController.popBackStack() },
-)
-```
-
-- Es presentacional: no conoce rutas ni el `NavHostController`.
-- `state.navigationAction` tiene prioridad sobre el botón atrás.
-- `onBack` usa `popBackStack()`, como recomienda la guía de Compose para la
-  top bar. Dentro del subgrafo de medicamentos, `navigateUp()` puede subir al
-  inicio del subgrafo en vez de volver a la lista.
-- El título va en `maxLines = 1` con `TextOverflow.Ellipsis`.
-- El logo y el título comparten una sola línea (`Row`); el logo es decorativo
-  (`clearAndSetSemantics`).
-
-## Home
-
-La barra muestra el logo; la fecha vive en el contenido (`homeDateTitle()` +
-`heading()`). No apiles logo y título en una `Column` dentro del small app bar
-(64dp): dos líneas de `titleLarge` no caben con `fontScale = 1.5` o `2.0`.
-
-Tampoco uses `MediumTopAppBar` como parche de accesibilidad: colapsa a 64dp,
-usa una tipografía mayor y las variantes baseline medium/large ya no son las
-recomendadas por Material 3.
-
-## Pestaña nueva
+## Cómo queda una pestaña nueva
 
 1. Añade su ruta al `when` de `MainScreen`.
-2. La pantalla no recibe `onTopBarChange` ni tiene un `LaunchedEffect` para el
-   título.
-3. `topLevelRoutes` sigue conteniendo solo las rutas raíz de las pestañas.
+2. La pantalla no recibe `onTopBarChange`.
+3. La pantalla no tiene `LaunchedEffect` para el título.
+4. `topLevelRoutes` sigue conteniendo solo las rutas raíz de las pestañas.
 
 ## Checklist
 
 - [ ] `MainScreen` deriva `TopBarState` de `currentBackStackEntryAsState()`.
 - [ ] La ruta nueva está en el `when`.
 - [ ] La pantalla nueva no usa `onTopBarChange`.
-- [ ] `MainTopBar` recibe `state`, `canGoBack` y `onBack`; no `NavHostController`.
-- [ ] Título con `maxLines = 1` + elipsis; logo decorativo.
-- [ ] Probado: cambiar de pestaña, volver atrás, `fontScale = 1.5` y `2.0`,
-      RTL y restaurar estado.
+- [ ] Probado: cambiar de pestaña, volver atrás y restaurar estado.
+- [ ] El título correcto aparece al entrar y al volver.

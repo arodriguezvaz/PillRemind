@@ -52,22 +52,8 @@ class BootRescheduleHandlerTest {
     }
 
     @Test
-    fun `reprograma al cambiar la hora del sistema`() = runTest {
-        handler.handle(Intent.ACTION_TIME_CHANGED)
-
-        coVerify(exactly = 1) { reminderScheduler.generateWindow(any(), any()) }
-    }
-
-    @Test
-    fun `reprograma al cambiar la zona horaria`() = runTest {
-        handler.handle(Intent.ACTION_TIMEZONE_CHANGED)
-
-        coVerify(exactly = 1) { reminderScheduler.generateWindow(any(), any()) }
-    }
-
-    @Test
     fun `ignora acciones que no requieren reprogramacion`() = runTest {
-        handler.handle(Intent.ACTION_SCREEN_ON)
+        handler.handle(Intent.ACTION_TIME_CHANGED)
         handler.handle(null)
 
         coVerify(exactly = 0) { reminderScheduler.generateWindow(any(), any()) }

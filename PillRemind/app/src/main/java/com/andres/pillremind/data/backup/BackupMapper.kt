@@ -15,7 +15,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeParseException
-import java.time.temporal.ChronoUnit
 
 /**
  * Conjunto de entidades listas para sustituir el contenido de la base de datos.
@@ -54,7 +53,7 @@ fun BackupSnapshot.toBackupFile(
     format = BackupFormat.NAME,
     formatVersion = BackupFormat.VERSION,
     appVersion = appVersion,
-    exportedAt = exportedAt.toBackupString(),
+    exportedAt = exportedAt.toString(),
     users = users.map { it.toBackupDto() },
     profiles = profiles.map { it.toBackupDto(imagePaths) },
     medications = medications.map { it.toBackupDto(imagePaths) },
@@ -77,8 +76,8 @@ fun BackupFileDto.toEntities(imagePaths: Map<String, String>): BackupEntities = 
 
 private fun UserEntity.toBackupDto(): BackupUserDto = BackupUserDto(
     id = id,
-    createdAt = createdAt.toBackupString(),
-    updatedAt = updatedAt.toBackupString()
+    createdAt = createdAt.toString(),
+    updatedAt = updatedAt.toString()
 )
 
 private fun ProfileEntity.toBackupDto(imagePaths: Map<String, String>): BackupProfileDto =
@@ -93,8 +92,8 @@ private fun ProfileEntity.toBackupDto(imagePaths: Map<String, String>): BackupPr
         allergies = allergies,
         medicalNotes = medicalNotes,
         healthCardNumber = healthCardNumber,
-        createdAt = createdAt.toBackupString(),
-        updatedAt = updatedAt.toBackupString()
+        createdAt = createdAt.toString(),
+        updatedAt = updatedAt.toString()
     )
 
 private fun MedicationEntity.toBackupDto(imagePaths: Map<String, String>): BackupMedicationDto =
@@ -109,9 +108,9 @@ private fun MedicationEntity.toBackupDto(imagePaths: Map<String, String>): Backu
         endDate = endDate?.toString(),
         imagePath = imageUrl?.let { imagePaths[it] },
         leafletUrl = leafletUrl,
-        createdAt = createdAt.toBackupString(),
-        updatedAt = updatedAt.toBackupString(),
-        deletedAt = deletedAt?.toBackupString()
+        createdAt = createdAt.toString(),
+        updatedAt = updatedAt.toString(),
+        deletedAt = deletedAt?.toString()
     )
 
 private fun ScheduleEntity.toBackupDto(): BackupScheduleDto = BackupScheduleDto(
@@ -132,13 +131,13 @@ private fun IntakeEntity.toBackupDto(): BackupIntakeDto = BackupIntakeDto(
     id = id,
     medicationId = medicationId,
     scheduleId = scheduleId,
-    scheduledAt = scheduledAt.toBackupString(),
-    takenAt = takenAt?.toBackupString(),
+    scheduledAt = scheduledAt.toString(),
+    takenAt = takenAt?.toString(),
     medicationNameSnapshot = medicationNameSnapshot,
     doseSnapshot = doseSnapshot,
     unitSnapshot = unitSnapshot,
-    createdAt = createdAt.toBackupString(),
-    updatedAt = updatedAt.toBackupString()
+    createdAt = createdAt.toString(),
+    updatedAt = updatedAt.toString()
 )
 
 private fun BackupUserDto.toEntity(): UserEntity = UserEntity(
@@ -303,7 +302,7 @@ private fun resolveImagePath(
  */
 fun parseBackupDateTime(value: String, field: String): LocalDateTime =
     try {
-        LocalDateTime.parse(value).truncatedTo(ChronoUnit.MINUTES)
+        LocalDateTime.parse(value)
     } catch (e: DateTimeParseException) {
         throw BackupException(
             BackupError.INVALID_DATA,
@@ -311,12 +310,6 @@ fun parseBackupDateTime(value: String, field: String): LocalDateTime =
             e
         )
     }
-
-/**
- * Serializa una fecha y hora con la misma precisión de minutos que usa Room.
- */
-private fun LocalDateTime.toBackupString(): String =
-    truncatedTo(ChronoUnit.MINUTES).toString()
 
 /**
  * Parsea una fecha ISO del archivo de copia.

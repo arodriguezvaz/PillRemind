@@ -43,7 +43,7 @@ class MarkAsTakenHandlerTest {
 
     @Before
     fun setUp() {
-        handler = MarkAsTakenHandler(intakeRepository, ReminderNotifications(context))
+        handler = MarkAsTakenHandler(context, intakeRepository)
         notificationManager = context.getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(
             NotificationChannel(
