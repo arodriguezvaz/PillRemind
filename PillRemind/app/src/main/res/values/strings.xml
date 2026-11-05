@@ -117,7 +117,11 @@
 
     <!-- Ajustes -->
     <string name="settings_title">Ajustes</string>
-    <string name="settings_dark_mode">Modo oscuro</string>
+    <string name="settings_theme_title">Tema</string>
+    <string name="settings_theme_system">Seguir al sistema</string>
+    <string name="settings_theme_system_description">Usa el modo claro u oscuro de Android.</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Oscuro</string>
     <string name="settings_reminders_title">Recordatorios</string>
     <string name="settings_notifications_title">Notificaciones</string>
     <string name="settings_notifications_description">Avisos de las tomas programadas.</string>

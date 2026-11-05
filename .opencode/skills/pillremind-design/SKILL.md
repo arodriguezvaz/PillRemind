@@ -45,8 +45,10 @@ el mismo cambio.
    de horas, botones y FAB. No añadas 8dp, 12dp ni sombras propias.
 3. **Superficies limpias.** Fondo `background`, cards y campos `surface`, texto
    principal `onSurface`, secundario `onSurfaceVariant`.
-4. **Claro y oscuro.** Comprueba ambos; no uses blanco/negro fijos. El modo
-   dinámico está desactivado en `PillRemindTheme`.
+4. **Claro y oscuro.** Comprueba ambos; no uses blanco/negro fijos. El tema
+   oscuro es monocromo (negro, blanco y grises) y reserva el naranja, el verde
+   y el rojo para los estados. El modo dinámico está desactivado en
+   `PillRemindTheme`.
 5. **Color solo desde el tema.** `Color(0x...)` vive únicamente en `Color.kt`.
    En pantallas y componentes usa `MaterialTheme.colorScheme`.
 6. **Reutiliza antes de crear.** Si un componente de `ui/components` cubre el
@@ -63,7 +65,7 @@ Resumen operativo; los valores completos están en `references/tokens.md`.
 
 | Rol | Uso |
 |---|---|
-| `primary` | Marca, títulos de sección, acción principal, icono activo. |
+| `primary` | Marca, títulos de sección, acción principal, icono activo. Negro en claro, blanco en oscuro. |
 | `onPrimary` | Texto e iconos sobre `primary`. |
 | `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, avatar por defecto. |
 | `secondaryContainer` / `onSecondaryContainer` | Botón de una toma ya realizada. |
@@ -119,7 +121,8 @@ Catálogo detallado en `references/components.md`.
 - **Formularios:** `AppFormSection`, `AppReadOnlyField` y `AppFormActions`.
 - **Cards:** `AppInfoCard`/`AppInfoRow`, `BlankCard`, `MedicationCard`,
   `IntakeCard`, `PerfilCard`.
-- **Ajustes:** `SettingsCard`, `SettingsToggleItem`, `SettingsLinkItem`.
+- **Ajustes:** `SettingsCard`, `SettingsRadioItem`, `SettingsToggleItem`,
+  `SettingsLinkItem`.
 - **Horarios:** `WeekDayChipGroup`, `TimeListEditor`, `TimeItem`, `AddTimeItem`.
 
 ## Patrones de pantalla
@@ -140,8 +143,9 @@ Catálogo detallado en `references/components.md`.
   empuja su título. El patrón `onTopBarChange` + `LaunchedEffect` es legado y
   puede dejar la top bar desincronizada; no lo uses en pestañas nuevas. Detalle
   en `references/top-bar.md`.
-- **Ajustes:** una `SettingsCard` por bloque, con `SettingsToggleItem` o
-  `SettingsLinkItem` dentro.
+- **Ajustes:** una `SettingsCard` por bloque; usa `SettingsRadioItem` para
+  opciones exclusivas, `SettingsToggleItem` para binarias y `SettingsLinkItem`
+  para acciones.
 - **Detalle:** si la pantalla vive fuera de `MainScreen` y necesita su propio
   `Scaffold`, reutiliza `MainTopBar` y pásale `topLevelRoutes` (patrón
   `ProfilesScreen`). Dentro de `MainScreen` no añadas otro `Scaffold`.

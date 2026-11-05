@@ -9,7 +9,7 @@ fuente de verdad: si un valor cambia, actualiza también esta tabla.
 
 | Rol | Uso | Evitar |
 |---|---|---|
-| `primary` | Marca, títulos de sección, acciones principales, icono activo de la barra inferior. | Usarlo como fondo de bloques grandes de información. |
+| `primary` | Marca, títulos de sección, acciones principales, icono activo de la barra inferior. Negro en claro, blanco en oscuro. | Usarlo como fondo de bloques grandes de información. |
 | `onPrimary` | Texto e iconos sobre `primary`. | Texto secundario. |
 | `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, avatar por defecto, FAB de perfiles. | Sustituir a `surface` en cards. |
 | `secondary` | Naranja de aviso; hoy se usa sobre todo como base de `secondaryContainer`. | Decoración o texto largo. |
@@ -34,18 +34,24 @@ Reglas:
   `PillRemindTheme`).
 - No inventes un color para un estado nuevo: reutiliza un rol existente o
   añádelo al tema y documenta su significado.
+- En oscuro, `secondary`, `tertiary` y `error` son solo colores de estado; no
+  los uses para decorar superficies ni para la marca.
 
 ### Marca
 
 | Nombre | Hex | Uso |
 |---|---|---|
-| `BrandPurple` | `#32138D` | Púrpura de marca: acciones principales y títulos. |
+| `BrandPurple` | `#32138D` | Púrpura de marca del tema claro. No se usa en oscuro. |
 | `ActionOrange` | `#FF6F00` | Naranja de aviso. |
 | `SuccessGreen` | `#81C784` | Verde de confirmación. |
 | `NeutralGray` | `#5F5F5F` | Texto secundario. |
 | `TextBlack` | `#1A1A1A` | Texto principal en claro. |
 | `SurfaceWhite` | `#FFFFFF` | Superficies en claro. |
 | `BackgroundOff` | `#F7F7F6` | Fondo general en claro. |
+
+El tema oscuro es monocromo: `primary` es blanco, las superficies son negras o
+grises y el naranja, el verde y el rojo quedan reservados a los estados de las
+tomas y a los avisos.
 
 ### Tema claro
 
@@ -91,10 +97,10 @@ Reglas:
 
 | Rol | Hex |
 |---|---|
-| `primary` | `#BB9EFF` |
-| `onPrimary` | `#1E0070` |
-| `primaryContainer` | `#32138D` |
-| `onPrimaryContainer` | `#EDE7F6` |
+| `primary` | `#FFFFFF` |
+| `onPrimary` | `#000000` |
+| `primaryContainer` | `#262626` |
+| `onPrimaryContainer` | `#F2F2F2` |
 | `secondary` | `#FFB74D` |
 | `onSecondary` | `#4D2C00` |
 | `secondaryContainer` | `#704000` |
@@ -103,29 +109,29 @@ Reglas:
 | `onTertiary` | `#00391C` |
 | `tertiaryContainer` | `#00522C` |
 | `onTertiaryContainer` | `#D7FFD9` |
-| `background` | `#121212` |
-| `onBackground` | `#EEEEEE` |
-| `surface` | `#1E1E1E` |
-| `onSurface` | `#EEEEEE` |
-| `surfaceVariant` | `#2C2C2C` |
+| `background` | `#000000` |
+| `onBackground` | `#F2F2F2` |
+| `surface` | `#121212` |
+| `onSurface` | `#F2F2F2` |
+| `surfaceVariant` | `#242424` |
 | `onSurfaceVariant` | `#BDBDBD` |
 | `error` | `#F2B8B5` |
 | `onError` | `#601410` |
 | `errorContainer` | `#8C1D18` |
 | `onErrorContainer` | `#F9DEDC` |
 | `outline` | `#8A8A8A` |
-| `outlineVariant` | `#444444` |
+| `outlineVariant` | `#3A3A3A` |
 | `scrim` | `#000000` |
-| `inverseSurface` | `#E6E6E6` |
-| `inverseOnSurface` | `#303030` |
-| `inversePrimary` | `#32138D` |
-| `surfaceDim` | `#121212` |
-| `surfaceBright` | `#3A3A3A` |
-| `surfaceContainerLowest` | `#0E0E0E` |
-| `surfaceContainerLow` | `#1A1A1A` |
-| `surfaceContainer` | `#242424` |
-| `surfaceContainerHigh` | `#2C2C2C` |
-| `surfaceContainerHighest` | `#333333` |
+| `inverseSurface` | `#F2F2F2` |
+| `inverseOnSurface` | `#1A1A1A` |
+| `inversePrimary` | `#1A1A1A` |
+| `surfaceDim` | `#000000` |
+| `surfaceBright` | `#2E2E2E` |
+| `surfaceContainerLowest` | `#000000` |
+| `surfaceContainerLow` | `#0A0A0A` |
+| `surfaceContainer` | `#121212` |
+| `surfaceContainerHigh` | `#1C1C1C` |
+| `surfaceContainerHighest` | `#262626` |
 
 ## Tipografía
 

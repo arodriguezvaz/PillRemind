@@ -3,14 +3,15 @@ package com.andres.pillremind.ui.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * Paleta de colores de la aplicación (claro/oscuro).
+ * Paleta de colores de la aplicación.
  *
- * Los colores de marca se mantienen; los roles de Material3 que faltaban se
- * definen aquí para que el sistema no mezcle la paleta con la de por defecto.
+ * El tema claro conserva el violeta de marca. El tema oscuro es monocromo
+ * (negro, blanco y grises) y reserva el naranja, el verde y el rojo para los
+ * estados de las tomas y los avisos.
  */
 
 // ─── Marca ───────────────────────────────────────────────
-val BrandPurple = Color(0xFF32138D)   // Botones primarios, títulos, iconos activos
+val BrandPurple = Color(0xFF32138D)   // Violeta del tema claro
 val ActionOrange = Color(0xFFFF6F00)  // Aviso: toma pendiente / urgente
 val SuccessGreen = Color(0xFF81C784)  // Confirmación: toma realizada
 val NeutralGray = Color(0xFF5F5F5F)   // Texto secundario legible
@@ -62,26 +63,26 @@ val LightSurfaceContainerHigh = Color(0xFFEAEAE8)
 val LightSurfaceContainerHighest = Color(0xFFE2E2E0)
 
 // ─── Dark Theme ──────────────────────────────────────────
-val DarkPrimary = Color(0xFFBB9EFF)
-val DarkOnPrimary = Color(0xFF1E0070)
-val DarkPrimaryContainer = Color(0xFF32138D)
-val DarkOnPrimaryContainer = Color(0xFFEDE7F6)
+val DarkPrimary = Color(0xFFFFFFFF)   // Blanco de marca: botones y títulos
+val DarkOnPrimary = Color(0xFF000000)
+val DarkPrimaryContainer = Color(0xFF262626)
+val DarkOnPrimaryContainer = Color(0xFFF2F2F2)
 
-val DarkSecondary = Color(0xFFFFB74D)
+val DarkSecondary = Color(0xFFFFB74D) // Naranja de aviso
 val DarkOnSecondary = Color(0xFF4D2C00)
 val DarkSecondaryContainer = Color(0xFF704000)
 val DarkOnSecondaryContainer = Color(0xFFFFDDB3)
 
-val DarkTertiary = Color(0xFFB9F6CA)
+val DarkTertiary = Color(0xFFB9F6CA)  // Verde de confirmación
 val DarkOnTertiary = Color(0xFF00391C)
 val DarkTertiaryContainer = Color(0xFF00522C)
 val DarkOnTertiaryContainer = Color(0xFFD7FFD9)
 
-val DarkBackground = Color(0xFF121212)
-val DarkOnBackground = Color(0xFFEEEEEE)
-val DarkSurface = Color(0xFF1E1E1E)
-val DarkOnSurface = Color(0xFFEEEEEE)
-val DarkSurfaceVariant = Color(0xFF2C2C2C)
+val DarkBackground = Color(0xFF000000)
+val DarkOnBackground = Color(0xFFF2F2F2)
+val DarkSurface = Color(0xFF121212)
+val DarkOnSurface = Color(0xFFF2F2F2)
+val DarkSurfaceVariant = Color(0xFF242424)
 val DarkOnSurfaceVariant = Color(0xFFBDBDBD)
 
 val DarkError = Color(0xFFF2B8B5)
@@ -90,16 +91,16 @@ val DarkErrorContainer = Color(0xFF8C1D18)
 val DarkOnErrorContainer = Color(0xFFF9DEDC)
 
 val DarkOutline = Color(0xFF8A8A8A)
-val DarkOutlineVariant = Color(0xFF444444)
+val DarkOutlineVariant = Color(0xFF3A3A3A)
 val DarkScrim = Color.Black
-val DarkInverseSurface = Color(0xFFE6E6E6)
-val DarkInverseOnSurface = Color(0xFF303030)
-val DarkInversePrimary = Color(0xFF32138D)
+val DarkInverseSurface = Color(0xFFF2F2F2)
+val DarkInverseOnSurface = Color(0xFF1A1A1A)
+val DarkInversePrimary = Color(0xFF1A1A1A)
 
-val DarkSurfaceDim = Color(0xFF121212)
-val DarkSurfaceBright = Color(0xFF3A3A3A)
-val DarkSurfaceContainerLowest = Color(0xFF0E0E0E)
-val DarkSurfaceContainerLow = Color(0xFF1A1A1A)
-val DarkSurfaceContainer = Color(0xFF242424)
-val DarkSurfaceContainerHigh = Color(0xFF2C2C2C)
-val DarkSurfaceContainerHighest = Color(0xFF333333)
+val DarkSurfaceDim = Color(0xFF000000)
+val DarkSurfaceBright = Color(0xFF2E2E2E)
+val DarkSurfaceContainerLowest = Color(0xFF000000)
+val DarkSurfaceContainerLow = Color(0xFF0A0A0A)
+val DarkSurfaceContainer = Color(0xFF121212)
+val DarkSurfaceContainerHigh = Color(0xFF1C1C1C)
+val DarkSurfaceContainerHighest = Color(0xFF262626)

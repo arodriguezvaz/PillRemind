@@ -8,7 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.andres.pillremind.data.local.session.SessionManager.Keys.DARK_MODE_KEY
+import com.andres.pillremind.domain.model.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,8 +23,9 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 /**
  * Clase encargada de gestionar la sesión del usuario.
  *
- * Permite guardar, obtener y eliminar el ID del profile activo
- * utilizando DataStore como sistema de persistencia.
+ * Permite guardar, obtener y eliminar el ID del profile activo, la preferencia
+ * de tema y el resto de ajustes de sesión utilizando DataStore como sistema de
+ * persistencia.
  *
  * @property context Contexto necesario para acceder a DataStore.
  */
@@ -40,13 +41,28 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
 
         // Clave para almacenar el ID de usuario activo
         val ACTIVE_USER_ID = intPreferencesKey("active_user_id")
-        val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
+        val THEME_MODE = stringPreferencesKey("theme_mode")
+        val LEGACY_DARK_MODE = booleanPreferencesKey("dark_mode")
         val LAST_GENERATED_DATE = stringPreferencesKey("ultima_generacion")
         val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
     }
 
-    val isDarkMode: Flow<Boolean> = context.dataStore.data
-        .map { it[DARK_MODE_KEY] ?: false }
+    /**
+     * Preferencia de tema de la aplicación.
+     *
+     * Si existe la clave antigua `dark_mode`, se migra al vuelo: activada pasa
+     * a [ThemeMode.DARK] y desactivada a [ThemeMode.SYSTEM], porque ese era el
+     * valor por defecto anterior.
+     */
+    val themeMode: Flow<ThemeMode> = context.dataStore.data
+        .map { preferences ->
+            preferences[Keys.THEME_MODE]?.toThemeMode()
+                ?: if (preferences[Keys.LEGACY_DARK_MODE] == true) {
+                    ThemeMode.DARK
+                } else {
+                    ThemeMode.SYSTEM
+                }
+        }
 
     /**
      * Devuelve el ID almacenado si existe o null si no hay ningún profile activo.
@@ -122,10 +138,13 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
     }
 
     /**
-     * Guarda la preferencia de modo oscuro.
+     * Guarda la preferencia de tema y elimina la clave antigua de modo oscuro.
      */
-    suspend fun setDarkMode(enabled: Boolean) {
-        context.dataStore.edit { it[DARK_MODE_KEY] = enabled }
+    suspend fun setThemeMode(mode: ThemeMode) {
+        context.dataStore.edit { preferences ->
+            preferences[Keys.THEME_MODE] = mode.name
+            preferences.remove(Keys.LEGACY_DARK_MODE)
+        }
     }
 
     /**
@@ -148,4 +167,10 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
             preferences.remove(Keys.LAST_GENERATED_DATE)
         }
     }
+
+    /**
+     * Convierte el valor persistido en [ThemeMode], ignorando valores inválidos.
+     */
+    private fun String.toThemeMode(): ThemeMode? =
+        ThemeMode.entries.firstOrNull { it.name == this }
 }

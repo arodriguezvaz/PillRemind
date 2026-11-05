@@ -161,7 +161,8 @@ Column(fillMaxSize + padding(AppSpacing.md))
 - Column con scroll:
   `padding(horizontal = AppSpacing.md)` y `spacedBy(AppSpacing.sm)`.
 - Bloques:
-  1. Apariencia: `SettingsCard` sin título + `SettingsToggleItem` (modo oscuro).
+  1. Apariencia: `SettingsCard` con título «Tema» + `SettingsRadioItem` para
+     Seguir al sistema / Claro / Oscuro.
   2. Recordatorios: `SettingsCard` con notificaciones y alarmas exactas.
   3. Copia de seguridad: descripción, `SettingsLinkItem` de exportar/importar,
      indicador de progreso y aviso de privacidad.

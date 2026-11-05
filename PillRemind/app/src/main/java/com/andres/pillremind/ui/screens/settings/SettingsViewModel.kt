@@ -10,6 +10,7 @@ import com.andres.pillremind.data.backup.BackupError
 import com.andres.pillremind.data.backup.BackupException
 import com.andres.pillremind.data.backup.BackupFileStore
 import com.andres.pillremind.data.local.session.SessionManager
+import com.andres.pillremind.domain.model.ThemeMode
 import com.andres.pillremind.domain.repository.BackupRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -57,7 +58,7 @@ sealed interface BackupUiState {
 /**
  * ViewModel encargado de la gestión de la pantalla de ajustes.
  *
- * Gestiona la preferencia de modo oscuro y las operaciones de exportación e
+ * Gestiona la preferencia de tema y las operaciones de exportación e
  * importación de la copia de seguridad local.
  *
  * @property sessionManager Gestor de sesión del usuario activo.
@@ -82,8 +83,8 @@ class SettingsViewModel @Inject constructor(
 
     private var pendingExportPassword: CharArray? = null
 
-    val isDarkMode: StateFlow<Boolean> = sessionManager.isDarkMode
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val themeMode: StateFlow<ThemeMode> = sessionManager.themeMode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ThemeMode.SYSTEM)
 
     private val _backupState = MutableStateFlow<BackupUiState>(BackupUiState.Idle)
 
@@ -97,8 +98,11 @@ class SettingsViewModel @Inject constructor(
      */
     fun suggestedBackupFileName(): String = backupFileStore.suggestedFileName()
 
-    fun toggleDarkMode(enabled: Boolean) {
-        viewModelScope.launch { sessionManager.setDarkMode(enabled) }
+    /**
+     * Guarda el tema elegido por el usuario.
+     */
+    fun setThemeMode(mode: ThemeMode) {
+        viewModelScope.launch { sessionManager.setThemeMode(mode) }
     }
 
     /**

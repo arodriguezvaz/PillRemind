@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -48,6 +49,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.andres.pillremind.R
+import com.andres.pillremind.domain.model.ThemeMode
 import com.andres.pillremind.notifications.ExactAlarmStatus
 import com.andres.pillremind.notifications.NotificationAction
 import com.andres.pillremind.notifications.NotificationStatus
@@ -62,7 +64,7 @@ import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.settings.SettingsCard
 import com.andres.pillremind.ui.components.settings.SettingsLinkItem
-import com.andres.pillremind.ui.components.settings.SettingsToggleItem
+import com.andres.pillremind.ui.components.settings.SettingsRadioItem
 import com.andres.pillremind.ui.screens.main.MainTopBar
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
@@ -70,9 +72,9 @@ import com.andres.pillremind.ui.theme.AppSpacing
 /**
  * Pantalla de ajustes de la aplicación.
  *
- * Permite gestionar el modo oscuro, el estado de los permisos de
- * notificaciones y alarmas exactas, y la exportación e importación de una copia
- * de seguridad local. Los datos de la aplicación son siempre locales.
+ * Permite elegir el tema, consultar el estado de los permisos de notificaciones
+ * y alarmas exactas, y exportar o importar una copia de seguridad local. Los
+ * datos de la aplicación son siempre locales.
  *
  * @param navController Controlador de navegación para volver a la pantalla anterior.
  * @param topLevelRoutes Rutas principales que no muestran flecha de retroceso.
@@ -85,7 +87,7 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
 
-    val isDarkMode by settingsViewModel.isDarkMode.collectAsStateWithLifecycle()
+    val themeMode by settingsViewModel.themeMode.collectAsStateWithLifecycle()
     val backupState by settingsViewModel.backupState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
@@ -229,12 +231,17 @@ fun SettingsScreen(
         ) {
 
             // Tarjeta de apariencia
-            SettingsCard {
-                SettingsToggleItem(
-                    label = stringResource(R.string.settings_dark_mode),
-                    checked = isDarkMode,
-                    onCheckedChange = { settingsViewModel.toggleDarkMode(it) }
-                )
+            SettingsCard(title = stringResource(R.string.settings_theme_title)) {
+                Column(modifier = Modifier.selectableGroup()) {
+                    ThemeMode.entries.forEach { mode ->
+                        SettingsRadioItem(
+                            label = stringResource(mode.labelRes()),
+                            description = mode.descriptionRes()?.let { stringResource(it) },
+                            selected = themeMode == mode,
+                            onClick = { settingsViewModel.setThemeMode(mode) },
+                        )
+                    }
+                }
             }
 
             // Estado de los permisos de recordatorios.
@@ -697,4 +704,24 @@ private fun ReminderPermissionRow(
             size = ButtonSize.Large,
         )
     }
+}
+
+/**
+ * Etiqueta del selector de tema para cada modo.
+ */
+@StringRes
+private fun ThemeMode.labelRes(): Int = when (this) {
+    ThemeMode.SYSTEM -> R.string.settings_theme_system
+    ThemeMode.LIGHT -> R.string.settings_theme_light
+    ThemeMode.DARK -> R.string.settings_theme_dark
+}
+
+/**
+ * Descripción opcional del selector de tema.
+ */
+@StringRes
+private fun ThemeMode.descriptionRes(): Int? = when (this) {
+    ThemeMode.SYSTEM -> R.string.settings_theme_system_description
+    ThemeMode.LIGHT -> null
+    ThemeMode.DARK -> null
 }
