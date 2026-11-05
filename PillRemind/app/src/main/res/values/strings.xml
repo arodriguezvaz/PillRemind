@@ -109,6 +109,7 @@
     <string name="profile_photo_description">Foto de perfil de %1$s</string>
     <string name="profile_avatar_description">Avatar del perfil</string>
     <string name="profile_view_adherence">Ver adherencia</string>
+    <string name="profile_tracking_section">Seguimiento</string>
     <string name="profile_adherence_soon">Próximamente</string>
     <string name="profile_adherence_placeholder_title">Adherencia</string>
     <string name="profile_adherence_placeholder_message">Próximamente podrás consultar aquí las estadísticas de tomas por medicamento.</string>
@@ -196,7 +197,10 @@
     <string name="medication_view_title">Ver medicamento</string>
     <string name="medication_edit_title">Editar medicamento</string>
     <string name="medication_data_section">Datos del medicamento</string>
+    <string name="medication_treatment_section">Tratamiento</string>
     <string name="medication_schedule_section">Pauta</string>
+    <string name="medication_next_intake">Próxima toma</string>
+    <string name="medication_no_end_date">Sin fecha de fin</string>
     <string name="medication_name_placeholder">Nombre del medicamento</string>
     <string name="medication_dose_placeholder">500</string>
     <string name="medication_select_placeholder">Selecciona</string>
@@ -268,8 +272,6 @@
     <string name="schedule_summary_cycle">%1$d días de toma y %2$d de descanso</string>
     <string name="schedule_summary_monthly_weekday">%1$s %2$s</string>
     <string name="schedule_summary_no_times">Sin horas</string>
-    <string name="schedule_selected_days">Días seleccionados</string>
-    <string name="schedule_cycle_detail">Ciclo</string>
 
     <!-- Acciones y fotos -->
     <string name="common_ok">OK</string>
@@ -277,9 +279,12 @@
     <string name="common_not_specified">Sin dato</string>
     <string name="common_yes">Sí</string>
     <string name="common_no">No</string>
+    <string name="common_today">Hoy</string>
+    <string name="common_tomorrow">Mañana</string>
     <string name="common_date_pattern">dd/MM/yyyy</string>
+    <string name="common_short_date_pattern">dd/MM</string>
     <string name="common_time_pattern">HH:mm</string>
-    <string name="common_info_row_format">%1$s:\u0020</string>
+    <string name="common_datetime_short">%1$s · %2$s</string>
     <string name="search_clear">Limpiar búsqueda</string>
     <string name="photo_profile">Foto de perfil</string>
     <string name="photo_medication">Foto del medicamento</string>

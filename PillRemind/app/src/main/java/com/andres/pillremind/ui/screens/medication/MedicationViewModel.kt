@@ -11,6 +11,7 @@ import com.andres.pillremind.data.utils.copyImageToInternalStorage
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.ScheduleRule
+import com.andres.pillremind.domain.model.nextIntake
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
@@ -21,6 +22,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -74,6 +76,20 @@ class MedicationViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyList()
         ) ?: MutableStateFlow(emptyList())
+
+    /**
+     * Próxima toma futura del medicamento, calculada a partir de sus horarios.
+     *
+     * Se recalcula cuando cambia el medicamento o su pauta. Si no quedan tomas
+     * futuras (tratamiento terminado o archivado), vale `null`.
+     */
+    val nextIntake: StateFlow<LocalDateTime?> = combine(medication, schedules) { med, horarios ->
+        med?.let { horarios.nextIntake(it) }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 
     /**
      * Crea un nuevo medicamento con sus horarios y programa las alarmas.

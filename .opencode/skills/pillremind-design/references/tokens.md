@@ -159,7 +159,7 @@ Familia: **Lexend** (`FontFamily.kt`). Todos los roles usan Lexend.
 
 | Rol | Uso | Evitar |
 |---|---|---|
-| `titleLarge` | Títulos de sección (`AppFormSection`, `AppInfoCard`) y título de la top bar. | Texto de párrafo. |
+| `titleLarge` | Títulos de sección (`AppFormSection`, `AppReadOnlySection`) y título de la top bar. | Texto de párrafo. |
 | `titleMedium` | Título de card (`MedicationCard`, `IntakeCard`, `PerfilCard`, `SettingsCard`). | Títulos de sección. |
 | `titleSmall` | Subtítulos y bloques secundarios. | Texto de lectura. |
 | `bodyLarge` | Texto de lectura, etiquetas de ajustes, horas. | Metadatos pequeños. |
@@ -170,7 +170,7 @@ Familia: **Lexend** (`FontFamily.kt`). Todos los roles usan Lexend.
 | `labelSmall` | Etiquetas muy compactas. | Texto de lectura. |
 | `headline*` / `display*` | Reservados; no hay uso actual. | Pantallas normales. |
 
-Lectura aumentada: `AppInfoRow` y `AppReadOnlyField` usan `bodyLarge` con
+Lectura aumentada: el valor de `AppDetailRow` usa `bodyLarge` con
 `fontSize = 18.sp`, `lineHeight = 26.sp` y peso Medium.
 
 No reduzcas el tamaño para que un texto quepa: usa `maxLines` + elipsis en
@@ -207,9 +207,9 @@ a `Shapes.kt` y documenta su uso.
 | `xl` | 24dp | Bajo la foto y entre bloques grandes del formulario de medicamento. |
 | `xxl` | 32dp | Alto visual de un estado vacío. |
 
-Excepciones que se mantienen como literales: 6dp de `AppInfoRow`, 10dp de los
-bloques de estado de `SettingsScreen`, paddings internos de `AppButton`
-(6/12/20/28), tamaños de iconos/imágenes/botones y bordes de 1/2dp.
+Excepciones que se mantienen como literales: 10dp de los bloques de estado de
+`SettingsScreen`, paddings internos de `AppButton` (6/12/20/28), tamaños de
+iconos/imágenes/botones y bordes/divisores de 1/2dp.
 
 ## Elevación
 

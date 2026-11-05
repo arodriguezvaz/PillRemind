@@ -195,6 +195,39 @@ fun List<ScheduleRule>.nextOccurrences(
 }
 
 /**
+ * Calcula la próxima toma futura de un medicamento a partir de sus horarios.
+ *
+ * Cada horario se evalúa con su propia regla y su propia hora, de modo que una
+ * pauta con reglas distintas no mezcla días ni horas. Se descartan las tomas ya
+ * pasadas y las que caen después de [Medication.endDate].
+ *
+ * @param medication Medicamento al que pertenecen los horarios.
+ * @param now Momento de referencia para descartar tomas pasadas.
+ * @return Próxima toma, o `null` si no queda ninguna.
+ */
+fun List<Schedule>.nextIntake(
+    medication: Medication,
+    now: LocalDateTime = LocalDateTime.now()
+): LocalDateTime? {
+    if (isEmpty() || medication.deletedAt != null) return null
+
+    return mapNotNull { schedule ->
+        listOf(schedule.rule)
+            .nextOccurrences(
+                startDate = medication.startDate,
+                times = listOf(schedule.time),
+                from = now.toLocalDate(),
+                count = 5,
+            )
+            .firstOrNull { candidate ->
+                candidate.isAfter(now) &&
+                    (medication.endDate == null ||
+                        !candidate.toLocalDate().isAfter(medication.endDate))
+            }
+    }.minOrNull()
+}
+
+/**
  * Representa un horario programado para la toma de un medicamento.
  *
  * @property id Identificador único del horario.

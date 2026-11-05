@@ -38,9 +38,8 @@ el mismo cambio.
 
 1. **Pensada para personas mayores.** El texto de lectura usa `bodyLarge`
    (16sp); `bodyMedium` (14sp) se reserva para descripciones y `bodySmall`
-   (12sp) para metadatos. Los datos de lectura de `AppInfoRow` y
-   `AppReadOnlyField` suben a 18sp/26sp. No reduzcas texto para que quepa:
-   reordena el layout.
+   (12sp) para metadatos. Los valores de `AppDetailRow` suben a 18sp/26sp.
+   No reduzcas texto para que quepa: reordena el layout.
 2. **Una sola elevación.** `AppElevation` (4dp) en cards, campos, chips, filas
    de horas, botones y FAB. No añadas 8dp, 12dp ni sombras propias.
 3. **Superficies limpias.** Fondo `background`, cards y campos `surface`, texto
@@ -83,7 +82,7 @@ No uses `secondary`/`tertiary` para decorar: cada rol tiene un significado.
 
 | Rol | Uso |
 |---|---|
-| `titleLarge` | Títulos de sección (`AppFormSection`, `AppInfoCard`) y título de la top bar. |
+| `titleLarge` | Títulos de sección (`AppFormSection`, `AppReadOnlySection`) y título de la top bar. |
 | `titleMedium` | Título de card (`MedicationCard`, `IntakeCard`, `PerfilCard`, `SettingsCard`). |
 | `bodyLarge` | Texto de lectura, etiquetas de ajustes, horas. |
 | `bodyMedium` | Descripciones, enlaces de ajustes y estado vacío. |
@@ -107,8 +106,8 @@ No uses `secondary`/`tertiary` para decorar: cada rol tiene un significado.
 
 No escribas `RoundedCornerShape(...)` en pantallas o componentes: usa un token.
 Excepciones que se mantienen como literales: tamaños de iconos/imágenes/botones,
-paddings internos de `AppButton`, 6dp de `AppInfoRow`, 10dp de un bloque de
-`SettingsScreen` y bordes de 1/2dp.
+paddings internos de `AppButton`, 10dp de un bloque de `SettingsScreen` y
+bordes/divisores de 1/2dp.
 
 ## Componentes
 
@@ -118,9 +117,10 @@ Catálogo detallado en `references/components.md`.
   `Small` 110dp, `Medium` 160dp, `Large` ancho completo) y `AppFab`.
 - **Campos:** `AppTextField` + `AppFormField`; `AppSearchField` para búsqueda;
   `AppDropdownField`, `AppDatePickerField`, `AppPhotoPicker`.
-- **Formularios:** `AppFormSection`, `AppReadOnlyField` y `AppFormActions`.
-- **Cards:** `AppInfoCard`/`AppInfoRow`, `BlankCard`, `MedicationCard`,
-  `IntakeCard`, `PerfilCard`.
+- **Formularios:** `AppFormSection` y `AppFormActions`.
+- **Solo lectura:** `AppReadOnlySection`, `AppDetailRow` (con variante
+  `stacked`), `AppNoticeBlock` y `AppScrollWithFooter`.
+- **Cards:** `BlankCard`, `MedicationCard`, `IntakeCard`, `PerfilCard`.
 - **Ajustes:** `SettingsCard`, `SettingsRadioItem`, `SettingsToggleItem`,
   `SettingsLinkItem`.
 - **Horarios:** `WeekDayChipGroup`, `TimeListEditor`, `TimeItem`, `AddTimeItem`.
