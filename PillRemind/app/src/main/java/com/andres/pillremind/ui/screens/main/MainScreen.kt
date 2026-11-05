@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.screens.main
 
+import android.annotation.SuppressLint
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
@@ -16,8 +17,8 @@ import com.andres.pillremind.R
 import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
-import com.andres.pillremind.navigation.ProfileScreens
 import com.andres.pillremind.ui.components.AppFab
+import com.andres.pillremind.ui.screens.home.homeTopBarTitle
 
 /**
  * Pantalla principal de la aplicación.
@@ -28,6 +29,7 @@ import com.andres.pillremind.ui.components.AppFab
  * @param navController Controlador de navegación interno de la barra inferior.
  * @param rootNavController Controlador de navegación raíz usado por el grafo principal.
  */
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(
     navController: NavHostController = rememberNavController(),
@@ -37,21 +39,10 @@ fun MainScreen(
     val currentRoute = navBackStackEntry?.destination?.route
     val showFab =
         currentRoute == BottomBarScreens.Home.route || currentRoute == BottomBarScreens.Medications.route
-    val topLevelRoutes = remember {
-        setOf(
-            BottomBarScreens.Home.route,
-            BottomBarScreens.Medications.route,
-            BottomBarScreens.Profile.route
-        )
-    }
-    val canGoBack = currentRoute !in topLevelRoutes &&
-        navController.previousBackStackEntry != null
 
     val defaultTopBarState = when (currentRoute) {
         BottomBarScreens.Home.route -> TopBarState(
-            // En Inicio la barra muestra el logo y la fecha vive en el
-            // contenido de HomeScreen, para no apilar dos líneas.
-            title = "",
+            title = homeTopBarTitle(),
             showLogo = true
         )
         BottomBarScreens.Medications.route -> TopBarState(
@@ -60,19 +51,13 @@ fun MainScreen(
         BottomBarScreens.Profile.route -> TopBarState(
             title = stringResource(R.string.profile_view_title)
         )
-        ProfileScreens.Adherence.route -> TopBarState(
-            title = stringResource(R.string.adherence_title)
-        )
         MedicationScreens.MedicationSeeScreen.route -> TopBarState(
             title = stringResource(R.string.medication_view_title)
         )
         MedicationScreens.MedicationCreateScreen.route -> TopBarState(
             title = stringResource(R.string.medication_add_title)
         )
-        MedicationScreens.ArchivedMedicationsScreen.route -> TopBarState(
-            title = stringResource(R.string.medication_archived_title)
-        )
-        else -> TopBarState(title = stringResource(R.string.nav_home))
+        else -> TopBarState(title = homeTopBarTitle(), showLogo = true)
     }
 
     // Los títulos estáticos se derivan de la ruta actual. El mapa solo guarda
@@ -84,13 +69,20 @@ fun MainScreen(
         statesByRoute = topBarStates,
         fallback = defaultTopBarState
     )
+    val topLevelRoutes = remember {
+        setOf(
+            BottomBarScreens.Home.route,
+            BottomBarScreens.Medications.route,
+            BottomBarScreens.Profile.route
+        )
+    }
 
     Scaffold(
         topBar = {
             MainTopBar(
                 state = topBarState,
-                canGoBack = canGoBack,
-                onBack = { navController.popBackStack() }
+                navController = navController,
+                topLevelRoutes = topLevelRoutes
             )
         },
         bottomBar = { MainBottomBar(navController = navController) },

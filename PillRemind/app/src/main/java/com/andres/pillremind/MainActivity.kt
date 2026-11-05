@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.andres.pillremind.data.local.session.SessionManager
+import com.andres.pillremind.domain.model.ThemeMode
 import com.andres.pillremind.navigation.RootNavigationGraph
 import com.andres.pillremind.ui.screens.onboarding.OnboardingRoute
 import com.andres.pillremind.ui.theme.PillRemindTheme
@@ -37,9 +39,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val isDarkMode by sessionManager.isDarkMode
-                .collectAsStateWithLifecycle(initialValue = false)
-            PillRemindTheme(darkTheme = isDarkMode) {
+            val themeMode by sessionManager.themeMode
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.SYSTEM)
+            val darkTheme = when (themeMode) {
+                ThemeMode.SYSTEM -> isSystemInDarkTheme()
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+            }
+            PillRemindTheme(darkTheme = darkTheme) {
                 val onboardingCompleted by sessionManager.onboardingCompleted
                     .collectAsStateWithLifecycle(initialValue = null)
 

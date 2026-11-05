@@ -28,9 +28,9 @@ visual).
 | Top bar | `ui/screens/main/` (`MainScreen`, `TopBarState`, `MainTopBar`) |
 | Textos | `app/src/main/res/values/strings.xml` |
 
-Si el código y esta skill discrepan, manda el código. En la top bar, el patrón
-derivado de la ruta es la fuente de verdad; `onTopBarChange` solo se conserva
-como override en Perfil/Medicamento mientras su modo no viva en la ruta
+Si el código y esta skill discrepan, manda el código. La excepción es la top
+bar: el patrón `onTopBarChange` + `LaunchedEffect` que aún existe en pantallas
+antiguas es legado; para pestañas nuevas manda el patrón derivado de la ruta
 (`references/top-bar.md`). Si el cambio es intencionado, actualiza la skill en
 el mismo cambio.
 
@@ -45,8 +45,10 @@ el mismo cambio.
    de horas, botones y FAB. No añadas 8dp, 12dp ni sombras propias.
 3. **Superficies limpias.** Fondo `background`, cards y campos `surface`, texto
    principal `onSurface`, secundario `onSurfaceVariant`.
-4. **Claro y oscuro.** Comprueba ambos; no uses blanco/negro fijos. El modo
-   dinámico está desactivado en `PillRemindTheme`.
+4. **Claro y oscuro.** Comprueba ambos; no uses blanco/negro fijos. El tema
+   oscuro es monocromo (negro, blanco y grises) y reserva el naranja, el verde
+   y el rojo para los estados. El modo dinámico está desactivado en
+   `PillRemindTheme`.
 5. **Color solo desde el tema.** `Color(0x...)` vive únicamente en `Color.kt`.
    En pantallas y componentes usa `MaterialTheme.colorScheme`.
 6. **Reutiliza antes de crear.** Si un componente de `ui/components` cubre el
@@ -63,7 +65,7 @@ Resumen operativo; los valores completos están en `references/tokens.md`.
 
 | Rol | Uso |
 |---|---|
-| `primary` | Marca, títulos de sección, acción principal, icono activo. |
+| `primary` | Marca, títulos de sección, acción principal, icono activo. Negro en claro, blanco en oscuro. |
 | `onPrimary` | Texto e iconos sobre `primary`. |
 | `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, avatar por defecto. |
 | `secondaryContainer` / `onSecondaryContainer` | Botón de una toma ya realizada. |
@@ -119,7 +121,8 @@ Catálogo detallado en `references/components.md`.
 - **Formularios:** `AppFormSection`, `AppReadOnlyField` y `AppFormActions`.
 - **Cards:** `AppInfoCard`/`AppInfoRow`, `BlankCard`, `MedicationCard`,
   `IntakeCard`, `PerfilCard`.
-- **Ajustes:** `SettingsCard`, `SettingsToggleItem`, `SettingsLinkItem`.
+- **Ajustes:** `SettingsCard`, `SettingsRadioItem`, `SettingsToggleItem`,
+  `SettingsLinkItem`.
 - **Horarios:** `WeekDayChipGroup`, `TimeListEditor`, `TimeItem`, `AddTimeItem`.
 
 ## Patrones de pantalla
@@ -136,17 +139,16 @@ Catálogo detallado en `references/components.md`.
 - **Card:** `Card(shape = MaterialTheme.shapes.large,
   colors = surface, elevation = AppElevation)`.
 - **Navegación:** `MainScreen` deriva `TopBarState` de la ruta actual
-  (`currentBackStackEntryAsState()` + `when`). Los títulos dinámicos
-  (Perfil/Medicamento en creación/edición) se publican como override por ruta;
-  no uses `onTopBarChange` en pestañas nuevas. `MainTopBar` es presentacional
-  (`state`, `canGoBack`, `onBack`), sin `NavHostController`. Detalle en
-  `references/top-bar.md`.
-- **Ajustes:** una `SettingsCard` por bloque, con `SettingsToggleItem` o
-  `SettingsLinkItem` dentro.
+  (`currentBackStackEntryAsState()`) y de un `when` de rutas. La pantalla no
+  empuja su título. El patrón `onTopBarChange` + `LaunchedEffect` es legado y
+  puede dejar la top bar desincronizada; no lo uses en pestañas nuevas. Detalle
+  en `references/top-bar.md`.
+- **Ajustes:** una `SettingsCard` por bloque; usa `SettingsRadioItem` para
+  opciones exclusivas, `SettingsToggleItem` para binarias y `SettingsLinkItem`
+  para acciones.
 - **Detalle:** si la pantalla vive fuera de `MainScreen` y necesita su propio
-  `Scaffold`, reutiliza `MainTopBar` con `state`, `canGoBack` y `onBack` (patrón
-  `ProfilesScreen` / `SettingsScreen`). Dentro de `MainScreen` no añadas otro
-  `Scaffold`.
+  `Scaffold`, reutiliza `MainTopBar` y pásale `topLevelRoutes` (patrón
+  `ProfilesScreen`). Dentro de `MainScreen` no añadas otro `Scaffold`.
 
 ## Pestaña nueva
 
@@ -205,7 +207,6 @@ JAVA_HOME=/opt/android-studio/jbr ./gradlew assembleDebug
 - [ ] Comprobado en claro y oscuro, y con texto grande.
 - [ ] La pestaña nueva está en el resolver de `TopBarState` de `MainScreen`;
       no usa `onTopBarChange` ni un `LaunchedEffect` para el título.
-- [ ] `MainTopBar` recibe `state`, `canGoBack` y `onBack`; no `NavHostController`.
 - [ ] Si es pestaña, seguí `references/new-tab.md`.
 - [ ] Componente nuevo: KDoc + `@Preview`.
 - [ ] `assembleDebug` compila.
@@ -216,6 +217,6 @@ JAVA_HOME=/opt/android-studio/jbr ./gradlew assembleDebug
   espaciado y elevación.
 - `references/components.md`: ficha y uso de cada componente.
 - `references/screens.md`: estructura de las pantallas actuales.
-- `references/top-bar.md`: contrato de la top bar, estado derivado de la ruta
-  y overrides de los modos dinámicos.
+- `references/top-bar.md`: top bar derivada de la ruta y migración del patrón
+  legado.
 - `references/new-tab.md`: receta completa para añadir una pestaña.

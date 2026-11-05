@@ -221,6 +221,19 @@ SettingsToggleItem(label, checked, onCheckedChange, modifier, enabled)
 
 - Fila con etiqueta `bodyLarge` Medium y `Switch`.
 
+### `SettingsRadioItem` (`settings/SettingsRadioItem.kt`)
+
+```kotlin
+SettingsRadioItem(label, selected, onClick, modifier, description)
+```
+
+- Fila seleccionable con `RadioButton`; toda la fila es clicable y cumple el
+  mínimo de 48dp.
+- Se usa dentro de `Column(Modifier.selectableGroup())`; etiqueta `bodyLarge` y
+  descripción opcional `bodyMedium` en `onSurfaceVariant`.
+- `SettingsToggleItem` se mantiene para opciones binarias; este componente es
+  para grupos exclusivos.
+
 ### `SettingsLinkItem` (`settings/SettingsLinkItem.kt`)
 
 ```kotlin

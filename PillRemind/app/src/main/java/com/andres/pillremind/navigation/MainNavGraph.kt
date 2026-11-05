@@ -13,8 +13,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.andres.pillremind.ui.screens.adherence.AdherenceScreen
-import com.andres.pillremind.ui.screens.archived.ArchivedMedicationsScreen
 import com.andres.pillremind.ui.screens.home.HomeScreen
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.screens.medication.MedicationMode
@@ -75,13 +73,7 @@ fun MainNavigationGraph(
                         MedicationScreens.MedicationSeeScreen.createRoute(id)
                     )
                 },
-                onArchivedClick = {
-                    navController.navigate(MedicationScreens.ArchivedMedicationsScreen.route)
-                },
             )
-        }
-        composable(MedicationScreens.ArchivedMedicationsScreen.route) {
-            ArchivedMedicationsScreen()
         }
 
         composable(BottomBarScreens.Profile.route) {
@@ -96,17 +88,11 @@ fun MainNavigationGraph(
                         }
                     }
                 },
-                onAdherenceClicked = {
-                    navController.navigate(ProfileScreens.Adherence.route)
-                },
                 onTopBarChange = topBarChangeFor(
                     BottomBarScreens.Profile.route,
                     onTopBarChange
                 ),
             )
-        }
-        composable(ProfileScreens.Adherence.route) {
-            AdherenceScreen()
         }
         medicationNavGraph(navController, onTopBarChange)
     }
@@ -196,15 +182,4 @@ sealed class MedicationScreens(val route: String) {
     }
 
     object MedicationCreateScreen : MedicationScreens("medication/create")
-
-    /** Lista de medicamentos archivados. */
-    object ArchivedMedicationsScreen : MedicationScreens("medication/archived")
-}
-
-/**
- * Destinos secundarios accesibles desde la pestaña de perfil.
- */
-sealed class ProfileScreens(val route: String) {
-    /** Estadísticas de adherencia del perfil activo. */
-    object Adherence : ProfileScreens("profile/adherence")
 }

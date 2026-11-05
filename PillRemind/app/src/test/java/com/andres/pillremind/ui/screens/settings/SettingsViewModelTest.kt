@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.andres.pillremind.R
 import com.andres.pillremind.data.backup.BackupFileStore
 import com.andres.pillremind.data.local.session.SessionManager
+import com.andres.pillremind.domain.model.ThemeMode
 import com.andres.pillremind.domain.repository.BackupRepository
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -50,7 +51,7 @@ class SettingsViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        every { sessionManager.isDarkMode } returns flowOf(false)
+        every { sessionManager.themeMode } returns flowOf(ThemeMode.SYSTEM)
         every { backupFileStore.openOutput(uri) } returns ByteArrayOutputStream()
         coEvery { backupRepository.exportTo(any(), any()) } just Runs
         viewModel = SettingsViewModel(
@@ -64,6 +65,13 @@ class SettingsViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `guarda el tema elegido`() {
+        viewModel.setThemeMode(ThemeMode.DARK)
+
+        coVerify { sessionManager.setThemeMode(ThemeMode.DARK) }
     }
 
     @Test

@@ -9,7 +9,6 @@ import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Schedule
-import com.andres.pillremind.domain.model.requireValidForSaving
 import com.andres.pillremind.domain.repository.MedicationRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -28,7 +27,6 @@ class MedicationRepositoryImpl @Inject constructor(
 ) : MedicationRepository {
 
     override suspend fun insertMedication(medication: Medication): Long {
-        medication.requireValidForSaving()
         return medicationDao.insertMedication(medication.toEntity())
     }
 
@@ -36,7 +34,6 @@ class MedicationRepositoryImpl @Inject constructor(
         medication: Medication,
         schedules: List<Schedule>
     ): Long = database.withTransaction {
-        medication.requireValidForSaving()
         val medicationId = medicationDao.insertMedication(medication.toEntity())
         schedules.forEach { schedule ->
             scheduleDao.insertSchedule(
@@ -44,6 +41,10 @@ class MedicationRepositoryImpl @Inject constructor(
             )
         }
         medicationId
+    }
+
+    override suspend fun deleteMedication(medication: Medication) {
+        medicationDao.deleteMedication(medication.toEntity())
     }
 
     override suspend fun softDeleteMedication(
@@ -54,20 +55,11 @@ class MedicationRepositoryImpl @Inject constructor(
         database.withTransaction {
             medicationDao.markDeleted(medicationId, deletedAt, deletedAt)
             intakeDao.deleteFutureIntakesByMedicationId(medicationId, deleteFutureFrom)
-            // Los horarios se conservan para que una restauración recupere la pauta.
+            scheduleDao.deleteByMedicationId(medicationId)
         }
     }
 
-    override suspend fun restoreMedication(medicationId: Int, restoredAt: LocalDateTime) {
-        medicationDao.restoreMedication(medicationId, restoredAt)
-    }
-
-    override suspend fun deleteMedicationPermanently(medicationId: Int) {
-        medicationDao.deleteMedicationById(medicationId)
-    }
-
     override suspend fun updateMedication(medication: Medication) {
-        medication.requireValidForSaving()
         medicationDao.updateMedication(medication.toEntity())
     }
 
@@ -76,7 +68,6 @@ class MedicationRepositoryImpl @Inject constructor(
         schedules: List<Schedule>,
         deleteFutureFrom: LocalDateTime
     ) {
-        medication.requireValidForSaving()
         database.withTransaction {
             medicationDao.updateMedication(medication.toEntity())
             intakeDao.deleteFutureIntakesByMedicationId(medication.id, deleteFutureFrom)
@@ -97,14 +88,5 @@ class MedicationRepositoryImpl @Inject constructor(
 
     override fun getMedications(profileId: Int): Flow<List<Medication>> {
         return medicationDao.getMedications(profileId).map { list -> list.map { it.toDomain() } }
-    }
-
-    override fun getArchivedMedications(profileId: Int): Flow<List<Medication>> {
-        return medicationDao.getArchivedMedications(profileId)
-            .map { list -> list.map { it.toDomain() } }
-    }
-
-    override suspend fun getMedicationsOnce(profileId: Int): List<Medication> {
-        return medicationDao.getMedicationsOnce(profileId).map { it.toDomain() }
     }
 }

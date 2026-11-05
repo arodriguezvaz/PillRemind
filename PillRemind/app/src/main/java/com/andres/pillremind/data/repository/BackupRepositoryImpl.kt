@@ -11,15 +11,12 @@ import com.andres.pillremind.data.backup.BackupImageStore
 import com.andres.pillremind.data.backup.BackupSerializer
 import com.andres.pillremind.data.backup.BackupSnapshot
 import com.andres.pillremind.data.backup.BackupValidator
-import com.andres.pillremind.data.backup.MAX_BACKUP_PAYLOAD_BYTES
-import com.andres.pillremind.data.backup.readBytesLimited
 import com.andres.pillremind.data.backup.toBackupFile
 import com.andres.pillremind.data.backup.toEntities
 import com.andres.pillremind.data.local.dao.BackupDao
 import com.andres.pillremind.data.local.database.AppDatabase
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.repository.BackupRepository
-import com.andres.pillremind.notifications.ReminderNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayInputStream
@@ -43,7 +40,6 @@ class BackupRepositoryImpl @Inject constructor(
     private val imageStore: BackupImageStore,
     private val sessionManager: SessionManager,
     private val reminderScheduler: ReminderScheduler,
-    private val notifications: ReminderNotifications,
     @ApplicationContext private val context: Context
 ) : BackupRepository {
 
@@ -99,12 +95,10 @@ class BackupRepositoryImpl @Inject constructor(
 
             val contents = try {
                 // Se lee el payload completo para que GCM valide la etiqueta de
-                // integridad antes de interpretar el ZIP. La lectura está
-                // acotada para no agotar la memoria con archivos enormes.
-                val payloadBytes = payload.use { it.readBytesLimited(MAX_BACKUP_PAYLOAD_BYTES) }
+                // integridad antes de interpretar el ZIP.
+                val payloadBytes = payload.use { it.readBytes() }
                 BackupArchive.read(ByteArrayInputStream(payloadBytes))
             } catch (e: Exception) {
-                if (e is BackupException) throw e
                 if (header.encrypted) {
                     throw BackupException(
                         BackupError.WRONG_PASSWORD,
@@ -112,6 +106,7 @@ class BackupRepositoryImpl @Inject constructor(
                         e
                     )
                 }
+                if (e is BackupException) throw e
                 throw BackupException(
                     BackupError.CORRUPTED,
                     "El archivo de copia está dañado",
@@ -176,7 +171,6 @@ class BackupRepositoryImpl @Inject constructor(
             }
 
             reminderScheduler.cancelAlarms(oldFutureIntakeIds)
-            notifications.cancelAll()
             sessionManager.clearActiveProfile()
             sessionManager.setActiveUser(entities.users.first().id)
             sessionManager.clearLastGeneratedDate()
