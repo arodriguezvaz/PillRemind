@@ -46,8 +46,8 @@ el mismo cambio.
 3. **Superficies limpias.** Fondo `background`, cards y campos `surface`, texto
    principal `onSurface`, secundario `onSurfaceVariant`.
 4. **Claro y oscuro.** Comprueba ambos; no uses blanco/negro fijos. El tema
-   oscuro es monocromo (negro, blanco y grises) y reserva el naranja, el verde
-   y el rojo para los estados. El modo dinámico está desactivado en
+   oscuro usa fondo negro y un primario azul cielo, y reserva el naranja, el
+   verde y el rojo para los estados. El modo dinámico está desactivado en
    `PillRemindTheme`.
 5. **Color solo desde el tema.** `Color(0x...)` vive únicamente en `Color.kt`.
    En pantallas y componentes usa `MaterialTheme.colorScheme`.
