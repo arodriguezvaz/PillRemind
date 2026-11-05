@@ -283,8 +283,8 @@ WeeklyStatisticsChart(days, modifier)
 MedicationStatisticsCard(statistics, modifier)
 ```
 
-- Imagen o `DefaultPill`, nombre, dosis, «X de Y tomas», pendientes y
-  porcentaje. Etiqueta «Archivado» cuando corresponde.
+- Imagen o `DefaultPill` (con `AppImagePlaceholder`), nombre, dosis, «X de Y
+  tomas», pendientes y porcentaje. Etiqueta «Archivado» cuando corresponde.
 
 ### `StatisticsHistoryItem` (`statistics/StatisticsHistoryItem.kt`)
 
