@@ -1,7 +1,22 @@
 # Proyecto fin de ciclo
 
  **PILLRemind**
- 
+
+## Descarga
+
+[![Última versión](https://img.shields.io/github/v/release/arodriguezvaz/PillRemind?label=versi%C3%B3n&color=2ea44f)](https://github.com/arodriguezvaz/PillRemind/releases/latest)
+
+A aplicación distribúese como APK desde as [releases de GitHub](https://github.com/arodriguezvaz/PillRemind/releases/latest).
+Non está publicada en Google Play.
+
+- Require Android 8.0 (API 26) ou superior.
+- Descarga o ficheiro `PillRemind-x.y.z.apk` e ábreo. Se o sistema o pide, permite a
+  instalación desde fontes descoñecidas para o navegador ou o xestor de ficheiros.
+- As actualizacións instálanse sobre a versión anterior e conservan os datos locais,
+  sempre que o APK estea asinado coa mesma clave.
+- A aplicación non ten permiso de internet: os datos só saen do dispositivo nas copias
+  de seguridade que exportes manualmente desde Axustes.
+
 ## Descrición
 
 
@@ -47,6 +62,25 @@ xa que son tecnoloxías modernas e en uso, con gran respaldo por parte de Google
 O motivo da realización deste proxecto foi persoal: decatouse de que con frecuencia se 
 esquece de tomar a medicación e non quería que outras empresas tivesen información sobre a súa medicación. 
 Por iso, decidiu crear unha aplicación que lle resultase útil a nivel persoal e familiar.
+
+## Publicación
+
+O APK de release compílase, asínase e publícase automaticamente con GitHub Actions
+(`.github/workflows/release.yml`). Para lanzar unha versión:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+O workflow toma a versión da etiqueta, usa o número de execución como `versionCode` e
+adjunta `PillRemind-1.0.0.apk` á release. Tamén se pode executar a man desde a pestana
+Actions: nese caso só se sobe o APK como artefacto, sen crear release.
+
+A firma necesita catro secretos no repositorio (Settings → Secrets and variables → Actions):
+`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` e `KEY_PASSWORD`. En local pódese
+crear `PillRemind/keystore.properties` coas claves `storeFile`, `storePassword`, `keyAlias`
+e `keyPassword`; tanto ese ficheiro como o keystore están en `.gitignore`.
 
 ## Licencia
 
