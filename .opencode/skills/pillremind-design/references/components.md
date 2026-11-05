@@ -277,6 +277,21 @@ WeeklyStatisticsChart(days, modifier)
 - Cada barra tiene `contentDescription` con el día y los conteos.
 - La leyenda usa `FlowRow` para envolver a fuente grande.
 
+### `AdherenceLineChart` (`statistics/AdherenceLineChart.kt`)
+
+```kotlin
+AdherenceLineChart(points, title, modifier)
+```
+
+- Card con gráfico de líneas de adherencia (0–100 %), guías horizontales,
+  etiquetas de fecha en los extremos y el centro, y puntos en la línea.
+- La línea se dibuja con curvas suaves entre los puntos y un relleno suave
+  debajo; los puntos sin tomas evaluadas dejan un hueco.
+- La serie se recibe ya calculada (`AdherencePoint`) y los textos ya resueltos;
+  el subtítulo indica que cada punto es una semana.
+- Se usa en 30 y 90 días con puntos semanales; en 7 días se mantiene
+  `WeeklyStatisticsChart`.
+
 ### `MedicationStatisticsCard` (`statistics/MedicationStatisticsCard.kt`)
 
 ```kotlin
@@ -285,6 +300,17 @@ MedicationStatisticsCard(statistics, modifier)
 
 - Imagen o `DefaultPill` (con `AppImagePlaceholder`), nombre, dosis, «X de Y
   tomas», pendientes y porcentaje. Etiqueta «Archivado» cuando corresponde.
+
+### `StatisticsRow` (`statistics/StatisticsRow.kt`)
+
+```kotlin
+StatisticsRow(label, description, onClick, modifier)
+```
+
+- Fila pulsable con icono `BarChart`, etiqueta `bodyLarge` en `primary`,
+  descripción `bodySmall` en `onSurfaceVariant` y chevron final.
+- Se usa en las fichas de perfil y de medicamento para abrir las estadísticas;
+  recibe los textos ya resueltos con `stringResource`.
 
 ### `StatisticsHistoryItem` (`statistics/StatisticsHistoryItem.kt`)
 

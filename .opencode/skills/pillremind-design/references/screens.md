@@ -17,7 +17,9 @@ RootNavigationGraph
     │   └── medicationNavGraph
     │       ├── MedicationSeeScreen             ("medication/see/{medicationId}")
     │       └── MedicationCreateScreen          ("medication/create")
-    └── BottomBarScreens.Profile                ("profile/see")
+    ├── BottomBarScreens.Profile                ("profile/see")
+    ├── StatisticsScreens.Statistics            ("statistics")
+    └── StatisticsScreens.MedicationStatistics  ("statistics/medication/{medicationId}")
 ```
 
 El grafo raíz está en `navigation/RootNavGraph.kt`; el de la barra inferior, en
@@ -118,10 +120,11 @@ Column(fillMaxSize + padding(AppSpacing.md))
   3. `AppFormSection(medication_schedule_section)` + `ScheduleEditor`.
   4. `AppFormActions` al final (`guardar`).
 - En `View`: `AppScrollWithFooter` con `MedicationHeader`,
-  `AppReadOnlySection` para «Tratamiento» y «Pauta», y `ScheduleReadOnly`
-  (resumen, chips de hora y fila «Próxima toma»). Las acciones (`editar` +
-  archivar) cierran el contenido; si la ficha no llena la pantalla, se anclan
-  abajo.
+  `AppReadOnlySection` para «Tratamiento» y «Pauta», `ScheduleReadOnly`
+  (resumen, chips de hora y fila «Próxima toma») y una sección «Seguimiento»
+  con `StatisticsRow` para abrir las estadísticas del medicamento. Las acciones
+  (`editar` + archivar) cierran el contenido; si la ficha no llena la pantalla,
+  se anclan abajo.
 - Sin badge de «Crónico»: el estado se deduce de la fila «Fecha fin»
   (`medication_no_end_date`).
 - La acción secundaria de `AppFormActions` sirve para archivar o eliminar; en
@@ -170,17 +173,26 @@ Column(fillMaxSize + padding(AppSpacing.md))
 - Destino de detalle `statistics` dentro de `MainNavigationGraph`; no es una
   pestaña. La barra inferior y el FAB se ocultan solos, y la flecha atrás la
   resuelve `MainTopBar`.
+- La ficha de medicamento abre `statistics/medication/{medicationId}`, que
+  reutiliza la pantalla y el ViewModel filtrando las tomas de ese medicamento.
+  En ese modo el resumen es `MedicationStatisticsCard`, se ocultan «Por
+  medicamento» y el historial, y el estado vacío usa
+  `BlankCard(statistics_empty_no_intakes_medication)`.
 - `StatisticsContent` separa el contenido del ViewModel para previsualizarlo.
-- Estructura:
+- Estructura general:
   `LazyColumn(padding(AppSpacing.md), spacedBy(AppSpacing.sm))` con:
   1. `StatisticsPeriodSelector` (7 / 30 / 90 días; 7 por defecto).
   2. `StatisticsSummaryCard` con porcentaje, tomadas, sin registrar y pendientes.
-  3. `WeeklyStatisticsChart` solo con periodo de 7 días.
+  3. `WeeklyStatisticsChart` con 7 días; `AdherenceLineChart` con 30 y 90 días
+     (puntos semanales).
   4. Título «Por medicamento» + `MedicationStatisticsCard` por medicamento.
   5. Título «Historial» + cabecera por día + `StatisticsHistoryItem`.
   6. Nota al pie.
 - Estados vacíos: `BlankCard(statistics_empty_no_medications)` y
-  `BlankCard(statistics_empty_no_intakes)`.
+  `BlankCard(statistics_empty_no_intakes)`; en modo medicamento,
+  `BlankCard(statistics_empty_no_intakes_medication)`. Si no hay tomas
+  evaluadas en 30/90 días, el hueco del gráfico usa
+  `BlankCard(statistics_chart_no_data)`.
 - Los textos y la accesibilidad salen de `statistics_*`. El gráfico es Compose
   puro y cada barra tiene `contentDescription` con el día y los conteos.
 

@@ -128,11 +128,16 @@
     <string name="statistics_weekly_title">Resumen semanal</string>
     <string name="statistics_chart_title">Últimos 7 días</string>
     <string name="statistics_chart_bar_description">%1$s. Tomadas: %2$d, sin registrar: %3$d, pendientes: %4$d.</string>
+    <string name="statistics_adherence_chart_title">Adherencia de los últimos %1$d días</string>
+    <string name="statistics_adherence_chart_subtitle">Cada punto es una semana.</string>
+    <string name="statistics_adherence_chart_description">Gráfico de adherencia. Mínimo %1$d%%, máximo %2$d%%.</string>
+    <string name="statistics_chart_no_data">Todavía no hay tomas evaluadas en este periodo.</string>
     <string name="statistics_by_medication_title">Por medicamento</string>
     <string name="statistics_history_title">Historial</string>
     <string name="statistics_archived">Archivado</string>
     <string name="statistics_empty_no_medications">Todavía no hay medicamentos en este perfil.</string>
     <string name="statistics_empty_no_intakes">No hay tomas registradas en este periodo.</string>
+    <string name="statistics_empty_no_intakes_medication">No hay tomas registradas de este medicamento en este periodo.</string>
     <string name="statistics_footnote">Se calculan con las tomas que registras en la app.</string>
     <string name="statistics_status_taken">Tomada</string>
     <string name="statistics_status_missed">Sin registrar</string>
@@ -243,6 +248,9 @@
     <string name="medication_archive_message">Dejará de aparecer en la lista y no generará recordatorios. Se conservará el historial de tomas.</string>
     <string name="medication_photo_description">Foto del medicamento %1$s</string>
     <string name="medication_icon_description">Icono de medicamento</string>
+    <string name="medication_tracking_section">Seguimiento</string>
+    <string name="medication_view_statistics">Ver estadísticas</string>
+    <string name="medication_statistics_description">Adherencia e historial de este medicamento</string>
     <string-array name="medication_units">
         <item>mg</item>
         <item>g</item>

@@ -155,17 +155,31 @@ data class DailyStatistics(
 }
 
 /**
+ * Punto de la gráfica de adherencia de un periodo.
+ *
+ * @property date Fecha que representa el punto, normalmente el último día del
+ * grupo.
+ * @property adherencePercent Porcentaje de adherencia, o `null` si el grupo no
+ * tiene tomas evaluadas.
+ */
+data class AdherencePoint(
+    val date: LocalDate,
+    val adherencePercent: Int?
+)
+
+/**
  * Informe completo de estadísticas de un periodo.
  *
  * @property summary Resumen global.
  * @property byMedication Desglose por medicamento, con los activos primero.
- * @property lastSevenDays Tomas de los últimos siete días para el gráfico.
+ * @property dailyStatistics Tomas por día del periodo, de más antiguo a más
+ * reciente.
  * @property history Tomas del periodo ordenadas de más reciente a más antigua.
  */
 data class StatisticsReport(
     val summary: StatisticsSummary = StatisticsSummary(),
     val byMedication: List<MedicationStatistics> = emptyList(),
-    val lastSevenDays: List<DailyStatistics> = emptyList(),
+    val dailyStatistics: List<DailyStatistics> = emptyList(),
     val history: List<StatisticsIntake> = emptyList()
 )
 
@@ -194,7 +208,8 @@ fun List<StatisticsIntake>.toStatisticsSummary(now: LocalDateTime): StatisticsSu
  * Construye el informe completo de estadísticas.
  *
  * @param now Momento de referencia para decidir qué tomas están sin registrar.
- * @param chartDays Número de días que se incluyen en el gráfico diario.
+ * @param chartDays Número de días que se incluyen en la serie diaria del
+ * informe.
  */
 fun List<StatisticsIntake>.toStatisticsReport(
     now: LocalDateTime,
@@ -230,7 +245,7 @@ fun List<StatisticsIntake>.toStatisticsReport(
     val safeChartDays = chartDays.coerceAtLeast(0)
     val startDate = endDate.minusDays((safeChartDays - 1).coerceAtLeast(0).toLong())
     val byDate = statuses.groupBy { (intake, _) -> intake.scheduledAt.toLocalDate() }
-    val lastSevenDays = (0 until safeChartDays).map { offset ->
+    val dailyStatistics = (0 until safeChartDays).map { offset ->
         val date = startDate.plusDays(offset.toLong())
         val dayEntries = byDate[date].orEmpty()
         DailyStatistics(
@@ -249,9 +264,45 @@ fun List<StatisticsIntake>.toStatisticsReport(
     return StatisticsReport(
         summary = summary,
         byMedication = byMedication,
-        lastSevenDays = lastSevenDays,
+        dailyStatistics = dailyStatistics,
         history = history
     )
+}
+
+/**
+ * Agrupa las estadísticas diarias en puntos para la gráfica de adherencia.
+ *
+ * Cada punto representa uno o varios días y usa la suma de tomadas y sin
+ * registrar del grupo, con el mismo criterio que el resumen del periodo.
+ *
+ * Los grupos se alinean con el final de la serie para que la última semana
+ * sea completa cuando el número de días no sea múltiplo de [groupDays].
+ *
+ * @param groupDays Número de días que representa cada punto. Un valor de 1
+ * devuelve un punto por día.
+ */
+fun List<DailyStatistics>.toAdherencePoints(
+    groupDays: Int = 1
+): List<AdherencePoint> {
+    if (isEmpty()) return emptyList()
+
+    val safeGroupDays = groupDays.coerceAtLeast(1)
+    val remainder = size % safeGroupDays
+    val groups = if (remainder == 0) {
+        chunked(safeGroupDays)
+    } else {
+        listOf(take(remainder)) + drop(remainder).chunked(safeGroupDays)
+    }
+
+    return groups.map { days ->
+        AdherencePoint(
+            date = days.last().date,
+            adherencePercent = adherencePercent(
+                taken = days.sumOf { it.taken },
+                missed = days.sumOf { it.missed }
+            )
+        )
+    }
 }
 
 /**

@@ -107,6 +107,14 @@ fun MainNavigationGraph(
         composable(StatisticsScreens.Statistics.route) {
             StatisticsScreen()
         }
+        composable(
+            route = StatisticsScreens.MedicationStatistics.route,
+            arguments = listOf(navArgument("medicationId") {
+                type = NavType.IntType
+            })
+        ) {
+            StatisticsScreen()
+        }
         medicationNavGraph(navController, onTopBarChange)
     }
 }
@@ -155,11 +163,22 @@ fun NavGraphBuilder.medicationNavGraph(
             arguments = listOf(navArgument("medicationId") {
                 type = NavType.IntType
             })
-        ) {
+        ) { backStackEntry ->
+            val medicationId = backStackEntry.arguments?.getInt("medicationId")
+
             MedicationScreen(
                 medicationMode = MedicationMode.View,
                 onArchivedClicked = {
                     navController.popBackStack()
+                },
+                onStatisticsClick = {
+                    medicationId?.let { id ->
+                        navController.navigate(
+                            StatisticsScreens.MedicationStatistics.createRoute(id)
+                        ) {
+                            launchSingleTop = true
+                        }
+                    }
                 },
                 onTopBarChange = topBarChangeFor(
                     MedicationScreens.MedicationSeeScreen.route,
