@@ -5,13 +5,13 @@ import androidx.compose.ui.graphics.Color
 /**
  * Paleta de colores de la aplicación.
  *
- * El tema claro conserva el violeta de marca. El tema oscuro usa fondo negro
+ * El tema claro usa un azul profundo de marca. El tema oscuro usa fondo negro
  * y un primario azul cielo, y reserva el naranja, el verde y el rojo para los
  * estados de las tomas y los avisos.
  */
 
 // ─── Marca ───────────────────────────────────────────────
-val BrandPurple = Color(0xFF32138D)   // Violeta del tema claro
+val BrandBlue = Color(0xFF15325E)      // Azul profundo del tema claro
 val ActionOrange = Color(0xFFFF6F00)  // Aviso: toma pendiente / urgente
 val SuccessGreen = Color(0xFF81C784)  // Confirmación: toma realizada
 val NeutralGray = Color(0xFF5F5F5F)   // Texto secundario legible
@@ -20,10 +20,10 @@ val SurfaceWhite = Color.White        // Fondo de cards y campos
 val BackgroundOff = Color(0xFFF7F7F6) // Fondo general de la app
 
 // ─── Light Theme ─────────────────────────────────────────
-val LightPrimary = BrandPurple
+val LightPrimary = BrandBlue
 val LightOnPrimary = Color.White
-val LightPrimaryContainer = Color(0xFFEDE7F6)
-val LightOnPrimaryContainer = BrandPurple
+val LightPrimaryContainer = Color(0xFFE1E9F2)
+val LightOnPrimaryContainer = Color(0xFF102646)
 
 val LightSecondary = ActionOrange
 val LightOnSecondary = Color(0xFF2B1700)
@@ -52,7 +52,7 @@ val LightOutlineVariant = Color(0xFFD9D9D7)
 val LightScrim = Color.Black
 val LightInverseSurface = Color(0xFF303030)
 val LightInverseOnSurface = Color(0xFFF5F5F5)
-val LightInversePrimary = Color(0xFFBB9EFF)
+val LightInversePrimary = Color(0xFFA9C8FF)
 
 val LightSurfaceDim = Color(0xFFDEDEDC)
 val LightSurfaceBright = Color(0xFFFFFFFF)
