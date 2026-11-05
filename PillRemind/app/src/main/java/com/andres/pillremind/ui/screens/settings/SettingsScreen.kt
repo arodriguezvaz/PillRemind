@@ -226,7 +226,7 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = AppSpacing.md),
+                .padding(horizontal = AppSpacing.md, vertical = AppSpacing.md),
             verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)
         ) {
 
