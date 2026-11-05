@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -148,23 +147,11 @@ fun ProfileScreen(
         ProfileMode.Edit -> stringResource(R.string.profile_edit_title)
     }
     val backContentDescription = stringResource(R.string.common_back)
-    val editContentDescription = stringResource(R.string.editar)
 
-    LaunchedEffect(currentMode, topBarTitle, editContentDescription) {
+    LaunchedEffect(currentMode, topBarTitle) {
         onTopBarChange(
             TopBarState(
                 title = topBarTitle,
-                actions = if (currentMode == ProfileMode.View) {
-                    listOf(
-                        TopBarAction(
-                            icon = Icons.Rounded.Edit,
-                            contentDescription = editContentDescription,
-                            onClick = { currentMode = ProfileMode.Edit }
-                        )
-                    )
-                } else {
-                    emptyList()
-                },
                 navigationAction = if (currentMode == ProfileMode.Edit) {
                     TopBarAction(
                         icon = Icons.AutoMirrored.Filled.ArrowBack,

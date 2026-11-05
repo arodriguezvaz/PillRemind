@@ -123,7 +123,6 @@ Column(fillMaxSize + padding(AppSpacing.md))
   abajo.
 - Sin badge de «Crónico»: el estado se deduce de la fila «Fecha fin»
   (`medication_no_end_date`).
-- La top bar muestra un lápiz de edición en `View` (`TopBarState.actions`).
 - La acción secundaria de `AppFormActions` sirve para archivar o eliminar; en
   `ProfileScreen` se marca con `secondaryContentColor = error`.
 - `LaunchedEffect(currentMode, topBarTitle)` actualiza la top bar (patrón
@@ -159,7 +158,6 @@ Column(fillMaxSize + padding(AppSpacing.md))
   `ProfileHeader`, `AppReadOnlySection` + `AppDetailRow` por sección,
   `AppNoticeBlock` para las alergias y la fila de «Ver adherencia» en
   «Seguimiento». Las acciones (`editar` + eliminar) cierran el contenido.
-- La top bar muestra un lápiz de edición en `View` (`TopBarState.actions`).
 - El diálogo de eliminación usa `AlertDialog` con textos de `strings.xml`.
 - En `MainScreen` (modo View) hoy empuja el título con `onTopBarChange`
   (legado); la ruta debe resolverlo en `MainScreen` (`top-bar.md`).

@@ -20,7 +20,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.rounded.Archive
-import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -207,22 +206,10 @@ fun MedicationScreen(
         MedicationMode.Edit -> stringResource(R.string.medication_edit_title)
     }
     val backContentDescription = stringResource(R.string.common_back)
-    val editContentDescription = stringResource(R.string.editar)
-    LaunchedEffect(currentMode, topBarTitle, editContentDescription) {
+    LaunchedEffect(currentMode, topBarTitle) {
         onTopBarChange(
             TopBarState(
                 title = topBarTitle,
-                actions = if (currentMode == MedicationMode.View) {
-                    listOf(
-                        TopBarAction(
-                            icon = Icons.Rounded.Edit,
-                            contentDescription = editContentDescription,
-                            onClick = { currentMode = MedicationMode.Edit }
-                        )
-                    )
-                } else {
-                    emptyList()
-                },
                 navigationAction = if (currentMode == MedicationMode.Edit) {
                     TopBarAction(
                         icon = Icons.AutoMirrored.Filled.ArrowBack,
