@@ -52,7 +52,8 @@ fun MainScreen(
         BottomBarScreens.Profile.route -> TopBarState(
             title = stringResource(R.string.profile_view_title)
         )
-        StatisticsScreens.Statistics.route -> TopBarState(
+        StatisticsScreens.Statistics.route,
+        StatisticsScreens.MedicationStatistics.route -> TopBarState(
             title = stringResource(R.string.statistics_title)
         )
         MedicationScreens.MedicationSeeScreen.route -> TopBarState(

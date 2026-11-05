@@ -26,8 +26,10 @@ import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.StatisticsIntake
 import com.andres.pillremind.domain.model.StatisticsPeriod
 import com.andres.pillremind.domain.model.status
+import com.andres.pillremind.domain.model.toAdherencePoints
 import com.andres.pillremind.domain.model.toStatisticsReport
 import com.andres.pillremind.ui.components.BlankCard
+import com.andres.pillremind.ui.components.statistics.AdherenceLineChart
 import com.andres.pillremind.ui.components.statistics.MedicationStatisticsCard
 import com.andres.pillremind.ui.components.statistics.StatisticsHistoryItem
 import com.andres.pillremind.ui.components.statistics.StatisticsPeriodSelector
@@ -133,7 +135,15 @@ private fun StatisticsContent(
 
             uiState.report.history.isEmpty() -> {
                 item(key = "empty-intakes") {
-                    BlankCard(stringResource(R.string.statistics_empty_no_intakes))
+                    BlankCard(
+                        stringResource(
+                            if (uiState.medicationId != null) {
+                                R.string.statistics_empty_no_intakes_medication
+                            } else {
+                                R.string.statistics_empty_no_intakes
+                            }
+                        )
+                    )
                 }
                 item(key = "footnote") {
                     StatisticsFootnote()
@@ -142,50 +152,84 @@ private fun StatisticsContent(
 
             else -> {
                 item(key = "summary") {
-                    StatisticsSummaryCard(summary = uiState.report.summary)
-                }
-
-                if (period == StatisticsPeriod.SEVEN) {
-                    item(key = "chart") {
-                        WeeklyStatisticsChart(days = uiState.report.lastSevenDays)
+                    val medicationStatistics = uiState.report.byMedication.firstOrNull()
+                    if (uiState.medicationId != null && medicationStatistics != null) {
+                        MedicationStatisticsCard(statistics = medicationStatistics)
+                    } else {
+                        StatisticsSummaryCard(summary = uiState.report.summary)
                     }
                 }
 
-                item(key = "medication-title") {
-                    StatisticsSectionTitle(
-                        text = stringResource(R.string.statistics_by_medication_title)
-                    )
-                }
-                items(
-                    items = uiState.report.byMedication,
-                    key = { "medication-${it.medicationId}" }
-                ) { medication ->
-                    MedicationStatisticsCard(statistics = medication)
+                item(key = "chart") {
+                    when (period) {
+                        StatisticsPeriod.SEVEN -> WeeklyStatisticsChart(
+                            days = uiState.report.dailyStatistics
+                        )
+
+                        StatisticsPeriod.THIRTY,
+                        StatisticsPeriod.NINETY -> {
+                            val points = uiState.report.dailyStatistics.toAdherencePoints(
+                                groupDays = 7
+                            )
+                            if (points.any { it.adherencePercent != null }) {
+                                AdherenceLineChart(
+                                    points = points,
+                                    title = stringResource(
+                                        R.string.statistics_adherence_chart_title,
+                                        period.days
+                                    ),
+                                    subtitle = stringResource(
+                                        R.string.statistics_adherence_chart_subtitle
+                                    )
+                                )
+                            } else {
+                                BlankCard(
+                                    stringResource(R.string.statistics_chart_no_data)
+                                )
+                            }
+                        }
+                    }
                 }
 
-                item(key = "history-title") {
-                    StatisticsSectionTitle(
-                        text = stringResource(R.string.statistics_history_title)
-                    )
-                }
-                val historyByDay = uiState.report.history.groupBy {
-                    it.scheduledAt.toLocalDate()
-                }
-                historyByDay.forEach { (date, intakes) ->
-                    item(key = "history-day-$date") {
-                        HistoryDayHeader(
-                            date = date,
-                            today = uiState.now.toLocalDate()
+                if (uiState.medicationId == null) {
+                    item(key = "medication-title") {
+                        StatisticsSectionTitle(
+                            text = stringResource(R.string.statistics_by_medication_title)
                         )
                     }
                     items(
-                        items = intakes,
-                        key = { "history-${it.intakeId}" }
-                    ) { intake ->
-                        StatisticsHistoryItem(
-                            intake = intake,
-                            status = intake.status(uiState.now)
+                        items = uiState.report.byMedication,
+                        key = { "medication-${it.medicationId}" }
+                    ) { medication ->
+                        MedicationStatisticsCard(statistics = medication)
+                    }
+                }
+
+                if (uiState.medicationId == null) {
+                    item(key = "history-title") {
+                        StatisticsSectionTitle(
+                            text = stringResource(R.string.statistics_history_title)
                         )
+                    }
+                    val historyByDay = uiState.report.history.groupBy {
+                        it.scheduledAt.toLocalDate()
+                    }
+                    historyByDay.forEach { (date, intakes) ->
+                        item(key = "history-day-$date") {
+                            HistoryDayHeader(
+                                date = date,
+                                today = uiState.now.toLocalDate()
+                            )
+                        }
+                        items(
+                            items = intakes,
+                            key = { "history-${it.intakeId}" }
+                        ) { intake ->
+                            StatisticsHistoryItem(
+                                intake = intake,
+                                status = intake.status(uiState.now)
+                            )
+                        }
                     }
                 }
 
@@ -278,6 +322,26 @@ private fun PreviewStatisticsContent() {
         ),
         onPeriodSelected = {}
     )
+}
+
+@Preview(showBackground = true, name = "Estadísticas de un medicamento")
+@Composable
+private fun MedicationStatisticsContentPreview() {
+    PillRemindTheme {
+        val now = LocalDateTime.of(2026, 11, 5, 12, 0)
+        val intakes = previewIntakes(now).filter { it.medicationId == 1 }
+        StatisticsContent(
+            period = StatisticsPeriod.SEVEN,
+            uiState = StatisticsUiState(
+                isLoading = false,
+                hasMedications = true,
+                medicationId = 1,
+                report = intakes.toStatisticsReport(now),
+                now = now
+            ),
+            onPeriodSelected = {}
+        )
+    }
 }
 
 private fun previewIntakes(now: LocalDateTime): List<StatisticsIntake> = listOf(

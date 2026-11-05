@@ -61,10 +61,13 @@ la deuda técnica se siguen registrando en el audit local `PillRemind/INCIDENCIA
 - **Contexto:** el perfil muestra la fila «Ver estadísticas» y la pantalla de
   Inicio incluye un resumen semanal cuando hay tomas evaluadas.
 - **Implementación:** ruta de detalle `statistics` con periodos de 7, 30 y 90
-  días, resumen de adherencia, gráfico de los últimos 7 días, desglose por
-  medicamento (incluidos los archivados) e historial agrupado por día. El
-  porcentaje no penaliza las tomas pendientes y usa el mismo margen de 15
-  minutos que Inicio.
+  días, resumen de adherencia, gráfico de barras de los últimos 7 días,
+  gráfico de líneas de adherencia semanal para 30 y 90 días, desglose por
+  medicamento (incluidos los archivados) e
+  historial agrupado por día. El porcentaje no penaliza las tomas pendientes y
+  usa el mismo margen de 15 minutos que Inicio. La ficha de cada medicamento
+  abre la misma pantalla filtrada por ese medicamento, sin el bloque de
+  historial.
 - **Pendiente:** exportar estadísticas y comparar perfiles.
 
 ### Historial de tomas
@@ -74,7 +77,8 @@ la deuda técnica se siguen registrando en el audit local `PillRemind/INCIDENCIA
   nombre, dosis y unidad.
 - **Implementación:** la pantalla de Estadísticas incluye un historial agrupado
   por día con todas las tomas del periodo seleccionado, diferenciando tomadas,
-  pendientes y sin registrar.
+  pendientes y sin registrar. El historial solo se muestra en la vista global
+  del perfil.
 - **Pendiente:** filtros por medicamento y rango de fechas, y una pantalla
   independiente si el historial crece.
 - **Prioridad:** baja.

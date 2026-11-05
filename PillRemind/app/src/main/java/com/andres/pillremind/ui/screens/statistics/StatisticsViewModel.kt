@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.screens.statistics
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
@@ -28,12 +29,15 @@ import java.time.LocalTime
  *
  * @property isLoading Indica que todavía no se ha recibido la primera consulta.
  * @property hasMedications Indica si el perfil tiene medicamentos, aunque estén archivados.
+ * @property medicationId Medicamento por el que se filtra el informe, o `null`
+ * cuando se muestran las estadísticas de todo el perfil.
  * @property report Informe calculado con las tomas del periodo seleccionado.
  * @property now Momento usado para calcular los estados de las tomas.
  */
 data class StatisticsUiState(
     val isLoading: Boolean = true,
     val hasMedications: Boolean = false,
+    val medicationId: Int? = null,
     val report: StatisticsReport = StatisticsReport(),
     val now: LocalDateTime = LocalDateTime.now()
 )
@@ -49,13 +53,20 @@ data class StatisticsUiState(
  * @param medicationRepository Repositorio de medicamentos, usado para saber si
  * el perfil tiene algún medicamento aunque no haya tomas en el periodo.
  * @param sessionManager Gestor de sesión con el perfil activo.
+ * @param savedStateHandle Estado de navegación con el medicamento a filtrar, si
+ * se ha abierto la pantalla desde su ficha.
  */
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
     private val intakeRepository: IntakeRepository,
     private val medicationRepository: MedicationRepository,
-    sessionManager: SessionManager
+    sessionManager: SessionManager,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val medicationId: Int? = savedStateHandle
+        .get<Int>("medicationId")
+        ?.takeIf { it > 0 }
 
     private val _period = MutableStateFlow(StatisticsPeriod.SEVEN)
 
@@ -97,7 +108,7 @@ class StatisticsViewModel @Inject constructor(
     ) { profileId, selectedPeriod, currentDate ->
         val to = currentDate.atTime(LocalTime.MAX)
         val from = currentDate.minusDays(selectedPeriod.days - 1).atStartOfDay()
-        StatisticsRequest(profileId, from, to)
+        StatisticsRequest(profileId, selectedPeriod, from, to)
     }.flatMapLatest { request ->
         combine(
             intakeRepository.observeStatisticsIntakes(
@@ -107,13 +118,21 @@ class StatisticsViewModel @Inject constructor(
             ),
             medicationRepository.hasMedications(request.profileId)
         ) { intakes, hasMedications ->
-            intakes to hasMedications
+            Triple(intakes, hasMedications, request.period)
         }
-    }.combine(now) { (intakes, hasMedications), moment ->
+    }.combine(now) { (intakes, hasMedications, selectedPeriod), moment ->
+        val reportIntakes = medicationId?.let { id ->
+            intakes.filter { it.medicationId == id }
+        } ?: intakes
+
         StatisticsUiState(
             isLoading = false,
-            hasMedications = hasMedications,
-            report = intakes.toStatisticsReport(moment),
+            hasMedications = medicationId != null || hasMedications,
+            medicationId = medicationId,
+            report = reportIntakes.toStatisticsReport(
+                now = moment,
+                chartDays = selectedPeriod.days.toInt()
+            ),
             now = moment
         )
     }.stateIn(
@@ -127,6 +146,7 @@ class StatisticsViewModel @Inject constructor(
      */
     private data class StatisticsRequest(
         val profileId: Int,
+        val period: StatisticsPeriod,
         val from: LocalDateTime,
         val to: LocalDateTime
     )

@@ -145,11 +145,11 @@ class StatisticsTest {
 
         val report = intakes.toStatisticsReport(now)
 
-        assertEquals(7, report.lastSevenDays.size)
-        assertEquals(LocalDate.of(2026, 10, 30), report.lastSevenDays.first().date)
-        assertEquals(LocalDate.of(2026, 11, 5), report.lastSevenDays.last().date)
-        assertEquals(1, report.lastSevenDays.last().taken)
-        assertEquals(0, report.lastSevenDays[4].total)
+        assertEquals(7, report.dailyStatistics.size)
+        assertEquals(LocalDate.of(2026, 10, 30), report.dailyStatistics.first().date)
+        assertEquals(LocalDate.of(2026, 11, 5), report.dailyStatistics.last().date)
+        assertEquals(1, report.dailyStatistics.last().taken)
+        assertEquals(0, report.dailyStatistics[4].total)
     }
 
     @Test
@@ -162,8 +162,81 @@ class StatisticsTest {
         val report = intakes.toStatisticsReport(now)
 
         assertEquals(2, report.summary.total)
-        assertEquals(7, report.lastSevenDays.size)
-        assertEquals(1, report.lastSevenDays.sumOf { it.total })
+        assertEquals(7, report.dailyStatistics.size)
+        assertEquals(1, report.dailyStatistics.sumOf { it.total })
+    }
+
+    @Test
+    fun `el informe genera la serie diaria del periodo solicitado`() {
+        val report = emptyList<StatisticsIntake>()
+            .toStatisticsReport(now, chartDays = 90)
+
+        assertEquals(90, report.dailyStatistics.size)
+        assertEquals(now.toLocalDate().minusDays(89), report.dailyStatistics.first().date)
+        assertEquals(now.toLocalDate(), report.dailyStatistics.last().date)
+    }
+
+    @Test
+    fun `la serie de adherencia agrupa los dias en semanas`() {
+        val daily = (0 until 14).map { offset ->
+            DailyStatistics(
+                date = now.toLocalDate().minusDays((13 - offset).toLong()),
+                taken = if (offset < 7) 2 else 0,
+                missed = if (offset < 7) 0 else 2,
+                pending = 0
+            )
+        }
+
+        val points = daily.toAdherencePoints(groupDays = 7)
+
+        assertEquals(2, points.size)
+        assertEquals(100, points[0].adherencePercent)
+        assertEquals(0, points[1].adherencePercent)
+        assertEquals(daily[6].date, points[0].date)
+        assertEquals(daily[13].date, points[1].date)
+    }
+
+    @Test
+    fun `la serie de adherencia deja huecos sin tomas evaluadas`() {
+        val daily = listOf(
+            DailyStatistics(
+                date = now.toLocalDate(),
+                taken = 0,
+                missed = 0,
+                pending = 2
+            )
+        )
+
+        val points = daily.toAdherencePoints()
+
+        assertEquals(1, points.size)
+        assertNull(points.single().adherencePercent)
+    }
+
+    @Test
+    fun `treinta dias se agrupan en cinco puntos semanales`() {
+        val report = emptyList<StatisticsIntake>()
+            .toStatisticsReport(now, chartDays = 30)
+
+        assertEquals(5, report.dailyStatistics.toAdherencePoints(groupDays = 7).size)
+    }
+
+    @Test
+    fun `la agrupacion semanal alinea las semanas completas al final`() {
+        val daily = (0 until 30).map { offset ->
+            DailyStatistics(
+                date = now.toLocalDate().minusDays((29 - offset).toLong()),
+                taken = 1,
+                missed = 0,
+                pending = 0
+            )
+        }
+
+        val points = daily.toAdherencePoints(groupDays = 7)
+
+        assertEquals(5, points.size)
+        assertEquals(daily[1].date, points.first().date)
+        assertEquals(daily[29].date, points.last().date)
     }
 
     @Test
@@ -187,8 +260,8 @@ class StatisticsTest {
         assertNull(report.summary.adherencePercent)
         assertTrue(report.byMedication.isEmpty())
         assertTrue(report.history.isEmpty())
-        assertEquals(7, report.lastSevenDays.size)
-        assertTrue(report.lastSevenDays.all { it.total == 0 })
+        assertEquals(7, report.dailyStatistics.size)
+        assertTrue(report.dailyStatistics.all { it.total == 0 })
     }
 
     private fun intake(

@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.screens.statistics
 
+import androidx.lifecycle.SavedStateHandle
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.StatisticsIntake
 import com.andres.pillremind.domain.model.StatisticsPeriod
@@ -22,6 +23,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -60,7 +62,8 @@ class StatisticsViewModelTest {
         viewModel = StatisticsViewModel(
             intakeRepository = intakeRepository,
             medicationRepository = medicationRepository,
-            sessionManager = sessionManager
+            sessionManager = sessionManager,
+            savedStateHandle = SavedStateHandle()
         )
         viewModel.refreshNow(now)
     }
@@ -79,6 +82,8 @@ class StatisticsViewModelTest {
 
         assertFalse(state.isLoading)
         assertTrue(state.hasMedications)
+        assertNull(state.medicationId)
+        assertEquals(7, state.report.dailyStatistics.size)
         assertEquals(1, state.report.summary.taken)
         assertEquals(1, state.report.summary.missed)
         assertEquals(50, state.report.summary.adherencePercent)
@@ -113,6 +118,7 @@ class StatisticsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(StatisticsPeriod.THIRTY, viewModel.period.value)
+        assertEquals(30, viewModel.uiState.value.report.dailyStatistics.size)
         verify {
             intakeRepository.observeStatisticsIntakes(
                 profileId = 1,
@@ -120,6 +126,19 @@ class StatisticsViewModelTest {
                 to = now.toLocalDate().atTime(LocalTime.MAX)
             )
         }
+
+        job.cancel()
+    }
+
+    @Test
+    fun `el periodo de noventa dias genera noventa puntos diarios`() = runTest {
+        val job = launch { viewModel.uiState.collect {} }
+        advanceUntilIdle()
+
+        viewModel.selectPeriod(StatisticsPeriod.NINETY)
+        advanceUntilIdle()
+
+        assertEquals(90, viewModel.uiState.value.report.dailyStatistics.size)
 
         job.cancel()
     }
@@ -159,6 +178,88 @@ class StatisticsViewModelTest {
     }
 
     @Test
+    fun `el modo medicamento filtra las tomas del medicamento elegido`() = runTest {
+        every { medicationRepository.hasMedications(1) } returns flowOf(false)
+        every { intakeRepository.observeStatisticsIntakes(any(), any(), any()) } returns flowOf(
+            listOf(
+                intake(
+                    id = 1,
+                    medicationId = 1,
+                    scheduledAt = now.minusHours(3),
+                    takenAt = now.minusHours(3)
+                ),
+                intake(
+                    id = 2,
+                    medicationId = 2,
+                    scheduledAt = now.minusHours(2),
+                    takenAt = now.minusHours(2)
+                ),
+                intake(
+                    id = 3,
+                    medicationId = 2,
+                    scheduledAt = now.minusHours(1)
+                )
+            )
+        )
+        val scopedViewModel = StatisticsViewModel(
+            intakeRepository = intakeRepository,
+            medicationRepository = medicationRepository,
+            sessionManager = sessionManager,
+            savedStateHandle = SavedStateHandle(mapOf("medicationId" to 2))
+        )
+        scopedViewModel.refreshNow(now)
+
+        val job = launch { scopedViewModel.uiState.collect {} }
+        advanceUntilIdle()
+
+        val state = scopedViewModel.uiState.value
+
+        assertEquals(2, state.medicationId)
+        assertTrue(state.hasMedications)
+        assertEquals(2, state.report.history.size)
+        assertEquals(1, state.report.byMedication.size)
+        assertEquals(2, state.report.byMedication.first().medicationId)
+        assertEquals(1, state.report.summary.taken)
+        assertEquals(1, state.report.summary.missed)
+        assertEquals(50, state.report.summary.adherencePercent)
+
+        job.cancel()
+    }
+
+    @Test
+    fun `el modo medicamento sin tomas deja el informe vacio`() = runTest {
+        every { intakeRepository.observeStatisticsIntakes(any(), any(), any()) } returns flowOf(
+            listOf(
+                intake(
+                    id = 1,
+                    medicationId = 1,
+                    scheduledAt = now.minusHours(1),
+                    takenAt = now.minusHours(1)
+                )
+            )
+        )
+        val scopedViewModel = StatisticsViewModel(
+            intakeRepository = intakeRepository,
+            medicationRepository = medicationRepository,
+            sessionManager = sessionManager,
+            savedStateHandle = SavedStateHandle(mapOf("medicationId" to 2))
+        )
+        scopedViewModel.refreshNow(now)
+
+        val job = launch { scopedViewModel.uiState.collect {} }
+        advanceUntilIdle()
+
+        val state = scopedViewModel.uiState.value
+
+        assertEquals(2, state.medicationId)
+        assertEquals(0, state.report.summary.total)
+        assertTrue(state.report.history.isEmpty())
+        assertTrue(state.report.byMedication.isEmpty())
+
+        job.cancel()
+    }
+
+    @Test
     fun `refreshNow actualiza el momento del estado`() = runTest {
         val job = launch { viewModel.uiState.collect {} }
         advanceUntilIdle()
@@ -173,11 +274,12 @@ class StatisticsViewModelTest {
 
     private fun intake(
         id: Int,
+        medicationId: Int = 1,
         scheduledAt: LocalDateTime,
         takenAt: LocalDateTime? = null
     ): StatisticsIntake = StatisticsIntake(
         intakeId = id,
-        medicationId = 1,
+        medicationId = medicationId,
         scheduledAt = scheduledAt,
         takenAt = takenAt,
         medicationName = "Ibuprofeno",

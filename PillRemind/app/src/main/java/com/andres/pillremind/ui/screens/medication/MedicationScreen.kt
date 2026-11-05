@@ -57,6 +57,7 @@ import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppReadOnlySection
 import com.andres.pillremind.ui.components.AppScrollWithFooter
 import com.andres.pillremind.ui.components.AppTextField
+import com.andres.pillremind.ui.components.statistics.StatisticsRow
 import com.andres.pillremind.ui.screens.main.TopBarAction
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
@@ -117,6 +118,8 @@ private fun AdaptiveFieldPair(
  * @param onSaveClicked Callback llamado tras guardar la medicación.
  * @param medicationMode Modo inicial de la pantalla (por defecto `Create`).
  * @param onArchivedClicked Callback llamado tras archivar la medicación.
+ * @param onStatisticsClick Callback ejecutado al abrir las estadísticas del
+ * medicamento.
  */
 @Composable
 fun MedicationScreen(
@@ -124,6 +127,7 @@ fun MedicationScreen(
     onSaveClicked: () -> Unit = {},
     medicationMode: MedicationMode = MedicationMode.Create,
     onArchivedClicked: () -> Unit = {},
+    onStatisticsClick: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
     medicationViewModel: MedicationViewModel = hiltViewModel()
 ) {
@@ -568,6 +572,7 @@ fun MedicationScreen(
                 nextIntake = nextIntake,
                 onEditClick = { currentMode = MedicationMode.Edit },
                 onArchiveClick = { showArchiveDialog = true },
+                onStatisticsClick = onStatisticsClick,
             )
         }
     }
@@ -632,6 +637,7 @@ private fun MedicationViewContent(
     nextIntake: LocalDateTime?,
     onEditClick: () -> Unit,
     onArchiveClick: () -> Unit,
+    onStatisticsClick: () -> Unit,
 ) {
     val datePattern = stringResource(R.string.common_date_pattern)
     val dateFormatter = remember(datePattern) { DateTimeFormatter.ofPattern(datePattern) }
@@ -680,6 +686,14 @@ private fun MedicationViewContent(
                 summary = periodicitySummary,
                 times = times,
                 nextIntake = nextIntake,
+            )
+        }
+
+        AppReadOnlySection(title = stringResource(R.string.medication_tracking_section)) {
+            StatisticsRow(
+                label = stringResource(R.string.medication_view_statistics),
+                description = stringResource(R.string.medication_statistics_description),
+                onClick = onStatisticsClick,
             )
         }
     }
@@ -742,6 +756,7 @@ private fun MedicationViewContentPreview() {
             nextIntake = LocalDateTime.of(2026, 3, 12, 21, 0),
             onEditClick = {},
             onArchiveClick = {},
+            onStatisticsClick = {},
         )
     }
 }
