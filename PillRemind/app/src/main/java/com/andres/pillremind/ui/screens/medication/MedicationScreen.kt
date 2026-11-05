@@ -12,13 +12,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -40,23 +42,30 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppDatePickerField
+import com.andres.pillremind.ui.components.AppDetailRow
 import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormActions
 import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppFormSection
-import com.andres.pillremind.ui.components.AppInfoCard
-import com.andres.pillremind.ui.components.AppInfoRow
 import com.andres.pillremind.ui.components.AppPhotoPicker
+import com.andres.pillremind.ui.components.AppReadOnlySection
+import com.andres.pillremind.ui.components.AppScrollWithFooter
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.screens.main.TopBarAction
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
+import com.andres.pillremind.ui.theme.PillRemindTheme
 import java.io.File
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 
@@ -121,12 +130,9 @@ fun MedicationScreen(
 ) {
     val medication by medicationViewModel.medication.collectAsState()
     val medicationSchedules by medicationViewModel.schedules.collectAsState()
+    val nextIntake by medicationViewModel.nextIntake.collectAsStateWithLifecycle()
 
     val unitOptions = stringArrayResource(R.array.medication_units).toList()
-    val datePattern = stringResource(R.string.common_date_pattern)
-    val medicationDateFormatter = remember(datePattern) {
-        DateTimeFormatter.ofPattern(datePattern)
-    }
 
     //Variables con estado mutable para los campos del formulario
     val name = rememberSaveable { mutableStateOf("") }
@@ -201,10 +207,22 @@ fun MedicationScreen(
         MedicationMode.Edit -> stringResource(R.string.medication_edit_title)
     }
     val backContentDescription = stringResource(R.string.common_back)
-    LaunchedEffect(currentMode, topBarTitle) {
+    val editContentDescription = stringResource(R.string.editar)
+    LaunchedEffect(currentMode, topBarTitle, editContentDescription) {
         onTopBarChange(
             TopBarState(
                 title = topBarTitle,
+                actions = if (currentMode == MedicationMode.View) {
+                    listOf(
+                        TopBarAction(
+                            icon = Icons.Rounded.Edit,
+                            contentDescription = editContentDescription,
+                            onClick = { currentMode = MedicationMode.Edit }
+                        )
+                    )
+                } else {
+                    emptyList()
+                },
                 navigationAction = if (currentMode == MedicationMode.Edit) {
                     TopBarAction(
                         icon = Icons.AutoMirrored.Filled.ArrowBack,
@@ -550,61 +568,20 @@ fun MedicationScreen(
         }
         //-------------SEE---------------
         MedicationMode.View -> {
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(AppSpacing.md)
-                    .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                AppPhotoPicker(
-                    photoUri = selectedPhotoUri,
-                    onPhotoSelected = { selectedPhotoUri = it },
-                    enabled = false,
-                    placeholderIcon = Icons.Default.Person,
-                    photoDescriptionRes = R.string.photo_medication,
-                    modifier = Modifier.padding(bottom = AppSpacing.xl)
-                )
-                AppInfoCard(title = stringResource(R.string.medication_data_section)) {
-                    AppInfoRow(
-                        label = stringResource(R.string.nombre),
-                        value = name.value,
-                    )
-                    AppInfoRow(
-                        label = stringResource(R.string.dosis),
-                        value = listOf(dose.value, unit.value)
-                            .filter { it.isNotBlank() }
-                            .joinToString(" "),
-                    )
-                    AppInfoRow(
-                        label = stringResource(R.string.medication_chronic_treatment),
-                        value = stringResource(
-                            if (isChronicTreatment.value) R.string.common_yes else R.string.common_no
-                        ),
-                    )
-                    AppInfoRow(
-                        label = stringResource(R.string.fecha_inicio),
-                        value = startDate.value?.format(medicationDateFormatter),
-                    )
-                    AppInfoRow(
-                        label = stringResource(R.string.fecha_fin),
-                        value = endDate.value?.format(medicationDateFormatter),
-                    )
-                }
-                Spacer(modifier = Modifier.height(AppSpacing.md))
-                AppInfoCard(title = stringResource(R.string.medication_schedule_section)) {
-                    ScheduleReadOnly(form = scheduleForm)
-                }
-                Spacer(modifier = Modifier.height(AppSpacing.xl))
-                AppFormActions(
-                    primaryText = stringResource(R.string.editar),
-                    onPrimaryClick = { currentMode = MedicationMode.Edit },
-                    secondaryIcon = Icons.Rounded.Archive,
-                    secondaryContentDescription = stringResource(R.string.medication_archive),
-                    onSecondaryClick = { showArchiveDialog = true },
-                )
-            }
+            MedicationViewContent(
+                modifier = modifier,
+                name = name.value,
+                photoUri = selectedPhotoUri,
+                dose = dose.value,
+                unit = unit.value,
+                startDate = startDate.value,
+                endDate = endDate.value,
+                periodicitySummary = scheduleSummary(scheduleForm),
+                times = scheduleForm.times.toList(),
+                nextIntake = nextIntake,
+                onEditClick = { currentMode = MedicationMode.Edit },
+                onArchiveClick = { showArchiveDialog = true },
+            )
         }
     }
     if (showArchiveDialog) {
@@ -644,6 +621,140 @@ fun MedicationScreen(
                     Text(stringResource(R.string.common_cancel))
                 }
             }
+        )
+    }
+}
+
+/**
+ * Ficha de solo lectura de un medicamento.
+ *
+ * Sustituye al formulario deshabilitado: cabecera con foto y dosis, secciones
+ * planas sin cards y acciones al final del contenido.
+ */
+@Composable
+private fun MedicationViewContent(
+    modifier: Modifier = Modifier,
+    name: String,
+    photoUri: Uri?,
+    dose: String,
+    unit: String,
+    startDate: LocalDate?,
+    endDate: LocalDate?,
+    periodicitySummary: String,
+    times: List<LocalTime>,
+    nextIntake: LocalDateTime?,
+    onEditClick: () -> Unit,
+    onArchiveClick: () -> Unit,
+) {
+    val datePattern = stringResource(R.string.common_date_pattern)
+    val dateFormatter = remember(datePattern) { DateTimeFormatter.ofPattern(datePattern) }
+    val doseValue = listOf(dose, unit)
+        .filter { it.isNotBlank() }
+        .joinToString(" ")
+
+    AppScrollWithFooter(
+        modifier = modifier,
+        footer = {
+            AppFormActions(
+                primaryText = stringResource(R.string.editar),
+                onPrimaryClick = onEditClick,
+                secondaryIcon = Icons.Rounded.Archive,
+                secondaryContentDescription = stringResource(R.string.medication_archive),
+                secondaryContentColor = MaterialTheme.colorScheme.error,
+                onSecondaryClick = onArchiveClick,
+            )
+        },
+    ) {
+        MedicationHeader(
+            name = name,
+            photoUri = photoUri,
+            subtitle = doseValue,
+        )
+
+        AppReadOnlySection(title = stringResource(R.string.medication_treatment_section)) {
+            AppDetailRow(
+                label = stringResource(R.string.dosis),
+                value = doseValue,
+            )
+            AppDetailRow(
+                label = stringResource(R.string.fecha_inicio),
+                value = startDate?.format(dateFormatter),
+            )
+            AppDetailRow(
+                label = stringResource(R.string.fecha_fin),
+                value = endDate?.format(dateFormatter)
+                    ?: stringResource(R.string.medication_no_end_date),
+                showDivider = false,
+            )
+        }
+
+        AppReadOnlySection(title = stringResource(R.string.medication_schedule_section)) {
+            ScheduleReadOnly(
+                summary = periodicitySummary,
+                times = times,
+                nextIntake = nextIntake,
+            )
+        }
+    }
+}
+
+/**
+ * Cabecera de la ficha de un medicamento.
+ */
+@Composable
+private fun MedicationHeader(
+    name: String,
+    photoUri: Uri?,
+    subtitle: String,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AppPhotoPicker(
+            photoUri = photoUri,
+            onPhotoSelected = {},
+            enabled = false,
+            placeholderIcon = Icons.Default.Medication,
+            photoDescriptionRes = R.string.photo_medication,
+        )
+        Spacer(modifier = Modifier.width(AppSpacing.md))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (subtitle.isNotBlank()) {
+                Spacer(modifier = Modifier.height(AppSpacing.xxs))
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Ficha de medicamento")
+@Composable
+private fun MedicationViewContentPreview() {
+    PillRemindTheme {
+        MedicationViewContent(
+            name = "Enalapril",
+            photoUri = null,
+            dose = "10",
+            unit = "mg",
+            startDate = LocalDate.of(2026, 3, 12),
+            endDate = null,
+            periodicitySummary = "Todos los días",
+            times = listOf(LocalTime.of(9, 0), LocalTime.of(21, 0)),
+            nextIntake = LocalDateTime.of(2026, 3, 12, 21, 0),
+            onEditClick = {},
+            onArchiveClick = {},
         )
     }
 }

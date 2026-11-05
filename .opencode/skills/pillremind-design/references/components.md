@@ -100,15 +100,6 @@ AppFormActions(
   `onSurfaceVariant`.
 - No inventes una fila de botones propia para guardar/editar/eliminar.
 
-### `AppReadOnlyField` (`AppReadOnlyField.kt`)
-
-```kotlin
-AppReadOnlyField(label, value, modifier, valueColor)
-```
-
-- Para modo lectura: etiqueta `labelLarge` Medium y valor `bodyLarge` a 18sp/26sp
-  Medium. No simula un input deshabilitado.
-
 ### `AppDropdownField` (`AppDropdownField.kt`)
 
 ```kotlin
@@ -143,27 +134,54 @@ AppPhotoPicker(
 - Badge de edición de 26dp (solo si `enabled`) con icono de 13dp.
 - `size` por defecto 96dp; en las cards se usa 64dp.
 
+## Solo lectura
+
+### `AppReadOnlySection` (`AppReadOnlySection.kt`)
+
+```kotlin
+AppReadOnlySection(title, modifier, content)
+```
+
+- Sección sin card: título `titleLarge` en `primary`, 8dp, divisor de 1dp
+  `outlineVariant` y 4dp hasta el contenido.
+- Para separar secciones, el contenedor usa `Arrangement.spacedBy(AppSpacing.lg)`.
+
+### `AppDetailRow` (`AppDetailRow.kt`)
+
+```kotlin
+AppDetailRow(label, value, modifier, stacked = false, showDivider = true)
+```
+
+- Etiqueta `bodyLarge` en `onSurfaceVariant` y valor 18sp/26sp Medium en
+  `onSurface`, alineado a la derecha; alto mínimo 48dp.
+- `stacked` coloca el valor debajo para textos largos (notas médicas).
+- Si `value` es nulo o está en blanco, la fila no se muestra.
+
+### `AppNoticeBlock` (`AppNoticeBlock.kt`)
+
+```kotlin
+AppNoticeBlock(icon, title, text, modifier)
+```
+
+- Bloque de aviso sin elevación: `secondaryContainer`/`onSecondaryContainer`,
+  `shapes.medium` y padding 16dp; el icono va en `secondary`.
+- Uso previsto: información que debe destacar, como las alergias de un perfil.
+
+### `AppScrollWithFooter` (`AppScrollWithFooter.kt`)
+
+```kotlin
+AppScrollWithFooter(modifier, scrollState, footer, content)
+```
+
+- Contenido desplazable con el footer al final: si no llena la pantalla, las
+  acciones se anclan abajo; si es más alto, se van con el scroll.
+- Mide el footer con `onSizeChanged` para no asumir su alto con texto grande.
+- Aplica `AppSpacing.md` de margen y separa el contenido con
+  `AppSpacing.lg`; el footer llevará su propio `AppFormActions`.
+
 ## Cards
 
 Todas usan `MaterialTheme.shapes.large` (20dp), `surface` y `AppElevation`.
-
-### `AppInfoCard` (`AppInfoCard.kt`)
-
-```kotlin
-AppInfoCard(title, modifier, content)
-```
-
-- Título `titleLarge` en `primary`, divisor de 1dp `outlineVariant`, padding 16dp.
-- Contenido típico: filas `AppInfoRow`.
-
-### `AppInfoRow` (`AppInfoRow.kt`)
-
-```kotlin
-AppInfoRow(label, value, modifier)
-```
-
-- Etiqueta en `onSurfaceVariant` y valor en `onSurface`, ambos Medium a 18sp/26sp.
-- Si `value` es nulo o está en blanco, no se muestra.
 
 ### `BlankCard` (`BlankCard.kt`)
 

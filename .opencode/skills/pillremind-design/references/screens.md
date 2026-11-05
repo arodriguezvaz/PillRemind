@@ -115,8 +115,15 @@ Column(fillMaxSize + padding(AppSpacing.md))
   1. `AppPhotoPicker` con `bottom = AppSpacing.xl`.
   2. `AppFormSection(medication_data_section)` con los campos de datos.
   3. `AppFormSection(medication_schedule_section)` + `ScheduleEditor`.
-  4. `AppFormActions` al final (`guardar`; en View, `editar` + archivar).
-- En `View`: `AppInfoCard` + `AppInfoRow` para datos y pauta.
+  4. `AppFormActions` al final (`guardar`).
+- En `View`: `AppScrollWithFooter` con `MedicationHeader`,
+  `AppReadOnlySection` para «Tratamiento» y «Pauta», y `ScheduleReadOnly`
+  (resumen, chips de hora y fila «Próxima toma»). Las acciones (`editar` +
+  archivar) cierran el contenido; si la ficha no llena la pantalla, se anclan
+  abajo.
+- Sin badge de «Crónico»: el estado se deduce de la fila «Fecha fin»
+  (`medication_no_end_date`).
+- La top bar muestra un lápiz de edición en `View` (`TopBarState.actions`).
 - La acción secundaria de `AppFormActions` sirve para archivar o eliminar; en
   `ProfileScreen` se marca con `secondaryContentColor = error`.
 - `LaunchedEffect(currentMode, topBarTitle)` actualiza la top bar (patrón
@@ -147,8 +154,12 @@ Column(fillMaxSize + padding(AppSpacing.md))
   2. `AppFormSection(profile_personal_data)`.
   3. `AppFormSection(profile_medical_info)`.
   4. `AppFormSection(profile_admin_data)`.
-  5. `AppFormActions` al final (`guardar` o `editar` + eliminar).
-- En `View`: `AppInfoCard` + `AppInfoRow` para las tres secciones.
+  5. `AppFormActions` al final (`guardar`).
+- En `View`: `ProfileViewContent` con `AppScrollWithFooter`, cabecera
+  `ProfileHeader`, `AppReadOnlySection` + `AppDetailRow` por sección,
+  `AppNoticeBlock` para las alergias y la fila de «Ver adherencia» en
+  «Seguimiento». Las acciones (`editar` + eliminar) cierran el contenido.
+- La top bar muestra un lápiz de edición en `View` (`TopBarState.actions`).
 - El diálogo de eliminación usa `AlertDialog` con textos de `strings.xml`.
 - En `MainScreen` (modo View) hoy empuja el título con `onTopBarChange`
   (legado); la ruta debe resolverlo en `MainScreen` (`top-bar.md`).

@@ -3,37 +3,52 @@ package com.andres.pillremind.ui.screens.medication
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.ScheduleRule
 import com.andres.pillremind.domain.model.WeekDay
 import com.andres.pillremind.domain.model.nextOccurrences
+import com.andres.pillremind.ui.components.AppDetailRow
 import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormField
-import com.andres.pillremind.ui.components.AppInfoRow
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.WeekDayChipGroup
 import com.andres.pillremind.ui.components.labelRes
 import com.andres.pillremind.ui.components.timeeditor.TimeListEditor
+import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppSpacing
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 /**
  * Periodicidad seleccionable en el formulario de medicamentos.
@@ -492,78 +507,152 @@ fun ScheduleEditor(
 }
 
 /**
- * Resumen de solo lectura de la pauta, sin campos deshabilitados.
+ * Resumen legible de la pauta, usado en el modo de solo lectura.
  *
- * @param form Estado editable de la pauta que se quiere mostrar.
+ * @param form Estado editable de la pauta.
  */
 @Composable
-fun ScheduleReadOnly(form: ScheduleFormState) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        AppInfoRow(
-            label = stringResource(R.string.schedule_periodicity),
-            value = stringResource(form.periodicity.labelRes()),
+fun scheduleSummary(form: ScheduleFormState): String = when (form.periodicity) {
+    SchedulePeriodicity.DAILY -> stringResource(R.string.schedule_periodicity_daily)
+
+    SchedulePeriodicity.WEEKLY -> {
+        val selectedDayLabels = mutableListOf<String>()
+        for (day in WeekDay.entries) {
+            if (day in form.selectedDays) {
+                selectedDayLabels.add(stringResource(day.labelRes()))
+            }
+        }
+        val days = selectedDayLabels.joinToString(", ")
+        if (days.isBlank()) stringResource(R.string.schedule_periodicity_weekly) else days
+    }
+
+    SchedulePeriodicity.EVERY_N_DAYS -> stringResource(
+        R.string.schedule_summary_every_n_days,
+        form.intervalDays.toIntOrNull() ?: 0,
+    )
+
+    SchedulePeriodicity.MONTHLY_DAY -> stringResource(
+        R.string.schedule_summary_day_of_month,
+        form.dayOfMonth.toIntOrNull() ?: 0,
+    )
+
+    SchedulePeriodicity.MONTHLY_WEEKDAY -> stringResource(
+        R.string.schedule_summary_monthly_weekday,
+        occurrenceLabel(form.occurrence),
+        stringResource(form.monthlyWeekDay.labelRes()),
+    )
+
+    SchedulePeriodicity.CYCLE -> stringResource(
+        R.string.schedule_summary_cycle,
+        form.onDays.toIntOrNull() ?: 0,
+        form.offDays.toIntOrNull() ?: 0,
+    )
+
+    SchedulePeriodicity.SINGLE -> stringResource(R.string.schedule_periodicity_single)
+}
+
+/**
+ * Muestra la pauta en modo lectura: resumen, horas como chips y próxima toma.
+ *
+ * @param summary Resumen legible de la periodicidad.
+ * @param times Horas de toma que se muestran como chips.
+ * @param nextIntake Próxima toma calculada, si existe.
+ */
+@Composable
+fun ScheduleReadOnly(
+    summary: String,
+    times: List<LocalTime>,
+    nextIntake: LocalDateTime? = null,
+) {
+    val timePattern = stringResource(R.string.common_time_pattern)
+    val shortDatePattern = stringResource(R.string.common_short_date_pattern)
+    val timeFormatter = remember(timePattern) { DateTimeFormatter.ofPattern(timePattern) }
+    val shortDateFormatter = remember(shortDatePattern) {
+        DateTimeFormatter.ofPattern(shortDatePattern)
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+    ) {
+        Text(
+            text = summary,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
         )
 
-        when (form.periodicity) {
-            SchedulePeriodicity.WEEKLY -> {
-                val selectedDayLabels = mutableListOf<String>()
-                for (day in WeekDay.entries) {
-                    if (day in form.selectedDays) {
-                        selectedDayLabels.add(stringResource(day.labelRes()))
-                    }
+        if (times.isEmpty()) {
+            Text(
+                text = stringResource(R.string.schedule_summary_no_times),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        } else {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+            ) {
+                times.sorted().forEach { time ->
+                    ReadOnlyTimeChip(text = time.format(timeFormatter))
                 }
-                AppInfoRow(
-                    label = stringResource(R.string.schedule_selected_days),
-                    value = selectedDayLabels.joinToString(", "),
-                )
             }
-
-            SchedulePeriodicity.EVERY_N_DAYS -> AppInfoRow(
-                label = stringResource(R.string.schedule_interval_days),
-                value = stringResource(
-                    R.string.schedule_summary_every_n_days,
-                    form.intervalDays.toIntOrNull() ?: 0,
-                ),
-            )
-
-            SchedulePeriodicity.MONTHLY_DAY -> AppInfoRow(
-                label = stringResource(R.string.schedule_day_of_month),
-                value = stringResource(
-                    R.string.schedule_summary_day_of_month,
-                    form.dayOfMonth.toIntOrNull() ?: 0,
-                ),
-            )
-
-            SchedulePeriodicity.MONTHLY_WEEKDAY -> {
-                val occurrence = occurrenceLabel(form.occurrence)
-                val day = stringResource(form.monthlyWeekDay.labelRes())
-                AppInfoRow(
-                    label = stringResource(R.string.schedule_occurrence),
-                    value = stringResource(
-                        R.string.schedule_summary_monthly_weekday,
-                        occurrence,
-                        day,
-                    ),
-                )
-            }
-
-            SchedulePeriodicity.CYCLE -> AppInfoRow(
-                label = stringResource(R.string.schedule_cycle_detail),
-                value = stringResource(
-                    R.string.schedule_summary_cycle,
-                    form.onDays.toIntOrNull() ?: 0,
-                    form.offDays.toIntOrNull() ?: 0,
-                ),
-            )
-
-            SchedulePeriodicity.DAILY,
-            SchedulePeriodicity.SINGLE -> Unit
         }
 
-        AppInfoRow(
-            label = stringResource(R.string.horario),
-            value = form.times.joinToString(", ") { it.toString() },
-        )
+        nextIntake?.let { dateTime ->
+            val today = LocalDate.now()
+            val dayLabel = when (dateTime.toLocalDate()) {
+                today -> stringResource(R.string.common_today)
+                today.plusDays(1) -> stringResource(R.string.common_tomorrow)
+                else -> dateTime.toLocalDate().format(shortDateFormatter)
+            }
+            AppDetailRow(
+                label = stringResource(R.string.medication_next_intake),
+                value = stringResource(
+                    R.string.common_datetime_short,
+                    dayLabel,
+                    dateTime.toLocalTime().format(timeFormatter),
+                ),
+                showDivider = false,
+            )
+        }
+    }
+}
+
+/**
+ * Chip de solo lectura con una hora de toma.
+ *
+ * @param text Hora formateada.
+ */
+@Composable
+private fun ReadOnlyTimeChip(text: String) {
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = AppElevation,
+    ) {
+        Row(
+            modifier = Modifier
+                .heightIn(min = 48.dp)
+                .padding(horizontal = AppSpacing.md, vertical = AppSpacing.xs),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Schedule,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp),
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 18.sp,
+                    lineHeight = 26.sp,
+                    fontWeight = FontWeight.Medium,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
     }
 }
 

@@ -57,9 +57,15 @@ fun AppPhotoPicker(
     placeholderIcon: ImageVector = Icons.Default.AddAPhoto,
     @StringRes photoDescriptionRes: Int = R.string.photo_profile,
 ) {
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri -> uri?.let { onPhotoSelected(it) } }
+    // Solo se registra el selector cuando se puede usar: en modo lectura no hace
+    // falta y permite previsualizar el componente sin un ActivityResultRegistry.
+    val launcher = if (enabled) {
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia()
+        ) { uri -> uri?.let { onPhotoSelected(it) } }
+    } else {
+        null
+    }
 
     Box(
         modifier = modifier
@@ -68,7 +74,7 @@ fun AppPhotoPicker(
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .then(
                 if (enabled) Modifier.clickable {
-                    launcher.launch(
+                    launcher?.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
                 } else Modifier
