@@ -1,4 +1,4 @@
-package com.andres.pillremind.ui.components.statistics
+package com.andres.pillremind.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -11,27 +11,34 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
 /**
- * Fila de navegación que abre las estadísticas de adherencia.
+ * Fila de navegación con icono, título, descripción y flecha.
  *
+ * Se usa en las secciones de «Seguimiento» de la ficha del perfil y del
+ * medicamento para abrir estadísticas o historial.
+ *
+ * @param icon Icono representativo de la sección.
  * @param label Texto principal de la fila.
  * @param description Texto secundario que explica el contenido.
  * @param onClick Acción ejecutada al pulsar la fila.
  * @param modifier Modificador opcional para la fila.
  */
 @Composable
-fun StatisticsRow(
+fun AppNavigationRow(
+    icon: ImageVector,
     label: String,
     description: String,
     onClick: () -> Unit,
@@ -45,7 +52,7 @@ fun StatisticsRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = Icons.Rounded.BarChart,
+            imageVector = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(22.dp),
@@ -72,15 +79,25 @@ fun StatisticsRow(
     }
 }
 
-@Preview(showBackground = true, name = "Fila de estadísticas")
+@Preview(showBackground = true, name = "Fila de navegación")
 @Composable
-private fun StatisticsRowPreview() {
+private fun AppNavigationRowPreview() {
     PillRemindTheme {
-        StatisticsRow(
-            label = "Ver estadísticas",
-            description = "Adherencia e historial de tomas",
-            onClick = {},
-            modifier = Modifier.padding(AppSpacing.md),
-        )
+        Column {
+            AppNavigationRow(
+                icon = Icons.Rounded.BarChart,
+                label = "Ver estadísticas",
+                description = "Adherencia y resumen de tomas",
+                onClick = {},
+                modifier = Modifier.padding(AppSpacing.md),
+            )
+            AppNavigationRow(
+                icon = Icons.Rounded.History,
+                label = "Ver historial de tomas",
+                description = "Busca y filtra las tomas registradas",
+                onClick = {},
+                modifier = Modifier.padding(AppSpacing.md),
+            )
+        }
     }
 }

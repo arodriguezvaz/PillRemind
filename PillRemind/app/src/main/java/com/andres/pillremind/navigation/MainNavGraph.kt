@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.andres.pillremind.ui.screens.history.HistoryScreen
 import com.andres.pillremind.ui.screens.home.HomeScreen
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.screens.medication.MedicationMode
@@ -55,6 +56,11 @@ fun MainNavigationGraph(
 ) {
     val openStatistics = {
         navController.navigate(StatisticsScreens.Statistics.route) {
+            launchSingleTop = true
+        }
+    }
+    val openHistory = {
+        navController.navigate(HistoryScreens.History.createRoute()) {
             launchSingleTop = true
         }
     }
@@ -102,6 +108,7 @@ fun MainNavigationGraph(
                     onTopBarChange
                 ),
                 onStatisticsClick = openStatistics,
+                onHistoryClick = openHistory,
             )
         }
         composable(StatisticsScreens.Statistics.route) {
@@ -114,6 +121,15 @@ fun MainNavigationGraph(
             })
         ) {
             StatisticsScreen()
+        }
+        composable(
+            route = HistoryScreens.History.route,
+            arguments = listOf(navArgument("medicationId") {
+                type = NavType.IntType
+                defaultValue = -1
+            })
+        ) {
+            HistoryScreen()
         }
         medicationNavGraph(navController, onTopBarChange)
     }
@@ -175,6 +191,15 @@ fun NavGraphBuilder.medicationNavGraph(
                     medicationId?.let { id ->
                         navController.navigate(
                             StatisticsScreens.MedicationStatistics.createRoute(id)
+                        ) {
+                            launchSingleTop = true
+                        }
+                    }
+                },
+                onHistoryClick = {
+                    medicationId?.let { id ->
+                        navController.navigate(
+                            HistoryScreens.History.createRoute(id)
                         ) {
                             launchSingleTop = true
                         }

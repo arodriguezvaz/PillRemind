@@ -90,6 +90,10 @@ class MedicationRepositoryImpl @Inject constructor(
         return medicationDao.getMedications(profileId).map { list -> list.map { it.toDomain() } }
     }
 
+    override fun getAllMedications(profileId: Int): Flow<List<Medication>> {
+        return medicationDao.getAllMedications(profileId).map { list -> list.map { it.toDomain() } }
+    }
+
     override fun hasMedications(profileId: Int): Flow<Boolean> {
         return medicationDao.countMedications(profileId).map { count -> count > 0 }
     }

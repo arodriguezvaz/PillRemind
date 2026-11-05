@@ -72,6 +72,16 @@ interface MedicationRepository {
     fun getMedications(profileId: Int): Flow<List<Medication>>
 
     /**
+     * Obtiene todos los medicamentos de un perfil, incluidos los archivados.
+     *
+     * Se usa en el historial para poder filtrar por un medicamento que ya no
+     * está activo.
+     *
+     * @param profileId ID del perfil propietario.
+     */
+    fun getAllMedications(profileId: Int): Flow<List<Medication>>
+
+    /**
      * Indica si el perfil tiene algún medicamento, incluidos los archivados.
      *
      * Se usa en estadísticas para distinguir un perfil sin medicamentos de uno

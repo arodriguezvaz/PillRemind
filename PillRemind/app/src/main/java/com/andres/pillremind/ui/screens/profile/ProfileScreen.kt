@@ -19,7 +19,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -52,13 +54,13 @@ import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormActions
 import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppFormSection
+import com.andres.pillremind.ui.components.AppNavigationRow
 import com.andres.pillremind.ui.components.AppNoticeBlock
 import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppReadOnlySection
 import com.andres.pillremind.ui.components.AppScrollWithFooter
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.labelRes
-import com.andres.pillremind.ui.components.statistics.StatisticsRow
 import com.andres.pillremind.ui.screens.main.TopBarAction
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
@@ -91,6 +93,7 @@ sealed class ProfileMode {
  * @param profileMode Modo inicial de la pantalla (crear, ver o editar).
  * @param onDeletedClicked Callback ejecutado tras eliminar el perfil.
  * @param onStatisticsClick Callback ejecutado al abrir las estadísticas.
+ * @param onHistoryClick Callback ejecutado al abrir el historial de tomas.
  * @param onTopBarChange Callback para modificar la TopBar.
  * @param profileViewModel ViewModel encargado de la lógica del perfil.
  */
@@ -101,6 +104,7 @@ fun ProfileScreen(
     profileMode: ProfileMode = ProfileMode.Create,
     onDeletedClicked: () -> Unit = {},
     onStatisticsClick: () -> Unit = {},
+    onHistoryClick: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -294,6 +298,7 @@ fun ProfileScreen(
                 onEditClick = { currentMode = ProfileMode.Edit },
                 onDeleteClick = { perfil?.let { showDeleteDialog = true } },
                 onStatisticsClick = onStatisticsClick,
+                onHistoryClick = onHistoryClick,
             )
         }
     }
@@ -530,6 +535,7 @@ private fun ProfileViewContent(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onStatisticsClick: () -> Unit,
+    onHistoryClick: () -> Unit,
 ) {
     val datePattern = stringResource(R.string.common_date_pattern)
     val dateFormatter = remember(datePattern) { DateTimeFormatter.ofPattern(datePattern) }
@@ -615,10 +621,20 @@ private fun ProfileViewContent(
         }
 
         AppReadOnlySection(title = stringResource(R.string.profile_tracking_section)) {
-            StatisticsRow(
+            AppNavigationRow(
+                icon = Icons.Rounded.BarChart,
                 label = stringResource(R.string.profile_view_statistics),
                 description = stringResource(R.string.profile_statistics_description),
                 onClick = onStatisticsClick,
+            )
+        }
+
+        AppReadOnlySection(title = stringResource(R.string.profile_history_section)) {
+            AppNavigationRow(
+                icon = Icons.Rounded.History,
+                label = stringResource(R.string.profile_view_history),
+                description = stringResource(R.string.profile_history_description),
+                onClick = onHistoryClick,
             )
         }
     }
@@ -680,6 +696,7 @@ private fun ProfileViewContentPreview() {
             onEditClick = {},
             onDeleteClick = {},
             onStatisticsClick = {},
+            onHistoryClick = {},
         )
     }
 }

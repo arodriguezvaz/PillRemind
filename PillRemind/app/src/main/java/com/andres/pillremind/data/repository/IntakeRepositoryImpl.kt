@@ -137,6 +137,15 @@ class IntakeRepositoryImpl @Inject constructor(
             .map { rows -> rows.map { it.toDomain() } }
     }
 
+    override fun observeHistoryIntakes(
+        profileId: Int,
+        from: LocalDateTime?,
+        to: LocalDateTime?
+    ): Flow<List<StatisticsIntake>> {
+        return intakeDao.observeHistoryIntakes(profileId, from, to)
+            .map { rows -> rows.map { it.toDomain() } }
+    }
+
     override suspend fun deleteFutureIntakesByMedicationId(medicationId: Int, date: LocalDateTime) {
         intakeDao.deleteFutureIntakesByMedicationId(medicationId, date)
     }

@@ -58,6 +58,18 @@ interface MedicationDao {
     fun getMedications(profileId: Int): Flow<List<MedicationEntity>>
 
     /**
+     * Observa todos los medicamentos de un perfil, incluidos los archivados.
+     *
+     * Se usa en el historial para poder filtrar por un medicamento que ya no
+     * está activo.
+     *
+     * @param profileId ID del perfil propietario.
+     * @return Flow con la lista de medicamentos ordenada por nombre.
+     */
+    @Query("SELECT * FROM medications WHERE profileId = :profileId ORDER BY name COLLATE NOCASE")
+    fun getAllMedications(profileId: Int): Flow<List<MedicationEntity>>
+
+    /**
      * Cuenta todos los medicamentos de un perfil, incluidos los archivados.
      *
      * Se usa en estadísticas para distinguir un perfil sin medicamentos de uno

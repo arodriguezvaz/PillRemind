@@ -1,4 +1,4 @@
-package com.andres.pillremind.ui.components.statistics
+package com.andres.pillremind.ui.components.history
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -30,25 +30,27 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 /**
- * Fila del historial de tomas de la pantalla de estadísticas.
+ * Fila del historial de tomas.
  *
  * @param intake Toma que se muestra.
  * @param status Estado calculado de la toma.
  * @param modifier Modificador opcional para la fila.
  */
 @Composable
-fun StatisticsHistoryItem(
+fun HistoryIntakeItem(
     intake: StatisticsIntake,
     status: StatisticsStatus,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val timePattern = stringResource(R.string.common_time_pattern)
     val timeFormatter = DateTimeFormatter.ofPattern(timePattern)
     val (containerColor, contentColor) = when (status) {
         StatisticsStatus.TAKEN -> MaterialTheme.colorScheme.tertiaryContainer to
             MaterialTheme.colorScheme.onTertiaryContainer
+
         StatisticsStatus.MISSED -> MaterialTheme.colorScheme.errorContainer to
             MaterialTheme.colorScheme.onErrorContainer
+
         StatisticsStatus.PENDING -> MaterialTheme.colorScheme.surfaceVariant to
             MaterialTheme.colorScheme.onSurfaceVariant
     }
@@ -84,6 +86,10 @@ fun StatisticsHistoryItem(
                     maxLines = 1,
                     modifier = Modifier.weight(1f)
                 )
+                if (intake.isArchived) {
+                    Spacer(modifier = Modifier.width(AppSpacing.xs))
+                    ArchivedBadge()
+                }
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -116,6 +122,27 @@ fun StatisticsHistoryItem(
 }
 
 /**
+ * Etiqueta compacta para las tomas de medicamentos archivados.
+ */
+@Composable
+private fun ArchivedBadge() {
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    ) {
+        Text(
+            text = stringResource(R.string.history_archived),
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(
+                horizontal = AppSpacing.xs,
+                vertical = AppSpacing.xxs,
+            ),
+        )
+    }
+}
+
+/**
  * Etiqueta visible del estado de una toma.
  */
 @StringRes
@@ -127,19 +154,19 @@ private fun StatisticsStatus.labelRes(): Int = when (this) {
 
 @Preview(showBackground = true)
 @Composable
-private fun StatisticsHistoryItemPreview() {
+private fun HistoryIntakeItemPreview() {
     PillRemindTheme {
         Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
-            StatisticsHistoryItem(
+            HistoryIntakeItem(
                 intake = previewIntake(taken = true),
                 status = StatisticsStatus.TAKEN
             )
-            StatisticsHistoryItem(
+            HistoryIntakeItem(
                 intake = previewIntake(taken = false),
                 status = StatisticsStatus.MISSED
             )
-            StatisticsHistoryItem(
-                intake = previewIntake(taken = false),
+            HistoryIntakeItem(
+                intake = previewIntake(taken = false, archived = true),
                 status = StatisticsStatus.PENDING
             )
         }
@@ -148,23 +175,24 @@ private fun StatisticsHistoryItemPreview() {
 
 @Preview(showBackground = true, fontScale = 1.5f)
 @Composable
-private fun StatisticsHistoryItemLargeTextPreview() {
+private fun HistoryIntakeItemLargeTextPreview() {
     PillRemindTheme(darkTheme = true) {
-        StatisticsHistoryItem(
-            intake = previewIntake(taken = false),
+        HistoryIntakeItem(
+            intake = previewIntake(taken = false, archived = true),
             status = StatisticsStatus.MISSED
         )
     }
 }
 
-private fun previewIntake(taken: Boolean): StatisticsIntake = StatisticsIntake(
-    intakeId = 1,
-    medicationId = 1,
-    scheduledAt = LocalDateTime.of(2026, 11, 5, 9, 0),
-    takenAt = if (taken) LocalDateTime.of(2026, 11, 5, 9, 5) else null,
-    medicationName = "Ibuprofeno",
-    dose = 600.0,
-    unit = "mg",
-    imageUrl = null,
-    isArchived = false
-)
+private fun previewIntake(taken: Boolean, archived: Boolean = false): StatisticsIntake =
+    StatisticsIntake(
+        intakeId = 1,
+        medicationId = 1,
+        scheduledAt = LocalDateTime.of(2026, 11, 5, 9, 0),
+        takenAt = if (taken) LocalDateTime.of(2026, 11, 5, 9, 5) else null,
+        medicationName = "Ibuprofeno",
+        dose = 600.0,
+        unit = "mg",
+        imageUrl = null,
+        isArchived = archived
+    )

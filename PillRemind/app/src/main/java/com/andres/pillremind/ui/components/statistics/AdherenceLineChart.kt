@@ -68,7 +68,7 @@ fun AdherenceLineChart(
             percentages.max()
         )
     }
-    val datePattern = stringResource(R.string.statistics_history_date_pattern)
+    val datePattern = stringResource(R.string.common_day_month_pattern)
     val dateFormatter = remember(datePattern) {
         DateTimeFormatter.ofPattern(datePattern, Locale.forLanguageTag("es"))
     }

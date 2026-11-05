@@ -20,6 +20,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -53,11 +55,11 @@ import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormActions
 import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppFormSection
+import com.andres.pillremind.ui.components.AppNavigationRow
 import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppReadOnlySection
 import com.andres.pillremind.ui.components.AppScrollWithFooter
 import com.andres.pillremind.ui.components.AppTextField
-import com.andres.pillremind.ui.components.statistics.StatisticsRow
 import com.andres.pillremind.ui.screens.main.TopBarAction
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
@@ -120,6 +122,7 @@ private fun AdaptiveFieldPair(
  * @param onArchivedClicked Callback llamado tras archivar la medicación.
  * @param onStatisticsClick Callback ejecutado al abrir las estadísticas del
  * medicamento.
+ * @param onHistoryClick Callback ejecutado al abrir el historial del medicamento.
  */
 @Composable
 fun MedicationScreen(
@@ -128,6 +131,7 @@ fun MedicationScreen(
     medicationMode: MedicationMode = MedicationMode.Create,
     onArchivedClicked: () -> Unit = {},
     onStatisticsClick: () -> Unit = {},
+    onHistoryClick: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
     medicationViewModel: MedicationViewModel = hiltViewModel()
 ) {
@@ -573,6 +577,7 @@ fun MedicationScreen(
                 onEditClick = { currentMode = MedicationMode.Edit },
                 onArchiveClick = { showArchiveDialog = true },
                 onStatisticsClick = onStatisticsClick,
+                onHistoryClick = onHistoryClick,
             )
         }
     }
@@ -638,6 +643,7 @@ private fun MedicationViewContent(
     onEditClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onStatisticsClick: () -> Unit,
+    onHistoryClick: () -> Unit,
 ) {
     val datePattern = stringResource(R.string.common_date_pattern)
     val dateFormatter = remember(datePattern) { DateTimeFormatter.ofPattern(datePattern) }
@@ -690,10 +696,17 @@ private fun MedicationViewContent(
         }
 
         AppReadOnlySection(title = stringResource(R.string.medication_tracking_section)) {
-            StatisticsRow(
+            AppNavigationRow(
+                icon = Icons.Rounded.BarChart,
                 label = stringResource(R.string.medication_view_statistics),
                 description = stringResource(R.string.medication_statistics_description),
                 onClick = onStatisticsClick,
+            )
+            AppNavigationRow(
+                icon = Icons.Rounded.History,
+                label = stringResource(R.string.medication_view_history),
+                description = stringResource(R.string.medication_history_description),
+                onClick = onHistoryClick,
             )
         }
     }
@@ -757,6 +770,7 @@ private fun MedicationViewContentPreview() {
             onEditClick = {},
             onArchiveClick = {},
             onStatisticsClick = {},
+            onHistoryClick = {},
         )
     }
 }

@@ -61,6 +61,7 @@
     <string name="nav_medications">Medicamentos</string>
     <string name="nav_profile">Perfil</string>
     <string name="common_back">Volver</string>
+    <string name="common_close">Cerrar</string>
     <string name="brand_pill" translatable="false">PILL</string>
     <string name="brand_remind" translatable="false">REMIND</string>
     <string name="home_title_today">Hoy, %1$s</string>
@@ -110,7 +111,10 @@
     <string name="profile_avatar_description">Avatar del perfil</string>
     <string name="profile_view_statistics">Ver estadísticas</string>
     <string name="profile_tracking_section">Seguimiento</string>
-    <string name="profile_statistics_description">Adherencia e historial de tomas</string>
+    <string name="profile_statistics_description">Adherencia y resumen de tomas</string>
+    <string name="profile_history_section">Historial</string>
+    <string name="profile_view_history">Ver historial de tomas</string>
+    <string name="profile_history_description">Busca y filtra las tomas registradas</string>
     <string name="profile_delete_title">Eliminar perfil</string>
     <string name="profile_delete_message">¿Seguro que quieres eliminar este perfil?</string>
 
@@ -133,7 +137,6 @@
     <string name="statistics_adherence_chart_description">Gráfico de adherencia. Mínimo %1$d%%, máximo %2$d%%.</string>
     <string name="statistics_chart_no_data">Todavía no hay tomas evaluadas en este periodo.</string>
     <string name="statistics_by_medication_title">Por medicamento</string>
-    <string name="statistics_history_title">Historial</string>
     <string name="statistics_archived">Archivado</string>
     <string name="statistics_empty_no_medications">Todavía no hay medicamentos en este perfil.</string>
     <string name="statistics_empty_no_intakes">No hay tomas registradas en este periodo.</string>
@@ -142,9 +145,6 @@
     <string name="statistics_status_taken">Tomada</string>
     <string name="statistics_status_missed">Sin registrar</string>
     <string name="statistics_status_pending">Pendiente</string>
-    <string name="statistics_history_today">Hoy</string>
-    <string name="statistics_history_yesterday">Ayer</string>
-    <string name="statistics_history_date_pattern">d MMM</string>
     <plurals name="statistics_taken_of_total">
         <item quantity="one">%1$d de %2$d toma</item>
         <item quantity="other">%1$d de %2$d tomas</item>
@@ -152,6 +152,49 @@
     <plurals name="statistics_pending_count">
         <item quantity="one">%1$d pendiente</item>
         <item quantity="other">%1$d pendientes</item>
+    </plurals>
+
+    <!-- Historial -->
+    <string name="history_title">Historial</string>
+    <string name="history_search_placeholder">Buscar por medicamento</string>
+    <string name="history_period_all">Todo</string>
+    <string name="history_filter_title">Filtros</string>
+    <string name="history_filter_none">Sin filtros activos</string>
+    <string name="history_filter_active_summary">Filtros aplicados</string>
+    <string name="history_filter_status">Estado</string>
+    <string name="history_filter_status_all">Todas</string>
+    <string name="history_filter_status_taken">Tomadas</string>
+    <string name="history_filter_status_missed">Sin registrar</string>
+    <string name="history_filter_status_pending">Pendientes</string>
+    <string name="history_filter_medication">Medicamento</string>
+    <string name="history_filter_medication_all">Todos</string>
+    <string name="history_filter_include_archived">Incluir archivados</string>
+    <string name="history_filter_custom_dates">Fechas personalizadas</string>
+    <string name="history_filter_date_from">Desde</string>
+    <string name="history_filter_date_to">Hasta</string>
+    <string name="history_filter_apply_dates">Aplicar rango</string>
+    <string name="history_filter_show_results">Ver resultados</string>
+    <string name="history_filter_clear">Limpiar filtros</string>
+    <string name="history_filter_date_error">La fecha inicial no puede ser posterior a la final</string>
+    <plurals name="history_filter_active_count">
+        <item quantity="one">%1$d activo</item>
+        <item quantity="other">%1$d activos</item>
+    </plurals>
+    <string name="history_empty_no_medications">Todavía no hay medicamentos en este perfil.</string>
+    <string name="history_empty_no_intakes">No hay tomas registradas en este periodo.</string>
+    <string name="history_empty_no_results">No hay tomas que coincidan con los filtros.</string>
+    <string name="history_day_today">Hoy</string>
+    <string name="history_day_yesterday">Ayer</string>
+    <string name="history_archived">Archivado</string>
+    <string name="history_medication_archived_option">%1$s (archivado)</string>
+    <string name="history_custom_range_summary">%1$s – %2$s</string>
+    <plurals name="history_result_count">
+        <item quantity="one">%1$d toma</item>
+        <item quantity="other">%1$d tomas</item>
+    </plurals>
+    <plurals name="history_result_count_filtered">
+        <item quantity="one">%1$d de %2$d toma</item>
+        <item quantity="other">%1$d de %2$d tomas</item>
     </plurals>
 
     <!-- Ajustes -->
@@ -250,7 +293,9 @@
     <string name="medication_icon_description">Icono de medicamento</string>
     <string name="medication_tracking_section">Seguimiento</string>
     <string name="medication_view_statistics">Ver estadísticas</string>
-    <string name="medication_statistics_description">Adherencia e historial de este medicamento</string>
+    <string name="medication_statistics_description">Adherencia y resumen de este medicamento</string>
+    <string name="medication_view_history">Ver historial</string>
+    <string name="medication_history_description">Tomas registradas de este medicamento</string>
     <string-array name="medication_units">
         <item>mg</item>
         <item>g</item>
@@ -324,6 +369,7 @@
     <string name="common_tomorrow">Mañana</string>
     <string name="common_date_pattern">dd/MM/yyyy</string>
     <string name="common_short_date_pattern">dd/MM</string>
+    <string name="common_day_month_pattern">d MMM</string>
     <string name="common_time_pattern">HH:mm</string>
     <string name="common_datetime_short">%1$s · %2$s</string>
     <string name="search_clear">Limpiar búsqueda</string>

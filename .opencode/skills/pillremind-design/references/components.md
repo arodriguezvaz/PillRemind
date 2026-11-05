@@ -301,24 +301,68 @@ MedicationStatisticsCard(statistics, modifier)
 - Imagen o `DefaultPill` (con `AppImagePlaceholder`), nombre, dosis, «X de Y
   tomas», pendientes y porcentaje. Etiqueta «Archivado» cuando corresponde.
 
-### `StatisticsRow` (`statistics/StatisticsRow.kt`)
+### `AppNavigationRow` (`AppNavigationRow.kt`)
 
 ```kotlin
-StatisticsRow(label, description, onClick, modifier)
+AppNavigationRow(icon, label, description, onClick, modifier)
 ```
 
-- Fila pulsable con icono `BarChart`, etiqueta `bodyLarge` en `primary`,
-  descripción `bodySmall` en `onSurfaceVariant` y chevron final.
-- Se usa en las fichas de perfil y de medicamento para abrir las estadísticas;
-  recibe los textos ya resueltos con `stringResource`.
+- Fila pulsable con icono configurable (`BarChart` o `History`), etiqueta
+  `bodyLarge` en `primary`, descripción `bodySmall` en `onSurfaceVariant` y
+  chevron final.
+- Se usa en las fichas de perfil y de medicamento para abrir estadísticas e
+  historial; recibe los textos ya resueltos con `stringResource`.
 
-### `StatisticsHistoryItem` (`statistics/StatisticsHistoryItem.kt`)
+### `HistoryIntakeItem` (`history/HistoryIntakeItem.kt`)
 
 ```kotlin
-StatisticsHistoryItem(intake, status, modifier)
+HistoryIntakeItem(intake, status, modifier)
 ```
 
-- Hora, medicamento, dosis y chip de estado con colores semánticos.
+- Hora, medicamento, dosis, chip de estado con colores semánticos y badge
+  «Archivado» cuando la toma pertenece a un medicamento archivado.
+
+### `HistoryDayHeader` (`history/HistoryDayHeader.kt`)
+
+```kotlin
+HistoryDayHeader(date, today, modifier)
+```
+
+- Cabecera `titleSmall` en `onSurfaceVariant`; muestra «Hoy», «Ayer» o el día
+  y mes abreviados.
+
+### `HistoryPeriodSelector` (`history/HistoryPeriodSelector.kt`)
+
+```kotlin
+HistoryPeriodSelector(selectedPeriod, onPeriodSelected, modifier)
+```
+
+- Cuatro chips en dos filas (7 / 30 / 90 días / todo) con el mismo patrón visual
+  que `StatisticsPeriodSelector`. Si hay un rango personalizado,
+  `selectedPeriod` es `null` y no se marca ningún chip.
+
+### `HistoryFiltersButton` (`history/HistoryFiltersButton.kt`)
+
+```kotlin
+HistoryFiltersButton(activeFilterCount, customRangeSummary, onClick, modifier)
+```
+
+- Card pulsable que abre la hoja de filtros. Muestra el resumen del rango
+  personalizado o «Sin filtros activos» y un badge con el número de filtros.
+
+### `HistoryFiltersSheet` (`history/HistoryFiltersSheet.kt`)
+
+```kotlin
+HistoryFiltersSheet(
+    filters, medications, today, onDismiss, onStatusSelected,
+    onMedicationSelected, onIncludeArchivedChange, onApplyCustomRange,
+    onClearFilters
+)
+```
+
+- `ModalBottomSheet` con estado, medicamento, «Incluir archivados» y rango
+  personalizado con `AppDatePickerField`. El contenido se separa en
+  `HistoryFiltersSheetContent` para previsualizarlo.
 
 ## Ajustes
 
