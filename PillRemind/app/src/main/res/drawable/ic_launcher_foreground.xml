@@ -4,10 +4,10 @@
     android:viewportWidth="960"
     android:viewportHeight="960">
   <group
-      android:scaleX="0.68"
-      android:scaleY="0.68"
-      android:translateX="153.6"
-      android:translateY="153.6">
+      android:scaleX="0.56"
+      android:scaleY="0.56"
+      android:translateX="211.2"
+      android:translateY="211.2">
     <!-- Mitad inferior de la pastilla, rellena con el violeta de marca -->
     <path
         android:fillColor="#32138D"
