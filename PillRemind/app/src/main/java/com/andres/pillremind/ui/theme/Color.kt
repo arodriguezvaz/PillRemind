@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.Color
 /**
  * Paleta de colores de la aplicación.
  *
- * El tema claro conserva el violeta de marca. El tema oscuro es monocromo
- * (negro, blanco y grises) y reserva el naranja, el verde y el rojo para los
+ * El tema claro conserva el violeta de marca. El tema oscuro usa fondo negro
+ * y un primario azul cielo, y reserva el naranja, el verde y el rojo para los
  * estados de las tomas y los avisos.
  */
 
@@ -63,10 +63,10 @@ val LightSurfaceContainerHigh = Color(0xFFEAEAE8)
 val LightSurfaceContainerHighest = Color(0xFFE2E2E0)
 
 // ─── Dark Theme ──────────────────────────────────────────
-val DarkPrimary = Color(0xFFFFFFFF)   // Blanco de marca: botones y títulos
-val DarkOnPrimary = Color(0xFF000000)
-val DarkPrimaryContainer = Color(0xFF262626)
-val DarkOnPrimaryContainer = Color(0xFFF2F2F2)
+val DarkPrimary = Color(0xFFA9C8FF)   // Azul cielo de marca en oscuro
+val DarkOnPrimary = Color(0xFF0A2A4D)
+val DarkPrimaryContainer = Color(0xFF1E3550)
+val DarkOnPrimaryContainer = Color(0xFFD6E6FF)
 
 val DarkSecondary = Color(0xFFFFB74D) // Naranja de aviso
 val DarkOnSecondary = Color(0xFF4D2C00)

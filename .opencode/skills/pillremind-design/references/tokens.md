@@ -9,7 +9,7 @@ fuente de verdad: si un valor cambia, actualiza también esta tabla.
 
 | Rol | Uso | Evitar |
 |---|---|---|
-| `primary` | Marca, títulos de sección, acciones principales, icono activo de la barra inferior. Negro en claro, blanco en oscuro. | Usarlo como fondo de bloques grandes de información. |
+| `primary` | Marca, títulos de sección, acciones principales, icono activo de la barra inferior. Violeta en claro, azul cielo en oscuro. | Usarlo como fondo de bloques grandes de información. |
 | `onPrimary` | Texto e iconos sobre `primary`. | Texto secundario. |
 | `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, avatar por defecto, FAB de perfiles. | Sustituir a `surface` en cards. |
 | `secondary` | Naranja de aviso; hoy se usa sobre todo como base de `secondaryContainer`. | Decoración o texto largo. |
@@ -49,9 +49,9 @@ Reglas:
 | `SurfaceWhite` | `#FFFFFF` | Superficies en claro. |
 | `BackgroundOff` | `#F7F7F6` | Fondo general en claro. |
 
-El tema oscuro es monocromo: `primary` es blanco, las superficies son negras o
-grises y el naranja, el verde y el rojo quedan reservados a los estados de las
-tomas y a los avisos.
+El tema oscuro usa fondo negro y un primario azul cielo: las superficies son
+negras o grises y el naranja, el verde y el rojo quedan reservados a los
+estados de las tomas y a los avisos.
 
 ### Tema claro
 
@@ -97,10 +97,10 @@ tomas y a los avisos.
 
 | Rol | Hex |
 |---|---|
-| `primary` | `#FFFFFF` |
-| `onPrimary` | `#000000` |
-| `primaryContainer` | `#262626` |
-| `onPrimaryContainer` | `#F2F2F2` |
+| `primary` | `#A9C8FF` |
+| `onPrimary` | `#0A2A4D` |
+| `primaryContainer` | `#1E3550` |
+| `onPrimaryContainer` | `#D6E6FF` |
 | `secondary` | `#FFB74D` |
 | `onSecondary` | `#4D2C00` |
 | `secondaryContainer` | `#704000` |
