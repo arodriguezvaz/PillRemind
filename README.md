@@ -80,7 +80,9 @@ Actions: nese caso só se sobe o APK como artefacto, sen crear release.
 A firma necesita catro secretos no repositorio (Settings → Secrets and variables → Actions):
 `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` e `KEY_PASSWORD`. En local pódese
 crear `PillRemind/keystore.properties` coas claves `storeFile`, `storePassword`, `keyAlias`
-e `keyPassword`; tanto ese ficheiro como o keystore están en `.gitignore`.
+e `keyPassword`; tanto ese ficheiro como o keystore están en `.gitignore`. Se o repositorio
+limita o token a só lectura, hai que activar «Read and write permissions» en
+Settings → Actions → General.
 
 ## Licencia
 
