@@ -73,20 +73,21 @@ migración y el patrón correcto están en `top-bar.md`.
 `HomeScreen.kt`
 
 ```text
-Column(fillMaxSize + padding(AppSpacing.md))
-├── LazyColumn(
+Column(fillMaxSize + padding(AppSpacing.md), spacedBy = AppSpacing.sm)
+├── StatisticsBanner(...)  // solo si hay tomas evaluadas en 7 días
+└── LazyColumn(
 │     contentPadding = PaddingValues(vertical = AppSpacing.sm),
 │     verticalArrangement = spacedBy(AppSpacing.sm))
 │   └── IntakeCard(...)
-└── o BlankCard(home_empty_today) centrada
+└── o BlankCard(home_empty_today) centrada (weight(1f))
 ```
 
 - Título de la top bar: `home_title_today` con la fecha formateada en español;
-  `showLogo = true`.
-- Hoy lo empuja con `onTopBarChange` (legado). Lo correcto es mover la fecha al
-  resolver de `TopBarState` de `MainScreen` (`top-bar.md`).
-- Usa `collectAsState()` (código heredado). En código nuevo, usa
-  `collectAsStateWithLifecycle()`.
+  `showLogo = true`, resuelto en `MainScreen` a partir de la ruta.
+- Usa `collectAsStateWithLifecycle()` y refresca el resumen con
+  `LifecycleEventEffect(ON_RESUME)`.
+- El banner abre `StatisticsScreens.Statistics`; se oculta si no hay ninguna
+  toma evaluada en los últimos siete días.
 
 ## Medicamentos
 
@@ -156,11 +157,32 @@ Column(fillMaxSize + padding(AppSpacing.md))
   5. `AppFormActions` al final (`guardar`).
 - En `View`: `ProfileViewContent` con `AppScrollWithFooter`, cabecera
   `ProfileHeader`, `AppReadOnlySection` + `AppDetailRow` por sección,
-  `AppNoticeBlock` para las alergias y la fila de «Ver adherencia» en
+  `AppNoticeBlock` para las alergias y la fila de «Ver estadísticas» en
   «Seguimiento». Las acciones (`editar` + eliminar) cierran el contenido.
 - El diálogo de eliminación usa `AlertDialog` con textos de `strings.xml`.
 - En `MainScreen` (modo View) hoy empuja el título con `onTopBarChange`
   (legado); la ruta debe resolverlo en `MainScreen` (`top-bar.md`).
+
+## Estadísticas
+
+`StatisticsScreen.kt` con `StatisticsViewModel`.
+
+- Destino de detalle `statistics` dentro de `MainNavigationGraph`; no es una
+  pestaña. La barra inferior y el FAB se ocultan solos, y la flecha atrás la
+  resuelve `MainTopBar`.
+- `StatisticsContent` separa el contenido del ViewModel para previsualizarlo.
+- Estructura:
+  `LazyColumn(padding(AppSpacing.md), spacedBy(AppSpacing.sm))` con:
+  1. `StatisticsPeriodSelector` (7 / 30 / 90 días; 7 por defecto).
+  2. `StatisticsSummaryCard` con porcentaje, tomadas, sin registrar y pendientes.
+  3. `WeeklyStatisticsChart` solo con periodo de 7 días.
+  4. Título «Por medicamento» + `MedicationStatisticsCard` por medicamento.
+  5. Título «Historial» + cabecera por día + `StatisticsHistoryItem`.
+  6. Nota al pie.
+- Estados vacíos: `BlankCard(statistics_empty_no_medications)` y
+  `BlankCard(statistics_empty_no_intakes)`.
+- Los textos y la accesibilidad salen de `statistics_*`. El gráfico es Compose
+  puro y cada barra tiene `contentDescription` con el día y los conteos.
 
 ## Ajustes
 

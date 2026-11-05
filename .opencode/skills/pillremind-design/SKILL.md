@@ -64,7 +64,7 @@ Resumen operativo; los valores completos están en `references/tokens.md`.
 
 | Rol | Uso |
 |---|---|
-| `primary` | Marca, títulos de sección, acción principal, icono activo. Negro en claro, blanco en oscuro. |
+| `primary` | Marca, títulos de sección, acción principal, icono activo. Negro en claro, azul cielo en oscuro. |
 | `onPrimary` | Texto e iconos sobre `primary`. |
 | `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, avatar por defecto. |
 | `secondaryContainer` / `onSecondaryContainer` | Botón de una toma ya realizada. |

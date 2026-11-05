@@ -108,13 +108,46 @@
     <string name="profile_manage">Gestionar</string>
     <string name="profile_photo_description">Foto de perfil de %1$s</string>
     <string name="profile_avatar_description">Avatar del perfil</string>
-    <string name="profile_view_adherence">Ver adherencia</string>
+    <string name="profile_view_statistics">Ver estadísticas</string>
     <string name="profile_tracking_section">Seguimiento</string>
-    <string name="profile_adherence_soon">Próximamente</string>
-    <string name="profile_adherence_placeholder_title">Adherencia</string>
-    <string name="profile_adherence_placeholder_message">Próximamente podrás consultar aquí las estadísticas de tomas por medicamento.</string>
+    <string name="profile_statistics_description">Adherencia e historial de tomas</string>
     <string name="profile_delete_title">Eliminar perfil</string>
     <string name="profile_delete_message">¿Seguro que quieres eliminar este perfil?</string>
+
+    <!-- Estadísticas -->
+    <string name="statistics_title">Estadísticas</string>
+    <string name="statistics_period_seven">7 días</string>
+    <string name="statistics_period_thirty">30 días</string>
+    <string name="statistics_period_ninety">90 días</string>
+    <string name="statistics_adherence_label">Adherencia</string>
+    <string name="statistics_percent_value">%1$d%%</string>
+    <string name="statistics_no_data">Sin datos</string>
+    <string name="statistics_taken_label">Tomadas</string>
+    <string name="statistics_missed_label">Sin registrar</string>
+    <string name="statistics_pending_label">Pendientes</string>
+    <string name="statistics_weekly_title">Resumen semanal</string>
+    <string name="statistics_chart_title">Últimos 7 días</string>
+    <string name="statistics_chart_bar_description">%1$s. Tomadas: %2$d, sin registrar: %3$d, pendientes: %4$d.</string>
+    <string name="statistics_by_medication_title">Por medicamento</string>
+    <string name="statistics_history_title">Historial</string>
+    <string name="statistics_archived">Archivado</string>
+    <string name="statistics_empty_no_medications">Todavía no hay medicamentos en este perfil.</string>
+    <string name="statistics_empty_no_intakes">No hay tomas registradas en este periodo.</string>
+    <string name="statistics_footnote">Se calculan con las tomas que registras en la app.</string>
+    <string name="statistics_status_taken">Tomada</string>
+    <string name="statistics_status_missed">Sin registrar</string>
+    <string name="statistics_status_pending">Pendiente</string>
+    <string name="statistics_history_today">Hoy</string>
+    <string name="statistics_history_yesterday">Ayer</string>
+    <string name="statistics_history_date_pattern">d MMM</string>
+    <plurals name="statistics_taken_of_total">
+        <item quantity="one">%1$d de %2$d toma</item>
+        <item quantity="other">%1$d de %2$d tomas</item>
+    </plurals>
+    <plurals name="statistics_pending_count">
+        <item quantity="one">%1$d pendiente</item>
+        <item quantity="other">%1$d pendientes</item>
+    </plurals>
 
     <!-- Ajustes -->
     <string name="settings_title">Ajustes</string>

@@ -2,6 +2,7 @@ package com.andres.pillremind.domain.repository
 
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.IntakeWithMedication
+import com.andres.pillremind.domain.model.StatisticsIntake
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -60,6 +61,22 @@ interface IntakeRepository {
      * @param date a partir de la que obtener las tomas
      */
     suspend fun getFutureIntakesByProfileId(profileId: Int, date: LocalDateTime): List<Intake>
+
+    /**
+     * Observa las tomas de un perfil dentro de un rango para calcular
+     * estadísticas e historial.
+     *
+     * Incluye los medicamentos archivados que conservan su historial.
+     *
+     * @param profileId ID del perfil propietario.
+     * @param from Inicio del rango.
+     * @param to Fin del rango.
+     */
+    fun observeStatisticsIntakes(
+        profileId: Int,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): Flow<List<StatisticsIntake>>
 
     /**
      * Elimina las tomas futuras de una medicación

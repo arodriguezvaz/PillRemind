@@ -52,28 +52,32 @@ la deuda técnica se siguen registrando en el audit local `PillRemind/INCIDENCIA
   opcionales. Los datos se muestran en «Ver perfil» y se incluyen en la copia de
   seguridad local. La base de datos pasa a la versión 6 y los campos nuevos son
   opcionales en el formato de copia.
-- **Pendiente:** el botón «Ver adherencia» de «Ver perfil» es un placeholder; la
-  pantalla de estadísticas se implementará en una próxima iteración.
 
 ## Historial y estadísticas
 
-### Pantalla de adherencia por medicamento
+### Pantalla de estadísticas
 
-- **Estado:** pendiente.
-- **Contexto:** el perfil ya muestra el botón «Ver adherencia» como placeholder.
-- **Propuesta:** pantalla con resumen global y estadísticas por medicamento
-  (tomas registradas, omitidas y porcentaje) para periodos de 7, 30 y 90 días,
-  incluyendo medicamentos archivados.
-- **Prioridad:** media.
+- **Estado:** implementada.
+- **Contexto:** el perfil muestra la fila «Ver estadísticas» y la pantalla de
+  Inicio incluye un resumen semanal cuando hay tomas evaluadas.
+- **Implementación:** ruta de detalle `statistics` con periodos de 7, 30 y 90
+  días, resumen de adherencia, gráfico de los últimos 7 días, desglose por
+  medicamento (incluidos los archivados) e historial agrupado por día. El
+  porcentaje no penaliza las tomas pendientes y usa el mismo margen de 15
+  minutos que Inicio.
+- **Pendiente:** exportar estadísticas y comparar perfiles.
 
-### Pantalla de historial de tomas
+### Historial de tomas
 
-- **Estado:** idea futura.
+- **Estado:** implementada parcialmente.
 - **Contexto:** cada `Intake` ya guarda `scheduledAt`, `takenAt` y snapshots de
   nombre, dosis y unidad.
-- **Propuesta:** pantalla para consultar tomas por perfil, medicamento y rango de
-  fechas, diferenciando tomadas, pendientes y omitidas.
-- **Prioridad:** media; el modelo de datos ya está preparado.
+- **Implementación:** la pantalla de Estadísticas incluye un historial agrupado
+  por día con todas las tomas del periodo seleccionado, diferenciando tomadas,
+  pendientes y sin registrar.
+- **Pendiente:** filtros por medicamento y rango de fechas, y una pantalla
+  independiente si el historial crece.
+- **Prioridad:** baja.
 
 ## Medicamentos archivados
 

@@ -7,6 +7,7 @@ import com.andres.pillremind.data.local.entity.IntakeEntity
 import com.andres.pillremind.data.local.entity.MedicationEntity
 import com.andres.pillremind.data.local.entity.ScheduleEntity
 import com.andres.pillremind.data.local.projections.IntakeWithMedicationRow
+import com.andres.pillremind.data.local.projections.StatisticsIntakeRow
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.ScheduleType
 import com.andres.pillremind.domain.model.WeekDay
@@ -14,11 +15,13 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
@@ -411,5 +414,48 @@ class IntakeRepositoryImplTest {
         assertEquals(20, result.single().medicationId)
         assertEquals("Ibuprofeno", result.single().medicationName)
         assertEquals("Andres", result.single().profileName)
+    }
+
+    @Test
+    fun `observeStatisticsIntakes mapea la proyeccion y conserva los archivados`() = runTest {
+        val from = date.atStartOfDay()
+        val to = date.atTime(LocalTime.MAX)
+        every {
+            intakeDao.observeStatisticsIntakes(1, from, to)
+        } returns flowOf(
+            listOf(
+                StatisticsIntakeRow(
+                    intakeId = 99,
+                    medicationId = 20,
+                    scheduledAt = scheduledAt,
+                    takenAt = scheduledAt.plusMinutes(5),
+                    medicationName = "Ibuprofeno",
+                    dose = 600.0,
+                    unit = "mg",
+                    imageUrl = null,
+                    deletedAt = LocalDateTime.of(2026, 10, 23, 20, 0)
+                )
+            )
+        )
+
+        val result = repository.observeStatisticsIntakes(1, from, to).first()
+
+        assertEquals(1, result.size)
+        assertEquals(99, result.single().intakeId)
+        assertEquals("Ibuprofeno", result.single().medicationName)
+        assertEquals(600.0, result.single().dose, 0.0)
+        assertEquals(scheduledAt.plusMinutes(5), result.single().takenAt)
+        assertTrue(result.single().isArchived)
+    }
+
+    @Test
+    fun `observeStatisticsIntakes consulta el rango indicado`() = runTest {
+        val from = date.atStartOfDay()
+        val to = date.atTime(LocalTime.MAX)
+        every { intakeDao.observeStatisticsIntakes(1, from, to) } returns flowOf(emptyList())
+
+        repository.observeStatisticsIntakes(1, from, to).first()
+
+        verify(exactly = 1) { intakeDao.observeStatisticsIntakes(1, from, to) }
     }
 }

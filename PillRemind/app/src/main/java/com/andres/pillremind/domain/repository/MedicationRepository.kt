@@ -70,4 +70,12 @@ interface MedicationRepository {
      * @param profileId ID del perfil
      */
     fun getMedications(profileId: Int): Flow<List<Medication>>
+
+    /**
+     * Indica si el perfil tiene algún medicamento, incluidos los archivados.
+     *
+     * Se usa en estadísticas para distinguir un perfil sin medicamentos de uno
+     * que todavía no tiene tomas en el periodo consultado.
+     */
+    fun hasMedications(profileId: Int): Flow<Boolean>
 }

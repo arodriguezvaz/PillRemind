@@ -94,6 +94,7 @@ sealed class ProfileMode {
  * @param onSaveClicked Callback ejecutado al guardar cambios.
  * @param profileMode Modo inicial de la pantalla (crear, ver o editar).
  * @param onDeletedClicked Callback ejecutado tras eliminar el perfil.
+ * @param onStatisticsClick Callback ejecutado al abrir las estadísticas.
  * @param onTopBarChange Callback para modificar la TopBar.
  * @param profileViewModel ViewModel encargado de la lógica del perfil.
  */
@@ -103,6 +104,7 @@ fun ProfileScreen(
     onSaveClicked: () -> Unit = {},
     profileMode: ProfileMode = ProfileMode.Create,
     onDeletedClicked: () -> Unit = {},
+    onStatisticsClick: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -119,7 +121,6 @@ fun ProfileScreen(
     var currentImagePath by rememberSaveable { mutableStateOf<String?>(null) }
     var newPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-    var showAdherencePlaceholder by rememberSaveable { mutableStateOf(false) }
     var formInitialized by rememberSaveable { mutableStateOf(false) }
     val modeSaver = Saver<ProfileMode, String>(
         save = { mode ->
@@ -296,7 +297,7 @@ fun ProfileScreen(
                 healthCardNumber = healthCardNumber.value,
                 onEditClick = { currentMode = ProfileMode.Edit },
                 onDeleteClick = { perfil?.let { showDeleteDialog = true } },
-                onAdherenceClick = { showAdherencePlaceholder = true },
+                onStatisticsClick = onStatisticsClick,
             )
         }
     }
@@ -324,19 +325,6 @@ fun ProfileScreen(
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
                     Text(stringResource(R.string.common_cancel))
-                }
-            }
-        )
-    }
-
-    if (showAdherencePlaceholder) {
-        AlertDialog(
-            onDismissRequest = { showAdherencePlaceholder = false },
-            title = { Text(stringResource(R.string.profile_adherence_placeholder_title)) },
-            text = { Text(stringResource(R.string.profile_adherence_placeholder_message)) },
-            confirmButton = {
-                TextButton(onClick = { showAdherencePlaceholder = false }) {
-                    Text(stringResource(R.string.common_ok))
                 }
             }
         )
@@ -545,7 +533,7 @@ private fun ProfileViewContent(
     healthCardNumber: String,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onAdherenceClick: () -> Unit,
+    onStatisticsClick: () -> Unit,
 ) {
     val datePattern = stringResource(R.string.common_date_pattern)
     val dateFormatter = remember(datePattern) { DateTimeFormatter.ofPattern(datePattern) }
@@ -631,7 +619,7 @@ private fun ProfileViewContent(
         }
 
         AppReadOnlySection(title = stringResource(R.string.profile_tracking_section)) {
-            AdherenceRow(onClick = onAdherenceClick)
+            StatisticsRow(onClick = onStatisticsClick)
         }
     }
 }
@@ -677,11 +665,11 @@ private fun ProfileHeader(
 }
 
 /**
- * Fila que abre el aviso de adherencia.
+ * Fila que abre las estadísticas de adherencia.
  */
 @Composable
-private fun AdherenceRow(onClick: () -> Unit) {
-    val label = stringResource(R.string.profile_view_adherence)
+private fun StatisticsRow(onClick: () -> Unit) {
+    val label = stringResource(R.string.profile_view_statistics)
 
     Row(
         modifier = Modifier
@@ -704,7 +692,7 @@ private fun AdherenceRow(onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = stringResource(R.string.profile_adherence_soon),
+                text = stringResource(R.string.profile_statistics_description),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -733,7 +721,7 @@ private fun ProfileViewContentPreview() {
             healthCardNumber = "1234 5678 9012",
             onEditClick = {},
             onDeleteClick = {},
-            onAdherenceClick = {},
+            onStatisticsClick = {},
         )
     }
 }

@@ -58,6 +58,15 @@ interface MedicationDao {
     fun getMedications(profileId: Int): Flow<List<MedicationEntity>>
 
     /**
+     * Cuenta todos los medicamentos de un perfil, incluidos los archivados.
+     *
+     * Se usa en estadísticas para distinguir un perfil sin medicamentos de uno
+     * que tiene medicamentos pero todavía no tiene tomas en el periodo.
+     */
+    @Query("SELECT COUNT(*) FROM medications WHERE profileId = :profileId")
+    fun countMedications(profileId: Int): Flow<Int>
+
+    /**
      * Marca un medicamento como archivado sin borrar su historial.
      */
     @Query("UPDATE medications SET deletedAt = :deletedAt, updatedAt = :updatedAt WHERE id = :medicationId")

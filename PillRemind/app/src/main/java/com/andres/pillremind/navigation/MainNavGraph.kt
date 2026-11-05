@@ -20,6 +20,7 @@ import com.andres.pillremind.ui.screens.medication.MedicationScreen
 import com.andres.pillremind.ui.screens.medications.MedicationsScreen
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
+import com.andres.pillremind.ui.screens.statistics.StatisticsScreen
 
 /**
  * Grafo de navegación principal de la aplicación.
@@ -52,6 +53,12 @@ fun MainNavigationGraph(
     paddingValues: PaddingValues,
     onTopBarChange: (route: String, state: TopBarState) -> Unit
 ) {
+    val openStatistics = {
+        navController.navigate(StatisticsScreens.Statistics.route) {
+            launchSingleTop = true
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = BottomBarScreens.Home.route,
@@ -64,7 +71,9 @@ fun MainNavigationGraph(
     ) {
         //Home screen donde se ven las tomas del día
         composable(BottomBarScreens.Home.route) {
-            HomeScreen()
+            HomeScreen(
+                onStatisticsClick = openStatistics
+            )
         }
         composable(BottomBarScreens.Medications.route) {
             MedicationsScreen(
@@ -92,7 +101,11 @@ fun MainNavigationGraph(
                     BottomBarScreens.Profile.route,
                     onTopBarChange
                 ),
+                onStatisticsClick = openStatistics,
             )
+        }
+        composable(StatisticsScreens.Statistics.route) {
+            StatisticsScreen()
         }
         medicationNavGraph(navController, onTopBarChange)
     }
