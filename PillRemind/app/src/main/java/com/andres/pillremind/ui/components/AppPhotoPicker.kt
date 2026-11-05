@@ -67,21 +67,32 @@ fun AppPhotoPicker(
         null
     }
 
-    Box(
-        modifier = modifier
-            .size(size)
-            .clip(AppImageShape)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .then(
-                if (enabled) Modifier.clickable {
-                    launcher?.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    )
-                } else Modifier
+    // El click debe funcionar también cuando todavía no hay imagen, así que se
+    // comparte entre la foto y el placeholder.
+    val clickModifier = if (enabled) Modifier.clickable {
+        launcher?.launch(
+            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+        )
+    } else Modifier
+
+    if (photoUri == null) {
+        AppImagePlaceholder(
+            icon = placeholderIcon,
+            contentDescription = stringResource(
+                if (enabled) R.string.photo_add else R.string.photo_none
             ),
-        contentAlignment = Alignment.Center
-    ) {
-        if (photoUri != null) {
+            modifier = modifier.then(clickModifier),
+            size = size
+        )
+    } else {
+        Box(
+            modifier = modifier
+                .size(size)
+                .clip(AppImageShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .then(clickModifier),
+            contentAlignment = Alignment.Center
+        ) {
             AsyncImage(
                 model = photoUri,
                 contentDescription = stringResource(photoDescriptionRes),
@@ -109,15 +120,6 @@ fun AppPhotoPicker(
                     )
                 }
             }
-        } else {
-            Icon(
-                imageVector = placeholderIcon,
-                contentDescription = stringResource(
-                    if (enabled) R.string.photo_add else R.string.photo_none
-                ),
-                modifier = Modifier.size(size * 0.4f),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }

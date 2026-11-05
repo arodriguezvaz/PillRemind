@@ -133,7 +133,19 @@ AppPhotoPicker(
 
 - Recorte con `AppImageShape`, fondo `surfaceVariant`.
 - Badge de edición de 26dp (solo si `enabled`) con icono de 13dp.
-- `size` por defecto 96dp; en las cards se usa 64dp.
+- `size` por defecto 96dp.
+- Sin foto, delega en `AppImagePlaceholder` (mismo aspecto que las cards).
+
+### `AppImagePlaceholder` (`AppImagePlaceholder.kt`)
+
+```kotlin
+AppImagePlaceholder(icon, contentDescription, modifier, size = 64.dp)
+```
+
+- Hueco común para imágenes sin foto: fondo `surfaceVariant`, recorte
+  `AppImageShape` e icono `onSurfaceVariant` al 40 % del tamaño.
+- Lo usan `AppPhotoPicker`, `DefaultPill()` (medicamentos) y `DefaultAvatar()`
+  (perfiles), así que las cards y las fichas de solo lectura se ven igual.
 
 ## Solo lectura
 
@@ -200,7 +212,7 @@ MedicationCard(medication, accion, modifier, buttonText, buttonVariant)
 ```
 
 - Imagen de 64dp con `AppImageShape`, nombre `titleMedium` y botón `Small`.
-- Si no hay imagen, `DefaultPill()` con `primaryContainer`.
+- Si no hay imagen, `DefaultPill()` con `AppImagePlaceholder`.
 
 ### `IntakeCard` (`IntakeCard.kt`)
 
@@ -219,7 +231,8 @@ IntakeCard(intake, visualState, onTake, modifier)
 PerfilCard(profile, gestionar, modifier, buttonText, buttonVariant)
 ```
 
-- Imagen de 64dp con `AppImageShape`; si no hay, `DefaultAvatar()`.
+- Imagen de 64dp con `AppImageShape`; si no hay, `DefaultAvatar()` con
+  `AppImagePlaceholder`.
 - Nombre `titleMedium` y botón `Small`.
 
 ## Estadísticas

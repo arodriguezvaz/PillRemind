@@ -4,7 +4,6 @@ import com.andres.pillremind.ui.theme.AppImageShape
 import com.andres.pillremind.ui.theme.AppSpacing
 
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,9 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -128,23 +127,12 @@ fun IntakeCard(
 }
 
 /**
- * Icono por defecto utilizado cuando un medicamento no tiene imagen asociada.
+ * Imagen por defecto utilizada cuando un medicamento no tiene foto asociada.
  */
 @Composable
 fun DefaultPill() {
-    Box(
-        modifier = Modifier
-            .size(64.dp)
-            .background(
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shape = AppImageShape
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_pill),
-            contentDescription = stringResource(R.string.medication_icon_description),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-    }
+    AppImagePlaceholder(
+        icon = Icons.Default.Medication,
+        contentDescription = stringResource(R.string.medication_icon_description)
+    )
 }

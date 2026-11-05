@@ -3,7 +3,6 @@ import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppImageShape
 import com.andres.pillremind.ui.theme.AppSpacing
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -12,10 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -107,20 +105,9 @@ fun PerfilCard(
 
 @Composable
 private fun DefaultAvatar() {
-    Box(
-        modifier = Modifier
-            .size(64.dp)
-            .background(
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shape = AppImageShape
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.Person,
-            contentDescription = stringResource(R.string.profile_avatar_description),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-    }
+    AppImagePlaceholder(
+        icon = Icons.Default.Person,
+        contentDescription = stringResource(R.string.profile_avatar_description)
+    )
 }
 
