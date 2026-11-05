@@ -66,11 +66,11 @@ Resumen operativo; los valores completos están en `references/tokens.md`.
 |---|---|
 | `primary` | Marca, títulos de sección, acción principal, icono activo. Negro en claro, azul cielo en oscuro. |
 | `onPrimary` | Texto e iconos sobre `primary`. |
-| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, avatar por defecto. |
+| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado. |
 | `secondaryContainer` / `onSecondaryContainer` | Botón de una toma ya realizada. |
 | `error` / `onError` | Acciones destructivas y toma retrasada. |
 | `surface` | Fondo de cards, campos, chips no seleccionados y filas. |
-| `surfaceVariant` | Campos deshabilitados y fondo del selector de foto. |
+| `surfaceVariant` | Campos deshabilitados, fondo del selector de foto y de los placeholders de imagen. |
 | `onSurfaceVariant` | Texto secundario, metadatos y descripciones. |
 | `outlineVariant` | Divisores y bordes finos. |
 | `background` | Fondo general y barra superior. |
@@ -116,7 +116,8 @@ Catálogo detallado en `references/components.md`.
 - **Botones:** `AppButton` (`Primary`, `Secondary`, `Tonal`, `Ghost`, `Danger`;
   `Small` 110dp, `Medium` 160dp, `Large` ancho completo) y `AppFab`.
 - **Campos:** `AppTextField` + `AppFormField`; `AppSearchField` para búsqueda;
-  `AppDropdownField`, `AppDatePickerField`, `AppPhotoPicker`.
+  `AppDropdownField`, `AppDatePickerField`, `AppPhotoPicker` y
+  `AppImagePlaceholder` para el hueco de las imágenes sin foto.
 - **Formularios:** `AppFormSection` y `AppFormActions`.
 - **Solo lectura:** `AppReadOnlySection`, `AppDetailRow` (con variante
   `stacked`), `AppNoticeBlock` y `AppScrollWithFooter`.

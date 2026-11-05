@@ -11,14 +11,14 @@ fuente de verdad: si un valor cambia, actualiza también esta tabla.
 |---|---|---|
 | `primary` | Marca, títulos de sección, acciones principales, icono activo de la barra inferior. Violeta en claro, azul cielo en oscuro. | Usarlo como fondo de bloques grandes de información. |
 | `onPrimary` | Texto e iconos sobre `primary`. | Texto secundario. |
-| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, avatar por defecto, FAB de perfiles. | Sustituir a `surface` en cards. |
+| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, FAB de perfiles. | Sustituir a `surface` en cards. |
 | `secondary` | Naranja de aviso; hoy se usa sobre todo como base de `secondaryContainer`. | Decoración o texto largo. |
 | `secondaryContainer` / `onSecondaryContainer` | Botón de una toma ya realizada (`ButtonVariant.Secondary`). | Estado pendiente. |
 | `tertiary` / `tertiaryContainer` | Verde de confirmación; uso puntual. | Acciones principales. |
 | `error` / `onError` | Acciones destructivas (`ButtonVariant.Danger`) y toma retrasada. | Texto de error sobre `surface` sin contraste. |
 | `errorContainer` / `onErrorContainer` | Fondos de error puntuales. | Sustituir a `error` en botones. |
 | `surface` | Fondo de cards, campos, chips no seleccionados y filas de horas. | Fondo general de pantalla. |
-| `surfaceVariant` | Campos deshabilitados, fondo del selector de foto y separadores suaves. | Fondo de cards. |
+| `surfaceVariant` | Campos deshabilitados, fondo del selector de foto, placeholders de imagen y separadores suaves. | Fondo de cards. |
 | `onSurface` | Texto principal y valores de lectura. | Texto secundario. |
 | `onSurfaceVariant` | Texto secundario, metadatos, descripciones y enlaces deshabilitados. | Texto principal. |
 | `outline` / `outlineVariant` | Bordes y divisores finos. | Texto. |
