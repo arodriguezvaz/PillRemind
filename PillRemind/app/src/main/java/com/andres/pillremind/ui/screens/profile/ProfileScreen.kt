@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -51,6 +52,7 @@ import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppReadOnlyField
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
+import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.labelRes
 import com.andres.pillremind.ui.screens.main.TopBarAction
 import com.andres.pillremind.ui.screens.main.TopBarState
@@ -82,6 +84,7 @@ sealed class ProfileMode {
  * @param onSaveClicked Callback ejecutado al guardar cambios.
  * @param profileMode Modo inicial de la pantalla (crear, ver o editar).
  * @param onDeletedClicked Callback ejecutado tras eliminar el perfil.
+ * @param onStatisticsClick Callback ejecutado al abrir las estadísticas.
  * @param onTopBarChange Callback para modificar la TopBar.
  * @param profileViewModel ViewModel encargado de la lógica del perfil.
  */
@@ -91,6 +94,7 @@ fun ProfileScreen(
     onSaveClicked: () -> Unit = {},
     profileMode: ProfileMode = ProfileMode.Create,
     onDeletedClicked: () -> Unit = {},
+    onStatisticsClick: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -107,7 +111,6 @@ fun ProfileScreen(
     var currentImagePath by rememberSaveable { mutableStateOf<String?>(null) }
     var newPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-    var showAdherencePlaceholder by rememberSaveable { mutableStateOf(false) }
     var formInitialized by rememberSaveable { mutableStateOf(false) }
     val modeSaver = Saver<ProfileMode, String>(
         save = { mode ->
@@ -295,22 +298,13 @@ fun ProfileScreen(
                 healthCardNumber = healthCardNumber.value,
                 onHealthCardNumberChange = {},
                 footer = {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(AppSpacing.xxs),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        AppButton(
-                            text = stringResource(R.string.profile_view_adherence),
-                            onClick = { showAdherencePlaceholder = true },
-                            size = ButtonSize.Large
-                        )
-                        Text(
-                            text = stringResource(R.string.profile_adherence_soon),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    AppButton(
+                        text = stringResource(R.string.profile_view_statistics),
+                        onClick = onStatisticsClick,
+                        variant = ButtonVariant.Tonal,
+                        size = ButtonSize.Large,
+                        leadingIcon = Icons.Rounded.BarChart
+                    )
                     AppFormActions(
                         primaryText = stringResource(R.string.editar),
                         onPrimaryClick = { currentMode = ProfileMode.Edit },
@@ -347,19 +341,6 @@ fun ProfileScreen(
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
                     Text(stringResource(R.string.common_cancel))
-                }
-            }
-        )
-    }
-
-    if (showAdherencePlaceholder) {
-        AlertDialog(
-            onDismissRequest = { showAdherencePlaceholder = false },
-            title = { Text(stringResource(R.string.profile_adherence_placeholder_title)) },
-            text = { Text(stringResource(R.string.profile_adherence_placeholder_message)) },
-            confirmButton = {
-                TextButton(onClick = { showAdherencePlaceholder = false }) {
-                    Text(stringResource(R.string.common_ok))
                 }
             }
         )

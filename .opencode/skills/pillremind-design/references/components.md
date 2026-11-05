@@ -1,9 +1,10 @@
 # Catálogo de componentes
 
 Todos viven en `PillRemind/app/src/main/java/com/andres/pillremind/ui/components/`
-(salvo los de ajustes, en `components/settings/`, y los de horarios, en
-`components/timeeditor/`). Reutiliza estos componentes antes de crear uno nuevo.
-Los textos que reciben son siempre cadenas ya resueltas con `stringResource`.
+(salvo los de ajustes, en `components/settings/`, los de horarios, en
+`components/timeeditor/`, y los de estadísticas, en `components/statistics/`).
+Reutiliza estos componentes antes de crear uno nuevo. Los textos que reciben
+son siempre cadenas ya resueltas con `stringResource`.
 
 ## Botones
 
@@ -202,6 +203,65 @@ PerfilCard(profile, gestionar, modifier, buttonText, buttonVariant)
 
 - Imagen de 64dp con `AppImageShape`; si no hay, `DefaultAvatar()`.
 - Nombre `titleMedium` y botón `Small`.
+
+## Estadísticas
+
+Viven en `components/statistics/` y se usan en `StatisticsScreen` y en el
+banner de Inicio.
+
+### `StatisticsBanner` (`statistics/StatisticsBanner.kt`)
+
+```kotlin
+StatisticsBanner(summary, onClick, modifier)
+```
+
+- Card pulsable con icono, «Resumen semanal», «X de Y tomas» y porcentaje.
+- Se oculta desde la pantalla si `summary.evaluated == 0`.
+
+### `StatisticsPeriodSelector` (`statistics/StatisticsPeriodSelector.kt`)
+
+```kotlin
+StatisticsPeriodSelector(selectedPeriod, onPeriodSelected, modifier)
+```
+
+- Tres chips con el estilo de `WeekDayChipGroup`: `primary` seleccionado,
+  `surface` no seleccionado y `AppElevation`.
+
+### `StatisticsSummaryCard` (`statistics/StatisticsSummaryCard.kt`)
+
+```kotlin
+StatisticsSummaryCard(summary, modifier)
+```
+
+- Porcentaje en chip `primaryContainer`; conteos con punto de color
+  (`tertiary`, `error`, `outline`).
+
+### `WeeklyStatisticsChart` (`statistics/WeeklyStatisticsChart.kt`)
+
+```kotlin
+WeeklyStatisticsChart(days, modifier)
+```
+
+- Barras apiladas al 100 % con Compose puro, sin librerías.
+- Cada barra tiene `contentDescription` con el día y los conteos.
+- La leyenda usa `FlowRow` para envolver a fuente grande.
+
+### `MedicationStatisticsCard` (`statistics/MedicationStatisticsCard.kt`)
+
+```kotlin
+MedicationStatisticsCard(statistics, modifier)
+```
+
+- Imagen o `DefaultPill`, nombre, dosis, «X de Y tomas», pendientes y
+  porcentaje. Etiqueta «Archivado» cuando corresponde.
+
+### `StatisticsHistoryItem` (`statistics/StatisticsHistoryItem.kt`)
+
+```kotlin
+StatisticsHistoryItem(intake, status, modifier)
+```
+
+- Hora, medicamento, dosis y chip de estado con colores semánticos.
 
 ## Ajustes
 

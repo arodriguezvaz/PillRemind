@@ -8,6 +8,7 @@ import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.IntakeWithMedication
+import com.andres.pillremind.domain.model.StatisticsIntake
 import com.andres.pillremind.domain.model.occursOn
 import com.andres.pillremind.domain.repository.IntakeRepository
 import javax.inject.Inject
@@ -125,6 +126,15 @@ class IntakeRepositoryImpl @Inject constructor(
         date: LocalDateTime
     ): List<Intake> {
         return intakeDao.getFutureIntakesByProfileId(profileId, date).map { it.toDomain() }
+    }
+
+    override fun observeStatisticsIntakes(
+        profileId: Int,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): Flow<List<StatisticsIntake>> {
+        return intakeDao.observeStatisticsIntakes(profileId, from, to)
+            .map { rows -> rows.map { it.toDomain() } }
     }
 
     override suspend fun deleteFutureIntakesByMedicationId(medicationId: Int, date: LocalDateTime) {

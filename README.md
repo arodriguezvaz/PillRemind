@@ -21,7 +21,8 @@ así como recordatorios e notificacións para cada toma.
 
 Cada perfil pode gardar información médica opcional: data de nacemento, sexo, grupo sanguíneo, alerxias, notas e
 número de tarxeta sanitaria. Estes datos móstranse desde «Ver perfil» e inclúense na copia de seguridade local. O botón
-«Ver adherencia» queda preparado como acceso ás futuras estatísticas de tomas por medicamento.
+«Ver estadísticas» abre un resumo de adherencia con períodos de 7, 30 e 90 días, gráfico semanal, desglose por
+medicamento e historial de tomas.
 
 ## Almacenamento local
 

@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.andres.pillremind.data.local.entity.IntakeEntity
 import com.andres.pillremind.data.local.projections.IntakeWithMedicationRow
+import com.andres.pillremind.data.local.projections.StatisticsIntakeRow
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 
@@ -90,6 +91,43 @@ interface IntakeDao {
         endOfDay: LocalDateTime,
         profileId: Int
     ): Flow<List<IntakeWithMedicationRow>>
+
+    /**
+     * Observa las tomas de un perfil dentro de un rango para calcular
+     * estadísticas e historial.
+     *
+     * Incluye los medicamentos archivados que conservan su historial. No se
+     * filtra por `deletedAt` para no perder las tomas anteriores al archivo.
+     *
+     * @param profileId ID del perfil propietario.
+     * @param from Inicio del rango.
+     * @param to Fin del rango.
+     * @return Flow con las tomas ordenadas por fecha programada.
+     */
+    @Query(
+        """
+    SELECT
+        i.id AS intakeId,
+        i.medicationId,
+        i.scheduledAt,
+        i.takenAt,
+        i.medicationNameSnapshot AS medicationName,
+        i.doseSnapshot AS dose,
+        i.unitSnapshot AS unit,
+        m.imageUrl,
+        m.deletedAt
+    FROM intakes i
+    JOIN medications m ON m.id = i.medicationId
+    WHERE m.profileId = :profileId
+    AND i.scheduledAt BETWEEN :from AND :to
+    ORDER BY i.scheduledAt
+    """
+    )
+    fun observeStatisticsIntakes(
+        profileId: Int,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): Flow<List<StatisticsIntakeRow>>
 
     /**
      * Devuelve las tomas futuras de un medicamento desde una fecha.

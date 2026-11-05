@@ -17,6 +17,7 @@ import com.andres.pillremind.R
 import com.andres.pillremind.navigation.BottomBarScreens
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
+import com.andres.pillremind.navigation.StatisticsScreens
 import com.andres.pillremind.ui.components.AppFab
 import com.andres.pillremind.ui.screens.home.homeTopBarTitle
 
@@ -50,6 +51,9 @@ fun MainScreen(
         )
         BottomBarScreens.Profile.route -> TopBarState(
             title = stringResource(R.string.profile_view_title)
+        )
+        StatisticsScreens.Statistics.route -> TopBarState(
+            title = stringResource(R.string.statistics_title)
         )
         MedicationScreens.MedicationSeeScreen.route -> TopBarState(
             title = stringResource(R.string.medication_view_title)
