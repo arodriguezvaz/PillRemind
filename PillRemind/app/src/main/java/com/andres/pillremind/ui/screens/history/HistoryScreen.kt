@@ -4,10 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,11 +32,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.StatisticsIntake
 import com.andres.pillremind.domain.model.StatisticsStatus
-import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppSearchField
 import com.andres.pillremind.ui.components.BlankCard
-import com.andres.pillremind.ui.components.ButtonSize
-import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.history.HistoryDayHeader
 import com.andres.pillremind.ui.components.history.HistoryFiltersButton
 import com.andres.pillremind.ui.components.history.HistoryFiltersSheet
@@ -92,7 +87,6 @@ fun HistoryScreen(
             focusManager.clearFocus()
             showFilters = true
         },
-        onClearFilters = historyViewModel::clearFilters,
         modifier = modifier,
     )
 
@@ -120,7 +114,6 @@ private fun HistoryContent(
     uiState: HistoryUiState,
     onSearchQueryChange: (String) -> Unit,
     onFiltersClick: () -> Unit,
-    onClearFilters: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val datePattern = stringResource(R.string.common_date_pattern)
@@ -169,7 +162,6 @@ private fun HistoryContent(
                 EmptyHistory(
                     hasMedications = uiState.hasMedications,
                     filters = filters,
-                    onClearFilters = onClearFilters,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -213,7 +205,6 @@ private fun HistoryContent(
 private fun EmptyHistory(
     hasMedications: Boolean,
     filters: HistoryFilters,
-    onClearFilters: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val message = when {
@@ -221,7 +212,6 @@ private fun EmptyHistory(
         filters.hasNarrowingFilters -> stringResource(R.string.history_empty_no_results)
         else -> stringResource(R.string.history_empty_no_intakes)
     }
-    val showClear = filters != HistoryFilters()
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -229,15 +219,6 @@ private fun EmptyHistory(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         BlankCard(message)
-        if (showClear) {
-            Spacer(modifier = Modifier.height(AppSpacing.sm))
-            AppButton(
-                text = stringResource(R.string.history_filter_clear),
-                onClick = onClearFilters,
-                variant = ButtonVariant.Ghost,
-                size = ButtonSize.Large,
-            )
-        }
     }
 }
 
@@ -343,7 +324,6 @@ private fun PreviewHistoryContent() {
         ),
         onSearchQueryChange = {},
         onFiltersClick = {},
-        onClearFilters = {},
     )
 }
 

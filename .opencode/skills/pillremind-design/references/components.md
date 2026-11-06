@@ -16,12 +16,19 @@ AppButton(
 )
 ```
 
-- Variantes: `Primary` (`primary`), `Secondary` (`secondaryContainer`),
-  `Tonal` (`primaryContainer`), `Ghost` (transparente + `primary`),
-  `Danger` (`error`).
+- Variantes y cuándo usarlas:
+  - `Primary` (`primary`): acción principal de la pantalla o del formulario.
+  - `Tonal` (`primaryContainer`): **acción secundaria con texto**, como
+    `AddTimeItem` o «Limpiar filtros»; en hojas y formularios, `Large`.
+  - `Ghost` (transparente + `primary`): acción inline o discreta que no debe
+    competir con una card; hoy no se usa en ninguna pantalla.
+  - `Danger` (`error`): acción destructiva.
+  - `Secondary` (`secondaryContainer`): solo para el estado «Tomado» de
+    `IntakeCard`; el naranja es de aviso y no sirve para una acción neutra.
 - Tamaños: `Small` 110dp, `Medium` 160dp, `Large` ancho completo.
 - `isLoading` deshabilita el botón y muestra un spinner de 16dp.
-- `leadingIcon` es decorativo (`contentDescription = null`).
+- `leadingIcon` es decorativo (`contentDescription = null`) y solo se añade si
+  aporta significado (`Add` en «Añadir hora»); el texto ya describe la acción.
 - Elevación `AppElevation`; deshabilitado sin elevación.
 
 ### `AppFab` (`AppFab.kt`)
@@ -248,8 +255,8 @@ IntakeCard(intake, visualState, onTake, modifier)
 ```
 
 - Misma estructura que `MedicationCard`.
-- Estado `PENDING` → botón `Primary`; `TAKEN` → `Secondary` deshabilitado;
-  `DELAYED` → `Danger`.
+- Estado `PENDING` → botón `Primary`; `TAKEN` → `Secondary` deshabilitado
+  (única excepción a la regla de acción secundaria); `DELAYED` → `Danger`.
 - Metadatos de dosis y hora en `bodySmall` / `onSurfaceVariant`.
 
 ### `PerfilCard` (`PerfilCard.kt`)
@@ -383,8 +390,9 @@ HistoryFiltersSheet(
 - `ModalBottomSheet` con estado, medicamento, «Incluir archivados» y rango
   personalizado con `AppDatePickerField`. Las fechas se guardan al cerrar
   («Ver resultados», X, arrastre o atrás) si son válidas; «Limpiar filtros» es
-  la acción secundaria, vuelve al rango por defecto y cierra la hoja. El
-  contenido se separa en `HistoryFiltersSheetContent` para previsualizarlo.
+  la acción secundaria (`Tonal` `Large`, sin icono), vuelve al rango por
+  defecto y cierra la hoja. El contenido se separa en
+  `HistoryFiltersSheetContent` para previsualizarlo.
 
 ## Ajustes
 
