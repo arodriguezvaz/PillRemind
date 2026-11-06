@@ -114,12 +114,12 @@ class MedicationViewModel @Inject constructor(
 
         val trimmedName = nombre.trim()
         val normalizedUnit = unit.trim()
-        val imagePath = photoUri?.let {
-            copyImageToInternalStorage(context, it)
-        }
 
         viewModelScope.launch {
             val profileId = profileId.firstOrNull() ?: return@launch
+            val imagePath = photoUri?.let {
+                copyImageToInternalStorage(context, it)
+            }
             val medication = Medication(
                 name = trimmedName,
                 profileId = profileId,
@@ -173,15 +173,22 @@ class MedicationViewModel @Inject constructor(
     ) {
         val trimmedName = name.trim()
         val normalizedUnit = unit.trim()
-        val imagePath = if (newPhotoUri != null) {
-            currentImagePath?.let { File(it).delete() }
-            copyImageToInternalStorage(context, newPhotoUri)
-        } else {
-            currentImagePath
-        }
         viewModelScope.launch {
             val id = medicationId ?: return@launch
             val currentMedication = medicationRepository.getMedicationByIdOnce(id) ?: return@launch
+            val previousImagePath = currentImagePath ?: currentMedication.imageUrl
+            val imagePath = if (newPhotoUri != null) {
+                // Copia primero la nueva imagen: si falla, se conserva la anterior.
+                val copiedPath = copyImageToInternalStorage(context, newPhotoUri)
+                if (copiedPath != null) {
+                    previousImagePath?.let { File(it).delete() }
+                    copiedPath
+                } else {
+                    previousImagePath
+                }
+            } else {
+                previousImagePath
+            }
             val now = LocalDateTime.now()
             val futureIntakeIds = intakeRepository
                 .getFutureIntakesByMedicationId(id, now)

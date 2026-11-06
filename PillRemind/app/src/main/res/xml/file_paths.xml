@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Archivos temporales que la app comparte con la app de cámara mediante
+    FileProvider. El recorte se guarda también aquí y luego se copia a filesDir.
+-->
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <cache-path
+        name="photos"
+        path="photos/" />
+</paths>

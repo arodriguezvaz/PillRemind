@@ -132,9 +132,36 @@ AppPhotoPicker(
 ```
 
 - Recorte con `AppImageShape`, fondo `surfaceVariant`.
-- Badge de edición de 26dp (solo si `enabled`) con icono de 13dp.
+- En edición abre un diálogo con cámara (si hay) y galería; después abre
+  `AppPhotoCropDialog` y devuelve el JPEG cuadrado ya recortado.
+- En solo lectura, si hay foto, al pulsarla se abre `AppPhotoViewerDialog`.
+- Badge de 26dp con icono de 13dp: lápiz al editar y lupa en solo lectura.
 - `size` por defecto 96dp.
 - Sin foto, delega en `AppImagePlaceholder` (mismo aspecto que las cards).
+- La cámara usa `FileProvider` y `cacheDir/photos`; no se declara el permiso
+  `CAMERA` porque se delega en la app de cámara del sistema.
+
+### `AppPhotoCropDialog` (`AppPhotoCropDialog.kt`)
+
+```kotlin
+AppPhotoCropDialog(sourceUri, onDismiss, onCropped)
+```
+
+- Diálogo a pantalla completa con un cuadrado fijo y la imagen por debajo.
+- Arrastrar, pellizcar, girar 90° y restablecer. La imagen siempre cubre el
+  cuadrado y no se pueden dejar huecos.
+- Salida siempre 1:1, como máximo 1024×1024 y JPEG calidad 90.
+- Decodifica con Coil a 2048 px y `allowHardware(false)` para respetar el EXIF.
+- Los cálculos viven en `PhotoCropMath`, con tests de JVM.
+
+### `AppPhotoViewerDialog` (`AppPhotoViewerDialog.kt`)
+
+```kotlin
+AppPhotoViewerDialog(photoUri, photoDescriptionRes, onDismiss)
+```
+
+- Visor a pantalla completa sobre `scrim`, con la imagen en `ContentScale.Fit`.
+- Se cierra con el botón, tocando fuera o con el gesto de volver.
 
 ### `AppImagePlaceholder` (`AppImagePlaceholder.kt`)
 

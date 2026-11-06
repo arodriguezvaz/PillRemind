@@ -115,16 +115,17 @@ Column(fillMaxSize + padding(AppSpacing.md))
 - Raíz de cada modo:
   `Column(fillMaxSize + padding(AppSpacing.md) + verticalScroll)`.
 - Orden:
-  1. `AppPhotoPicker` con `bottom = AppSpacing.xl`.
+  1. `AppPhotoPicker` con `bottom = AppSpacing.xl`; en edición permite cámara o
+     galería y siempre recorta en 1:1.
   2. `AppFormSection(medication_data_section)` con los campos de datos.
   3. `AppFormSection(medication_schedule_section)` + `ScheduleEditor`.
   4. `AppFormActions` al final (`guardar`).
 - En `View`: `AppScrollWithFooter` con `MedicationHeader`,
   `AppReadOnlySection` para «Tratamiento» y «Pauta», `ScheduleReadOnly`
   (resumen, chips de hora y fila «Próxima toma») y una sección «Seguimiento»
-  con `StatisticsRow` para abrir las estadísticas del medicamento. Las acciones
-  (`editar` + archivar) cierran el contenido; si la ficha no llena la pantalla,
-  se anclan abajo.
+  con `StatisticsRow` para abrir las estadísticas del medicamento. La foto de
+  la cabecera abre `AppPhotoViewerDialog`. Las acciones (`editar` + archivar)
+  cierran el contenido; si la ficha no llena la pantalla, se anclan abajo.
 - Sin badge de «Crónico»: el estado se deduce de la fila «Fecha fin»
   (`medication_no_end_date`).
 - En `Archived`: `MedicationArchivedContent` reutiliza `MedicationHeader`,
@@ -174,7 +175,8 @@ Column(fillMaxSize + padding(AppSpacing.md))
   `Column(fillMaxSize + verticalScroll + imePadding + padding(AppSpacing.md))`
   con `spacedBy(AppSpacing.lg)`.
 - Orden:
-  1. `AppPhotoPicker` centrado.
+  1. `AppPhotoPicker` centrado; en edición permite cámara o galería y siempre
+     recorta en 1:1.
   2. `AppFormSection(profile_personal_data)`.
   3. `AppFormSection(profile_medical_info)`.
   4. `AppFormSection(profile_admin_data)`.
@@ -183,7 +185,8 @@ Column(fillMaxSize + padding(AppSpacing.md))
   `ProfileHeader`, `AppReadOnlySection` + `AppDetailRow` por sección,
   `AppNoticeBlock` para las alergias y las filas de «Ver estadísticas» y
   «Medicamentos archivados» en «Seguimiento» (`StatisticsRow` con
-  `Icons.Rounded.Archive`). Las acciones (`editar` + eliminar) cierran el
+  `Icons.Rounded.Archive`). La foto de la cabecera abre
+  `AppPhotoViewerDialog`. Las acciones (`editar` + eliminar) cierran el
   contenido.
 - El diálogo de eliminación usa `AlertDialog` con textos de `strings.xml`.
 - En `MainScreen` (modo View) hoy empuja el título con `onTopBarChange`
