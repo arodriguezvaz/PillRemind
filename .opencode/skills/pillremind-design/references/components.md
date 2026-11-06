@@ -142,7 +142,8 @@ AppPhotoPicker(
 - En edición abre un diálogo con cámara (si hay) y galería; después abre
   `AppPhotoCropDialog` y devuelve el JPEG cuadrado ya recortado.
 - En solo lectura, si hay foto, al pulsarla se abre `AppPhotoViewerDialog`.
-- Badge de 26dp con icono de 13dp: lápiz al editar y lupa en solo lectura.
+- Badge de 26dp con icono de 13dp solo al editar (lápiz); en solo lectura no
+  hay insignia, aunque la foto sigue siendo pulsable.
 - `size` por defecto 96dp.
 - Sin foto, delega en `AppImagePlaceholder` (mismo aspecto que las cards).
 - La cámara usa `FileProvider` y `cacheDir/photos`; no se declara el permiso

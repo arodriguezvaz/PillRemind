@@ -564,7 +564,10 @@ fun MedicationScreen(
                             scheduleRules = scheduleForm.rules(),
                             times = scheduleForm.times,
                             isChronic = isChronicTreatment.value,
-                            onSaved = {
+                            onSaved = { savedImagePath ->
+                                selectedPhotoUri = savedImagePath?.let(Uri::parse)
+                                currentImagePath = savedImagePath
+                                newPhotoUri = null
                                 currentMode = MedicationMode.View
                                 onSaveClicked()
                             }

@@ -28,7 +28,6 @@ import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -200,14 +199,6 @@ fun AppPhotoPicker(
                         .align(Alignment.BottomEnd)
                         .offset(x = 2.dp, y = 2.dp),
                 )
-            } else {
-                PhotoBadge(
-                    icon = Icons.Default.ZoomIn,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .offset(x = 2.dp, y = 2.dp),
-                )
             }
         }
     }
@@ -333,7 +324,7 @@ private fun PhotoSourceOption(
 }
 
 /**
- * Insignia circular sobre la foto: lápiz al editar y lupa en modo lectura.
+ * Insignia circular sobre la foto en modo edición (lápiz).
  */
 @Composable
 private fun PhotoBadge(

@@ -156,7 +156,7 @@ class MedicationViewModel @Inject constructor(
      * si el commit va bien, se cancelan las alarmas antiguas y se regeneran.
      *
      * @param onSaved Callback ejecutado cuando la actualización y la generación
-     * de tomas ya han terminado.
+     *   de tomas ya han terminado; recibe la ruta de la imagen resultante.
      */
     fun updateMedication(
         name: String,
@@ -169,7 +169,7 @@ class MedicationViewModel @Inject constructor(
         scheduleRules: List<ScheduleRule>,
         times: List<LocalTime>,
         isChronic: Boolean,
-        onSaved: () -> Unit = {}
+        onSaved: (String?) -> Unit = {}
     ) {
         val trimmedName = name.trim()
         val normalizedUnit = unit.trim()
@@ -223,7 +223,7 @@ class MedicationViewModel @Inject constructor(
                 .onFailure {
                     Log.e("PillDebug", "No se pudieron regenerar las tomas al editar", it)
                 }
-            onSaved()
+            onSaved(imagePath)
         }
     }
 
