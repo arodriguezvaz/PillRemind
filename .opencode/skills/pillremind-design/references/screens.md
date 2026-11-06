@@ -225,7 +225,8 @@ Column(fillMaxSize + padding(AppSpacing.md))
 
 - `Scaffold` con `MainTopBar` y `SnackbarHost`.
 - Column con scroll:
-  `padding(horizontal = AppSpacing.md)` y `spacedBy(AppSpacing.sm)`.
+  `padding(horizontal = AppSpacing.md, vertical = AppSpacing.md)` y
+  `spacedBy(AppSpacing.sm)`.
 - Bloques:
   1. Apariencia: `SettingsCard` con título «Tema» + `SettingsRadioItem` para
      Seguir al sistema / Claro / Oscuro.
