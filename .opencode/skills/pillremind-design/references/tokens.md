@@ -11,9 +11,9 @@ fuente de verdad: si un valor cambia, actualiza también esta tabla.
 |---|---|---|
 | `primary` | Marca, títulos de sección, acciones principales, icono activo de la barra inferior. Violeta en claro, azul cielo en oscuro. | Usarlo como fondo de bloques grandes de información. |
 | `onPrimary` | Texto e iconos sobre `primary`. | Texto secundario. |
-| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, FAB de perfiles. | Sustituir a `surface` en cards. |
+| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, FAB de perfiles, badge de filtros y botón secundario (`ButtonVariant.Tonal`). | Sustituir a `surface` en cards. |
 | `secondary` | Naranja de aviso; hoy se usa sobre todo como base de `secondaryContainer`. | Decoración o texto largo. |
-| `secondaryContainer` / `onSecondaryContainer` | Botón de una toma ya realizada (`ButtonVariant.Secondary`). | Estado pendiente. |
+| `secondaryContainer` / `onSecondaryContainer` | Solo el estado de una toma ya realizada (`ButtonVariant.Secondary` en `IntakeCard`). | Botón secundario genérico (usa `primaryContainer`) y estado pendiente. |
 | `tertiary` / `tertiaryContainer` | Verde de confirmación; uso puntual. | Acciones principales. |
 | `error` / `onError` | Acciones destructivas (`ButtonVariant.Danger`) y toma retrasada. | Texto de error sobre `surface` sin contraste. |
 | `errorContainer` / `onErrorContainer` | Fondos de error puntuales. | Sustituir a `error` en botones. |

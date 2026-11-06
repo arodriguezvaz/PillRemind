@@ -66,8 +66,8 @@ Resumen operativo; los valores completos están en `references/tokens.md`.
 |---|---|
 | `primary` | Marca, títulos de sección, acción principal, icono activo. Negro en claro, azul cielo en oscuro. |
 | `onPrimary` | Texto e iconos sobre `primary`. |
-| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado. |
-| `secondaryContainer` / `onSecondaryContainer` | Botón de una toma ya realizada. |
+| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado y acción secundaria (`ButtonVariant.Tonal`). |
+| `secondaryContainer` / `onSecondaryContainer` | Solo el estado de una toma ya realizada (`IntakeCard`); no es el botón secundario genérico. |
 | `error` / `onError` | Acciones destructivas y toma retrasada. |
 | `surface` | Fondo de cards, campos, chips no seleccionados y filas. |
 | `surfaceVariant` | Campos deshabilitados, fondo del selector de foto y de los placeholders de imagen. |
@@ -114,7 +114,11 @@ bordes/divisores de 1/2dp.
 Catálogo detallado en `references/components.md`.
 
 - **Botones:** `AppButton` (`Primary`, `Secondary`, `Tonal`, `Ghost`, `Danger`;
-  `Small` 110dp, `Medium` 160dp, `Large` ancho completo) y `AppFab`.
+  `Small` 110dp, `Medium` 160dp, `Large` ancho completo) y `AppFab`. La acción
+  secundaria con texto usa `Tonal` (`primaryContainer`), como `AddTimeItem` y
+  «Limpiar filtros»; `Secondary` queda para el estado «Tomado» de `IntakeCard`
+  y `Ghost` para acciones inline. El icono inicial solo si aporta significado
+  (`Add` en «Añadir hora»).
 - **Campos:** `AppTextField` + `AppFormField`; `AppSearchField` para búsqueda;
   `AppDropdownField`, `AppDatePickerField`, `AppPhotoPicker` (con
   `AppPhotoCropDialog` y `AppPhotoViewerDialog`) y `AppImagePlaceholder` para el
@@ -207,6 +211,7 @@ JAVA_HOME=/opt/android-studio/jbr ./gradlew assembleDebug
 - [ ] Leí `ui/theme` y reutilizo tokens y componentes.
 - [ ] No hay `Color(0x...)` ni formas literales fuera de las excepciones.
 - [ ] `AppSpacing` en paddings, spacers y separaciones.
+- [ ] Las acciones secundarias usan `Tonal`; `Secondary` solo marca «Tomado».
 - [ ] Textos en `strings.xml` y `contentDescription` correctos.
 - [ ] Comprobado en claro y oscuro, y con texto grande.
 - [ ] La pestaña nueva está en el resolver de `TopBarState` de `MainScreen`;

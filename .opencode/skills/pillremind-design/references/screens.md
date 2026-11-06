@@ -242,12 +242,13 @@ Column(fillMaxSize + padding(AppSpacing.md))
   4. `LazyColumn` con `HistoryDayHeader` + `HistoryIntakeItem` agrupados por día.
 - `HistoryFiltersSheet` contiene estado, medicamento (incluidos archivados),
   interruptor «Incluir archivados» y rango personalizado con
-  `AppDatePickerField`. Las fechas se aplican al cerrar con «Ver resultados»,
-  con la X, con el gesto de arrastre o con atrás; «Limpiar filtros» vuelve al
-  rango por defecto de 30 días y cierra la hoja.
+  `AppDatePickerField`. Las fechas se aplican al cerrar con «Ver resultados»
+  (`Primary` `Large`), con la X, con el gesto de arrastre o con atrás; «Limpiar
+  filtros» (`Tonal` `Large`, sin icono) vuelve al rango por defecto de 30 días y
+  cierra la hoja.
 - Estados vacíos: `BlankCard` con `history_empty_no_medications`,
   `history_empty_no_intakes` o `history_empty_no_results`, y botón «Limpiar
-  filtros» cuando hay filtros aplicados.
+  filtros» (`Ghost` `Large`) cuando hay filtros aplicados.
 - Los textos salen de `history_*` y `profile_history_*`. Los estados de las
   tomas se recalculan con `ON_RESUME` y un ticker de 60 segundos.
 

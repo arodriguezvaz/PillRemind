@@ -370,7 +370,7 @@ private fun PhotoCropContent(
                 text = stringResource(R.string.common_cancel),
                 onClick = onCancel,
                 enabled = !isSaving,
-                variant = ButtonVariant.Secondary,
+                variant = ButtonVariant.Tonal,
                 size = ButtonSize.Small,
             )
             AppButton(
@@ -447,7 +447,7 @@ private fun PhotoCropError(onDismiss: () -> Unit) {
         AppButton(
             text = stringResource(R.string.common_close),
             onClick = onDismiss,
-            variant = ButtonVariant.Secondary,
+            variant = ButtonVariant.Tonal,
             size = ButtonSize.Medium,
         )
     }

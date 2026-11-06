@@ -285,7 +285,7 @@ fun HistoryFiltersSheetContent(
         AppButton(
             text = stringResource(R.string.history_filter_clear),
             onClick = onClearFilters,
-            variant = ButtonVariant.Secondary,
+            variant = ButtonVariant.Tonal,
             size = ButtonSize.Large,
         )
     }
