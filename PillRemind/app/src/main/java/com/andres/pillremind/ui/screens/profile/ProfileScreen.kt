@@ -638,9 +638,6 @@ private fun ProfileViewContent(
                 description = stringResource(R.string.profile_archived_medications_description),
                 onClick = onArchivedMedicationsClick,
             )
-        }
-
-        AppReadOnlySection(title = stringResource(R.string.profile_history_section)) {
             AppNavigationRow(
                 icon = Icons.Rounded.History,
                 label = stringResource(R.string.profile_view_history),
