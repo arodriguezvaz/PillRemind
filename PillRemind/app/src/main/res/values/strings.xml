@@ -157,10 +157,7 @@
     <!-- Historial -->
     <string name="history_title">Historial</string>
     <string name="history_search_placeholder">Buscar por medicamento</string>
-    <string name="history_period_all">Todo</string>
     <string name="history_filter_title">Filtros</string>
-    <string name="history_filter_none">Sin filtros activos</string>
-    <string name="history_filter_active_summary">Filtros aplicados</string>
     <string name="history_filter_status">Estado</string>
     <string name="history_filter_status_all">Todas</string>
     <string name="history_filter_status_taken">Tomadas</string>
@@ -172,7 +169,6 @@
     <string name="history_filter_custom_dates">Fechas personalizadas</string>
     <string name="history_filter_date_from">Desde</string>
     <string name="history_filter_date_to">Hasta</string>
-    <string name="history_filter_apply_dates">Aplicar rango</string>
     <string name="history_filter_show_results">Ver resultados</string>
     <string name="history_filter_clear">Limpiar filtros</string>
     <string name="history_filter_date_error">La fecha inicial no puede ser posterior a la final</string>
@@ -181,12 +177,13 @@
         <item quantity="other">%1$d activos</item>
     </plurals>
     <string name="history_empty_no_medications">Todavía no hay medicamentos en este perfil.</string>
-    <string name="history_empty_no_intakes">No hay tomas registradas en este periodo.</string>
+    <string name="history_empty_no_intakes">No hay tomas registradas en este rango.</string>
     <string name="history_empty_no_results">No hay tomas que coincidan con los filtros.</string>
     <string name="history_day_today">Hoy</string>
     <string name="history_day_yesterday">Ayer</string>
     <string name="history_archived">Archivado</string>
     <string name="history_medication_archived_option">%1$s (archivado)</string>
+    <string name="history_default_range_summary">Últimos 30 días</string>
     <string name="history_custom_range_summary">%1$s – %2$s</string>
     <plurals name="history_result_count">
         <item quantity="one">%1$d toma</item>

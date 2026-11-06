@@ -123,7 +123,7 @@ Catálogo detallado en `references/components.md`.
   `stacked`), `AppNoticeBlock`, `AppNavigationRow` y `AppScrollWithFooter`.
 - **Cards:** `BlankCard`, `MedicationCard`, `IntakeCard`, `PerfilCard`.
 - **Historial:** `HistoryIntakeItem`, `HistoryDayHeader`,
-  `HistoryPeriodSelector`, `HistoryFiltersButton` y `HistoryFiltersSheet`.
+  `HistoryFiltersButton` y `HistoryFiltersSheet`.
 - **Ajustes:** `SettingsCard`, `SettingsRadioItem`, `SettingsToggleItem`,
   `SettingsLinkItem`.
 - **Horarios:** `WeekDayChipGroup`, `TimeListEditor`, `TimeItem`, `AddTimeItem`.

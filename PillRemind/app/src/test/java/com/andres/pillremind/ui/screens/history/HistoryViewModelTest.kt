@@ -228,33 +228,6 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun `el periodo todo consulta sin fecha inicial`() = runTest {
-        every {
-            intakeRepository.observeHistoryIntakes(1, null, any())
-        } returns flowOf(intakes)
-        val viewModel = createViewModel()
-        val job = launch { viewModel.uiState.collect {} }
-        advanceUntilIdle()
-
-        viewModel.selectPeriod(HistoryPeriod.ALL)
-        advanceUntilIdle()
-
-        assertEquals(
-            HistoryDateFilter.Preset(HistoryPeriod.ALL),
-            viewModel.filters.value.dateFilter
-        )
-        verify {
-            intakeRepository.observeHistoryIntakes(
-                profileId = 1,
-                from = null,
-                to = today.atTime(LocalTime.MAX),
-            )
-        }
-
-        job.cancel()
-    }
-
-    @Test
     fun `el medicamento de navegacion se preselecciona`() = runTest {
         val viewModel = createViewModel(
             savedStateHandle = SavedStateHandle(mapOf("medicationId" to 2))

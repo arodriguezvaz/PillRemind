@@ -38,7 +38,7 @@ Cada perfil pode gardar información médica opcional: data de nacemento, sexo, 
 número de tarxeta sanitaria. Estes datos móstranse desde «Ver perfil» e inclúense na copia de seguridade local. A opción
 «Ver estadísticas» abre un resumo de adherencia con períodos de 7, 30 e 90 días, gráfico semanal e desglose por
 medicamento. A sección «Historial» abre unha pantalla independente con busca e filtros por estado, medicamento,
-período e medicamentos arquivados, coas tomas agrupadas por día.
+rango de datas e medicamentos arquivados, coas tomas agrupadas por día.
 
 ## Almacenamento local
 

@@ -4,17 +4,9 @@ import com.andres.pillremind.domain.model.StatisticsStatus
 import java.time.LocalDate
 
 /**
- * Periodos rápidos disponibles en el historial.
- *
- * @property days Número de días incluidos, contando hoy, o `null` para todo
- * el historial.
+ * Días que cubre el rango por defecto del historial, contando hoy.
  */
-enum class HistoryPeriod(val days: Long?) {
-    SEVEN(7),
-    THIRTY(30),
-    NINETY(90),
-    ALL(null)
-}
+internal const val DEFAULT_HISTORY_DAYS = 30L
 
 /**
  * Filtro por estado de una toma en el historial.
@@ -29,16 +21,14 @@ enum class HistoryStatusFilter {
 /**
  * Rango de fechas aplicado al historial.
  *
- * Puede ser un periodo rápido o un intervalo personalizado con ambas fechas
- * incluidas.
+ * Puede ser el rango por defecto o un intervalo personalizado con ambas
+ * fechas incluidas.
  */
 sealed interface HistoryDateFilter {
     /**
-     * Periodo rápido seleccionado con los chips.
-     *
-     * @param period Periodo elegido.
+     * Últimos [DEFAULT_HISTORY_DAYS] días, incluido hoy.
      */
-    data class Preset(val period: HistoryPeriod) : HistoryDateFilter
+    data object Default : HistoryDateFilter
 
     /**
      * Intervalo personalizado.
@@ -61,15 +51,15 @@ sealed interface HistoryDateFilter {
  */
 data class HistoryFilters(
     val query: String = "",
-    val dateFilter: HistoryDateFilter = HistoryDateFilter.Preset(HistoryPeriod.THIRTY),
+    val dateFilter: HistoryDateFilter = HistoryDateFilter.Default,
     val status: HistoryStatusFilter = HistoryStatusFilter.ALL,
     val medicationId: Int? = null,
     val includeArchived: Boolean = true,
 ) {
     /**
-     * Indica si hay algún filtro que reduzca la lista más allá del periodo.
+     * Indica si hay algún filtro que reduzca la lista más allá del rango.
      *
-     * Se usa para elegir entre el estado vacío de «sin tomas en el periodo» y
+     * Se usa para elegir entre el estado vacío de «sin tomas en el rango» y
      * el de «sin coincidencias».
      */
     val hasNarrowingFilters: Boolean

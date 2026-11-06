@@ -43,7 +43,6 @@ import com.andres.pillremind.ui.components.history.HistoryDayHeader
 import com.andres.pillremind.ui.components.history.HistoryFiltersButton
 import com.andres.pillremind.ui.components.history.HistoryFiltersSheet
 import com.andres.pillremind.ui.components.history.HistoryIntakeItem
-import com.andres.pillremind.ui.components.history.HistoryPeriodSelector
 import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
 import java.time.LocalDate
@@ -57,9 +56,9 @@ private const val CLOCK_TICK_MILLIS = 60_000L
 /**
  * Pantalla con el historial de tomas del perfil activo.
  *
- * Permite buscar por medicamento y filtrar por estado, periodo, medicamento y
- * tomas de medicamentos archivados. Se abre desde el perfil o desde la ficha
- * de un medicamento.
+ * Permite buscar por medicamento y filtrar por estado, rango de fechas,
+ * medicamento y tomas de medicamentos archivados. Se abre desde el perfil o
+ * desde la ficha de un medicamento.
  *
  * @param modifier Modificador opcional.
  * @param historyViewModel ViewModel con los filtros y las tomas.
@@ -89,7 +88,6 @@ fun HistoryScreen(
         filters = filters,
         uiState = uiState,
         onSearchQueryChange = historyViewModel::onSearchQueryChange,
-        onPeriodSelected = historyViewModel::selectPeriod,
         onFiltersClick = {
             focusManager.clearFocus()
             showFilters = true
@@ -107,10 +105,7 @@ fun HistoryScreen(
             onStatusSelected = historyViewModel::selectStatus,
             onMedicationSelected = historyViewModel::selectMedication,
             onIncludeArchivedChange = historyViewModel::setIncludeArchived,
-            onApplyCustomRange = { from, to ->
-                historyViewModel.applyCustomRange(from, to)
-                showFilters = false
-            },
+            onApplyCustomRange = historyViewModel::applyCustomRange,
             onClearFilters = historyViewModel::clearFilters,
         )
     }
@@ -124,18 +119,18 @@ private fun HistoryContent(
     filters: HistoryFilters,
     uiState: HistoryUiState,
     onSearchQueryChange: (String) -> Unit,
-    onPeriodSelected: (HistoryPeriod) -> Unit,
     onFiltersClick: () -> Unit,
     onClearFilters: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val datePattern = stringResource(R.string.common_date_pattern)
     val dateFormatter = remember(datePattern) { DateTimeFormatter.ofPattern(datePattern) }
-    val customRangeSummary = (filters.dateFilter as? HistoryDateFilter.Custom)?.let { range ->
-        stringResource(
+    val dateRangeSummary = when (val dateFilter = filters.dateFilter) {
+        HistoryDateFilter.Default -> stringResource(R.string.history_default_range_summary)
+        is HistoryDateFilter.Custom -> stringResource(
             R.string.history_custom_range_summary,
-            range.from.format(dateFormatter),
-            range.to.format(dateFormatter),
+            dateFilter.from.format(dateFormatter),
+            dateFilter.to.format(dateFormatter),
         )
     }
 
@@ -152,14 +147,9 @@ private fun HistoryContent(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        HistoryPeriodSelector(
-            selectedPeriod = (filters.dateFilter as? HistoryDateFilter.Preset)?.period,
-            onPeriodSelected = onPeriodSelected,
-        )
-
         HistoryFiltersButton(
             activeFilterCount = filters.activeFilterCount,
-            customRangeSummary = customRangeSummary,
+            dateRangeSummary = dateRangeSummary,
             onClick = onFiltersClick,
         )
 
@@ -352,7 +342,6 @@ private fun PreviewHistoryContent() {
             now = now,
         ),
         onSearchQueryChange = {},
-        onPeriodSelected = {},
         onFiltersClick = {},
         onClearFilters = {},
     )

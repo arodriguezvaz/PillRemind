@@ -31,18 +31,17 @@ import com.andres.pillremind.ui.theme.PillRemindTheme
 /**
  * Botón que abre la hoja de filtros del historial.
  *
- * Muestra cuántos filtros hay activos y, si se ha aplicado un rango
- * personalizado, el resumen de las fechas.
+ * Muestra el rango de fechas activo y cuántos filtros hay aplicados.
  *
  * @param activeFilterCount Número de filtros activos.
- * @param customRangeSummary Resumen del rango personalizado, o `null`.
+ * @param dateRangeSummary Resumen del rango de fechas activo.
  * @param onClick Acción que abre la hoja de filtros.
  * @param modifier Modificador opcional para la tarjeta.
  */
 @Composable
 fun HistoryFiltersButton(
     activeFilterCount: Int,
-    customRangeSummary: String?,
+    dateRangeSummary: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -75,12 +74,7 @@ fun HistoryFiltersButton(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = customRangeSummary
-                        ?: if (activeFilterCount > 0) {
-                            stringResource(R.string.history_filter_active_summary)
-                        } else {
-                            stringResource(R.string.history_filter_none)
-                        },
+                    text = dateRangeSummary,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -122,7 +116,7 @@ private fun HistoryFiltersButtonPreview() {
     PillRemindTheme {
         HistoryFiltersButton(
             activeFilterCount = 0,
-            customRangeSummary = null,
+            dateRangeSummary = "Últimos 30 días",
             onClick = {},
             modifier = Modifier.padding(AppSpacing.md),
         )
@@ -135,7 +129,7 @@ private fun HistoryFiltersButtonActivePreview() {
     PillRemindTheme {
         HistoryFiltersButton(
             activeFilterCount = 3,
-            customRangeSummary = "1 oct – 5 nov",
+            dateRangeSummary = "01/10/2026 – 05/11/2026",
             onClick = {},
             modifier = Modifier.padding(AppSpacing.md),
         )

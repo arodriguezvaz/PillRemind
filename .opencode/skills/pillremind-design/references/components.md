@@ -331,24 +331,15 @@ HistoryDayHeader(date, today, modifier)
 - Cabecera `titleSmall` en `onSurfaceVariant`; muestra «Hoy», «Ayer» o el día
   y mes abreviados.
 
-### `HistoryPeriodSelector` (`history/HistoryPeriodSelector.kt`)
-
-```kotlin
-HistoryPeriodSelector(selectedPeriod, onPeriodSelected, modifier)
-```
-
-- Cuatro chips en dos filas (7 / 30 / 90 días / todo) con el mismo patrón visual
-  que `StatisticsPeriodSelector`. Si hay un rango personalizado,
-  `selectedPeriod` es `null` y no se marca ningún chip.
-
 ### `HistoryFiltersButton` (`history/HistoryFiltersButton.kt`)
 
 ```kotlin
-HistoryFiltersButton(activeFilterCount, customRangeSummary, onClick, modifier)
+HistoryFiltersButton(activeFilterCount, dateRangeSummary, onClick, modifier)
 ```
 
-- Card pulsable que abre la hoja de filtros. Muestra el resumen del rango
-  personalizado o «Sin filtros activos» y un badge con el número de filtros.
+- Card pulsable que abre la hoja de filtros. Muestra el rango de fechas activo
+  («Últimos 30 días» o las fechas personalizadas) y un badge con el número de
+  filtros.
 
 ### `HistoryFiltersSheet` (`history/HistoryFiltersSheet.kt`)
 
@@ -361,7 +352,9 @@ HistoryFiltersSheet(
 ```
 
 - `ModalBottomSheet` con estado, medicamento, «Incluir archivados» y rango
-  personalizado con `AppDatePickerField`. El contenido se separa en
+  personalizado con `AppDatePickerField`. Las fechas se guardan al cerrar
+  («Ver resultados», X, arrastre o atrás) si son válidas; «Limpiar filtros» es
+  la acción secundaria y vuelve al rango por defecto. El contenido se separa en
   `HistoryFiltersSheetContent` para previsualizarlo.
 
 ## Ajustes

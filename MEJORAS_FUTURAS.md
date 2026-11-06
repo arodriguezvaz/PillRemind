@@ -75,8 +75,8 @@ la deuda técnica se siguen registrando en el audit local `PillRemind/INCIDENCIA
 - **Contexto:** cada `Intake` guarda `scheduledAt`, `takenAt` y snapshots de
   nombre, dosis y unidad.
 - **Implementación:** ruta de detalle `history` con búsqueda por nombre de
-  medicamento, filtros por estado, medicamento, medicamentos archivados y
-  periodo (7, 30, 90 días, todo o rango personalizado), y lista agrupada por
+  medicamento, filtros por estado, medicamento, medicamentos archivados y rango
+  de fechas personalizado (por defecto, últimos 30 días), y lista agrupada por
   día de más reciente a más antigua. Se abre desde la sección «Historial» del
   perfil y desde la ficha de cada medicamento, con ese medicamento
   preseleccionado. El bloque de historial ya no se muestra dentro de

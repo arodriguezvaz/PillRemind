@@ -35,10 +35,10 @@ import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.settings.SettingsToggleItem
+import com.andres.pillremind.ui.screens.history.DEFAULT_HISTORY_DAYS
 import com.andres.pillremind.ui.screens.history.HistoryDateFilter
 import com.andres.pillremind.ui.screens.history.HistoryFilters
 import com.andres.pillremind.ui.screens.history.HistoryMedicationOption
-import com.andres.pillremind.ui.screens.history.HistoryPeriod
 import com.andres.pillremind.ui.screens.history.HistoryStatusFilter
 import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
@@ -46,6 +46,10 @@ import java.time.LocalDate
 
 /**
  * Hoja modal con los filtros avanzados del historial.
+ *
+ * El rango de fechas se guarda al cerrar la hoja: el botón «Ver resultados»,
+ * la X, el gesto de arrastre y el botón atrás aplican antes las fechas
+ * editadas si son válidas.
  *
  * @param filters Filtros actuales.
  * @param medications Medicamentos disponibles, incluidos los archivados.
@@ -71,8 +75,26 @@ fun HistoryFiltersSheet(
     onClearFilters: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val initialRange = remember(filters.dateFilter, today) {
+        filters.dateFilter.prefill(today)
+    }
+    var fromDate by rememberSaveable { mutableStateOf<LocalDate?>(initialRange.first) }
+    var toDate by rememberSaveable { mutableStateOf<LocalDate?>(initialRange.second) }
+    var datesEdited by rememberSaveable { mutableStateOf(false) }
+
+    val from = fromDate
+    val to = toDate
+    val rangeIsValid = from != null && to != null && !from.isAfter(to) && !to.isAfter(today)
+
+    val dismissWithPendingRange = {
+        if (datesEdited && from != null && to != null && rangeIsValid) {
+            onApplyCustomRange(from, to)
+        }
+        onDismiss()
+    }
+
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = dismissWithPendingRange,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
     ) {
@@ -80,12 +102,28 @@ fun HistoryFiltersSheet(
             filters = filters,
             medications = medications,
             today = today,
-            onDismiss = onDismiss,
+            fromDate = fromDate,
+            toDate = toDate,
+            rangeIsValid = rangeIsValid,
+            onFromDateSelected = {
+                fromDate = it
+                datesEdited = true
+            },
+            onToDateSelected = {
+                toDate = it
+                datesEdited = true
+            },
+            onDismiss = dismissWithPendingRange,
             onStatusSelected = onStatusSelected,
             onMedicationSelected = onMedicationSelected,
             onIncludeArchivedChange = onIncludeArchivedChange,
-            onApplyCustomRange = onApplyCustomRange,
-            onClearFilters = onClearFilters,
+            onClearFilters = {
+                onClearFilters()
+                val defaultRange = HistoryDateFilter.Default.prefill(today)
+                fromDate = defaultRange.first
+                toDate = defaultRange.second
+                datesEdited = false
+            },
         )
     }
 }
@@ -98,11 +136,15 @@ fun HistoryFiltersSheetContent(
     filters: HistoryFilters,
     medications: List<HistoryMedicationOption>,
     today: LocalDate,
+    fromDate: LocalDate?,
+    toDate: LocalDate?,
+    rangeIsValid: Boolean,
+    onFromDateSelected: (LocalDate?) -> Unit,
+    onToDateSelected: (LocalDate?) -> Unit,
     onDismiss: () -> Unit,
     onStatusSelected: (HistoryStatusFilter) -> Unit,
     onMedicationSelected: (HistoryMedicationOption?) -> Unit,
     onIncludeArchivedChange: (Boolean) -> Unit,
-    onApplyCustomRange: (LocalDate, LocalDate) -> Unit,
     onClearFilters: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -146,16 +188,7 @@ fun HistoryFiltersSheetContent(
         else -> selectedMedication.name
     }
 
-    val initialRange = remember(filters.dateFilter, today) {
-        filters.dateFilter.prefill(today)
-    }
-    var fromDate by rememberSaveable { mutableStateOf<LocalDate?>(initialRange.first) }
-    var toDate by rememberSaveable { mutableStateOf<LocalDate?>(initialRange.second) }
-
-    val from = fromDate
-    val to = toDate
-    val rangeIsValid = from != null && to != null && !from.isAfter(to) && !to.isAfter(today)
-    val showRangeError = from != null && to != null && !rangeIsValid
+    val showRangeError = fromDate != null && toDate != null && !rangeIsValid
 
     Column(
         modifier = modifier
@@ -219,7 +252,7 @@ fun HistoryFiltersSheetContent(
         AppFormField(label = stringResource(R.string.history_filter_date_from)) {
             AppDatePickerField(
                 value = fromDate,
-                onDateSelected = { fromDate = it },
+                onDateSelected = onFromDateSelected,
                 isError = showRangeError,
                 maxDate = toDate ?: today,
             )
@@ -228,7 +261,7 @@ fun HistoryFiltersSheetContent(
         AppFormField(label = stringResource(R.string.history_filter_date_to)) {
             AppDatePickerField(
                 value = toDate,
-                onDateSelected = { toDate = it },
+                onDateSelected = onToDateSelected,
                 isError = showRangeError,
                 minDate = fromDate,
                 maxDate = today,
@@ -244,34 +277,17 @@ fun HistoryFiltersSheetContent(
         }
 
         AppButton(
-            text = stringResource(R.string.history_filter_apply_dates),
-            onClick = {
-                if (from != null && to != null && rangeIsValid) {
-                    onApplyCustomRange(from, to)
-                }
-            },
-            enabled = rangeIsValid,
-            variant = ButtonVariant.Tonal,
-            size = ButtonSize.Large,
-        )
-
-        AppButton(
             text = stringResource(R.string.history_filter_show_results),
             onClick = onDismiss,
+            enabled = rangeIsValid,
             variant = ButtonVariant.Primary,
             size = ButtonSize.Large,
         )
 
         AppButton(
             text = stringResource(R.string.history_filter_clear),
-            onClick = {
-                onClearFilters()
-                val defaultRange = HistoryDateFilter.Preset(HistoryPeriod.THIRTY)
-                    .prefill(today)
-                fromDate = defaultRange.first
-                toDate = defaultRange.second
-            },
-            variant = ButtonVariant.Ghost,
+            onClick = onClearFilters,
+            variant = ButtonVariant.Secondary,
             size = ButtonSize.Large,
         )
     }
@@ -281,13 +297,8 @@ fun HistoryFiltersSheetContent(
  * Rango inicial de los campos de fecha a partir del filtro actual.
  */
 private fun HistoryDateFilter.prefill(today: LocalDate): Pair<LocalDate, LocalDate> = when (this) {
+    HistoryDateFilter.Default -> today.minusDays(DEFAULT_HISTORY_DAYS - 1) to today
     is HistoryDateFilter.Custom -> from to to
-
-    is HistoryDateFilter.Preset -> {
-        // Para «Todo» se usa el último mes como punto de partida editable.
-        val days = period.days ?: HistoryPeriod.THIRTY.days ?: 30L
-        today.minusDays(days - 1) to today
-    }
 }
 
 @Preview(showBackground = true, name = "Hoja de filtros")
@@ -304,11 +315,15 @@ private fun HistoryFiltersSheetContentPreview() {
                 HistoryMedicationOption(2, "Omeprazol", true),
             ),
             today = LocalDate.of(2026, 11, 6),
+            fromDate = LocalDate.of(2026, 10, 8),
+            toDate = LocalDate.of(2026, 11, 6),
+            rangeIsValid = true,
+            onFromDateSelected = {},
+            onToDateSelected = {},
             onDismiss = {},
             onStatusSelected = {},
             onMedicationSelected = {},
             onIncludeArchivedChange = {},
-            onApplyCustomRange = { _, _ -> },
             onClearFilters = {},
             modifier = Modifier.padding(vertical = AppSpacing.md),
         )

@@ -111,7 +111,7 @@ class HistoryViewModel @Inject constructor(
     /**
      * Actualiza el momento de referencia para recalcular los estados.
      *
-     * Si cambia el día, también se actualiza el rango de los periodos rápidos.
+     * Si cambia el día, también se actualiza el rango por defecto.
      *
      * @param moment Nuevo momento de referencia.
      */
@@ -129,15 +129,6 @@ class HistoryViewModel @Inject constructor(
      */
     fun onSearchQueryChange(query: String) {
         _filters.update { it.copy(query = query) }
-    }
-
-    /**
-     * Selecciona un periodo rápido y descarta el rango personalizado.
-     *
-     * @param period Periodo elegido.
-     */
-    fun selectPeriod(period: HistoryPeriod) {
-        _filters.update { it.copy(dateFilter = HistoryDateFilter.Preset(period)) }
     }
 
     /**
@@ -278,17 +269,16 @@ class HistoryViewModel @Inject constructor(
      */
     private data class HistoryRequest(
         val profileId: Int,
-        val from: LocalDateTime?,
+        val from: LocalDateTime,
         val to: LocalDateTime,
     )
 
     /**
      * Inicio del rango de fechas.
      */
-    private fun HistoryDateFilter.rangeStart(today: LocalDate): LocalDateTime? = when (this) {
-        is HistoryDateFilter.Preset -> period.days?.let { days ->
-            today.minusDays(days - 1).atStartOfDay()
-        }
+    private fun HistoryDateFilter.rangeStart(today: LocalDate): LocalDateTime = when (this) {
+        HistoryDateFilter.Default ->
+            today.minusDays(DEFAULT_HISTORY_DAYS - 1).atStartOfDay()
 
         is HistoryDateFilter.Custom -> from.atStartOfDay()
     }
@@ -297,7 +287,7 @@ class HistoryViewModel @Inject constructor(
      * Fin del rango de fechas.
      */
     private fun HistoryDateFilter.rangeEnd(today: LocalDate): LocalDateTime = when (this) {
-        is HistoryDateFilter.Preset -> today.atTime(LocalTime.MAX)
+        HistoryDateFilter.Default -> today.atTime(LocalTime.MAX)
         is HistoryDateFilter.Custom -> to.atTime(LocalTime.MAX)
     }
 }

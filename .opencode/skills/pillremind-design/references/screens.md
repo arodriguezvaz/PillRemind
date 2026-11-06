@@ -210,13 +210,15 @@ Column(fillMaxSize + padding(AppSpacing.md))
 - Estructura:
   `Column(fillMaxSize + padding(AppSpacing.md), spacedBy = AppSpacing.sm)` con:
   1. `AppSearchField` por nombre de medicamento.
-  2. `HistoryPeriodSelector` (7 / 30 / 90 días / todo) en dos filas.
-  3. `HistoryFiltersButton`, que abre `HistoryFiltersSheet`.
-  4. Contador de resultados.
-  5. `LazyColumn` con `HistoryDayHeader` + `HistoryIntakeItem` agrupados por día.
+  2. `HistoryFiltersButton`, que abre `HistoryFiltersSheet` y muestra el rango
+     de fechas activo («Últimos 30 días» o las fechas personalizadas).
+  3. Contador de resultados.
+  4. `LazyColumn` con `HistoryDayHeader` + `HistoryIntakeItem` agrupados por día.
 - `HistoryFiltersSheet` contiene estado, medicamento (incluidos archivados),
   interruptor «Incluir archivados» y rango personalizado con
-  `AppDatePickerField`; se aplica con «Aplicar rango».
+  `AppDatePickerField`. Las fechas se aplican al cerrar con «Ver resultados»,
+  con la X, con el gesto de arrastre o con atrás; «Limpiar filtros» vuelve al
+  rango por defecto de 30 días.
 - Estados vacíos: `BlankCard` con `history_empty_no_medications`,
   `history_empty_no_intakes` o `history_empty_no_results`, y botón «Limpiar
   filtros» cuando hay filtros aplicados.
