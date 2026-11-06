@@ -270,7 +270,10 @@ fun ProfileScreen(
                                 allergies = allergies.value,
                                 medicalNotes = medicalNotes.value,
                                 healthCardNumber = healthCardNumber.value,
-                                onSaved = {
+                                onSaved = { savedImagePath ->
+                                    selectedPhotoUri = savedImagePath?.let(Uri::parse)
+                                    currentImagePath = savedImagePath
+                                    newPhotoUri = null
                                     onSaveClicked()
                                     currentMode = ProfileMode.View
                                 }

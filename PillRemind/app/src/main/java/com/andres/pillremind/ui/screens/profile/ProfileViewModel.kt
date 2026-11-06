@@ -144,7 +144,8 @@ class ProfileViewModel @Inject constructor(
      * @param allergies Alergias conocidas opcionales.
      * @param medicalNotes Notas médicas opcionales.
      * @param healthCardNumber Número de tarjeta sanitaria opcional.
-     * @param onSaved Callback ejecutado cuando el perfil ya está actualizado.
+     * @param onSaved Callback ejecutado cuando el perfil ya está actualizado;
+     *   recibe la ruta de la imagen resultante.
      */
     fun updateProfile(
         nombre: String,
@@ -156,7 +157,7 @@ class ProfileViewModel @Inject constructor(
         allergies: String? = null,
         medicalNotes: String? = null,
         healthCardNumber: String? = null,
-        onSaved: () -> Unit = {}
+        onSaved: (String?) -> Unit = {}
     ) {
         val trimmedNombre = nombre.trim()
         if (trimmedNombre.isBlank()) return
@@ -193,7 +194,7 @@ class ProfileViewModel @Inject constructor(
                     updatedAt = LocalDateTime.now()
                 )
             )
-            onSaved()
+            onSaved(imagePath)
         }
     }
 
