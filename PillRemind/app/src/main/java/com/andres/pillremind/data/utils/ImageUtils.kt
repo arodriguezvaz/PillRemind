@@ -10,7 +10,8 @@ import java.io.File
  * de la aplicación y devuelve la ruta absoluta del archivo generado.
  *
  * Se crea un nombre único basado en la marca temporal actual para evitar
- * colisiones con imágenes existentes.
+ * colisiones con imágenes existentes. Si la copia falla, se borra el archivo
+ * parcial para no dejar restos en el almacenamiento.
  *
  * @param context Contexto de Android utilizado para acceder al ContentResolver,
  * que permite abrir el Uri de la imagen, y también para acceder al
@@ -21,22 +22,20 @@ import java.io.File
  * durante el proceso.
  */
 fun copyImageToInternalStorage(context: Context, uri: Uri): String? {
+    val file = File(context.filesDir, "profile_${System.currentTimeMillis()}.jpg")
     return try {
-        // Obtiene un InputStream para leer el contenido de la imagen seleccionada.
-        val inputStream = context.contentResolver.openInputStream(uri) ?: return null
-        // Genera un nombre único para la imagen usando la fecha actual.
-        val fileName = "profile_${System.currentTimeMillis()}.jpg"
-        // Crea el archivo dentro del almacenamiento interno de la aplicación.
-        val file = File(context.filesDir, fileName)
-        // Copia el contenido de la imagen al nuevo archivo.
-        file.outputStream().use { output ->
-            inputStream.copyTo(output)
-        }
-        // Devuelve la ruta absoluta del archivo guardado.
-        file.absolutePath
+        // `use` garantiza que el InputStream se cierre también si falla la copia.
+        val copied = context.contentResolver.openInputStream(uri)?.use { input ->
+            file.outputStream().use { output ->
+                input.copyTo(output)
+            }
+            true
+        } ?: false
+        if (copied) file.absolutePath else null
     } catch (e: Exception) {
-        // Registra el error y devuelve null si falla la copia.
+        // Registra el error y elimina el archivo a medias si llegó a crearse.
         Log.e("ImageStorage", "Error copying image to internal storage", e)
+        file.delete()
         null
     }
 }

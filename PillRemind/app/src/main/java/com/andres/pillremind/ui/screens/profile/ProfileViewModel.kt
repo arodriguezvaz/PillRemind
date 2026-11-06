@@ -76,12 +76,12 @@ class ProfileViewModel @Inject constructor(
         onSaved: () -> Unit = {}
     ) {
         val trimmedNombre = nombre.trim()
-        val imagePath = photoUri?.let {
-            copyImageToInternalStorage(context, it)
-        }
         if (trimmedNombre.isNotEmpty()) {
             viewModelScope.launch {
                 val userId = activeUserId.firstOrNull() ?: return@launch
+                val imagePath = photoUri?.let {
+                    copyImageToInternalStorage(context, it)
+                }
                 profileRepository.insertProfile(
                     Profile(
                         usuarioId = userId,
@@ -166,14 +166,18 @@ class ProfileViewModel @Inject constructor(
             val currentProfile =
                 profileRepository.getProfileByIdOnce(activeProfileId) ?: return@launch
 
+            val previousImagePath = currentImagePath ?: currentProfile.urlImagen
             val imagePath = if (newPhotoUri != null) {
-                // Borrar imagen antigua si existía
-                (currentImagePath ?: currentProfile.urlImagen)?.let { File(it).delete() }
-                // Copiar la nueva al almacenamiento interno
-                copyImageToInternalStorage(context, newPhotoUri)
+                // Copia primero la nueva imagen: si falla, se conserva la anterior.
+                val copiedPath = copyImageToInternalStorage(context, newPhotoUri)
+                if (copiedPath != null) {
+                    previousImagePath?.let { File(it).delete() }
+                    copiedPath
+                } else {
+                    previousImagePath
+                }
             } else {
-                // Sin cambio, mantener la ruta actual
-                currentImagePath ?: currentProfile.urlImagen
+                previousImagePath
             }
 
             profileRepository.updateProfile(

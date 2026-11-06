@@ -116,8 +116,9 @@ Catálogo detallado en `references/components.md`.
 - **Botones:** `AppButton` (`Primary`, `Secondary`, `Tonal`, `Ghost`, `Danger`;
   `Small` 110dp, `Medium` 160dp, `Large` ancho completo) y `AppFab`.
 - **Campos:** `AppTextField` + `AppFormField`; `AppSearchField` para búsqueda;
-  `AppDropdownField`, `AppDatePickerField`, `AppPhotoPicker` y
-  `AppImagePlaceholder` para el hueco de las imágenes sin foto.
+  `AppDropdownField`, `AppDatePickerField`, `AppPhotoPicker` (con
+  `AppPhotoCropDialog` y `AppPhotoViewerDialog`) y `AppImagePlaceholder` para el
+  hueco de las imágenes sin foto.
 - **Formularios:** `AppFormSection` y `AppFormActions`.
 - **Solo lectura:** `AppReadOnlySection`, `AppDetailRow` (con variante
   `stacked`), `AppNoticeBlock`, `AppNavigationRow` y `AppScrollWithFooter`.
