@@ -62,6 +62,12 @@ fun MainScreen(
         MedicationScreens.MedicationCreateScreen.route -> TopBarState(
             title = stringResource(R.string.medication_add_title)
         )
+        MedicationScreens.ArchivedMedicationsScreen.route -> TopBarState(
+            title = stringResource(R.string.medication_archived_list_title)
+        )
+        MedicationScreens.ArchivedMedicationSeeScreen.route -> TopBarState(
+            title = stringResource(R.string.medication_archived_title)
+        )
         else -> TopBarState(title = homeTopBarTitle(), showLogo = true)
     }
 

@@ -17,6 +17,7 @@ import com.andres.pillremind.ui.screens.home.HomeScreen
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.screens.medication.MedicationMode
 import com.andres.pillremind.ui.screens.medication.MedicationScreen
+import com.andres.pillremind.ui.screens.medications.ArchivedMedicationsScreen
 import com.andres.pillremind.ui.screens.medications.MedicationsScreen
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
@@ -102,6 +103,9 @@ fun MainNavigationGraph(
                     onTopBarChange
                 ),
                 onStatisticsClick = openStatistics,
+                onArchivedMedicationsClick = {
+                    navController.navigate(MedicationScreens.ArchivedMedicationsScreen.route)
+                },
             )
         }
         composable(StatisticsScreens.Statistics.route) {
@@ -196,6 +200,38 @@ fun NavGraphBuilder.medicationNavGraph(
                 )
             )
         }
+        composable(route = MedicationScreens.ArchivedMedicationsScreen.route) {
+            ArchivedMedicationsScreen(
+                onMedicationClick = { id ->
+                    navController.navigate(
+                        MedicationScreens.ArchivedMedicationSeeScreen.createRoute(id)
+                    )
+                },
+            )
+        }
+        composable(
+            route = MedicationScreens.ArchivedMedicationSeeScreen.route,
+            arguments = listOf(navArgument("medicationId") {
+                type = NavType.IntType
+            })
+        ) { backStackEntry ->
+            val medicationId = backStackEntry.arguments?.getInt("medicationId")
+
+            MedicationScreen(
+                medicationMode = MedicationMode.Archived,
+                onUnarchivedClicked = { navController.popBackStack() },
+                onDeletedPermanentlyClicked = { navController.popBackStack() },
+                onStatisticsClick = {
+                    medicationId?.let { id ->
+                        navController.navigate(
+                            StatisticsScreens.MedicationStatistics.createRoute(id)
+                        ) {
+                            launchSingleTop = true
+                        }
+                    }
+                },
+            )
+        }
     }
 }
 
@@ -214,4 +250,17 @@ sealed class MedicationScreens(val route: String) {
     }
 
     object MedicationCreateScreen : MedicationScreens("medication/create")
+
+    /**
+     * Lista de medicamentos archivados del perfil activo.
+     */
+    object ArchivedMedicationsScreen : MedicationScreens("medication/archived")
+
+    /**
+     * Detalle de un medicamento archivado.
+     */
+    object ArchivedMedicationSeeScreen :
+        MedicationScreens("medication/archived/{medicationId}") {
+        fun createRoute(medicationId: Int) = "medication/archived/$medicationId"
+    }
 }

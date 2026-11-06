@@ -223,8 +223,8 @@ class MedicationViewModel @Inject constructor(
     /**
      * Archiva el medicamento y cancela sus alarmas futuras.
      *
-     * No se borra el historial de tomas ni la imagen, para poder conservar
-     * las estadísticas y el historial.
+     * No se borra el historial de tomas, la imagen ni la pauta, para poder
+     * recuperar el medicamento y conservar sus estadísticas.
      *
      * @param medication Medicamento que se desea archivar.
      * @param onArchived Callback ejecutado cuando el archivado se completa.
@@ -250,6 +250,72 @@ class MedicationViewModel @Inject constructor(
 
             reminderScheduler.cancelAlarms(futureIntakeIds)
             onArchived()
+        }
+    }
+
+    /**
+     * Desarchiva el medicamento y regenera su ventana de tomas.
+     *
+     * La pauta se conserva al archivar, así que tras limpiar `deletedAt` se
+     * vuelven a generar las tomas y sus alarmas.
+     *
+     * @param medication Medicamento que se desea recuperar.
+     * @param onRestored Callback ejecutado cuando el medicamento vuelve a estar activo.
+     */
+    fun restoreMedication(medication: Medication, onRestored: () -> Unit = {}) {
+        viewModelScope.launch {
+            val restored = runCatching {
+                medicationRepository.unarchiveMedication(
+                    medicationId = medication.id,
+                    updatedAt = LocalDateTime.now()
+                )
+            }.onFailure {
+                Log.e("PillDebug", "No se pudo desarchivar el medicamento", it)
+            }.isSuccess
+
+            if (!restored) return@launch
+
+            runCatching { reminderScheduler.generateWindow() }
+                .onFailure {
+                    Log.e("PillDebug", "No se pudieron regenerar las tomas al desarchivar", it)
+                }
+            onRestored()
+        }
+    }
+
+    /**
+     * Elimina definitivamente el medicamento y todo su historial.
+     *
+     * Primero guarda las tomas futuras para cancelar sus alarmas, después
+     * borra el medicamento (Room elimina en cascada su pauta y sus tomas) y
+     * finalmente borra la imagen asociada.
+     *
+     * @param medication Medicamento que se desea eliminar.
+     * @param onDeleted Callback ejecutado cuando el borrado se completa.
+     */
+    fun deleteMedicationPermanently(medication: Medication, onDeleted: () -> Unit = {}) {
+        viewModelScope.launch {
+            val now = LocalDateTime.now()
+            val futureIntakeIds = intakeRepository
+                .getFutureIntakesByMedicationId(medication.id, now)
+                .map { it.id }
+
+            val deleted = runCatching {
+                medicationRepository.deleteMedication(medication)
+            }.onFailure {
+                Log.e("PillDebug", "No se pudo eliminar el medicamento", it)
+            }.isSuccess
+
+            if (!deleted) return@launch
+
+            medication.imageUrl?.let { imagePath ->
+                runCatching { File(imagePath).delete() }
+                    .onFailure {
+                        Log.w("PillDebug", "No se pudo borrar la imagen del medicamento", it)
+                    }
+            }
+            reminderScheduler.cancelAlarms(futureIntakeIds)
+            onDeleted()
         }
     }
 
