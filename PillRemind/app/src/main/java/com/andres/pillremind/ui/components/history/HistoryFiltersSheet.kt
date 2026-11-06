@@ -49,7 +49,7 @@ import java.time.LocalDate
  *
  * El rango de fechas se guarda al cerrar la hoja: el botón «Ver resultados»,
  * la X, el gesto de arrastre y el botón atrás aplican antes las fechas
- * editadas si son válidas.
+ * editadas si son válidas. «Limpiar filtros» restablece todo y cierra la hoja.
  *
  * @param filters Filtros actuales.
  * @param medications Medicamentos disponibles, incluidos los archivados.
@@ -119,10 +119,8 @@ fun HistoryFiltersSheet(
             onIncludeArchivedChange = onIncludeArchivedChange,
             onClearFilters = {
                 onClearFilters()
-                val defaultRange = HistoryDateFilter.Default.prefill(today)
-                fromDate = defaultRange.first
-                toDate = defaultRange.second
                 datesEdited = false
+                onDismiss()
             },
         )
     }

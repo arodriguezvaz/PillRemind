@@ -218,7 +218,7 @@ Column(fillMaxSize + padding(AppSpacing.md))
   interruptor «Incluir archivados» y rango personalizado con
   `AppDatePickerField`. Las fechas se aplican al cerrar con «Ver resultados»,
   con la X, con el gesto de arrastre o con atrás; «Limpiar filtros» vuelve al
-  rango por defecto de 30 días.
+  rango por defecto de 30 días y cierra la hoja.
 - Estados vacíos: `BlankCard` con `history_empty_no_medications`,
   `history_empty_no_intakes` o `history_empty_no_results`, y botón «Limpiar
   filtros» cuando hay filtros aplicados.

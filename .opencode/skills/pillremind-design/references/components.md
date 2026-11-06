@@ -354,8 +354,8 @@ HistoryFiltersSheet(
 - `ModalBottomSheet` con estado, medicamento, «Incluir archivados» y rango
   personalizado con `AppDatePickerField`. Las fechas se guardan al cerrar
   («Ver resultados», X, arrastre o atrás) si son válidas; «Limpiar filtros» es
-  la acción secundaria y vuelve al rango por defecto. El contenido se separa en
-  `HistoryFiltersSheetContent` para previsualizarlo.
+  la acción secundaria, vuelve al rango por defecto y cierra la hoja. El
+  contenido se separa en `HistoryFiltersSheetContent` para previsualizarlo.
 
 ## Ajustes
 
