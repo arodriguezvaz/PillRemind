@@ -247,8 +247,8 @@ Column(fillMaxSize + padding(AppSpacing.md))
   filtros» (`Tonal` `Large`, sin icono) vuelve al rango por defecto de 30 días y
   cierra la hoja.
 - Estados vacíos: `BlankCard` con `history_empty_no_medications`,
-  `history_empty_no_intakes` o `history_empty_no_results`, y botón «Limpiar
-  filtros» (`Ghost` `Large`) cuando hay filtros aplicados.
+  `history_empty_no_intakes` o `history_empty_no_results`, sin acción directa;
+  los filtros se limpian desde la hoja de `HistoryFiltersButton`.
 - Los textos salen de `history_*` y `profile_history_*`. Los estados de las
   tomas se recalculan con `ON_RESUME` y un ticker de 60 segundos.
 

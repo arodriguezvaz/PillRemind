@@ -20,8 +20,8 @@ AppButton(
   - `Primary` (`primary`): acción principal de la pantalla o del formulario.
   - `Tonal` (`primaryContainer`): **acción secundaria con texto**, como
     `AddTimeItem` o «Limpiar filtros»; en hojas y formularios, `Large`.
-  - `Ghost` (transparente + `primary`): acción inline o discreta, como el
-    «Limpiar filtros» del estado vacío del historial.
+  - `Ghost` (transparente + `primary`): acción inline o discreta que no debe
+    competir con una card; hoy no se usa en ninguna pantalla.
   - `Danger` (`error`): acción destructiva.
   - `Secondary` (`secondaryContainer`): solo para el estado «Tomado» de
     `IntakeCard`; el naranja es de aviso y no sirve para una acción neutra.
