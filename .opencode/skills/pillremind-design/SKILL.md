@@ -120,8 +120,10 @@ Catálogo detallado en `references/components.md`.
   `AppImagePlaceholder` para el hueco de las imágenes sin foto.
 - **Formularios:** `AppFormSection` y `AppFormActions`.
 - **Solo lectura:** `AppReadOnlySection`, `AppDetailRow` (con variante
-  `stacked`), `AppNoticeBlock` y `AppScrollWithFooter`.
+  `stacked`), `AppNoticeBlock`, `AppNavigationRow` y `AppScrollWithFooter`.
 - **Cards:** `BlankCard`, `MedicationCard`, `IntakeCard`, `PerfilCard`.
+- **Historial:** `HistoryIntakeItem`, `HistoryDayHeader`,
+  `HistoryFiltersButton` y `HistoryFiltersSheet`.
 - **Ajustes:** `SettingsCard`, `SettingsRadioItem`, `SettingsToggleItem`,
   `SettingsLinkItem`.
 - **Horarios:** `WeekDayChipGroup`, `TimeListEditor`, `TimeItem`, `AddTimeItem`.

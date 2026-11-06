@@ -19,7 +19,8 @@ RootNavigationGraph
     │       └── MedicationCreateScreen          ("medication/create")
     ├── BottomBarScreens.Profile                ("profile/see")
     ├── StatisticsScreens.Statistics            ("statistics")
-    └── StatisticsScreens.MedicationStatistics  ("statistics/medication/{medicationId}")
+    ├── StatisticsScreens.MedicationStatistics  ("statistics/medication/{medicationId}")
+    └── HistoryScreens.History                  ("history?medicationId={medicationId}")
 ```
 
 El grafo raíz está en `navigation/RootNavGraph.kt`; el de la barra inferior, en
@@ -122,9 +123,9 @@ Column(fillMaxSize + padding(AppSpacing.md))
 - En `View`: `AppScrollWithFooter` con `MedicationHeader`,
   `AppReadOnlySection` para «Tratamiento» y «Pauta», `ScheduleReadOnly`
   (resumen, chips de hora y fila «Próxima toma») y una sección «Seguimiento»
-  con `StatisticsRow` para abrir las estadísticas del medicamento. Las acciones
-  (`editar` + archivar) cierran el contenido; si la ficha no llena la pantalla,
-  se anclan abajo.
+  con `AppNavigationRow` para abrir las estadísticas y el historial de ese
+  medicamento. Las acciones (`editar` + archivar) cierran el contenido; si la
+  ficha no llena la pantalla, se anclan abajo.
 - Sin badge de «Crónico»: el estado se deduce de la fila «Fecha fin»
   (`medication_no_end_date`).
 - En `Archived`: `MedicationArchivedContent` reutiliza `MedicationHeader`,
@@ -181,10 +182,10 @@ Column(fillMaxSize + padding(AppSpacing.md))
   5. `AppFormActions` al final (`guardar`).
 - En `View`: `ProfileViewContent` con `AppScrollWithFooter`, cabecera
   `ProfileHeader`, `AppReadOnlySection` + `AppDetailRow` por sección,
-  `AppNoticeBlock` para las alergias y las filas de «Ver estadísticas» y
-  «Medicamentos archivados» en «Seguimiento» (`StatisticsRow` con
-  `Icons.Rounded.Archive`). Las acciones (`editar` + eliminar) cierran el
-  contenido.
+  `AppNoticeBlock` para las alergias, las filas de «Ver estadísticas» y
+  «Medicamentos archivados» en «Seguimiento» (`AppNavigationRow` con
+  `Icons.Rounded.Archive`) y la fila de «Ver historial de tomas» en
+  «Historial». Las acciones (`editar` + eliminar) cierran el contenido.
 - El diálogo de eliminación usa `AlertDialog` con textos de `strings.xml`.
 - En `MainScreen` (modo View) hoy empuja el título con `onTopBarChange`
   (legado); la ruta debe resolverlo en `MainScreen` (`top-bar.md`).
@@ -198,8 +199,8 @@ Column(fillMaxSize + padding(AppSpacing.md))
   resuelve `MainTopBar`.
 - La ficha de medicamento abre `statistics/medication/{medicationId}`, que
   reutiliza la pantalla y el ViewModel filtrando las tomas de ese medicamento.
-  En ese modo el resumen es `MedicationStatisticsCard`, se ocultan «Por
-  medicamento» y el historial, y el estado vacío usa
+  En ese modo el resumen es `MedicationStatisticsCard`, se oculta «Por
+  medicamento» y el estado vacío usa
   `BlankCard(statistics_empty_no_intakes_medication)`.
 - `StatisticsContent` separa el contenido del ViewModel para previsualizarlo.
 - Estructura general:
@@ -209,8 +210,7 @@ Column(fillMaxSize + padding(AppSpacing.md))
   3. `WeeklyStatisticsChart` con 7 días; `AdherenceLineChart` con 30 y 90 días
      (puntos semanales).
   4. Título «Por medicamento» + `MedicationStatisticsCard` por medicamento.
-  5. Título «Historial» + cabecera por día + `StatisticsHistoryItem`.
-  6. Nota al pie.
+  5. Nota al pie.
 - Estados vacíos: `BlankCard(statistics_empty_no_medications)` y
   `BlankCard(statistics_empty_no_intakes)`; en modo medicamento,
   `BlankCard(statistics_empty_no_intakes_medication)`. Si no hay tomas
@@ -218,6 +218,34 @@ Column(fillMaxSize + padding(AppSpacing.md))
   `BlankCard(statistics_chart_no_data)`.
 - Los textos y la accesibilidad salen de `statistics_*`. El gráfico es Compose
   puro y cada barra tiene `contentDescription` con el día y los conteos.
+
+## Historial
+
+`HistoryScreen.kt` con `HistoryViewModel`.
+
+- Destino de detalle `history?medicationId={medicationId}` dentro de
+  `MainNavigationGraph`; no es una pestaña. La barra inferior y el FAB se
+  ocultan, y la flecha atrás la resuelve `MainTopBar`.
+- Se abre desde la sección «Historial» de la ficha del perfil con
+  `medicationId = -1`, y desde la ficha de un medicamento con su id para
+  preseleccionar ese medicamento.
+- Estructura:
+  `Column(fillMaxSize + padding(AppSpacing.md), spacedBy = AppSpacing.sm)` con:
+  1. `AppSearchField` por nombre de medicamento.
+  2. `HistoryFiltersButton`, que abre `HistoryFiltersSheet` y muestra el rango
+     de fechas activo («Últimos 30 días» o las fechas personalizadas).
+  3. Contador de resultados.
+  4. `LazyColumn` con `HistoryDayHeader` + `HistoryIntakeItem` agrupados por día.
+- `HistoryFiltersSheet` contiene estado, medicamento (incluidos archivados),
+  interruptor «Incluir archivados» y rango personalizado con
+  `AppDatePickerField`. Las fechas se aplican al cerrar con «Ver resultados»,
+  con la X, con el gesto de arrastre o con atrás; «Limpiar filtros» vuelve al
+  rango por defecto de 30 días y cierra la hoja.
+- Estados vacíos: `BlankCard` con `history_empty_no_medications`,
+  `history_empty_no_intakes` o `history_empty_no_results`, y botón «Limpiar
+  filtros» cuando hay filtros aplicados.
+- Los textos salen de `history_*` y `profile_history_*`. Los estados de las
+  tomas se recalculan con `ON_RESUME` y un ticker de 60 segundos.
 
 ## Ajustes
 

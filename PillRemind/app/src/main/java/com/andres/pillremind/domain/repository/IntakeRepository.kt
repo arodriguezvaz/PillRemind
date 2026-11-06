@@ -79,6 +79,23 @@ interface IntakeRepository {
     ): Flow<List<StatisticsIntake>>
 
     /**
+     * Observa las tomas de un perfil para la pantalla de historial.
+     *
+     * A diferencia de [observeStatisticsIntakes], ordena de más reciente a más
+     * antigua y permite un rango abierto con `from` o `to` nulos. Incluye los
+     * medicamentos archivados que conservan su historial.
+     *
+     * @param profileId ID del perfil propietario.
+     * @param from Inicio del rango, o null para no limitar por abajo.
+     * @param to Fin del rango, o null para no limitar por arriba.
+     */
+    fun observeHistoryIntakes(
+        profileId: Int,
+        from: LocalDateTime?,
+        to: LocalDateTime?
+    ): Flow<List<StatisticsIntake>>
+
+    /**
      * Elimina las tomas futuras de una medicación
      * @param medicationId ID de la medicación
      * @param date a partir de la que eliiminar las tomas

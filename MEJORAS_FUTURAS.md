@@ -62,25 +62,26 @@ la deuda técnica se siguen registrando en el audit local `PillRemind/INCIDENCIA
   Inicio incluye un resumen semanal cuando hay tomas evaluadas.
 - **Implementación:** ruta de detalle `statistics` con periodos de 7, 30 y 90
   días, resumen de adherencia, gráfico de barras de los últimos 7 días,
-  gráfico de líneas de adherencia semanal para 30 y 90 días, desglose por
-  medicamento (incluidos los archivados) e
-  historial agrupado por día. El porcentaje no penaliza las tomas pendientes y
-  usa el mismo margen de 15 minutos que Inicio. La ficha de cada medicamento
-  abre la misma pantalla filtrada por ese medicamento, sin el bloque de
-  historial.
+  gráfico de líneas de adherencia semanal para 30 y 90 días y desglose por
+  medicamento (incluidos los archivados). El porcentaje no penaliza las tomas
+  pendientes y usa el mismo margen de 15 minutos que Inicio. La ficha de cada
+  medicamento abre la misma pantalla filtrada por ese medicamento. El
+  historial de tomas tiene una pantalla propia.
 - **Pendiente:** exportar estadísticas y comparar perfiles.
 
 ### Historial de tomas
 
-- **Estado:** implementada parcialmente.
-- **Contexto:** cada `Intake` ya guarda `scheduledAt`, `takenAt` y snapshots de
+- **Estado:** implementada.
+- **Contexto:** cada `Intake` guarda `scheduledAt`, `takenAt` y snapshots de
   nombre, dosis y unidad.
-- **Implementación:** la pantalla de Estadísticas incluye un historial agrupado
-  por día con todas las tomas del periodo seleccionado, diferenciando tomadas,
-  pendientes y sin registrar. El historial solo se muestra en la vista global
-  del perfil.
-- **Pendiente:** filtros por medicamento y rango de fechas, y una pantalla
-  independiente si el historial crece.
+- **Implementación:** ruta de detalle `history` con búsqueda por nombre de
+  medicamento, filtros por estado, medicamento, medicamentos archivados y rango
+  de fechas personalizado (por defecto, últimos 30 días), y lista agrupada por
+  día de más reciente a más antigua. Se abre desde la sección «Historial» del
+  perfil y desde la ficha de cada medicamento, con ese medicamento
+  preseleccionado. El bloque de historial ya no se muestra dentro de
+  Estadísticas.
+- **Pendiente:** exportar el historial filtrado y guardar filtros favoritos.
 - **Prioridad:** baja.
 
 ## Medicamentos archivados

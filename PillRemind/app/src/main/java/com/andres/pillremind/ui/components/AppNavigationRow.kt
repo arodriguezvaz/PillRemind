@@ -1,4 +1,4 @@
-package com.andres.pillremind.ui.components.statistics
+package com.andres.pillremind.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,21 +25,24 @@ import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
 /**
- * Fila de navegación dentro de una sección de seguimiento.
+ * Fila de navegación con icono, título, descripción y flecha.
  *
+ * Se usa en las secciones de «Seguimiento» de la ficha del perfil y del
+ * medicamento para abrir estadísticas o historial.
+ *
+ * @param icon Icono representativo de la sección.
  * @param label Texto principal de la fila.
  * @param description Texto secundario que explica el contenido.
  * @param onClick Acción ejecutada al pulsar la fila.
  * @param modifier Modificador opcional para la fila.
- * @param icon Icono de la fila; por defecto, el de estadísticas.
  */
 @Composable
-fun StatisticsRow(
+fun AppNavigationRow(
+    icon: ImageVector,
     label: String,
     description: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    icon: ImageVector = Icons.Rounded.BarChart,
 ) {
     Row(
         modifier = modifier
@@ -75,15 +79,25 @@ fun StatisticsRow(
     }
 }
 
-@Preview(showBackground = true, name = "Fila de estadísticas")
+@Preview(showBackground = true, name = "Fila de navegación")
 @Composable
-private fun StatisticsRowPreview() {
+private fun AppNavigationRowPreview() {
     PillRemindTheme {
-        StatisticsRow(
-            label = "Ver estadísticas",
-            description = "Adherencia e historial de tomas",
-            onClick = {},
-            modifier = Modifier.padding(AppSpacing.md),
-        )
+        Column {
+            AppNavigationRow(
+                icon = Icons.Rounded.BarChart,
+                label = "Ver estadísticas",
+                description = "Adherencia y resumen de tomas",
+                onClick = {},
+                modifier = Modifier.padding(AppSpacing.md),
+            )
+            AppNavigationRow(
+                icon = Icons.Rounded.History,
+                label = "Ver historial de tomas",
+                description = "Busca y filtra las tomas registradas",
+                onClick = {},
+                modifier = Modifier.padding(AppSpacing.md),
+            )
+        }
     }
 }

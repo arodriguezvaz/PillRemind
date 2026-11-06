@@ -25,13 +25,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.StatisticsIntake
 import com.andres.pillremind.domain.model.StatisticsPeriod
-import com.andres.pillremind.domain.model.status
 import com.andres.pillremind.domain.model.toAdherencePoints
 import com.andres.pillremind.domain.model.toStatisticsReport
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.statistics.AdherenceLineChart
 import com.andres.pillremind.ui.components.statistics.MedicationStatisticsCard
-import com.andres.pillremind.ui.components.statistics.StatisticsHistoryItem
 import com.andres.pillremind.ui.components.statistics.StatisticsPeriodSelector
 import com.andres.pillremind.ui.components.statistics.StatisticsSummaryCard
 import com.andres.pillremind.ui.components.statistics.WeeklyStatisticsChart
@@ -39,19 +37,16 @@ import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 private const val CLOCK_TICK_MILLIS = 60_000L
 
 /**
  * Pantalla con las estadísticas de tomas del perfil activo.
  *
- * Muestra el resumen de adherencia, el gráfico semanal, el desglose por
- * medicamento y el historial del periodo seleccionado. El cálculo se hace en
- * el dominio y esta pantalla solo presenta el resultado.
+ * Muestra el resumen de adherencia, el gráfico del periodo y el desglose por
+ * medicamento. El historial de tomas tiene su propia pantalla. El cálculo se
+ * hace en el dominio y esta pantalla solo presenta el resultado.
  *
  * @param modifier Modificador opcional.
  * @param statisticsViewModel ViewModel con el periodo y los datos calculados.
@@ -133,7 +128,7 @@ private fun StatisticsContent(
                 }
             }
 
-            uiState.report.history.isEmpty() -> {
+            uiState.report.summary.total == 0 -> {
                 item(key = "empty-intakes") {
                     BlankCard(
                         stringResource(
@@ -205,34 +200,6 @@ private fun StatisticsContent(
                     }
                 }
 
-                if (uiState.medicationId == null) {
-                    item(key = "history-title") {
-                        StatisticsSectionTitle(
-                            text = stringResource(R.string.statistics_history_title)
-                        )
-                    }
-                    val historyByDay = uiState.report.history.groupBy {
-                        it.scheduledAt.toLocalDate()
-                    }
-                    historyByDay.forEach { (date, intakes) ->
-                        item(key = "history-day-$date") {
-                            HistoryDayHeader(
-                                date = date,
-                                today = uiState.now.toLocalDate()
-                            )
-                        }
-                        items(
-                            items = intakes,
-                            key = { "history-${it.intakeId}" }
-                        ) { intake ->
-                            StatisticsHistoryItem(
-                                intake = intake,
-                                status = intake.status(uiState.now)
-                            )
-                        }
-                    }
-                }
-
                 item(key = "footnote") {
                     StatisticsFootnote()
                 }
@@ -251,31 +218,6 @@ private fun StatisticsSectionTitle(text: String) {
         style = MaterialTheme.typography.titleLarge,
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(top = AppSpacing.sm)
-    )
-}
-
-/**
- * Cabecera de un día del historial.
- *
- * @param date Día que se representa.
- * @param today Día actual según el momento de referencia del informe.
- */
-@Composable
-private fun HistoryDayHeader(date: LocalDate, today: LocalDate) {
-    val text = when (date) {
-        today -> stringResource(R.string.statistics_history_today)
-        today.minusDays(1) -> stringResource(R.string.statistics_history_yesterday)
-        else -> {
-            val pattern = stringResource(R.string.statistics_history_date_pattern)
-            date.format(DateTimeFormatter.ofPattern(pattern, Locale.forLanguageTag("es")))
-        }
-    }
-
-    Text(
-        text = text,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(top = AppSpacing.xs)
     )
 }
 

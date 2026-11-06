@@ -130,6 +130,44 @@ interface IntakeDao {
     ): Flow<List<StatisticsIntakeRow>>
 
     /**
+     * Observa las tomas de un perfil para la pantalla de historial.
+     *
+     * A diferencia de [observeStatisticsIntakes], ordena de más reciente a más
+     * antigua y permite un rango abierto con `from` o `to` nulos. Incluye los
+     * medicamentos archivados que conservan su historial.
+     *
+     * @param profileId ID del perfil propietario.
+     * @param from Inicio del rango, o null para no limitar por abajo.
+     * @param to Fin del rango, o null para no limitar por arriba.
+     * @return Flow con las tomas ordenadas de más reciente a más antigua.
+     */
+    @Query(
+        """
+    SELECT
+        i.id AS intakeId,
+        i.medicationId,
+        i.scheduledAt,
+        i.takenAt,
+        i.medicationNameSnapshot AS medicationName,
+        i.doseSnapshot AS dose,
+        i.unitSnapshot AS unit,
+        m.imageUrl,
+        m.deletedAt
+    FROM intakes i
+    JOIN medications m ON m.id = i.medicationId
+    WHERE m.profileId = :profileId
+    AND (:from IS NULL OR i.scheduledAt >= :from)
+    AND (:to IS NULL OR i.scheduledAt <= :to)
+    ORDER BY i.scheduledAt DESC
+    """
+    )
+    fun observeHistoryIntakes(
+        profileId: Int,
+        from: LocalDateTime?,
+        to: LocalDateTime?
+    ): Flow<List<StatisticsIntakeRow>>
+
+    /**
      * Devuelve las tomas futuras de un medicamento desde una fecha.
      */
     @Query(

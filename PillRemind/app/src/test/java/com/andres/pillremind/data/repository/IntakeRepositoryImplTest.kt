@@ -458,4 +458,48 @@ class IntakeRepositoryImplTest {
 
         verify(exactly = 1) { intakeDao.observeStatisticsIntakes(1, from, to) }
     }
+
+    @Test
+    fun `observeHistoryIntakes mapea la proyeccion y conserva los archivados`() = runTest {
+        val from = date.atStartOfDay()
+        val to = date.atTime(LocalTime.MAX)
+        every {
+            intakeDao.observeHistoryIntakes(1, from, to)
+        } returns flowOf(
+            listOf(
+                StatisticsIntakeRow(
+                    intakeId = 99,
+                    medicationId = 20,
+                    scheduledAt = scheduledAt,
+                    takenAt = scheduledAt.plusMinutes(5),
+                    medicationName = "Ibuprofeno",
+                    dose = 600.0,
+                    unit = "mg",
+                    imageUrl = null,
+                    deletedAt = LocalDateTime.of(2026, 10, 23, 20, 0)
+                )
+            )
+        )
+
+        val result = repository.observeHistoryIntakes(1, from, to).first()
+
+        assertEquals(1, result.size)
+        assertEquals(99, result.single().intakeId)
+        assertEquals("Ibuprofeno", result.single().medicationName)
+        assertEquals(600.0, result.single().dose, 0.0)
+        assertEquals(scheduledAt.plusMinutes(5), result.single().takenAt)
+        assertTrue(result.single().isArchived)
+    }
+
+    @Test
+    fun `observeHistoryIntakes admite un rango abierto`() = runTest {
+        val to = date.atTime(LocalTime.MAX)
+        every {
+            intakeDao.observeHistoryIntakes(1, null, to)
+        } returns flowOf(emptyList())
+
+        repository.observeHistoryIntakes(1, null, to).first()
+
+        verify(exactly = 1) { intakeDao.observeHistoryIntakes(1, null, to) }
+    }
 }
