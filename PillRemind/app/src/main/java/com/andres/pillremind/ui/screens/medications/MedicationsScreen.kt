@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.screens.medications
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +27,9 @@ import com.andres.pillremind.ui.theme.AppSpacing
 /**
  * Pantalla que muestra la lista de medicamentos del perfil activo.
  *
+ * El texto del buscador es transitorio: se limpia al salir de la pantalla
+ * (cambio de pestaña o ficha) para no volver a una lista filtrada sin contexto.
+ *
  * @param modifier Modificador opcional para la pantalla.
  * @param onMedicationClick Callback que recibe el id del medicamento seleccionado.
  * @param medicationsViewModel ViewModel que gestiona la lógica de medicamentos.
@@ -39,6 +44,17 @@ fun MedicationsScreen(
     val medications by medicationsViewModel.medications.collectAsStateWithLifecycle()
     val searchQuery by medicationsViewModel.searchQuery.collectAsStateWithLifecycle()
     val query = searchQuery.trim()
+
+    // La búsqueda vive en el ViewModel, que Navigation conserva con
+    // `saveState`: sin esto, al volver a la pestaña seguiría el filtro anterior.
+    val activity = LocalActivity.current
+    DisposableEffect(medicationsViewModel) {
+        onDispose {
+            if (activity?.isChangingConfigurations != true) {
+                medicationsViewModel.onSearchQueryChange("")
+            }
+        }
+    }
 
     Column(
         modifier = modifier

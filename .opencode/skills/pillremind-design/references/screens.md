@@ -105,6 +105,8 @@ Column(fillMaxSize + padding(AppSpacing.md))
 
 - Estado vacío: `BlankCard(medication_empty)` o
   `BlankCard(medication_search_no_results, query)`.
+- El texto de `AppSearchField` es transitorio: se limpia al salir de la
+  pantalla (cambio de pestaña o ficha), no al rotar ni al cambiar de tema.
 - Cada item lleva `key = { it.id }`.
 - Hoy empuja el título con `onTopBarChange` (legado); lo correcto es resolverlo
   por ruta en `MainScreen`.
