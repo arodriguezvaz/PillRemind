@@ -39,6 +39,14 @@ interface MedicationRepository {
     )
 
     /**
+     * Desarchiva un medicamento limpiando su fecha de archivo.
+     *
+     * @param medicationId ID del medicamento.
+     * @param updatedAt Fecha de la actualización.
+     */
+    suspend fun unarchiveMedication(medicationId: Int, updatedAt: LocalDateTime)
+
+    /**
      * Actualiza un medicamento en la base de datos
      * @param medication Medicamento a actualizar
      */
@@ -70,6 +78,13 @@ interface MedicationRepository {
      * @param profileId ID del perfil
      */
     fun getMedications(profileId: Int): Flow<List<Medication>>
+
+    /**
+     * Obtiene los medicamentos archivados de un perfil.
+     *
+     * @param profileId ID del perfil.
+     */
+    fun getArchivedMedications(profileId: Int): Flow<List<Medication>>
 
     /**
      * Indica si el perfil tiene algún medicamento, incluidos los archivados.

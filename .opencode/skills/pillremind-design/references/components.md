@@ -304,13 +304,15 @@ MedicationStatisticsCard(statistics, modifier)
 ### `StatisticsRow` (`statistics/StatisticsRow.kt`)
 
 ```kotlin
-StatisticsRow(label, description, onClick, modifier)
+StatisticsRow(label, description, onClick, modifier, icon = Icons.Rounded.BarChart)
 ```
 
-- Fila pulsable con icono `BarChart`, etiqueta `bodyLarge` en `primary`,
-  descripción `bodySmall` en `onSurfaceVariant` y chevron final.
-- Se usa en las fichas de perfil y de medicamento para abrir las estadísticas;
-  recibe los textos ya resueltos con `stringResource`.
+- Fila pulsable con icono configurable (`BarChart` por defecto), etiqueta
+  `bodyLarge` en `primary`, descripción `bodySmall` en `onSurfaceVariant` y
+  chevron final.
+- Se usa en las fichas de perfil y de medicamento para abrir las estadísticas y,
+  con `Icons.Rounded.Archive`, para abrir los medicamentos archivados desde el
+  perfil. Recibe los textos ya resueltos con `stringResource`.
 
 ### `StatisticsHistoryItem` (`statistics/StatisticsHistoryItem.kt`)
 

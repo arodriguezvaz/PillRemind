@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -53,6 +54,7 @@ import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormActions
 import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppFormSection
+import com.andres.pillremind.ui.components.AppNoticeBlock
 import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppReadOnlySection
 import com.andres.pillremind.ui.components.AppScrollWithFooter
@@ -74,11 +76,13 @@ import java.time.format.DateTimeFormatter
  * - `Create`: crear nueva medicación.
  * - `View`: ver detalles.
  * - `Edit`: editar existente.
+ * - `Archived`: consultar un medicamento archivado.
  */
 sealed class MedicationMode {
     object Create : MedicationMode()
     object View : MedicationMode()
     object Edit : MedicationMode()
+    object Archived : MedicationMode()
 }
 
 /**
@@ -118,6 +122,9 @@ private fun AdaptiveFieldPair(
  * @param onSaveClicked Callback llamado tras guardar la medicación.
  * @param medicationMode Modo inicial de la pantalla (por defecto `Create`).
  * @param onArchivedClicked Callback llamado tras archivar la medicación.
+ * @param onUnarchivedClicked Callback llamado tras desarchivar la medicación.
+ * @param onDeletedPermanentlyClicked Callback llamado tras eliminar
+ * definitivamente la medicación.
  * @param onStatisticsClick Callback ejecutado al abrir las estadísticas del
  * medicamento.
  */
@@ -127,6 +134,8 @@ fun MedicationScreen(
     onSaveClicked: () -> Unit = {},
     medicationMode: MedicationMode = MedicationMode.Create,
     onArchivedClicked: () -> Unit = {},
+    onUnarchivedClicked: () -> Unit = {},
+    onDeletedPermanentlyClicked: () -> Unit = {},
     onStatisticsClick: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
     medicationViewModel: MedicationViewModel = hiltViewModel()
@@ -183,13 +192,15 @@ fun MedicationScreen(
                 MedicationMode.Create -> "create"
                 MedicationMode.View -> "view"
                 MedicationMode.Edit -> "edit"
+                MedicationMode.Archived -> "archived"
             }
         },
         restore = { value ->
             when (value) {
                 "create" -> MedicationMode.Create
                 "view" -> MedicationMode.View
-                else -> MedicationMode.Edit
+                "edit" -> MedicationMode.Edit
+                else -> MedicationMode.Archived
             }
         }
     )
@@ -203,11 +214,17 @@ fun MedicationScreen(
         mutableStateOf(false)
     }
 
+    //Variable que si es true muestra el diálogo de borrado definitivo
+    var showPermanentDeleteDialog by remember {
+        mutableStateOf(false)
+    }
+
     //Si cambia el modo actualiza el título en la topbar de MainScreen
     val topBarTitle = when (currentMode) {
         MedicationMode.Create -> stringResource(R.string.medication_add_title)
         MedicationMode.View -> stringResource(R.string.medication_view_title)
         MedicationMode.Edit -> stringResource(R.string.medication_edit_title)
+        MedicationMode.Archived -> stringResource(R.string.medication_archived_title)
     }
     val backContentDescription = stringResource(R.string.common_back)
     LaunchedEffect(currentMode, topBarTitle) {
@@ -575,6 +592,31 @@ fun MedicationScreen(
                 onStatisticsClick = onStatisticsClick,
             )
         }
+        //-------------ARCHIVED---------------
+        MedicationMode.Archived -> {
+            MedicationArchivedContent(
+                modifier = modifier,
+                name = name.value,
+                photoUri = selectedPhotoUri,
+                dose = dose.value,
+                unit = unit.value,
+                startDate = startDate.value,
+                endDate = endDate.value,
+                archivedAt = medication?.deletedAt,
+                periodicitySummary = scheduleSummary(scheduleForm),
+                times = scheduleForm.times.toList(),
+                showSchedule = scheduleInitialized && medicationSchedules.isNotEmpty(),
+                onUnarchiveClick = {
+                    medication?.let { med ->
+                        medicationViewModel.restoreMedication(med) {
+                            onUnarchivedClicked()
+                        }
+                    }
+                },
+                onDeletePermanentlyClick = { showPermanentDeleteDialog = true },
+                onStatisticsClick = onStatisticsClick,
+            )
+        }
     }
     if (showArchiveDialog) {
         AlertDialog(
@@ -614,6 +656,141 @@ fun MedicationScreen(
                 }
             }
         )
+    }
+    if (showPermanentDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showPermanentDeleteDialog = false
+            },
+            title = {
+                Text(stringResource(R.string.medication_delete_permanently_title))
+            },
+            text = {
+                Text(stringResource(R.string.medication_delete_permanently_message))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showPermanentDeleteDialog = false
+                        medication?.let {
+                            medicationViewModel.deleteMedicationPermanently(it) {
+                                onDeletedPermanentlyClicked()
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text(stringResource(R.string.medication_delete_permanently))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showPermanentDeleteDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.common_cancel))
+                }
+            }
+        )
+    }
+}
+
+/**
+ * Ficha de solo lectura de un medicamento archivado.
+ *
+ * Muestra el aviso de archivo, el tratamiento y, si se conserva, la pauta.
+ * El pie permite desarchivar el medicamento o eliminarlo definitivamente.
+ */
+@Composable
+private fun MedicationArchivedContent(
+    modifier: Modifier = Modifier,
+    name: String,
+    photoUri: Uri?,
+    dose: String,
+    unit: String,
+    startDate: LocalDate?,
+    endDate: LocalDate?,
+    archivedAt: LocalDateTime?,
+    periodicitySummary: String,
+    times: List<LocalTime>,
+    showSchedule: Boolean,
+    onUnarchiveClick: () -> Unit,
+    onDeletePermanentlyClick: () -> Unit,
+    onStatisticsClick: () -> Unit,
+) {
+    val datePattern = stringResource(R.string.common_date_pattern)
+    val dateFormatter = remember(datePattern) { DateTimeFormatter.ofPattern(datePattern) }
+    val archivedDate = archivedAt?.format(dateFormatter)
+    val doseValue = listOf(dose, unit)
+        .filter { it.isNotBlank() }
+        .joinToString(" ")
+
+    AppScrollWithFooter(
+        modifier = modifier,
+        footer = {
+            AppFormActions(
+                primaryText = stringResource(R.string.medication_unarchive),
+                onPrimaryClick = onUnarchiveClick,
+                secondaryIcon = Icons.Rounded.Delete,
+                secondaryContentDescription = stringResource(
+                    R.string.medication_delete_permanently
+                ),
+                secondaryContentColor = MaterialTheme.colorScheme.error,
+                onSecondaryClick = onDeletePermanentlyClick,
+            )
+        },
+    ) {
+        MedicationHeader(
+            name = name,
+            photoUri = photoUri,
+            subtitle = doseValue,
+        )
+
+        if (archivedDate != null) {
+            AppNoticeBlock(
+                icon = Icons.Rounded.Archive,
+                title = stringResource(R.string.medication_archived_title),
+                text = stringResource(R.string.medication_archived_notice, archivedDate),
+            )
+        }
+
+        AppReadOnlySection(title = stringResource(R.string.medication_treatment_section)) {
+            AppDetailRow(
+                label = stringResource(R.string.dosis),
+                value = doseValue,
+            )
+            AppDetailRow(
+                label = stringResource(R.string.fecha_inicio),
+                value = startDate?.format(dateFormatter),
+            )
+            AppDetailRow(
+                label = stringResource(R.string.fecha_fin),
+                value = endDate?.format(dateFormatter)
+                    ?: stringResource(R.string.medication_no_end_date),
+                showDivider = false,
+            )
+        }
+
+        if (showSchedule) {
+            AppReadOnlySection(title = stringResource(R.string.medication_schedule_section)) {
+                ScheduleReadOnly(
+                    summary = periodicitySummary,
+                    times = times,
+                    nextIntake = null,
+                )
+            }
+        }
+
+        AppReadOnlySection(title = stringResource(R.string.medication_tracking_section)) {
+            StatisticsRow(
+                label = stringResource(R.string.medication_view_statistics),
+                description = stringResource(R.string.medication_statistics_description),
+                onClick = onStatisticsClick,
+            )
+        }
     }
 }
 
@@ -756,6 +933,28 @@ private fun MedicationViewContentPreview() {
             nextIntake = LocalDateTime.of(2026, 3, 12, 21, 0),
             onEditClick = {},
             onArchiveClick = {},
+            onStatisticsClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Ficha de medicamento archivado")
+@Composable
+private fun MedicationArchivedContentPreview() {
+    PillRemindTheme {
+        MedicationArchivedContent(
+            name = "Enalapril",
+            photoUri = null,
+            dose = "10",
+            unit = "mg",
+            startDate = LocalDate.of(2026, 3, 12),
+            endDate = null,
+            archivedAt = LocalDateTime.of(2026, 11, 2, 18, 30),
+            periodicitySummary = "Todos los días",
+            times = listOf(LocalTime.of(9, 0), LocalTime.of(21, 0)),
+            showSchedule = true,
+            onUnarchiveClick = {},
+            onDeletePermanentlyClick = {},
             onStatisticsClick = {},
         )
     }

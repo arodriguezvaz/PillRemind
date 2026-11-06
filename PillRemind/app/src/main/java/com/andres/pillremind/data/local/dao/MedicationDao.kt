@@ -58,6 +58,16 @@ interface MedicationDao {
     fun getMedications(profileId: Int): Flow<List<MedicationEntity>>
 
     /**
+     * Observa los medicamentos archivados de un perfil.
+     *
+     * @param profileId ID del perfil propietario.
+     * @return Flow con la lista de medicamentos archivados, del más reciente al
+     * más antiguo.
+     */
+    @Query("SELECT * FROM medications WHERE profileId = :profileId AND deletedAt IS NOT NULL ORDER BY deletedAt DESC")
+    fun getArchivedMedications(profileId: Int): Flow<List<MedicationEntity>>
+
+    /**
      * Cuenta todos los medicamentos de un perfil, incluidos los archivados.
      *
      * Se usa en estadísticas para distinguir un perfil sin medicamentos de uno
@@ -75,6 +85,15 @@ interface MedicationDao {
         deletedAt: LocalDateTime,
         updatedAt: LocalDateTime
     )
+
+    /**
+     * Desarchiva un medicamento limpiando su fecha de archivo.
+     *
+     * @param medicationId ID del medicamento.
+     * @param updatedAt Fecha de la actualización.
+     */
+    @Query("UPDATE medications SET deletedAt = NULL, updatedAt = :updatedAt WHERE id = :medicationId")
+    suspend fun unarchiveMedication(medicationId: Int, updatedAt: LocalDateTime)
 
     /**
      * Devuelve un medicamento por su ID en una consulta unica.

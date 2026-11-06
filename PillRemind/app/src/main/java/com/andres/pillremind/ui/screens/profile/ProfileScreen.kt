@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
@@ -91,6 +92,7 @@ sealed class ProfileMode {
  * @param profileMode Modo inicial de la pantalla (crear, ver o editar).
  * @param onDeletedClicked Callback ejecutado tras eliminar el perfil.
  * @param onStatisticsClick Callback ejecutado al abrir las estadísticas.
+ * @param onArchivedMedicationsClick Callback ejecutado al abrir los medicamentos archivados.
  * @param onTopBarChange Callback para modificar la TopBar.
  * @param profileViewModel ViewModel encargado de la lógica del perfil.
  */
@@ -101,6 +103,7 @@ fun ProfileScreen(
     profileMode: ProfileMode = ProfileMode.Create,
     onDeletedClicked: () -> Unit = {},
     onStatisticsClick: () -> Unit = {},
+    onArchivedMedicationsClick: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -294,6 +297,7 @@ fun ProfileScreen(
                 onEditClick = { currentMode = ProfileMode.Edit },
                 onDeleteClick = { perfil?.let { showDeleteDialog = true } },
                 onStatisticsClick = onStatisticsClick,
+                onArchivedMedicationsClick = onArchivedMedicationsClick,
             )
         }
     }
@@ -530,6 +534,7 @@ private fun ProfileViewContent(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onStatisticsClick: () -> Unit,
+    onArchivedMedicationsClick: () -> Unit,
 ) {
     val datePattern = stringResource(R.string.common_date_pattern)
     val dateFormatter = remember(datePattern) { DateTimeFormatter.ofPattern(datePattern) }
@@ -620,6 +625,12 @@ private fun ProfileViewContent(
                 description = stringResource(R.string.profile_statistics_description),
                 onClick = onStatisticsClick,
             )
+            StatisticsRow(
+                label = stringResource(R.string.profile_archived_medications),
+                description = stringResource(R.string.profile_archived_medications_description),
+                onClick = onArchivedMedicationsClick,
+                icon = Icons.Rounded.Archive,
+            )
         }
     }
 }
@@ -680,6 +691,7 @@ private fun ProfileViewContentPreview() {
             onEditClick = {},
             onDeleteClick = {},
             onStatisticsClick = {},
+            onArchivedMedicationsClick = {},
         )
     }
 }

@@ -110,7 +110,7 @@ Column(fillMaxSize + padding(AppSpacing.md))
 
 ## Ficha de medicamento
 
-`MedicationScreen.kt` con `MedicationMode.Create / Edit / View`.
+`MedicationScreen.kt` con `MedicationMode.Create / Edit / View / Archived`.
 
 - Raíz de cada modo:
   `Column(fillMaxSize + padding(AppSpacing.md) + verticalScroll)`.
@@ -127,11 +127,32 @@ Column(fillMaxSize + padding(AppSpacing.md))
   se anclan abajo.
 - Sin badge de «Crónico»: el estado se deduce de la fila «Fecha fin»
   (`medication_no_end_date`).
+- En `Archived`: `MedicationArchivedContent` reutiliza `MedicationHeader`,
+  `AppScrollWithFooter`, `AppNoticeBlock` con la fecha de archivo y las
+  secciones «Tratamiento», «Pauta» (solo si se conserva) y «Seguimiento». El
+  pie ofrece «Desarchivar» como acción principal y el borrado definitivo como
+  secundaria roja; este último abre un `AlertDialog` de confirmación.
 - La acción secundaria de `AppFormActions` sirve para archivar o eliminar; en
   `ProfileScreen` se marca con `secondaryContentColor = error`.
 - `LaunchedEffect(currentMode, topBarTitle)` actualiza la top bar (patrón
   legado, pendiente de migrar); en modo Edit muestra `navigationAction` para
   volver a View y `BackHandler` hace lo mismo.
+
+## Medicamentos archivados
+
+`ArchivedMedicationsScreen.kt` con `ArchivedMedicationsViewModel`.
+
+- Destino de detalle `medication/archived` dentro del subgrafo de medicamentos;
+  no es una pestaña. Se abre desde la fila «Medicamentos archivados» de la
+  ficha de perfil.
+- Lista: `Column(fillMaxSize + padding(AppSpacing.md))` y `LazyColumn` con
+  `MedicationCard` (`ver`) y `key = { it.id }`; estado vacío
+  `BlankCard(medication_archived_empty)`.
+- Cada item abre `medication/archived/{medicationId}`. La ficha usa
+  `MedicationMode.Archived`; al desarchivar o eliminar definitivamente se
+  vuelve a la lista.
+- El perfil abre las estadísticas del medicamento archivado reutilizando
+  `statistics/medication/{medicationId}`.
 
 ## Perfiles
 
@@ -160,8 +181,10 @@ Column(fillMaxSize + padding(AppSpacing.md))
   5. `AppFormActions` al final (`guardar`).
 - En `View`: `ProfileViewContent` con `AppScrollWithFooter`, cabecera
   `ProfileHeader`, `AppReadOnlySection` + `AppDetailRow` por sección,
-  `AppNoticeBlock` para las alergias y la fila de «Ver estadísticas» en
-  «Seguimiento». Las acciones (`editar` + eliminar) cierran el contenido.
+  `AppNoticeBlock` para las alergias y las filas de «Ver estadísticas» y
+  «Medicamentos archivados» en «Seguimiento» (`StatisticsRow` con
+  `Icons.Rounded.Archive`). Las acciones (`editar` + eliminar) cierran el
+  contenido.
 - El diálogo de eliminación usa `AlertDialog` con textos de `strings.xml`.
 - En `MainScreen` (modo View) hoy empuja el título con `onTopBarChange`
   (legado); la ruta debe resolverlo en `MainScreen` (`top-bar.md`).

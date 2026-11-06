@@ -87,13 +87,16 @@ la deuda técnica se siguen registrando en el audit local `PillRemind/INCIDENCIA
 
 ### Gestión de medicamentos archivados y borrado definitivo
 
-- **Estado:** idea futura.
+- **Estado:** implementada.
 - **Contexto:** los medicamentos se archivan con `deletedAt` y dejan de aparecer
-  en la lista activa, pero todavía no hay forma de consultarlos ni de borrarlos
-  definitivamente.
-- **Propuesta:** pantalla o filtro de archivados, opción de restaurar y opción de
-  borrado definitivo con confirmación.
-- **Prioridad:** media.
+  en la lista activa. El archivado conserva la pauta para poder recuperarlos.
+- **Implementación:** el perfil incluye la fila «Medicamentos archivados» dentro
+  de Seguimiento. La lista abre una ficha de solo lectura con el aviso de archivo,
+  el tratamiento, la pauta conservada y acceso a sus estadísticas. Desde ahí se
+  puede desarchivar (se regeneran las tomas y alarmas) o eliminar definitivamente
+  con confirmación, borrando también la imagen y el historial.
+- **Pendiente:** buscador y filtros en la lista de archivados.
+- **Prioridad:** baja.
 
 ## Datos locales
 

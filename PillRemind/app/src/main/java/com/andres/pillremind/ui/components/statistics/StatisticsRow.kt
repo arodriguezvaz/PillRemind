@@ -17,18 +17,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
 /**
- * Fila de navegación que abre las estadísticas de adherencia.
+ * Fila de navegación dentro de una sección de seguimiento.
  *
  * @param label Texto principal de la fila.
  * @param description Texto secundario que explica el contenido.
  * @param onClick Acción ejecutada al pulsar la fila.
  * @param modifier Modificador opcional para la fila.
+ * @param icon Icono de la fila; por defecto, el de estadísticas.
  */
 @Composable
 fun StatisticsRow(
@@ -36,6 +38,7 @@ fun StatisticsRow(
     description: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    icon: ImageVector = Icons.Rounded.BarChart,
 ) {
     Row(
         modifier = modifier
@@ -45,7 +48,7 @@ fun StatisticsRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = Icons.Rounded.BarChart,
+            imageVector = icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(22.dp),

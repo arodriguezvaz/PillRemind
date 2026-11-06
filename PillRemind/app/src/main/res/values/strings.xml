@@ -111,6 +111,8 @@
     <string name="profile_view_statistics">Ver estadísticas</string>
     <string name="profile_tracking_section">Seguimiento</string>
     <string name="profile_statistics_description">Adherencia e historial de tomas</string>
+    <string name="profile_archived_medications">Medicamentos archivados</string>
+    <string name="profile_archived_medications_description">Consulta, recupera o elimina medicamentos archivados</string>
     <string name="profile_delete_title">Eliminar perfil</string>
     <string name="profile_delete_message">¿Seguro que quieres eliminar este perfil?</string>
 
@@ -245,7 +247,15 @@
     <string name="medication_chronic_treatment">Tratamiento crónico</string>
     <string name="medication_archive">Archivar</string>
     <string name="medication_archive_title">Archivar medicamento</string>
-    <string name="medication_archive_message">Dejará de aparecer en la lista y no generará recordatorios. Se conservará el historial de tomas.</string>
+    <string name="medication_archive_message">Dejará de aparecer en la lista y no generará recordatorios. Se conservará el historial y podrás recuperarlo desde «Medicamentos archivados».</string>
+    <string name="medication_archived_list_title">Medicamentos archivados</string>
+    <string name="medication_archived_empty">No hay medicamentos archivados</string>
+    <string name="medication_archived_title">Medicamento archivado</string>
+    <string name="medication_archived_notice">Archivado el %1$s. No genera recordatorios.</string>
+    <string name="medication_unarchive">Desarchivar</string>
+    <string name="medication_delete_permanently">Eliminar definitivamente</string>
+    <string name="medication_delete_permanently_title">Eliminar definitivamente</string>
+    <string name="medication_delete_permanently_message">Se borrarán el medicamento, su pauta, su imagen y todo su historial de tomas. Esta acción no se puede deshacer.</string>
     <string name="medication_photo_description">Foto del medicamento %1$s</string>
     <string name="medication_icon_description">Icono de medicamento</string>
     <string name="medication_tracking_section">Seguimiento</string>
