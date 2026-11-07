@@ -256,8 +256,9 @@ IntakeCard(intake, visualState, onTake, modifier)
 ```
 
 - Misma estructura que `MedicationCard`.
-- Estado `PENDING` → botón `Primary`; `TAKEN` → `Secondary` deshabilitado
-  (única excepción a la regla de acción secundaria); `DELAYED` → `Danger`.
+- Estado `PENDING` → botón `Primary`; `TAKEN` → `Secondary` «Tomado», habilitado
+  para deshacer la toma (única excepción a la regla de acción secundaria);
+  `DELAYED` → `Danger`.
 - Metadatos de dosis y hora en `bodySmall` / `onSurfaceVariant`.
 
 ### `PerfilCard` (`PerfilCard.kt`)

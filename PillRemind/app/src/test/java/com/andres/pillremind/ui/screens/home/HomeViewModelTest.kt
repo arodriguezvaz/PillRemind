@@ -1,13 +1,16 @@
 package com.andres.pillremind.ui.screens.home
 
 import com.andres.pillremind.data.local.session.SessionManager
+import com.andres.pillremind.domain.model.IntakeWithMedication
 import com.andres.pillremind.domain.model.StatisticsIntake
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.notifications.ReminderScheduler
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import java.time.LocalDateTime
 import java.time.LocalTime
 import kotlinx.coroutines.Dispatchers
@@ -101,6 +104,40 @@ class HomeViewModelTest {
         assertEquals(0, summary?.evaluated)
         assertEquals(1, summary?.pending)
     }
+
+    @Test
+    fun `tomarIntake marca la toma pendiente`() = runTest {
+        coEvery { intakeRepository.markTaken(any(), any()) } returns Unit
+
+        viewModel.tomarIntake(intakeWithMedication(takenAt = null))
+
+        val takenAt = slot<LocalDateTime>()
+        coVerify(exactly = 1) { intakeRepository.markTaken(1, capture(takenAt)) }
+        assertNotNull(takenAt.captured)
+    }
+
+    @Test
+    fun `tomarIntake deshace la toma ya registrada`() = runTest {
+        coEvery { intakeRepository.markTaken(any(), any()) } returns Unit
+
+        viewModel.tomarIntake(intakeWithMedication(takenAt = now.minusHours(1)))
+
+        coVerify(exactly = 1) { intakeRepository.markTaken(1, null) }
+    }
+
+    private fun intakeWithMedication(takenAt: LocalDateTime?): IntakeWithMedication =
+        IntakeWithMedication(
+            intakeId = 1,
+            medicationId = 1,
+            scheduledAt = now,
+            scheduleId = 1,
+            takenAt = takenAt,
+            medicationName = "Ibuprofeno",
+            dose = 600.0,
+            unit = "mg",
+            imageUrl = null,
+            profileName = "Andrés"
+        )
 
     private fun intake(
         id: Int,
