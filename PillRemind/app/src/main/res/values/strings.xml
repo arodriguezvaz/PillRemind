@@ -292,6 +292,10 @@
     <string name="medication_search_no_results">No hay resultados para «%1$s»</string>
     <string name="save_missing_fields">Faltan: %1$s</string>
     <string name="medication_missing_schedule">pauta y al menos una hora</string>
+    <string name="medication_dose_invalid">La dosis debe ser un número mayor que 0. Puedes usar coma o punto.</string>
+    <string name="medication_date_range_invalid">La fecha de fin no puede ser anterior a la de inicio.</string>
+    <string name="medication_invalid_data_title">Datos no válidos</string>
+    <string name="medication_invalid_data_message">Revisa la dosis y las fechas: mientras no sean válidas, no se generarán tomas.</string>
     <string name="profile_save_name_required">Escribe un nombre para guardar</string>
     <string name="medication_view_title">Ver medicamento</string>
     <string name="medication_edit_title">Editar medicamento</string>
