@@ -12,7 +12,8 @@ son siempre cadenas ya resueltas con `stringResource`.
 
 ```kotlin
 AppButton(
-    text, onClick, modifier, variant, size, enabled, isLoading, leadingIcon
+    text, onClick, modifier, variant, size, enabled, isLoading, leadingIcon,
+    looksDisabled
 )
 ```
 
@@ -29,6 +30,8 @@ AppButton(
 - `isLoading` deshabilita el botón y muestra un spinner de 16dp.
 - `leadingIcon` es decorativo (`contentDescription = null`) y solo se añade si
   aporta significado (`Add` en «Añadir hora»); el texto ya describe la acción.
+- `looksDisabled` mantiene los colores y la elevación del estado deshabilitado
+  aunque el botón siga siendo pulsable; se usa en el estado «Tomado».
 - Elevación `AppElevation`; deshabilitado sin elevación.
 
 ### `AppFab` (`AppFab.kt`)
@@ -256,8 +259,10 @@ IntakeCard(intake, visualState, onTake, modifier)
 ```
 
 - Misma estructura que `MedicationCard`.
-- Estado `PENDING` → botón `Primary`; `TAKEN` → `Secondary` deshabilitado
-  (única excepción a la regla de acción secundaria); `DELAYED` → `Danger`.
+- Estado `PENDING` → botón `Primary`; `TAKEN` → `Secondary` «Tomado», habilitado
+  para deshacer la toma pero con `looksDisabled` para conservar su aspecto
+  original (única excepción a la regla de acción secundaria); `DELAYED` →
+  `Danger`.
 - Metadatos de dosis y hora en `bodySmall` / `onSurfaceVariant`.
 
 ### `PerfilCard` (`PerfilCard.kt`)

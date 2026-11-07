@@ -40,7 +40,8 @@ import java.time.format.DateTimeFormatter
  *
  * @param intake Información de la toma junto con el medicamento asociado.
  * @param visualState Estado visual de la toma (pendiente, tomada o retrasada).
- * @param onTake Acción ejecutada al pulsar el botón de tomar.
+ * @param onTake Acción ejecutada al pulsar el botón de estado: marca la toma
+ * como realizada o la deshace si ya estaba registrada.
  * @param modifier Modificador para personalizar el layout.
  */
 @Composable
@@ -120,7 +121,7 @@ fun IntakeCard(
                 onClick = onTake,
                 variant = buttonVariant,
                 size = ButtonSize.Small,
-                enabled = visualState != IntakeVisualState.TAKEN,
+                looksDisabled = visualState == IntakeVisualState.TAKEN,
             )
         }
     }

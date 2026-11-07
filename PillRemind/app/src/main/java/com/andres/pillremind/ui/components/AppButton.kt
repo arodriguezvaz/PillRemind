@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
  * @param isLoading Si es true se muestra un indicador de progreso en lugar del texto.
  * @param leadingIcon Icono opcional a la izquierda del texto. Es decorativo: el
  *   texto del botón ya describe la acción.
+ * @param looksDisabled Si es true, usa los colores y la elevación del estado
+ *   deshabilitado aunque el botón siga siendo pulsable.
  */
 @Composable
 fun AppButton(
@@ -45,6 +47,7 @@ fun AppButton(
     enabled: Boolean = true,
     isLoading: Boolean = false,
     leadingIcon: ImageVector? = null,
+    looksDisabled: Boolean = false,
 ) {
     val (containerColor, contentColor) = when (variant) {
         ButtonVariant.Primary -> MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary
@@ -63,6 +66,18 @@ fun AppButton(
         ButtonSize.Medium -> Triple(20.dp, 12.dp, MaterialTheme.typography.labelLarge)
         ButtonSize.Large -> Triple(28.dp, 16.dp, MaterialTheme.typography.titleSmall)
     }
+    val defaultColors = ButtonDefaults.buttonColors()
+    val effectiveContainerColor = if (looksDisabled) {
+        defaultColors.disabledContainerColor
+    } else {
+        containerColor
+    }
+    val effectiveContentColor = if (looksDisabled) {
+        defaultColors.disabledContentColor
+    } else {
+        contentColor
+    }
+    val effectiveElevation = if (looksDisabled) 0.dp else AppElevation
 
     Button(
         onClick = onClick,
@@ -74,12 +89,12 @@ fun AppButton(
         },
         shape = MaterialTheme.shapes.medium,
         colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = contentColor,
+            containerColor = effectiveContainerColor,
+            contentColor = effectiveContentColor,
         ),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = AppElevation,
-            pressedElevation = AppElevation,
+            defaultElevation = effectiveElevation,
+            pressedElevation = effectiveElevation,
             disabledElevation = 0.dp,
         ),
         contentPadding = PaddingValues(
@@ -91,7 +106,7 @@ fun AppButton(
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(16.dp),
-                color = contentColor,
+                color = effectiveContentColor,
                 strokeWidth = 2.dp,
             )
         } else {
