@@ -23,6 +23,7 @@ import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -253,16 +254,20 @@ fun MedicationScreen(
     }
 
     val scrollState = rememberScrollState()
+    val parsedDose = parseDoseInput(dose.value)
+    val doseInvalid = dose.value.isNotBlank() && parsedDose == null
+    val dateRangeInvalid = !isDateRangeValid(startDate.value, endDate.value)
     val isFormValid = name.value.isNotBlank() &&
-            dose.value.isNotBlank() &&
+            parsedDose != null &&
             unit.value.isNotBlank() &&
             startDate.value != null &&
+            !dateRangeInvalid &&
             scheduleForm.isValid() &&
             (isChronicTreatment.value || endDate.value != null)
 
     val missingFields = mutableListOf<String>()
     if (name.value.isBlank()) missingFields.add(stringResource(R.string.nombre))
-    if (dose.value.toDoubleOrNull() == null) missingFields.add(stringResource(R.string.dosis))
+    if (dose.value.isBlank()) missingFields.add(stringResource(R.string.dosis))
     if (unit.value.isBlank()) missingFields.add(stringResource(R.string.unidad))
     if (startDate.value == null) missingFields.add(stringResource(R.string.fecha_inicio))
     if (!isChronicTreatment.value && endDate.value == null) {
@@ -272,10 +277,10 @@ fun MedicationScreen(
         missingFields.add(stringResource(R.string.medication_missing_schedule))
     }
 
-    val missingFieldsMessage = if (isFormValid) {
-        null
-    } else {
+    val missingFieldsMessage = if (!isFormValid && missingFields.isNotEmpty()) {
         stringResource(R.string.save_missing_fields, missingFields.joinToString(", "))
+    } else {
+        null
     }
 
     when (currentMode) {
@@ -344,6 +349,16 @@ fun MedicationScreen(
                             }
                         }
                     )
+                    if (doseInvalid) {
+                        Text(
+                            text = stringResource(R.string.medication_dose_invalid),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = AppSpacing.md),
+                        )
+                    }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -375,6 +390,7 @@ fun MedicationScreen(
                                 AppDatePickerField(
                                     value = startDate.value,
                                     onDateSelected = { startDate.value = it },
+                                    isError = dateRangeInvalid,
                                     enabled = true,
                                 )
                             }
@@ -387,12 +403,23 @@ fun MedicationScreen(
                                 AppDatePickerField(
                                     value = endDate.value,
                                     onDateSelected = { endDate.value = it },
+                                    isError = dateRangeInvalid,
                                     enabled = !isChronicTreatment.value,
                                     minDate = startDate.value
                                 )
                             }
                         }
                     )
+                    if (dateRangeInvalid) {
+                        Text(
+                            text = stringResource(R.string.medication_date_range_invalid),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = AppSpacing.md),
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(AppSpacing.xl))
                 AppFormSection(
@@ -408,18 +435,22 @@ fun MedicationScreen(
                 AppFormActions(
                     primaryText = stringResource(R.string.guardar),
                     onPrimaryClick = {
-                        medicationViewModel.addMedication(
-                            nombre = name.value,
-                            photoUri = selectedPhotoUri,
-                            dose = dose.value.toDoubleOrNull() ?: 0.0,
-                            unit = unit.value,
-                            startDate = startDate.value!!,
-                            endDate = endDate.value,
-                            scheduleRules = scheduleForm.rules(),
-                            times = scheduleForm.times,
-                            isChronic = isChronicTreatment.value,
-                            onSaved = onSaveClicked
-                        )
+                        val doseValue = parsedDose
+                        val formStartDate = startDate.value
+                        if (doseValue != null && formStartDate != null) {
+                            medicationViewModel.addMedication(
+                                nombre = name.value,
+                                photoUri = selectedPhotoUri,
+                                dose = doseValue,
+                                unit = unit.value,
+                                startDate = formStartDate,
+                                endDate = endDate.value,
+                                scheduleRules = scheduleForm.rules(),
+                                times = scheduleForm.times,
+                                isChronic = isChronicTreatment.value,
+                                onSaved = onSaveClicked
+                            )
+                        }
                     },
                     primaryEnabled = isFormValid,
                     supportingText = missingFieldsMessage,
@@ -489,6 +520,16 @@ fun MedicationScreen(
                             }
                         }
                     )
+                    if (doseInvalid) {
+                        Text(
+                            text = stringResource(R.string.medication_dose_invalid),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = AppSpacing.md),
+                        )
+                    }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -520,6 +561,7 @@ fun MedicationScreen(
                                 AppDatePickerField(
                                     value = startDate.value,
                                     onDateSelected = { startDate.value = it },
+                                    isError = dateRangeInvalid,
                                     enabled = true
                                 )
                             }
@@ -532,12 +574,23 @@ fun MedicationScreen(
                                 AppDatePickerField(
                                     value = endDate.value,
                                     onDateSelected = { endDate.value = it },
+                                    isError = dateRangeInvalid,
                                     enabled = !isChronicTreatment.value,
                                     minDate = startDate.value
                                 )
                             }
                         }
                     )
+                    if (dateRangeInvalid) {
+                        Text(
+                            text = stringResource(R.string.medication_date_range_invalid),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = AppSpacing.md),
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(AppSpacing.xl))
                 AppFormSection(
@@ -553,25 +606,29 @@ fun MedicationScreen(
                 AppFormActions(
                     primaryText = stringResource(R.string.guardar),
                     onPrimaryClick = {
-                        medicationViewModel.updateMedication(
-                            name = name.value,
-                            newPhotoUri = newPhotoUri,
-                            currentImagePath = currentImagePath,
-                            dose = dose.value.toDoubleOrNull() ?: 0.0,
-                            unit = unit.value,
-                            startDate = startDate.value!!,
-                            endDate = endDate.value,
-                            scheduleRules = scheduleForm.rules(),
-                            times = scheduleForm.times,
-                            isChronic = isChronicTreatment.value,
-                            onSaved = { savedImagePath ->
-                                selectedPhotoUri = savedImagePath?.let(Uri::parse)
-                                currentImagePath = savedImagePath
-                                newPhotoUri = null
-                                currentMode = MedicationMode.View
-                                onSaveClicked()
-                            }
-                        )
+                        val doseValue = parsedDose
+                        val formStartDate = startDate.value
+                        if (doseValue != null && formStartDate != null) {
+                            medicationViewModel.updateMedication(
+                                name = name.value,
+                                newPhotoUri = newPhotoUri,
+                                currentImagePath = currentImagePath,
+                                dose = doseValue,
+                                unit = unit.value,
+                                startDate = formStartDate,
+                                endDate = endDate.value,
+                                scheduleRules = scheduleForm.rules(),
+                                times = scheduleForm.times,
+                                isChronic = isChronicTreatment.value,
+                                onSaved = { savedImagePath ->
+                                    selectedPhotoUri = savedImagePath?.let(Uri::parse)
+                                    currentImagePath = savedImagePath
+                                    newPhotoUri = null
+                                    currentMode = MedicationMode.View
+                                    onSaveClicked()
+                                }
+                            )
+                        }
                     },
                     primaryEnabled = isFormValid,
                     supportingText = missingFieldsMessage,
@@ -831,6 +888,8 @@ private fun MedicationViewContent(
     val doseValue = listOf(dose, unit)
         .filter { it.isNotBlank() }
         .joinToString(" ")
+    val hasInvalidData = parseDoseInput(dose) == null ||
+            !isDateRangeValid(startDate, endDate)
 
     AppScrollWithFooter(
         modifier = modifier,
@@ -850,6 +909,14 @@ private fun MedicationViewContent(
             photoUri = photoUri,
             subtitle = doseValue,
         )
+
+        if (hasInvalidData) {
+            AppNoticeBlock(
+                icon = Icons.Rounded.Warning,
+                title = stringResource(R.string.medication_invalid_data_title),
+                text = stringResource(R.string.medication_invalid_data_message),
+            )
+        }
 
         AppReadOnlySection(title = stringResource(R.string.medication_treatment_section)) {
             AppDetailRow(
