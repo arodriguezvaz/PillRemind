@@ -17,6 +17,7 @@ import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.ThemeMode
 import com.andres.pillremind.navigation.RootNavigationGraph
 import com.andres.pillremind.ui.screens.onboarding.OnboardingRoute
+import com.andres.pillremind.ui.screens.update.UpdateGate
 import com.andres.pillremind.ui.theme.PillRemindTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -60,7 +61,9 @@ class MainActivity : ComponentActivity() {
                     )
 
                     false -> OnboardingRoute()
-                    true -> RootNavigationGraph(navController = rememberNavController())
+                    true -> UpdateGate {
+                        RootNavigationGraph(navController = rememberNavController())
+                    }
                 }
             }
         }

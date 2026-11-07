@@ -14,8 +14,8 @@ Non está publicada en Google Play.
   instalación desde fontes descoñecidas para o navegador ou o xestor de ficheiros.
 - As actualizacións instálanse sobre a versión anterior e conservan os datos locais,
   sempre que o APK estea asinado coa mesma clave.
-- A aplicación non ten permiso de internet: os datos só saen do dispositivo nas copias
-  de seguridade que exportes manualmente desde Axustes.
+- A aplicación só usa internet para comprobar se hai unha versión nova; os datos de
+  saúde non saen do dispositivo.
 
 ## Descrición
 
@@ -30,8 +30,9 @@ A partir desta información, o sistema xera recordatorios e notificacións no mo
 Ademais, o usuario pode confirmar a toma da medicación, o que permite levar un control do cumprimento do tratamento.
 
 Outro dos aspectos importantes é a xestión de perfís, que permite organizar a medicación de diferentes persoas dentro 
-dun mesmo dispositivo. A aplicación funciona integramente de forma local: non require conta nin conexión a internet,
-e os datos gárdanse só no dispositivo. Tamén conta con funcionalidades de modificación e eliminación de medicamentos,
+dun mesmo dispositivo. A aplicación funciona integramente de forma local: non require conta nin
+conexión a internet para funcionar, agás a comprobación diaria de actualizacións, e os datos
+gárdanse só no dispositivo. Tamén conta con funcionalidades de modificación e eliminación de medicamentos,
 así como recordatorios e notificacións para cada toma.
 
 Cada perfil pode gardar información médica opcional: data de nacemento, sexo, grupo sanguíneo, alerxias, notas e
@@ -84,6 +85,25 @@ crear `PillRemind/keystore.properties` coas claves `storeFile`, `storePassword`,
 e `keyPassword`; tanto ese ficheiro como o keystore están en `.gitignore`. Se o repositorio
 limita o token a só lectura, hai que activar «Read and write permissions» en
 Settings → Actions → General.
+
+## Actualizacións
+
+A aplicación consulta como máximo unha vez ao día o ficheiro `update.json` publicado
+xunto á última release. Se hai unha versión nova, amosa un aviso que se pode pospoñer;
+se a release marca unha versión mínima, bloquea o uso ata actualizar. O botón de
+actualizar abre a descarga do APK no navegador e a instalación confírmase co instalador
+do sistema, coa mesma clave de firma.
+
+- A comprobación só fai unha petición a GitHub; non envía datos de saúde nin
+  identificadores. GitHub recibe a IP como en calquera conexión.
+- A primeira versión que inclúe este sistema hai que instalala unha vez a man; a partir
+  de aí as seguintes xa se detectan desde a propia aplicación.
+- `UPDATE_REQUIRED` (Settings → Secrets and variables → Actions → Variables) a `true`
+  fai que esa release obrigue a actualizar a calquera versión anterior. Se non existe
+  ou vale `false`, só se avisa e o usuario pode pospoñer a actualización. Mantén o
+  valor en `true` mentres queiras seguir forzando a actualización nas seguintes releases.
+- O workflow xera `update.json` co `versionCode`, `versionName`, `minimumVersionCode` e
+  as URLs do APK e da release, e adxúntao á release.
 
 ## Licencia
 

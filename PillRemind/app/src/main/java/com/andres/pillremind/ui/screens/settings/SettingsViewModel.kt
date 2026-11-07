@@ -11,7 +11,9 @@ import com.andres.pillremind.data.backup.BackupException
 import com.andres.pillremind.data.backup.BackupFileStore
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.ThemeMode
+import com.andres.pillremind.domain.model.UpdateStatus
 import com.andres.pillremind.domain.repository.BackupRepository
+import com.andres.pillremind.domain.repository.UpdateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
@@ -56,6 +58,27 @@ sealed interface BackupUiState {
 }
 
 /**
+ * Estados de la comprobación manual de actualizaciones.
+ */
+sealed interface UpdateCheckUiState {
+
+    /** No hay ninguna comprobación reciente que mostrar. */
+    data object Idle : UpdateCheckUiState
+
+    /** Se está consultando el manifiesto. */
+    data object Checking : UpdateCheckUiState
+
+    /** La versión instalada ya está al día. */
+    data object UpToDate : UpdateCheckUiState
+
+    /** Hay una versión nueva disponible. */
+    data object Available : UpdateCheckUiState
+
+    /** No se pudo consultar el manifiesto. */
+    data object Error : UpdateCheckUiState
+}
+
+/**
  * ViewModel encargado de la gestión de la pantalla de ajustes.
  *
  * Gestiona la preferencia de tema y las operaciones de exportación e
@@ -64,12 +87,14 @@ sealed interface BackupUiState {
  * @property sessionManager Gestor de sesión del usuario activo.
  * @property backupRepository Repositorio de copias de seguridad.
  * @property backupFileStore Acceso a los documentos elegidos por el usuario.
+ * @property updateRepository Repositorio de comprobación de actualizaciones.
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val backupRepository: BackupRepository,
     private val backupFileStore: BackupFileStore,
+    private val updateRepository: UpdateRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -92,6 +117,21 @@ class SettingsViewModel @Inject constructor(
      * Estado actual del flujo de copia de seguridad.
      */
     val backupState: StateFlow<BackupUiState> = _backupState.asStateFlow()
+
+    private val _updateCheckState =
+        MutableStateFlow<UpdateCheckUiState>(UpdateCheckUiState.Idle)
+
+    /**
+     * Estado de la comprobación manual de actualizaciones.
+     */
+    val updateCheckState: StateFlow<UpdateCheckUiState> = _updateCheckState.asStateFlow()
+
+    /**
+     * Versión instalada, mostrada en la tarjeta «Acerca de».
+     */
+    val currentVersionName: String = updateRepository.installedAppInfo().let { info ->
+        info.versionName.ifBlank { info.versionCode.toString() }
+    }
 
     /**
      * Nombre sugerido para el archivo de exportación.
@@ -233,6 +273,50 @@ class SettingsViewModel @Inject constructor(
     fun consumeBackupState() {
         if (!isBusy()) {
             _backupState.value = BackupUiState.Idle
+        }
+    }
+
+    /**
+     * Comprueba manualmente si hay una actualización disponible.
+     *
+     * La comprobación automática se omite si ya se hizo en las últimas 24
+     * horas; este método siempre consulta el manifiesto.
+     */
+    fun checkForUpdates() {
+        if (_updateCheckState.value == UpdateCheckUiState.Checking) return
+
+        viewModelScope.launch {
+            _updateCheckState.value = UpdateCheckUiState.Checking
+            _updateCheckState.value = try {
+                val result = updateRepository.refresh()
+                if (result.isSuccess) {
+                    val info = result.getOrThrow()
+                    val installed = updateRepository.installedAppInfo()
+                    if (info.statusFor(installed.versionCode) is UpdateStatus.UpToDate) {
+                        UpdateCheckUiState.UpToDate
+                    } else {
+                        // Una comprobación manual vuelve a mostrar el aviso aunque
+                        // el usuario lo hubiera pospuesto antes.
+                        updateRepository.clearDismissal()
+                        UpdateCheckUiState.Available
+                    }
+                } else {
+                    UpdateCheckUiState.Error
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                UpdateCheckUiState.Error
+            }
+        }
+    }
+
+    /**
+     * Marca como consumido el resultado de la comprobación de actualizaciones.
+     */
+    fun consumeUpdateCheckState() {
+        if (_updateCheckState.value != UpdateCheckUiState.Checking) {
+            _updateCheckState.value = UpdateCheckUiState.Idle
         }
     }
 

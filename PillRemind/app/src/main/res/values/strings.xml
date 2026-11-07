@@ -217,6 +217,13 @@
     <string name="settings_exact_alarms_disabled">Desactivadas</string>
     <string name="settings_allow_exact_alarms">Permitir alarmas exactas</string>
     <string name="settings_open_app_settings">Abrir ajustes de la app</string>
+    <string name="settings_about_title">Acerca de</string>
+    <string name="settings_version">Versión %1$s</string>
+    <string name="settings_check_updates">Buscar actualizaciones</string>
+    <string name="settings_checking_updates">Comprobando actualizaciones…</string>
+    <string name="settings_update_up_to_date">Ya tienes la última versión</string>
+    <string name="settings_update_available">Hay una actualización disponible</string>
+    <string name="settings_update_check_error">No se pudo comprobar si hay actualizaciones</string>
     <string name="settings_data_title">Datos</string>
     <string name="settings_data_description">Copia de seguridad local de perfiles, medicamentos, horarios, historial e imágenes.</string>
     <string name="settings_export_data">Exportar datos</string>
@@ -225,10 +232,22 @@
     <string name="settings_backup_privacy_warning">El archivo contiene datos de salud. Si no lo proteges con contraseña, cualquiera que lo tenga podrá leerlo.</string>
     <string name="settings_legal_title">Legal</string>
     <string name="settings_privacy_policy">Política de privacidad</string>
-    <string name="settings_privacy_policy_body">PillRemind funciona íntegramente en este dispositivo. No recopila, transmite ni comparte datos personales o de salud, no requiere una cuenta y no se conecta a internet.\n\nLos perfiles, medicamentos, horarios, tomas e imágenes se guardan en una base de datos local. Esa información solo sale del dispositivo si tú exportas una copia de seguridad y eliges dónde guardarla o con quién compartirla. La copia puede contener datos de salud: protégela con contraseña y guárdala en un lugar seguro.\n\nAl desinstalar la aplicación o borrar sus datos se elimina toda la información almacenada. Las copias de seguridad que hayas exportado no se eliminan y quedan bajo tu control.\n\nLos permisos de notificaciones y alarmas exactas se usan únicamente para avisarte de las tomas programadas.</string>
+    <string name="settings_privacy_policy_body">PillRemind guarda los datos de perfiles, medicamentos, horarios, tomas e imágenes en este dispositivo y no los envía a ningún servidor. No recopila datos personales ni de salud y no requiere una cuenta. Para comprobar si existe una versión nueva, consulta de forma automática como máximo una vez al día un fichero público alojado en GitHub Releases; también puedes lanzar la comprobación manualmente desde Ajustes. Esa consulta no envía perfiles, medicamentos, tomas ni ningún identificador personal; como cualquier conexión a internet, GitHub recibe la dirección IP y datos técnicos de la conexión, que trata según su propia política de privacidad. Si hay una actualización, la descarga se realiza desde el navegador y solo se instala si tú lo confirmas.\n\nLos perfiles, medicamentos, horarios, tomas e imágenes se guardan en una base de datos local. Esa información solo sale del dispositivo si tú exportas una copia de seguridad y eliges dónde guardarla o con quién compartirla. La copia puede contener datos de salud: protégela con contraseña y guárdala en un lugar seguro.\n\nAl desinstalar la aplicación o borrar sus datos se elimina toda la información almacenada. Las copias de seguridad que hayas exportado no se eliminan y quedan bajo tu control.\n\nLos permisos de notificaciones y alarmas exactas se usan únicamente para avisarte de las tomas programadas.\n\nÚltima revisión: noviembre de 2026.</string>
     <string name="settings_legal_notice">Aviso legal</string>
-    <string name="settings_legal_notice_body">Titular y desarrollador: Andrés Rodríguez Vázquez.\n\nPillRemind es un proyecto personal de código abierto distribuido bajo la licencia MIT. El código fuente está disponible en github.com/arodriguezvaz/PillRemind.\n\nLa aplicación es una herramienta de apoyo para recordar la medicación. No es un producto sanitario, no emite diagnósticos ni recomendaciones médicas y no sustituye la consulta con un profesional sanitario. Ante cualquier duda sobre un tratamiento, consulta con tu médico o farmacéutico.\n\nLa aplicación se ofrece «tal cual», sin garantías de disponibilidad o funcionamiento ininterrumpido, conforme al texto de la licencia MIT.</string>
+    <string name="settings_legal_notice_body">Titular y desarrollador: Andrés Rodríguez Vázquez.\n\nPillRemind es un proyecto personal de código abierto distribuido bajo la licencia MIT. El código fuente está disponible en github.com/arodriguezvaz/PillRemind.\n\nLa aplicación es una herramienta de apoyo para recordar la medicación. No es un producto sanitario, no emite diagnósticos ni recomendaciones médicas y no sustituye la consulta con un profesional sanitario. Ante cualquier duda sobre un tratamiento, consulta con tu médico o farmacéutico.\n\nLa aplicación puede comprobar la existencia de actualizaciones y requerir su instalación para seguir funcionando. Las actualizaciones se distribuyen desde GitHub Releases y su disponibilidad no está garantizada.\n\nLa aplicación se ofrece «tal cual», sin garantías de disponibilidad o funcionamiento ininterrumpido, conforme al texto de la licencia MIT.</string>
     <string name="settings_legal_close">Cerrar</string>
+
+    <!-- Actualizaciones -->
+    <string name="update_required_title">Actualización obligatoria</string>
+    <string name="update_required_message">La versión %1$s ya no es compatible. Actualiza a la versión %2$s para seguir usando PillRemind. Tus datos se conservarán.</string>
+    <string name="update_required_footer">Los recordatorios ya programados seguirán funcionando aunque la aplicación esté bloqueada.</string>
+    <string name="update_optional_title">Nueva versión disponible</string>
+    <string name="update_optional_message">La versión %1$s ya está disponible. ¿Quieres actualizar ahora?</string>
+    <string name="update_now">Actualizar ahora</string>
+    <string name="update_later">Más tarde</string>
+    <string name="update_release_notes">Ver novedades</string>
+    <string name="update_exit">Salir de la aplicación</string>
+    <string name="update_open_error">No se pudo abrir el navegador</string>
 
     <!-- Copia de seguridad -->
     <string name="backup_export_success">Copia exportada correctamente</string>

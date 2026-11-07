@@ -12,7 +12,7 @@
 - Load the matching `android-*` skill with the `skill` tool before writing or reviewing code (Kotlin, Compose, architecture, coroutines, Hilt, testing, Gradle); several can apply to the same change.
 - Load `pillremind-design` (`.opencode/skills/pillremind-design/SKILL.md`) before creating or modifying any screen, tab or component; it holds the design tokens, component catalog and new-tab recipe.
 - The skills live in `.agents/` (installed with autoskills and Git-ignored), so a fresh clone may not have them: when missing, this file and the code are the reference.
-- If a skill contradicts this file, this file wins: the app is local-only, with no auth, network or `INTERNET` permission.
+- If a skill contradicts this file, this file wins: the app is local-only, with no auth or remote database. The only network use is the update manifest check against GitHub Releases (`INTERNET` permission).
 
 ## UI strings
 
@@ -49,7 +49,7 @@ cd PillRemind
 
 - Layers: `domain/model` + `domain/repository` interfaces; `data/local` (Room entities/DAOs/relations/converters plus the DataStore `SessionManager`), `data/mapper`, `data/repository` implementations; `ui/screens/<feature>` Screen+ViewModel pairs; `ui/components`; `di` Hilt modules; `navigation` nested graphs; `notifications` alarm/worker pipeline.
 - Keep `domain` pure Kotlin: no Android resources, no `data.*` imports. UI labels for domain enums belong to `ui/components` (for example, `WeekDayLabels.kt`).
-- The app is local-only: no authentication, remote database, sync layer or network permission. Do not reintroduce Supabase or account fields.
+- The app is local-only: no authentication, remote database, sync layer or account fields. The only network request is the update check (at most once a day) against the `update.json` asset of the latest GitHub release (`data/remote/GitHubUpdateDataSource`); its result is cached in `UpdatePreferences` and a failed check must never block the app. Do not add other network calls or reintroduce Supabase.
 - New repository: interface in `domain/repository`, implementation in `data/repository`, binding in `di/RepositoryModule`. New entity/DAO: register in `AppDatabase`, provide it through `DatabaseModule` and add an index for every foreign-key column (Room warns otherwise). ViewModels use `@HiltViewModel` and screens obtain them with `hiltViewModel()`.
 - Room uses `exportSchema = false` and `fallbackToDestructiveMigration(dropAllTables = true)`. There are no migrations: bump `AppDatabase.version` for any schema change and expect local data loss. The app is not in production, so do not write migrations or backwards compatibility (same for `BackupFormat.VERSION`) unless explicitly asked.
 - Intakes belong to medications (`medicationId`); `scheduleId` is optional and becomes `NULL` when a schedule is deleted. Each intake stores `medicationNameSnapshot`, `doseSnapshot` and `unitSnapshot` so history survives medication edits. Medications are archived with `deletedAt` instead of being physically deleted.

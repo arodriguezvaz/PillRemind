@@ -89,6 +89,7 @@ fun SettingsScreen(
 
     val themeMode by settingsViewModel.themeMode.collectAsStateWithLifecycle()
     val backupState by settingsViewModel.backupState.collectAsStateWithLifecycle()
+    val updateCheckState by settingsViewModel.updateCheckState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val activity = LocalActivity.current
@@ -154,6 +155,9 @@ fun SettingsScreen(
 
     val exportedMessage = stringResource(R.string.backup_export_success)
     val genericErrorMessage = stringResource(R.string.backup_error_generic)
+    val updateUpToDateMessage = stringResource(R.string.settings_update_up_to_date)
+    val updateAvailableMessage = stringResource(R.string.settings_update_available)
+    val updateErrorMessage = stringResource(R.string.settings_update_check_error)
     val errorMessage = when (val state = backupState) {
         is BackupUiState.Error -> stringResource(state.messageRes)
         else -> null
@@ -209,6 +213,27 @@ fun SettingsScreen(
         notificationStatus = reminderPermissions.notificationStatus()
         exactAlarmStatus = reminderPermissions.exactAlarmStatus()
         notificationRationale = shouldShowNotificationRationale(activity)
+    }
+
+    LaunchedEffect(updateCheckState) {
+        when (updateCheckState) {
+            UpdateCheckUiState.UpToDate -> {
+                snackbarHostState.showSnackbar(updateUpToDateMessage)
+                settingsViewModel.consumeUpdateCheckState()
+            }
+
+            UpdateCheckUiState.Available -> {
+                snackbarHostState.showSnackbar(updateAvailableMessage)
+                settingsViewModel.consumeUpdateCheckState()
+            }
+
+            UpdateCheckUiState.Error -> {
+                snackbarHostState.showSnackbar(updateErrorMessage)
+                settingsViewModel.consumeUpdateCheckState()
+            }
+
+            else -> Unit
+        }
     }
 
     Scaffold(
@@ -330,6 +355,41 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+
+            // Tarjeta de información de la aplicación
+            SettingsCard(title = stringResource(R.string.settings_about_title)) {
+                Text(
+                    text = stringResource(
+                        R.string.settings_version,
+                        settingsViewModel.currentVersionName
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(AppSpacing.xs))
+                SettingsLinkItem(
+                    label = stringResource(R.string.settings_check_updates),
+                    onClick = { settingsViewModel.checkForUpdates() },
+                    enabled = updateCheckState != UpdateCheckUiState.Checking
+                )
+                if (updateCheckState == UpdateCheckUiState.Checking) {
+                    Spacer(Modifier.height(AppSpacing.xs))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_checking_updates),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
 
             // Tarjeta legal
