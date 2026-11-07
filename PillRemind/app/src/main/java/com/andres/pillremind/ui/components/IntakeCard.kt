@@ -121,6 +121,7 @@ fun IntakeCard(
                 onClick = onTake,
                 variant = buttonVariant,
                 size = ButtonSize.Small,
+                looksDisabled = visualState == IntakeVisualState.TAKEN,
             )
         }
     }
