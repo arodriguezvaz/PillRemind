@@ -40,7 +40,14 @@ object DatabaseModule {
             // Las versiones 1-5 eran builds internas sin releases públicas.
             // A partir de la 6 no se borra la base de datos: si falta una
             // migración, Room falla en lugar de perder el historial.
-            .fallbackToDestructiveMigrationFrom(1, 2, 3, 4, 5)
+            .fallbackToDestructiveMigrationFrom(
+                dropAllTables = true,
+                1,
+                2,
+                3,
+                4,
+                5
+            )
             .build()
     }
 

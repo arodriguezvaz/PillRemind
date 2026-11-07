@@ -80,10 +80,10 @@ android {
         unitTests.isIncludeAndroidResources = true
     }
     sourceSets {
-        // Los esquemas se incluyen en los assets de la app para que
-        // MigrationTestHelper pueda leerlos tanto en Robolectric como en
-        // las pruebas instrumentadas. Son solo el esquema, no datos.
-        getByName("main").assets.srcDir("$projectDir/schemas")
+        // Los esquemas solo se incluyen en la variante debug, que es la que
+        // usan los tests locales e instrumentados. Así MigrationTestHelper
+        // puede leerlos sin enviarlos en el APK de release.
+        getByName("debug").assets.srcDir("$projectDir/schemas")
     }
 }
 

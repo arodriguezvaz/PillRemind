@@ -17,6 +17,14 @@ import com.andres.pillremind.data.local.entity.ScheduleEntity
 import com.andres.pillremind.data.local.entity.UserEntity
 
 /**
+ * Versión actual del esquema de Room.
+ *
+ * Es la única fuente de verdad: la anotación y los tests de migración la usan
+ * para no quedar desincronizados al subir de versión.
+ */
+const val APP_DATABASE_VERSION = 6
+
+/**
  * Clase que representa la base de datos de la aplicación
  */
 @Database(
@@ -27,7 +35,7 @@ import com.andres.pillremind.data.local.entity.UserEntity
         ScheduleEntity::class,
         IntakeEntity::class
     ],
-    version = 6,
+    version = APP_DATABASE_VERSION,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
