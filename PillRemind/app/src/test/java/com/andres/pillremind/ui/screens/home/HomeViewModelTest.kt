@@ -24,6 +24,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -108,12 +109,15 @@ class HomeViewModelTest {
     @Test
     fun `tomarIntake marca la toma pendiente`() = runTest {
         coEvery { intakeRepository.markTaken(any(), any()) } returns Unit
+        val before = LocalDateTime.now()
 
         viewModel.tomarIntake(intakeWithMedication(takenAt = null))
 
+        val after = LocalDateTime.now()
         val takenAt = slot<LocalDateTime>()
         coVerify(exactly = 1) { intakeRepository.markTaken(1, capture(takenAt)) }
-        assertNotNull(takenAt.captured)
+        assertTrue(!takenAt.captured.isBefore(before))
+        assertTrue(!takenAt.captured.isAfter(after))
     }
 
     @Test
