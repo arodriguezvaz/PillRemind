@@ -47,7 +47,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
     signingConfigs {
         // Solo se crea si hay keystore, para que un clon sin credenciales siga compilando.
         if (releaseKeystore != null) {
@@ -80,6 +79,18 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+    sourceSets {
+        // Los esquemas solo se incluyen en la variante debug, que es la que
+        // usan los tests locales e instrumentados. Así MigrationTestHelper
+        // puede leerlos sin enviarlos en el APK de release.
+        getByName("debug").assets.srcDir("$projectDir/schemas")
+    }
+}
+
+ksp {
+    // Los esquemas exportados son la base de las auto-migraciones y de los
+    // tests de migración de Room. Se versionan en app/schemas.
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
@@ -122,8 +133,11 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
+    testImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)

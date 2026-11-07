@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Solo se usa para consultar el manifiesto de actualizaciones de GitHub
+         Releases. El resto de la aplicación funciona sin conexión. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- La cámara se abre con la app del sistema, así que no se pide el permiso
          CAMERA; esta característica opcional permite instalar en dispositivos sin ella. -->
     <uses-feature

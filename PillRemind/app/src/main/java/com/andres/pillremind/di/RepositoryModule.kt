@@ -5,12 +5,14 @@ import com.andres.pillremind.data.repository.IntakeRepositoryImpl
 import com.andres.pillremind.data.repository.MedicationRepositoryImpl
 import com.andres.pillremind.data.repository.ProfileRepositoryImpl
 import com.andres.pillremind.data.repository.ScheduleRepositoryImpl
+import com.andres.pillremind.data.repository.UpdateRepositoryImpl
 import com.andres.pillremind.data.repository.UserRepositoryImpl
 import com.andres.pillremind.domain.repository.BackupRepository
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
+import com.andres.pillremind.domain.repository.UpdateRepository
 import com.andres.pillremind.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -40,4 +42,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindBackupRepository(impl: BackupRepositoryImpl): BackupRepository
+
+    @Binds
+    abstract fun bindUpdateRepository(impl: UpdateRepositoryImpl): UpdateRepository
 }

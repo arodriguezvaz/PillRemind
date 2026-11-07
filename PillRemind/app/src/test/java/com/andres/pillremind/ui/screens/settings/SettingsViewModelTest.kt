@@ -5,8 +5,11 @@ import androidx.lifecycle.SavedStateHandle
 import com.andres.pillremind.R
 import com.andres.pillremind.data.backup.BackupFileStore
 import com.andres.pillremind.data.local.session.SessionManager
+import com.andres.pillremind.domain.model.InstalledAppInfo
 import com.andres.pillremind.domain.model.ThemeMode
+import com.andres.pillremind.domain.model.UpdateInfo
 import com.andres.pillremind.domain.repository.BackupRepository
+import com.andres.pillremind.domain.repository.UpdateRepository
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -15,6 +18,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +47,7 @@ class SettingsViewModelTest {
     private val sessionManager = mockk<SessionManager>(relaxed = true)
     private val backupRepository = mockk<BackupRepository>(relaxed = true)
     private val backupFileStore = mockk<BackupFileStore>(relaxed = true)
+    private val updateRepository = mockk<UpdateRepository>(relaxed = true)
     private val savedStateHandle = SavedStateHandle()
     private val uri: Uri = Uri.parse("content://test/backup.pmbackup")
 
@@ -52,12 +57,18 @@ class SettingsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         every { sessionManager.themeMode } returns flowOf(ThemeMode.SYSTEM)
+        every { updateRepository.installedAppInfo() } returns InstalledAppInfo(
+            versionCode = 2,
+            versionName = "1.1.0",
+            isDebuggable = false,
+        )
         every { backupFileStore.openOutput(uri) } returns ByteArrayOutputStream()
         coEvery { backupRepository.exportTo(any(), any()) } just Runs
         viewModel = SettingsViewModel(
             sessionManager = sessionManager,
             backupRepository = backupRepository,
             backupFileStore = backupFileStore,
+            updateRepository = updateRepository,
             savedStateHandle = savedStateHandle
         )
     }
@@ -128,4 +139,43 @@ class SettingsViewModelTest {
         coVerify(exactly = 0) { backupRepository.exportTo(any(), any()) }
         assertTrue(viewModel.backupState.value is BackupUiState.Error)
     }
+
+    @Test
+    fun `la comprobacion manual informa de que no hay actualizaciones`() {
+        coEvery { updateRepository.refresh() } returns Result.success(updateInfo(versionCode = 2))
+
+        viewModel.checkForUpdates()
+
+        assertEquals(UpdateCheckUiState.UpToDate, viewModel.updateCheckState.value)
+        coVerify(exactly = 0) { updateRepository.clearDismissal() }
+        viewModel.consumeUpdateCheckState()
+        assertEquals(UpdateCheckUiState.Idle, viewModel.updateCheckState.value)
+    }
+
+    @Test
+    fun `la comprobacion manual detecta una version nueva`() {
+        coEvery { updateRepository.refresh() } returns Result.success(updateInfo(versionCode = 3))
+
+        viewModel.checkForUpdates()
+
+        assertEquals(UpdateCheckUiState.Available, viewModel.updateCheckState.value)
+        coVerify(exactly = 1) { updateRepository.clearDismissal() }
+    }
+
+    @Test
+    fun `la comprobacion manual informa de un error de red`() {
+        coEvery { updateRepository.refresh() } returns Result.failure(IOException("sin red"))
+
+        viewModel.checkForUpdates()
+
+        assertEquals(UpdateCheckUiState.Error, viewModel.updateCheckState.value)
+    }
+
+    private fun updateInfo(versionCode: Long) = UpdateInfo(
+        versionCode = versionCode,
+        versionName = "1.2.0",
+        minimumVersionCode = 0,
+        apkUrl = "https://github.com/arodriguezvaz/PillRemind/releases/download/v1.2.0/PillRemind-1.2.0.apk",
+        releaseUrl = "https://github.com/arodriguezvaz/PillRemind/releases/tag/v1.2.0",
+    )
 }

@@ -69,6 +69,35 @@ jobs:
       - name: Renombrar APK
         run: cp app/build/outputs/apk/release/app-release.apk "PillRemind-${VERSION}.apk"
 
+      - name: Generar manifiesto de actualización
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          UPDATE_REQUIRED: ${{ vars.UPDATE_REQUIRED }}
+        run: |
+          case "${UPDATE_REQUIRED:-false}" in
+            true)
+              MIN_VERSION_CODE="${{ github.run_number }}"
+              ;;
+            false|"")
+              MIN_VERSION_CODE=0
+              ;;
+            *)
+              echo "::error::UPDATE_REQUIRED solo admite true o false."
+              exit 1
+              ;;
+          esac
+          cat > update.json <<EOF
+          {
+            "versionCode": ${{ github.run_number }},
+            "versionName": "${VERSION}",
+            "minimumVersionCode": ${MIN_VERSION_CODE},
+            "apkUrl": "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/PillRemind-${VERSION}.apk",
+            "releaseUrl": "https://github.com/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}"
+          }
+          EOF
+          python3 -m json.tool update.json > /dev/null
+          cat update.json
+
       - name: Subir artefacto
         uses: actions/upload-artifact@v4
         with:
@@ -84,5 +113,6 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" \
             "PillRemind/PillRemind-${VERSION}.apk" \
+            "PillRemind/update.json" \
             --title "PillRemind ${VERSION}" \
             --generate-notes

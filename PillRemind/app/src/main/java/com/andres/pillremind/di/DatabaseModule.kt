@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.andres.pillremind.data.local.dao.BackupDao
 import com.andres.pillremind.data.local.database.AppDatabase
+import com.andres.pillremind.data.local.database.DatabaseMigrations
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,7 +36,18 @@ object DatabaseModule {
             AppDatabase::class.java,
             "pillremind.db"
         )
-            .fallbackToDestructiveMigration(dropAllTables = true)
+            .addMigrations(*DatabaseMigrations.ALL)
+            // Las versiones 1-5 eran builds internas sin releases públicas.
+            // A partir de la 6 no se borra la base de datos: si falta una
+            // migración, Room falla en lugar de perder el historial.
+            .fallbackToDestructiveMigrationFrom(
+                dropAllTables = true,
+                1,
+                2,
+                3,
+                4,
+                5
+            )
             .build()
     }
 
