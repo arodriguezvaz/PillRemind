@@ -28,7 +28,7 @@ import com.andres.pillremind.data.local.entity.UserEntity
         IntakeEntity::class
     ],
     version = 6,
-    exportSchema = false
+    exportSchema = true
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

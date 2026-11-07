@@ -2,8 +2,17 @@ package com.andres.pillremind.data.repository
 
 import android.content.Context
 import androidx.room.Room
+import com.andres.pillremind.data.backup.BackupArchive
+import com.andres.pillremind.data.backup.BackupCrypto
 import com.andres.pillremind.data.backup.BackupException
+import com.andres.pillremind.data.backup.BackupFormat
 import com.andres.pillremind.data.backup.BackupImageStore
+import com.andres.pillremind.data.backup.legacy.v1.BackupV1FileDto
+import com.andres.pillremind.data.backup.legacy.v1.BackupV1IntakeDto
+import com.andres.pillremind.data.backup.legacy.v1.BackupV1MedicationDto
+import com.andres.pillremind.data.backup.legacy.v1.BackupV1ProfileDto
+import com.andres.pillremind.data.backup.legacy.v1.BackupV1ScheduleDto
+import com.andres.pillremind.data.backup.legacy.v1.BackupV1UserDto
 import com.andres.pillremind.data.local.database.AppDatabase
 import com.andres.pillremind.data.local.entity.IntakeEntity
 import com.andres.pillremind.data.local.entity.MedicationEntity
@@ -30,6 +39,8 @@ import java.time.LocalTime
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -57,6 +68,7 @@ class BackupRepositoryImplTest {
     private lateinit var repository: BackupRepositoryImpl
 
     private val now = LocalDateTime.of(2026, 10, 31, 12, 0)
+    private val json = Json { encodeDefaults = true }
 
     @Before
     fun setUp() = runBlocking {
@@ -193,6 +205,88 @@ class BackupRepositoryImplTest {
         assertEquals(2, recurring.intervalDays)
         assertEquals(LocalTime.of(20, 0), recurring.time)
     }
+
+    @Test
+    fun `importa una copia del formato 1 con horarios semanales`() = runTest {
+        seedDatabase()
+        val exported = ByteArrayOutputStream()
+        BackupCrypto.writeHeader(exported, encrypted = false)
+        BackupArchive.write(
+            exported,
+            json.encodeToString(v1Backup()),
+            emptyMap()
+        )
+
+        repository.importFrom(
+            input = ByteArrayInputStream(exported.toByteArray()),
+            password = null
+        )
+
+        val profiles = database.backupDao().getProfilesOnce()
+        val schedules = database.backupDao().getSchedulesOnce()
+
+        assertEquals("Ana v1", profiles.single().name)
+        assertNull(profiles.single().birthDate)
+        assertEquals(ScheduleType.WEEKLY, schedules.single().type)
+        assertEquals(WeekDay.MONDAY, schedules.single().weekDay)
+    }
+
+    private fun v1Backup() = BackupV1FileDto(
+        format = BackupFormat.NAME,
+        formatVersion = 1,
+        appVersion = "1.0.0",
+        exportedAt = "2026-10-31T12:00:00",
+        users = listOf(
+            BackupV1UserDto(
+                id = 1,
+                createdAt = "2026-10-01T09:00:00",
+                updatedAt = "2026-10-01T09:00:00"
+            )
+        ),
+        profiles = listOf(
+            BackupV1ProfileDto(
+                id = 1,
+                usuarioId = 1,
+                name = "Ana v1",
+                createdAt = "2026-10-01T09:00:00",
+                updatedAt = "2026-10-01T09:00:00"
+            )
+        ),
+        medications = listOf(
+            BackupV1MedicationDto(
+                id = 1,
+                profileId = 1,
+                name = "Ibuprofeno v1",
+                dose = 400.0,
+                unit = "mg",
+                isChronic = false,
+                startDate = "2026-10-01",
+                createdAt = "2026-10-01T09:00:00",
+                updatedAt = "2026-10-01T09:00:00"
+            )
+        ),
+        schedules = listOf(
+            BackupV1ScheduleDto(
+                id = 1,
+                medicationId = 1,
+                weekDay = WeekDay.MONDAY.name,
+                time = "08:00"
+            )
+        ),
+        intakes = listOf(
+            BackupV1IntakeDto(
+                id = 1,
+                medicationId = 1,
+                scheduleId = 1,
+                scheduledAt = "2026-10-31T08:00:00",
+                medicationNameSnapshot = "Ibuprofeno v1",
+                doseSnapshot = 400.0,
+                unitSnapshot = "mg",
+                createdAt = "2026-10-31T08:00:00",
+                updatedAt = "2026-10-31T08:00:00"
+            )
+        )
+    )
 
     private suspend fun seedDatabase(): SeededData {
         val userId = database.userDao()

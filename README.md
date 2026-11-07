@@ -48,7 +48,8 @@ A aplicación non envía información a servidores externos nin sincroniza datos
 
 Desde Axustes pódese exportar e importar unha copia de seguridade local que inclúe perfís, medicamentos,
 horarios, historial e imaxes. A copia pódese protexer cun contrasinal; a importación substitúe todos os
-datos actuais.
+datos actuais. As copias creadas por versións anteriores tamén se poden importar: o formato migrase
+automaticamente ao máis actual.
 
 ## Sobre a autoría
 
@@ -96,6 +97,8 @@ do sistema, coa mesma clave de firma.
 
 - A comprobación só fai unha petición a GitHub; non envía datos de saúde nin
   identificadores. GitHub recibe a IP como en calquera conexión.
+- As actualizacións aplican as migracións de base de datos necesarias e conservan o
+  historial local.
 - A primeira versión que inclúe este sistema hai que instalala unha vez a man; a partir
   de aí as seguintes xa se detectan desde a propia aplicación.
 - `UPDATE_REQUIRED` (Settings → Secrets and variables → Actions → Variables) a `true`
