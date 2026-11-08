@@ -10,7 +10,9 @@ import com.andres.pillremind.data.utils.copyImageToInternalStorage
 import com.andres.pillremind.domain.model.BloodType
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.model.Sex
+import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
+import com.andres.pillremind.notifications.IntakeNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -37,12 +39,16 @@ import java.time.LocalDateTime
  * @property profileRepository Repositorio de perfiles.
  * @property sessionManager Gestor de sesión con el perfil activo.
  * @property reminderScheduler Coordinador de alarmas de recordatorio.
+ * @property intakeRepository Repositorio de tomas, usado para localizar sus notificaciones.
+ * @property intakeNotifications Cancela las notificaciones de las tomas del perfil.
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val sessionManager: SessionManager,
     private val reminderScheduler: ReminderScheduler,
+    private val intakeRepository: IntakeRepository,
+    private val intakeNotifications: IntakeNotifications,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -108,6 +114,11 @@ class ProfileViewModel @Inject constructor(
      */
     fun deleteProfile(profile: Profile, onDeleted: () -> Unit = {}) {
         viewModelScope.launch {
+            // Guardar los IDs antes de que Room borre las tomas en cascada.
+            val intakeIds = runCatching {
+                intakeRepository.getIntakeIdsByProfileId(profile.id)
+            }.getOrDefault(emptyList())
+
             // Cancelar las alarmas antes de que Room borre las tomas en cascada.
             runCatching { reminderScheduler.cancelFutureForProfile(profile.id) }
                 .onFailure {
@@ -120,6 +131,7 @@ class ProfileViewModel @Inject constructor(
 
             profile.urlImagen?.let { File(it).delete() }
             profileRepository.deleteProfile(profile)
+            intakeNotifications.cancelAll(intakeIds)
 
             // Solo se limpia la sesión si el perfil borrado era el activo.
             if (sessionManager.activeProfileId.firstOrNull() == profile.id) {

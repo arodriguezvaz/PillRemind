@@ -57,10 +57,10 @@ interface IntakeDao {
     suspend fun getIntakeById(intakeId: Int): IntakeEntity?
 
     /**
-     * Observa las tomas programadas del dia para un perfil, con datos del medicamento.
+     * Observa las tomas programadas de un día para un perfil, con datos del medicamento.
      *
-     * @param startOfDay Inicio del dia.
-     * @param endOfDay Fin del dia.
+     * @param startOfDay Inicio del día.
+     * @param endOfDay Fin del día.
      * @param profileId ID del perfil propietario.
      * @return Flow con la lista ordenada por fecha programada.
      */
@@ -86,7 +86,7 @@ interface IntakeDao {
     ORDER BY i.scheduledAt
     """
     )
-    fun getIntakesForToday(
+    fun observeIntakesForDay(
         startOfDay: LocalDateTime,
         endOfDay: LocalDateTime,
         profileId: Int
@@ -198,6 +198,34 @@ interface IntakeDao {
         profileId: Int,
         from: LocalDateTime
     ): List<IntakeEntity>
+
+    /**
+     * Devuelve los IDs de todas las tomas de un medicamento.
+     *
+     * Se usa para cancelar las notificaciones asociadas antes de archivar,
+     * editar o borrar el medicamento.
+     *
+     * @param medicationId ID del medicamento.
+     */
+    @Query("SELECT id FROM intakes WHERE medicationId = :medicationId")
+    suspend fun getIntakeIdsByMedicationId(medicationId: Int): List<Int>
+
+    /**
+     * Devuelve los IDs de todas las tomas de un perfil.
+     *
+     * Se usa para cancelar sus notificaciones antes de borrar el perfil y sus
+     * medicamentos en cascada.
+     *
+     * @param profileId ID del perfil propietario.
+     */
+    @Query(
+        """
+    SELECT i.id FROM intakes i
+    JOIN medications m ON m.id = i.medicationId
+    WHERE m.profileId = :profileId
+"""
+    )
+    suspend fun getIntakeIdsByProfileId(profileId: Int): List<Int>
 
     /**
      * Elimina las tomas futuras de un medicamento desde una fecha.

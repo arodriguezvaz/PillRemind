@@ -389,8 +389,10 @@ class IntakeRepositoryImplTest {
     }
 
     @Test
-    fun `getIntakesForToday mapea la proyeccion de Room al dominio`() = runTest {
-        every { intakeDao.getIntakesForToday(any(), any(), any()) } returns flowOf(
+    fun `observeIntakesForDay mapea la proyeccion de Room al dominio`() = runTest {
+        val startOfDay = date.atStartOfDay()
+        val endOfDay = date.atTime(LocalTime.MAX)
+        every { intakeDao.observeIntakesForDay(startOfDay, endOfDay, 1) } returns flowOf(
             listOf(
                 IntakeWithMedicationRow(
                     intakeId = 99,
@@ -407,13 +409,16 @@ class IntakeRepositoryImplTest {
             )
         )
 
-        val result = repository.getIntakesForToday(date, 1).first()
+        val result = repository.observeIntakesForDay(1, date).first()
 
         assertEquals(1, result.size)
         assertEquals(99, result.single().intakeId)
         assertEquals(20, result.single().medicationId)
         assertEquals("Ibuprofeno", result.single().medicationName)
         assertEquals("Andres", result.single().profileName)
+        verify(exactly = 1) {
+            intakeDao.observeIntakesForDay(startOfDay, endOfDay, 1)
+        }
     }
 
     @Test
@@ -501,5 +506,19 @@ class IntakeRepositoryImplTest {
         repository.observeHistoryIntakes(1, null, to).first()
 
         verify(exactly = 1) { intakeDao.observeHistoryIntakes(1, null, to) }
+    }
+
+    @Test
+    fun `getIntakeIdsByMedicationId delega en el DAO`() = runTest {
+        coEvery { intakeDao.getIntakeIdsByMedicationId(20) } returns listOf(1, 2, 3)
+
+        assertEquals(listOf(1, 2, 3), repository.getIntakeIdsByMedicationId(20))
+    }
+
+    @Test
+    fun `getIntakeIdsByProfileId delega en el DAO`() = runTest {
+        coEvery { intakeDao.getIntakeIdsByProfileId(1) } returns listOf(4, 5)
+
+        assertEquals(listOf(4, 5), repository.getIntakeIdsByProfileId(1))
     }
 }

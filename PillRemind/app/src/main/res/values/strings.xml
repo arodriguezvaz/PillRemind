@@ -67,6 +67,10 @@
     <string name="home_title_today">Hoy, %1$s</string>
     <string name="home_date_pattern">d \'de\' MMMM</string>
     <string name="home_empty_today">No hay medicamentos para tomar hoy</string>
+    <plurals name="home_pending_yesterday_notice">
+        <item quantity="one">Tienes %1$d toma pendiente de ayer</item>
+        <item quantity="other">Tienes %1$d tomas pendientes de ayer</item>
+    </plurals>
 
     <!-- Perfil -->
     <string name="profiles_title">Perfiles</string>

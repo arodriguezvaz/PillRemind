@@ -15,6 +15,7 @@ import com.andres.pillremind.domain.model.nextIntake
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
+import com.andres.pillremind.notifications.IntakeNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -41,6 +42,8 @@ import java.time.LocalTime
  * @param medicationRepository Repositorio para operaciones CRUD sobre medicaciones.
  * @param scheduleRepository Repositorio para los horarios asociados a medicamentos.
  * @param reminderScheduler Coordina la generación de tomas y la programación de alarmas.
+ * @param intakeRepository Repositorio de tomas, usado para localizar sus notificaciones.
+ * @param intakeNotifications Cancela las notificaciones de las tomas afectadas.
  * @param sessionManager Gestor de sesión que expone el perfil activo.
  */
 @HiltViewModel
@@ -50,6 +53,7 @@ class MedicationViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val reminderScheduler: ReminderScheduler,
     private val intakeRepository: IntakeRepository,
+    private val intakeNotifications: IntakeNotifications,
     sessionManager: SessionManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -193,6 +197,7 @@ class MedicationViewModel @Inject constructor(
             val futureIntakeIds = intakeRepository
                 .getFutureIntakesByMedicationId(id, now)
                 .map { it.id }
+            val intakeIds = intakeRepository.getIntakeIdsByMedicationId(id)
 
             val updatedMedication = currentMedication.copy(
                 name = trimmedName,
@@ -219,6 +224,7 @@ class MedicationViewModel @Inject constructor(
             if (!saved) return@launch
 
             reminderScheduler.cancelAlarms(futureIntakeIds)
+            intakeNotifications.cancelAll(intakeIds)
             runCatching { reminderScheduler.generateWindow() }
                 .onFailure {
                     Log.e("PillDebug", "No se pudieron regenerar las tomas al editar", it)
@@ -242,6 +248,7 @@ class MedicationViewModel @Inject constructor(
             val futureIntakeIds = intakeRepository
                 .getFutureIntakesByMedicationId(medication.id, now)
                 .map { it.id }
+            val intakeIds = intakeRepository.getIntakeIdsByMedicationId(medication.id)
 
             val archived = runCatching {
                 medicationRepository.softDeleteMedication(
@@ -256,6 +263,7 @@ class MedicationViewModel @Inject constructor(
             if (!archived) return@launch
 
             reminderScheduler.cancelAlarms(futureIntakeIds)
+            intakeNotifications.cancelAll(intakeIds)
             onArchived()
         }
     }
@@ -306,6 +314,7 @@ class MedicationViewModel @Inject constructor(
             val futureIntakeIds = intakeRepository
                 .getFutureIntakesByMedicationId(medication.id, now)
                 .map { it.id }
+            val intakeIds = intakeRepository.getIntakeIdsByMedicationId(medication.id)
 
             val deleted = runCatching {
                 medicationRepository.deleteMedication(medication)
@@ -322,6 +331,7 @@ class MedicationViewModel @Inject constructor(
                     }
             }
             reminderScheduler.cancelAlarms(futureIntakeIds)
+            intakeNotifications.cancelAll(intakeIds)
             onDeleted()
         }
     }

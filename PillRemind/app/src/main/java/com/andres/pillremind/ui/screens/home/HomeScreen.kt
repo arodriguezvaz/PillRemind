@@ -9,11 +9,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -23,11 +29,16 @@ import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.visualState
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.IntakeCard
+import com.andres.pillremind.ui.components.history.HistoryDayHeader
 import com.andres.pillremind.ui.components.statistics.StatisticsBanner
 import com.andres.pillremind.ui.theme.AppSpacing
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+
+private const val CLOCK_TICK_MILLIS = 60_000L
 
 /**
  * Título de la top bar de la pantalla de inicio, con la fecha del día.
@@ -37,7 +48,15 @@ import java.util.Locale
  */
 @Composable
 fun homeTopBarTitle(): String {
-    val today = LocalDate.now()
+    var today by remember { mutableStateOf(LocalDate.now()) }
+
+    LaunchedEffect(Unit) {
+        while (isActive) {
+            delay(CLOCK_TICK_MILLIS)
+            today = LocalDate.now()
+        }
+    }
+
     val datePattern = stringResource(R.string.home_date_pattern)
     val formattedDate = remember(today, datePattern) {
         today.format(DateTimeFormatter.ofPattern(datePattern, Locale.forLanguageTag("es")))
@@ -60,11 +79,22 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
+    val now by homeViewModel.now.collectAsStateWithLifecycle()
     val todayIntakes by homeViewModel.todayIntakes.collectAsStateWithLifecycle()
+    val yesterdayIntakes by homeViewModel.yesterdayIntakes.collectAsStateWithLifecycle()
     val weeklySummary by homeViewModel.weeklySummary.collectAsStateWithLifecycle()
+    val pendingYesterdayCount = yesterdayIntakes.count { it.takenAt == null }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         homeViewModel.refreshNow()
+    }
+
+    LaunchedEffect(homeViewModel) {
+        homeViewModel.refreshNow()
+        while (isActive) {
+            delay(CLOCK_TICK_MILLIS)
+            homeViewModel.refreshNow()
+        }
     }
 
     Column(
@@ -83,7 +113,19 @@ fun HomeScreen(
                 )
             }
 
-        if (todayIntakes.isEmpty()) {
+        if (pendingYesterdayCount > 0) {
+            Text(
+                text = pluralStringResource(
+                    R.plurals.home_pending_yesterday_notice,
+                    pendingYesterdayCount,
+                    pendingYesterdayCount
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        if (todayIntakes.isEmpty() && yesterdayIntakes.isEmpty()) {
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -104,11 +146,33 @@ fun HomeScreen(
                 ) { intake ->
                     IntakeCard(
                         intake = intake,
-                        visualState = intake.visualState(),
+                        visualState = intake.visualState(now),
                         onTake = {
                             homeViewModel.tomarIntake(intake)
                         }
                     )
+                }
+
+                if (yesterdayIntakes.isNotEmpty()) {
+                    item(key = "yesterday-header") {
+                        HistoryDayHeader(
+                            date = now.toLocalDate().minusDays(1),
+                            today = now.toLocalDate()
+                        )
+                    }
+
+                    items(
+                        items = yesterdayIntakes,
+                        key = { it.intakeId }
+                    ) { intake ->
+                        IntakeCard(
+                            intake = intake,
+                            visualState = intake.visualState(now),
+                            onTake = {
+                                homeViewModel.tomarIntake(intake)
+                            }
+                        )
+                    }
                 }
             }
         }

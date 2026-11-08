@@ -22,11 +22,14 @@ interface IntakeRepository {
     suspend fun getIntakeById(intakeId: Int): Intake?
 
     /**
-     * Obtiene todas las tomas de un perfil para hoy
+     * Observa todas las tomas de un perfil para el día indicado.
+     *
+     * @param profileId ID del perfil propietario.
+     * @param date Día del que se obtienen las tomas.
      */
-    fun getIntakesForToday(
-        today: LocalDate,
-        profileId: Int
+    fun observeIntakesForDay(
+        profileId: Int,
+        date: LocalDate
     ): Flow<List<IntakeWithMedication>>
 
     /**
@@ -61,6 +64,24 @@ interface IntakeRepository {
      * @param date a partir de la que obtener las tomas
      */
     suspend fun getFutureIntakesByProfileId(profileId: Int, date: LocalDateTime): List<Intake>
+
+    /**
+     * Obtiene los IDs de todas las tomas de un medicamento.
+     *
+     * Se usa para cancelar sus notificaciones al archivar, editar o borrar.
+     *
+     * @param medicationId ID de la medicación.
+     */
+    suspend fun getIntakeIdsByMedicationId(medicationId: Int): List<Int>
+
+    /**
+     * Obtiene los IDs de todas las tomas de un perfil.
+     *
+     * Se usa para cancelar sus notificaciones antes de borrar el perfil.
+     *
+     * @param profileId ID del perfil.
+     */
+    suspend fun getIntakeIdsByProfileId(profileId: Int): List<Int>
 
     /**
      * Observa las tomas de un perfil dentro de un rango para calcular
