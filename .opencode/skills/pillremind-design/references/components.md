@@ -51,6 +51,11 @@ AppFab(onClick, modifier, content)
 
 ## Campos y formularios
 
+Los textos de ayuda (placeholder) de los campos usan `appFieldPlaceholderColor()`
+(`FieldColors.kt`): `onSurface` al 38 %, el mismo tono que el marcador de
+posición de `AppDatePickerField`. No dejes que un campo herede el placeholder
+por defecto de Material 3 (`onSurfaceVariant`), que se ve más oscuro.
+
 ### `AppTextField` (`AppTextField.kt`)
 
 ```kotlin
@@ -105,8 +110,9 @@ AppFormActions(
 - Se coloca al final del formulario, dentro del contenido desplazable.
 - La acción principal es un `AppButton` `Large` que ocupa el ancho disponible.
 - La acción secundaria es un cuadrado con icono a la derecha; úsala para
-  acciones destructivas o de cierre, con `secondaryContentColor = error` si
-  corresponde.
+  acciones secundarias o destructivas. Reserva `secondaryContentColor = error`
+  para las destructivas (borrar); archivar, desarchivar o cerrar usan el
+  `primary` por defecto.
 - `supportingText` avisa de campos pendientes; usa `bodySmall` y
   `onSurfaceVariant`.
 - No inventes una fila de botones propia para guardar/editar/eliminar.
@@ -118,7 +124,8 @@ AppDropdownField(value, options, onOptionSelected, modifier, placeholder, enable
 ```
 
 - `Surface` con `shapes.medium`, `AppElevation` y `surface`.
-- `TextField` de solo lectura y menú desplegable.
+- `TextField` de solo lectura y menú desplegable; placeholder con
+  `appFieldPlaceholderColor()`.
 
 ### `AppDatePickerField` (`AppDatePicker.kt`)
 

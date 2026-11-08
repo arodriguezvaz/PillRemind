@@ -77,6 +77,9 @@ fun AppDropdownField(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
+                    focusedPlaceholderColor = appFieldPlaceholderColor(),
+                    unfocusedPlaceholderColor = appFieldPlaceholderColor(),
+                    disabledPlaceholderColor = appFieldPlaceholderColor(),
                 ),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier

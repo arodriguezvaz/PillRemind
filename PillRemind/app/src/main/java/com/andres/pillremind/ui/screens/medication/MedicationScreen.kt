@@ -899,7 +899,6 @@ private fun MedicationViewContent(
                 onPrimaryClick = onEditClick,
                 secondaryIcon = Icons.Rounded.Archive,
                 secondaryContentDescription = stringResource(R.string.medication_archive),
-                secondaryContentColor = MaterialTheme.colorScheme.error,
                 onSecondaryClick = onArchiveClick,
             )
         },
