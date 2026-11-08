@@ -8,3 +8,7 @@ Producto: reverso de Tritace 5 mg (ramipril), envase polaco, DataMatrix FMD sin 
 tritab_ean_no_es.jpg
 Foto del usuario (Tritab Azitromicina 200 mg/5 ml, Paraguay/Argentina).
 EAN-13 sin CN español; se usa como caso negativo real.
+
+Fotos del usuario (WhatsApp 2026-11-08):
+wa_01_cn215936.jpeg, wa_02_datamatrix_pc.jpeg, wa_04_nasonex_cn663526.jpeg,
+wa_05_cn722321.jpeg, wa_06_ryaltris_ntin.jpeg, wa_07_cn205642.jpeg

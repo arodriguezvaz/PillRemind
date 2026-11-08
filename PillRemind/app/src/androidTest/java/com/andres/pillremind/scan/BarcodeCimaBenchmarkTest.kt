@@ -2,6 +2,10 @@ package com.andres.pillremind.scan
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -11,6 +15,8 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -106,7 +112,7 @@ class BarcodeCimaBenchmarkTest {
                 }
 
                 val start = System.currentTimeMillis()
-                val barcodes = try {
+                var barcodes = try {
                     Tasks.await(
                         scanner.process(InputImage.fromBitmap(bitmap, 0)),
                         TIMEOUT_SECONDS,
@@ -117,9 +123,21 @@ class BarcodeCimaBenchmarkTest {
                     bitmap.recycle()
                     return@forEach
                 }
+                var inverted = false
+                if (barcodes.isEmpty()) {
+                    val invertedBitmap = invert(bitmap)
+                    barcodes = Tasks.await(
+                        scanner.process(InputImage.fromBitmap(invertedBitmap, 0)),
+                        TIMEOUT_SECONDS,
+                        TimeUnit.SECONDS
+                    )
+                    invertedBitmap.recycle()
+                    inverted = barcodes.isNotEmpty()
+                }
                 val elapsed = System.currentTimeMillis() - start
 
                 val found = JSONArray()
+                var hasCn = false
                 barcodes.forEach { barcode ->
                     val raw = barcode.rawValue.orEmpty()
                     val cn = when (barcode.format) {
@@ -131,16 +149,22 @@ class BarcodeCimaBenchmarkTest {
                         .put("raw", raw)
                         .put("format", formatName(barcode.format))
                         .put("cn", cn ?: JSONObject.NULL)
-                    if (cn != null) entry.put("cima", lookupCima(cn))
+                    if (cn != null) {
+                        hasCn = true
+                        entry.put("cima", lookupCima(cn))
+                    }
                     found.put(entry)
                     Log.i(TAG, "${file.name}: $entry")
                 }
 
+                val ocr = if (!hasCn) runOcr(bitmap) else null
                 results.put(
                     JSONObject()
                         .put("file", file.name)
                         .put("ms", elapsed)
+                        .put("inverted", inverted)
                         .put("barcodes", found)
+                        .put("ocr", ocr ?: JSONObject.NULL)
                 )
                 bitmap.recycle()
             }
@@ -250,6 +274,36 @@ class BarcodeCimaBenchmarkTest {
         Barcode.FORMAT_EAN_13 -> "EAN_13"
         Barcode.FORMAT_DATA_MATRIX -> "DATA_MATRIX"
         else -> "FORMAT_$format"
+    }
+
+    private fun invert(source: Bitmap): Bitmap {
+        val matrix = ColorMatrix(
+            floatArrayOf(
+                -1f, 0f, 0f, 0f, 255f,
+                0f, -1f, 0f, 0f, 255f,
+                0f, 0f, -1f, 0f, 255f,
+                0f, 0f, 0f, 1f, 0f
+            )
+        )
+        val paint = Paint().apply { colorFilter = ColorMatrixColorFilter(matrix) }
+        val result = Bitmap.createBitmap(source.width, source.height, Bitmap.Config.ARGB_8888)
+        Canvas(result).drawBitmap(source, 0f, 0f, paint)
+        return result
+    }
+
+    private fun runOcr(bitmap: Bitmap): String? {
+        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+        return try {
+            Tasks.await(
+                recognizer.process(InputImage.fromBitmap(bitmap, 0)),
+                TIMEOUT_SECONDS,
+                TimeUnit.SECONDS
+            ).text
+        } catch (e: Exception) {
+            null
+        } finally {
+            recognizer.close()
+        }
     }
 
     private fun decodeDownscaled(file: File): Bitmap? {

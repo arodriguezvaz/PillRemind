@@ -2,6 +2,10 @@ package com.andres.pillremind.debug
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -95,6 +99,12 @@ private val testAssets = listOf(
     "ean_cn_000000.png" to "CN 000000 (no existe en CIMA)",
     "tritace_fmd_datamatrix_3.jpg" to "Tritace (DataMatrix FMD, sin CN)",
     "tritab_ean_no_es.jpg" to "Tritab (EAN no español, foto real)",
+    "wa_01_cn215936.jpeg" to "CN 215936 (no está en CIMA)",
+    "wa_02_datamatrix_pc.jpeg" to "Nasonex negro (DataMatrix invertido)",
+    "wa_04_nasonex_cn663526.jpeg" to "Nasonex frontal (CN impreso)",
+    "wa_05_cn722321.jpeg" to "MuCibron (CN 722321)",
+    "wa_06_ryaltris_ntin.jpeg" to "Ryaltris (NTIN 731271)",
+    "wa_07_cn205642.jpeg" to "CN 205642 (no está en CIMA)",
 )
 
 @Composable
@@ -208,6 +218,13 @@ private fun ScanResult(result: ScanUiState.Success) {
         ) {
             Text(result.source, style = MaterialTheme.typography.titleMedium)
             Text("${result.ms} ms", style = MaterialTheme.typography.bodySmall)
+            if (result.inverted) {
+                Text(
+                    "Detectado al invertir la imagen (código blanco sobre negro).",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
 
             Image(
                 bitmap = result.image,
@@ -319,11 +336,22 @@ private fun scan(input: InputStream, source: String): ScanUiState {
     val start = System.currentTimeMillis()
 
     return try {
-        val barcodes = Tasks.await(
+        var barcodes = Tasks.await(
             scanner.process(InputImage.fromBitmap(bitmap, 0)),
             20,
             TimeUnit.SECONDS
         )
+        var inverted = false
+        if (barcodes.isEmpty()) {
+            val invertedBitmap = invert(bitmap)
+            barcodes = Tasks.await(
+                scanner.process(InputImage.fromBitmap(invertedBitmap, 0)),
+                20,
+                TimeUnit.SECONDS
+            )
+            invertedBitmap.recycle()
+            inverted = barcodes.isNotEmpty()
+        }
         val results = barcodes.map { barcode ->
             val raw = barcode.rawValue.orEmpty()
             val cn = when (barcode.format) {
@@ -344,13 +372,29 @@ private fun scan(input: InputStream, source: String): ScanUiState {
             ms = System.currentTimeMillis() - start,
             barcodes = results,
             image = bitmap.asImageBitmap(),
-            ocrText = if (needsOcr) runOcr(bitmap) else null
+            ocrText = if (needsOcr) runOcr(bitmap) else null,
+            inverted = inverted
         )
     } catch (e: Exception) {
         ScanUiState.Error(source, e.message ?: e.javaClass.simpleName)
     } finally {
         scanner.close()
     }
+}
+
+private fun invert(source: Bitmap): Bitmap {
+    val matrix = ColorMatrix(
+        floatArrayOf(
+            -1f, 0f, 0f, 0f, 255f,
+            0f, -1f, 0f, 0f, 255f,
+            0f, 0f, -1f, 0f, 255f,
+            0f, 0f, 0f, 1f, 0f
+        )
+    )
+    val paint = Paint().apply { colorFilter = ColorMatrixColorFilter(matrix) }
+    val result = Bitmap.createBitmap(source.width, source.height, Bitmap.Config.ARGB_8888)
+    Canvas(result).drawBitmap(source, 0f, 0f, paint)
+    return result
 }
 
 private fun runOcr(bitmap: Bitmap): String? {
@@ -479,7 +523,8 @@ private sealed interface ScanUiState {
         val ms: Long,
         val barcodes: List<BarcodeUi>,
         val image: ImageBitmap,
-        val ocrText: String?
+        val ocrText: String?,
+        val inverted: Boolean
     ) : ScanUiState
 
     data class Error(val source: String, val message: String) : ScanUiState
