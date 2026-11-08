@@ -92,13 +92,13 @@ class IntakeRepositoryImpl @Inject constructor(
         return intakeDao.getIntakeById(intakeId)?.toDomain()
     }
 
-    override fun getIntakesForToday(
-        today: LocalDate,
-        profileId: Int
+    override fun observeIntakesForDay(
+        profileId: Int,
+        date: LocalDate
     ): Flow<List<IntakeWithMedication>> {
-        return intakeDao.getIntakesForToday(
-            today.atStartOfDay(),
-            today.atTime(LocalTime.MAX),
+        return intakeDao.observeIntakesForDay(
+            date.atStartOfDay(),
+            date.atTime(LocalTime.MAX),
             profileId
         ).map { rows -> rows.map { it.toDomain() } }
     }
@@ -126,6 +126,14 @@ class IntakeRepositoryImpl @Inject constructor(
         date: LocalDateTime
     ): List<Intake> {
         return intakeDao.getFutureIntakesByProfileId(profileId, date).map { it.toDomain() }
+    }
+
+    override suspend fun getIntakeIdsByMedicationId(medicationId: Int): List<Int> {
+        return intakeDao.getIntakeIdsByMedicationId(medicationId)
+    }
+
+    override suspend fun getIntakeIdsByProfileId(profileId: Int): List<Int> {
+        return intakeDao.getIntakeIdsByProfileId(profileId)
     }
 
     override fun observeStatisticsIntakes(

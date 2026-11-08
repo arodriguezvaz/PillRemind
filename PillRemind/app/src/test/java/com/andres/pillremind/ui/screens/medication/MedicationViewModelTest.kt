@@ -8,6 +8,7 @@ import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
+import com.andres.pillremind.notifications.IntakeNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -42,6 +43,7 @@ class MedicationViewModelTest {
     private val scheduleRepository = mockk<ScheduleRepository>(relaxed = true)
     private val intakeRepository = mockk<IntakeRepository>()
     private val reminderScheduler = mockk<ReminderScheduler>(relaxed = true)
+    private val intakeNotifications = mockk<IntakeNotifications>(relaxed = true)
     private val sessionManager = mockk<SessionManager>(relaxed = true)
     private val context = mockk<Context>(relaxed = true)
 
@@ -69,6 +71,7 @@ class MedicationViewModelTest {
             scheduleRepository = scheduleRepository,
             reminderScheduler = reminderScheduler,
             intakeRepository = intakeRepository,
+            intakeNotifications = intakeNotifications,
             sessionManager = sessionManager,
             context = context,
         )
@@ -103,6 +106,8 @@ class MedicationViewModelTest {
         coEvery {
             intakeRepository.getFutureIntakesByMedicationId(medication.id, any())
         } returns listOf(futureIntake)
+        coEvery { intakeRepository.getIntakeIdsByMedicationId(medication.id) } returns
+            listOf(5, futureIntake.id)
         coEvery { medicationRepository.deleteMedication(medicationWithImage) } just Runs
         var deleted = false
 
@@ -110,7 +115,75 @@ class MedicationViewModelTest {
 
         coVerify { medicationRepository.deleteMedication(medicationWithImage) }
         verify { reminderScheduler.cancelAlarms(listOf(futureIntake.id)) }
+        coVerify { intakeNotifications.cancelAll(listOf(5, futureIntake.id)) }
         assertFalse(image.exists())
         assertTrue(deleted)
+    }
+
+    @Test
+    fun `archiveMedication cancela las alarmas y notificaciones del medicamento`() = runTest {
+        val futureIntake = Intake(
+            id = 7,
+            medicationId = medication.id,
+            scheduledAt = LocalDateTime.now().plusHours(2),
+        )
+        coEvery {
+            intakeRepository.getFutureIntakesByMedicationId(medication.id, any())
+        } returns listOf(futureIntake)
+        coEvery { intakeRepository.getIntakeIdsByMedicationId(medication.id) } returns
+            listOf(5, futureIntake.id)
+        coEvery { medicationRepository.softDeleteMedication(medication.id, any(), any()) } just Runs
+        var archived = false
+
+        viewModel.archiveMedication(medication) { archived = true }
+
+        coVerify { medicationRepository.softDeleteMedication(medication.id, any(), any()) }
+        verify { reminderScheduler.cancelAlarms(listOf(futureIntake.id)) }
+        coVerify { intakeNotifications.cancelAll(listOf(5, futureIntake.id)) }
+        assertTrue(archived)
+    }
+
+    @Test
+    fun `updateMedication cancela las notificaciones anteriores`() = runTest {
+        val editViewModel = MedicationViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("medicationId" to medication.id)),
+            medicationRepository = medicationRepository,
+            scheduleRepository = scheduleRepository,
+            reminderScheduler = reminderScheduler,
+            intakeRepository = intakeRepository,
+            intakeNotifications = intakeNotifications,
+            sessionManager = sessionManager,
+            context = context,
+        )
+        val futureIntake = Intake(
+            id = 7,
+            medicationId = medication.id,
+            scheduledAt = LocalDateTime.now().plusHours(2),
+        )
+        coEvery { medicationRepository.getMedicationByIdOnce(medication.id) } returns medication
+        coEvery {
+            intakeRepository.getFutureIntakesByMedicationId(medication.id, any())
+        } returns listOf(futureIntake)
+        coEvery { intakeRepository.getIntakeIdsByMedicationId(medication.id) } returns
+            listOf(5, futureIntake.id)
+        coEvery {
+            medicationRepository.updateMedicationWithSchedules(any(), any(), any())
+        } just Runs
+        var saved = false
+
+        editViewModel.updateMedication(
+            name = medication.name,
+            dose = medication.dose,
+            unit = medication.unit,
+            startDate = medication.startDate,
+            scheduleRules = emptyList(),
+            times = emptyList(),
+            isChronic = true,
+        ) { saved = true }
+
+        coVerify { medicationRepository.updateMedicationWithSchedules(any(), any(), any()) }
+        verify { reminderScheduler.cancelAlarms(listOf(futureIntake.id)) }
+        coVerify { intakeNotifications.cancelAll(listOf(5, futureIntake.id)) }
+        assertTrue(saved)
     }
 }

@@ -5,7 +5,9 @@ import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.BloodType
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.model.Sex
+import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
+import com.andres.pillremind.notifications.IntakeNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -26,6 +28,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -38,6 +41,8 @@ class ProfileViewModelTest {
     private val profileRepository = mockk<ProfileRepository>(relaxed = true)
     private val sessionManager = mockk<SessionManager>(relaxed = true)
     private val reminderScheduler = mockk<ReminderScheduler>(relaxed = true)
+    private val intakeRepository = mockk<IntakeRepository>()
+    private val intakeNotifications = mockk<IntakeNotifications>(relaxed = true)
     private val context = mockk<Context>(relaxed = true)
 
     private lateinit var viewModel: ProfileViewModel
@@ -55,6 +60,8 @@ class ProfileViewModelTest {
             profileRepository = profileRepository,
             sessionManager = sessionManager,
             reminderScheduler = reminderScheduler,
+            intakeRepository = intakeRepository,
+            intakeNotifications = intakeNotifications,
             context = context
         )
     }
@@ -120,5 +127,21 @@ class ProfileViewModelTest {
         assertNull(updated.captured.allergies)
         assertEquals("Asma", updated.captured.medicalNotes)
         assertNull(updated.captured.healthCardNumber)
+    }
+
+    @Test
+    fun `deleteProfile cancela las alarmas y notificaciones del perfil`() = runTest {
+        val profile = Profile(id = profileId, usuarioId = userId, name = "Ana")
+        coEvery { intakeRepository.getIntakeIdsByProfileId(profileId) } returns listOf(11, 12)
+        coEvery { reminderScheduler.cancelFutureForProfile(profileId) } returns Unit
+        coEvery { profileRepository.deleteProfile(profile) } just Runs
+        var deleted = false
+
+        viewModel.deleteProfile(profile) { deleted = true }
+
+        coVerify { profileRepository.deleteProfile(profile) }
+        coVerify { reminderScheduler.cancelFutureForProfile(profileId, any()) }
+        coVerify { intakeNotifications.cancelAll(listOf(11, 12)) }
+        assertTrue(deleted)
     }
 }

@@ -1,7 +1,11 @@
 package com.andres.pillremind.data.repository
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import androidx.core.app.NotificationCompat
 import androidx.room.Room
+import com.andres.pillremind.R
 import com.andres.pillremind.data.backup.BackupArchive
 import com.andres.pillremind.data.backup.BackupCrypto
 import com.andres.pillremind.data.backup.BackupException
@@ -15,6 +19,8 @@ import com.andres.pillremind.data.local.entity.UserEntity
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.ScheduleType
 import com.andres.pillremind.domain.model.WeekDay
+import com.andres.pillremind.notifications.IntakeNotifications
+import com.andres.pillremind.notifications.NotificationChannels
 import com.andres.pillremind.notifications.ReminderScheduler
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -42,6 +48,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
 /**
@@ -56,6 +63,8 @@ class BackupRepositoryImplTest {
     private lateinit var database: AppDatabase
     private lateinit var sessionManager: SessionManager
     private lateinit var reminderScheduler: ReminderScheduler
+    private lateinit var intakeNotifications: IntakeNotifications
+    private lateinit var notificationManager: NotificationManager
     private lateinit var repository: BackupRepositoryImpl
 
     private val now = LocalDateTime.of(2026, 10, 31, 12, 0)
@@ -72,12 +81,22 @@ class BackupRepositoryImplTest {
         reminderScheduler = mockk(relaxed = true)
         coEvery { reminderScheduler.generateWindow(any(), any()) } returns emptyList()
         every { reminderScheduler.cancelAlarms(any()) } just Runs
+        intakeNotifications = IntakeNotifications(context)
+        notificationManager = context.getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(
+            NotificationChannel(
+                NotificationChannels.REMINDERS,
+                "Recordatorios",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+        )
         repository = BackupRepositoryImpl(
             database = database,
             backupDao = database.backupDao(),
             imageStore = BackupImageStore(context),
             sessionManager = sessionManager,
             reminderScheduler = reminderScheduler,
+            intakeNotifications = intakeNotifications,
             context = context
         )
     }
@@ -98,6 +117,7 @@ class BackupRepositoryImplTest {
         val currentProfile = database.backupDao().getProfilesOnce().first()
         database.profileDao().updateProfile(currentProfile.copy(name = "Nombre cambiado"))
         sessionManager.setActiveProfile(seeded.profileId)
+        postNotification(intakeId = 777)
 
         repository.importFrom(
             input = ByteArrayInputStream(exported.toByteArray()),
@@ -127,6 +147,7 @@ class BackupRepositoryImplTest {
         assertNull(sessionManager.lastGeneratedDate.first())
         coVerify(exactly = 1) { reminderScheduler.generateWindow(any(), any()) }
         verify(exactly = 1) { reminderScheduler.cancelAlarms(any()) }
+        assertEquals(0, shadowOf(notificationManager).size())
     }
 
     @Test
@@ -348,6 +369,16 @@ class BackupRepositoryImplTest {
             profileId = profileId,
             medicationId = medicationId,
             imagePath = imageFile.absolutePath
+        )
+    }
+
+    private fun postNotification(intakeId: Int) {
+        notificationManager.notify(
+            intakeId,
+            NotificationCompat.Builder(context, NotificationChannels.REMINDERS)
+                .setSmallIcon(R.drawable.ic_pill)
+                .setContentTitle("Recordatorio")
+                .build()
         )
     }
 

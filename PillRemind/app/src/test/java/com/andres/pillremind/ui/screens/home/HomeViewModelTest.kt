@@ -5,18 +5,23 @@ import com.andres.pillremind.domain.model.IntakeWithMedication
 import com.andres.pillremind.domain.model.StatisticsIntake
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
+import com.andres.pillremind.notifications.IntakeNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import java.time.LocalDateTime
 import java.time.LocalTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -39,6 +44,7 @@ class HomeViewModelTest {
     private val intakeRepository = mockk<IntakeRepository>()
     private val sessionManager = mockk<SessionManager>(relaxed = true)
     private val reminderScheduler = mockk<ReminderScheduler>(relaxed = true)
+    private val intakeNotifications = mockk<IntakeNotifications>(relaxed = true)
 
     private lateinit var viewModel: HomeViewModel
 
@@ -47,7 +53,12 @@ class HomeViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         coEvery { reminderScheduler.generateWindow(any(), any()) } returns emptyList()
         every { sessionManager.activeProfileId } returns flowOf(1)
-        every { intakeRepository.getIntakesForToday(any(), 1) } returns flowOf(emptyList())
+        every {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate())
+        } returns flowOf(emptyList())
+        every {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate().minusDays(1))
+        } returns flowOf(emptyList())
         every { intakeRepository.observeStatisticsIntakes(1, any(), any()) } returns flowOf(
             listOf(
                 intake(id = 1, scheduledAt = now.minusHours(2), takenAt = now.minusHours(2)),
@@ -55,12 +66,7 @@ class HomeViewModelTest {
                 intake(id = 3, scheduledAt = now.minusMinutes(30))
             )
         )
-        viewModel = HomeViewModel(
-            profileRepository = profileRepository,
-            intakeRepository = intakeRepository,
-            sessionManager = sessionManager,
-            reminderScheduler = reminderScheduler
-        )
+        viewModel = createViewModel()
         viewModel.refreshNow(now)
     }
 
@@ -107,6 +113,153 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `las tomas de hoy se consultan con la fecha de referencia`() = runTest {
+        val todayIntake = intakeWithMedication(id = 7, scheduledAt = now)
+        every {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate())
+        } returns flowOf(listOf(todayIntake))
+
+        val result = viewModel.todayIntakes.first { it.isNotEmpty() }
+
+        assertEquals(7, result.single().intakeId)
+        io.mockk.verify {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate())
+        }
+    }
+
+    @Test
+    fun `las tomas de ayer incluyen pendientes y tomadas de madrugada`() = runTest {
+        val yesterday = now.toLocalDate().minusDays(1)
+        val pending = intakeWithMedication(
+            id = 10,
+            scheduledAt = yesterday.atTime(23, 0)
+        )
+        val takenOnTime = intakeWithMedication(
+            id = 11,
+            scheduledAt = yesterday.atTime(9, 0),
+            takenAt = yesterday.atTime(9, 5)
+        )
+        val takenAfterMidnight = intakeWithMedication(
+            id = 12,
+            scheduledAt = yesterday.atTime(23, 30),
+            takenAt = now.toLocalDate().atTime(0, 25)
+        )
+        every {
+            intakeRepository.observeIntakesForDay(1, yesterday)
+        } returns flowOf(listOf(pending, takenOnTime, takenAfterMidnight))
+
+        val result = viewModel.yesterdayIntakes.first { it.isNotEmpty() }
+
+        assertEquals(listOf(10, 12), result.map { it.intakeId })
+    }
+
+    @Test
+    fun `refreshNow cambia el dia consultado`() = runTest {
+        val nextDay = now.toLocalDate().plusDays(1)
+        every {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate())
+        } returns flowOf(listOf(intakeWithMedication(id = 1)))
+        every {
+            intakeRepository.observeIntakesForDay(1, nextDay)
+        } returns flowOf(listOf(intakeWithMedication(id = 2)))
+        viewModel.todayIntakes.first { it.isNotEmpty() }
+
+        viewModel.refreshNow(now.plusDays(1))
+
+        val result = viewModel.todayIntakes.first { it.singleOrNull()?.intakeId == 2 }
+        assertEquals(2, result.single().intakeId)
+    }
+
+    @Test
+    fun `refreshNow actualiza el momento y consulta el ayer del nuevo dia`() = runTest {
+        val nextDay = now.toLocalDate().plusDays(1)
+        val pendingFromNow = intakeWithMedication(
+            id = 21,
+            scheduledAt = now.toLocalDate().atTime(23, 0)
+        )
+        every {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate())
+        } returns flowOf(listOf(pendingFromNow))
+        every {
+            intakeRepository.observeIntakesForDay(1, nextDay)
+        } returns flowOf(emptyList())
+        every {
+            intakeRepository.observeIntakesForDay(1, nextDay.minusDays(1))
+        } returns flowOf(listOf(pendingFromNow))
+
+        viewModel.refreshNow(now.plusDays(1))
+
+        assertEquals(now.plusDays(1), viewModel.now.value)
+        val yesterday = viewModel.yesterdayIntakes.first { list ->
+            list.any { it.intakeId == 21 }
+        }
+        assertEquals(listOf(21), yesterday.map { it.intakeId })
+    }
+
+    @Test
+    fun `refreshNow en el mismo dia no vuelve a consultar las tomas`() = runTest {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.todayIntakes.collect()
+        }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.yesterdayIntakes.collect()
+        }
+
+        viewModel.refreshNow(now.plusHours(1))
+
+        io.mockk.verify(exactly = 1) {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate())
+        }
+        io.mockk.verify(exactly = 1) {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate().minusDays(1))
+        }
+    }
+
+    @Test
+    fun `cambiar de perfil vuelve a consultar hoy y ayer sin mezclar`() = runTest {
+        val activeProfile = MutableStateFlow<Int?>(1)
+        every { sessionManager.activeProfileId } returns activeProfile
+        every {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate())
+        } returns flowOf(listOf(intakeWithMedication(id = 101, scheduledAt = now)))
+        every {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate().minusDays(1))
+        } returns flowOf(
+            listOf(intakeWithMedication(id = 102, scheduledAt = now.minusDays(1)))
+        )
+        every {
+            intakeRepository.observeIntakesForDay(2, now.toLocalDate())
+        } returns flowOf(listOf(intakeWithMedication(id = 201, scheduledAt = now)))
+        every {
+            intakeRepository.observeIntakesForDay(2, now.toLocalDate().minusDays(1))
+        } returns flowOf(emptyList())
+        val switchedViewModel = createViewModel()
+        switchedViewModel.refreshNow(now)
+
+        assertEquals(
+            listOf(101),
+            switchedViewModel.todayIntakes.first { it.isNotEmpty() }.map { it.intakeId }
+        )
+        assertEquals(
+            listOf(102),
+            switchedViewModel.yesterdayIntakes.first { it.isNotEmpty() }.map { it.intakeId }
+        )
+
+        activeProfile.value = 2
+
+        assertEquals(
+            listOf(201),
+            switchedViewModel.todayIntakes
+                .first { list -> list.singleOrNull()?.intakeId == 201 }
+                .map { it.intakeId }
+        )
+        val yesterday = switchedViewModel.yesterdayIntakes.first { list ->
+            list.none { it.intakeId == 102 }
+        }
+        assertEquals(emptyList<Int>(), yesterday.map { it.intakeId })
+    }
+
+    @Test
     fun `tomarIntake marca la toma pendiente`() = runTest {
         coEvery { intakeRepository.markTaken(any(), any()) } returns Unit
         val before = LocalDateTime.now()
@@ -118,6 +271,7 @@ class HomeViewModelTest {
         coVerify(exactly = 1) { intakeRepository.markTaken(1, capture(takenAt)) }
         assertTrue(!takenAt.captured.isBefore(before))
         assertTrue(!takenAt.captured.isAfter(after))
+        verify(exactly = 1) { intakeNotifications.cancel(1) }
     }
 
     @Test
@@ -127,13 +281,26 @@ class HomeViewModelTest {
         viewModel.tomarIntake(intakeWithMedication(takenAt = now.minusHours(1)))
 
         coVerify(exactly = 1) { intakeRepository.markTaken(1, null) }
+        verify(exactly = 0) { intakeNotifications.cancel(any()) }
     }
 
-    private fun intakeWithMedication(takenAt: LocalDateTime?): IntakeWithMedication =
+    private fun createViewModel(): HomeViewModel = HomeViewModel(
+        profileRepository = profileRepository,
+        intakeRepository = intakeRepository,
+        sessionManager = sessionManager,
+        reminderScheduler = reminderScheduler,
+        intakeNotifications = intakeNotifications
+    )
+
+    private fun intakeWithMedication(
+        id: Int = 1,
+        scheduledAt: LocalDateTime = now,
+        takenAt: LocalDateTime? = null
+    ): IntakeWithMedication =
         IntakeWithMedication(
-            intakeId = 1,
+            intakeId = id,
             medicationId = 1,
-            scheduledAt = now,
+            scheduledAt = scheduledAt,
             scheduleId = 1,
             takenAt = takenAt,
             medicationName = "Ibuprofeno",
