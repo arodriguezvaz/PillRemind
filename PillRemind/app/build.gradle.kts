@@ -126,6 +126,9 @@ dependencies {
     ksp(libs.androidx.hilt.compiler)
     //COIL
     implementation(libs.coil.compose)
+    // Lector de códigos para el benchmark de la fase 0. Solo en debug: usa el
+    // modelo de Google Play Services y añade ~200 KB al APK.
+    debugImplementation(libs.mlkit.barcode.scanning)
     //TESTING
 //TESTING
     testImplementation(libs.junit)
