@@ -91,6 +91,7 @@ private val testAssets = listOf(
     "ean_non_oss.png" to "EAN no OSS (sin CN)",
     "ean_invalid_check.png" to "EAN con check inválido",
     "ean_cn_000000.png" to "CN 000000 (no existe en CIMA)",
+    "tritace_fmd_datamatrix_3.jpg" to "Tritace (DataMatrix FMD, sin CN)",
 )
 
 @Composable
@@ -168,6 +169,13 @@ private fun CodeScanDemoScreen() {
                 )
                 is ScanUiState.Success -> ScanResult(current)
             }
+
+            Text(
+                "Imágenes de prueba: códigos generados y una foto de Zylla / " +
+                    "Wikimedia Commons (CC BY-SA 4.0).",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -215,7 +223,7 @@ private fun ScanResult(result: ScanUiState.Success) {
                 HorizontalDivider()
                 Text(barcode.format, style = MaterialTheme.typography.labelMedium)
                 Text(
-                    text = barcode.raw,
+                    text = barcode.raw.replace('\u001d', '|'),
                     fontFamily = FontFamily.Monospace,
                     style = MaterialTheme.typography.bodyMedium
                 )
