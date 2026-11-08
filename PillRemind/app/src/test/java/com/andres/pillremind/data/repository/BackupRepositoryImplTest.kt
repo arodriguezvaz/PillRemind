@@ -191,6 +191,22 @@ class BackupRepositoryImplTest {
     }
 
     @Test
+    fun `una importacion con un archivo invalido no cancela las notificaciones visibles`() = runTest {
+        seedDatabase()
+        postNotification(intakeId = 777)
+
+        val result = runCatching {
+            repository.importFrom(
+                input = ByteArrayInputStream(byteArrayOf(0, 1, 2, 3)),
+                password = null
+            )
+        }
+
+        assertTrue(result.isFailure)
+        assertEquals(1, shadowOf(notificationManager).size())
+    }
+
+    @Test
     fun `exporta e importa horarios recurrentes`() = runTest {
         val seeded = seedDatabase()
         database.scheduleDao().insertSchedule(
