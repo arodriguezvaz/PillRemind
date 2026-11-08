@@ -64,7 +64,7 @@ Resumen operativo; los valores completos están en `references/tokens.md`.
 
 | Rol | Uso |
 |---|---|
-| `primary` | Marca, títulos de sección, acción principal, icono activo. Negro en claro, azul cielo en oscuro. |
+| `primary` | Marca, títulos de sección, acción principal, icono activo. Azul profundo en claro, azul cielo en oscuro. |
 | `onPrimary` | Texto e iconos sobre `primary`. |
 | `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado y acción secundaria (`ButtonVariant.Tonal`). |
 | `secondaryContainer` / `onSecondaryContainer` | Solo el estado de una toma ya realizada (`IntakeCard`); no es el botón secundario genérico. |
