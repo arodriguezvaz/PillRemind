@@ -12,6 +12,7 @@ import com.andres.pillremind.notifications.ReminderScheduler
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.coVerifyOrder
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -143,5 +144,21 @@ class ProfileViewModelTest {
         coVerify { reminderScheduler.cancelFutureForProfile(profileId, any()) }
         coVerify { intakeNotifications.cancelAll(listOf(11, 12)) }
         assertTrue(deleted)
+    }
+
+    @Test
+    fun `deleteProfile guarda los IDs antes del borrado y cancela despues`() = runTest {
+        val profile = Profile(id = profileId, usuarioId = userId, name = "Ana")
+        coEvery { intakeRepository.getIntakeIdsByProfileId(profileId) } returns listOf(11, 12)
+        coEvery { reminderScheduler.cancelFutureForProfile(profileId) } returns Unit
+        coEvery { profileRepository.deleteProfile(profile) } just Runs
+
+        viewModel.deleteProfile(profile)
+
+        coVerifyOrder {
+            intakeRepository.getIntakeIdsByProfileId(profileId)
+            profileRepository.deleteProfile(profile)
+            intakeNotifications.cancelAll(listOf(11, 12))
+        }
     }
 }

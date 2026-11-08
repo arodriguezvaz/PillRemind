@@ -80,9 +80,10 @@ fun HomeScreen(
 ) {
 
     val now by homeViewModel.now.collectAsStateWithLifecycle()
-    val todayIntakes by homeViewModel.todayIntakes.collectAsStateWithLifecycle()
-    val yesterdayIntakes by homeViewModel.yesterdayIntakes.collectAsStateWithLifecycle()
+    val intakes by homeViewModel.intakes.collectAsStateWithLifecycle()
     val weeklySummary by homeViewModel.weeklySummary.collectAsStateWithLifecycle()
+    val todayIntakes = intakes.today
+    val yesterdayIntakes = intakes.yesterday
     val pendingYesterdayCount = yesterdayIntakes.count { it.takenAt == null }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {

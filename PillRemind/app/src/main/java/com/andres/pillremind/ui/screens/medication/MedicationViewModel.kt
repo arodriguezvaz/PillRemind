@@ -20,6 +20,7 @@ import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -224,7 +225,7 @@ class MedicationViewModel @Inject constructor(
             if (!saved) return@launch
 
             reminderScheduler.cancelAlarms(futureIntakeIds)
-            intakeNotifications.cancelAll(intakeIds)
+            cancelNotifications(intakeIds)
             runCatching { reminderScheduler.generateWindow() }
                 .onFailure {
                     Log.e("PillDebug", "No se pudieron regenerar las tomas al editar", it)
@@ -263,7 +264,7 @@ class MedicationViewModel @Inject constructor(
             if (!archived) return@launch
 
             reminderScheduler.cancelAlarms(futureIntakeIds)
-            intakeNotifications.cancelAll(intakeIds)
+            cancelNotifications(intakeIds)
             onArchived()
         }
     }
@@ -331,9 +332,24 @@ class MedicationViewModel @Inject constructor(
                     }
             }
             reminderScheduler.cancelAlarms(futureIntakeIds)
-            intakeNotifications.cancelAll(intakeIds)
+            cancelNotifications(intakeIds)
             onDeleted()
         }
+    }
+
+    /**
+     * Cancela las notificaciones sin impedir que termine la operación principal.
+     *
+     * Las notificaciones son un efecto accesorio: si el gestor del sistema
+     * falla, el medicamento ya se ha guardado y la UI debe continuar.
+     */
+    private suspend fun cancelNotifications(intakeIds: List<Int>) {
+        runCatching { intakeNotifications.cancelAll(intakeIds) }
+            .onFailure { error ->
+                // La cancelación del ViewModel no debe tratarse como un fallo recuperable.
+                if (error is CancellationException) throw error
+                Log.w("PillDebug", "No se pudieron cancelar las notificaciones", error)
+            }
     }
 
     private fun buildSchedules(
