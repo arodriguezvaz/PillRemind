@@ -60,6 +60,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Permite instalar la build de debug junto a la app real del móvil,
+            // sin compartir firma ni datos.
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
