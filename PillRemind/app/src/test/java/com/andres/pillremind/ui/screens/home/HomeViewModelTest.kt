@@ -119,7 +119,7 @@ class HomeViewModelTest {
             intakeRepository.observeIntakesForDay(1, now.toLocalDate())
         } returns flowOf(listOf(todayIntake))
 
-        val result = viewModel.todayIntakes.first { it.isNotEmpty() }
+        val result = viewModel.intakes.first { it.today.isNotEmpty() }.today
 
         assertEquals(7, result.single().intakeId)
         io.mockk.verify {
@@ -148,7 +148,7 @@ class HomeViewModelTest {
             intakeRepository.observeIntakesForDay(1, yesterday)
         } returns flowOf(listOf(pending, takenOnTime, takenAfterMidnight))
 
-        val result = viewModel.yesterdayIntakes.first { it.isNotEmpty() }
+        val result = viewModel.intakes.first { it.yesterday.isNotEmpty() }.yesterday
 
         assertEquals(listOf(10, 12), result.map { it.intakeId })
     }
@@ -162,11 +162,13 @@ class HomeViewModelTest {
         every {
             intakeRepository.observeIntakesForDay(1, nextDay)
         } returns flowOf(listOf(intakeWithMedication(id = 2)))
-        viewModel.todayIntakes.first { it.isNotEmpty() }
+        viewModel.intakes.first { it.today.isNotEmpty() }
 
         viewModel.refreshNow(now.plusDays(1))
 
-        val result = viewModel.todayIntakes.first { it.singleOrNull()?.intakeId == 2 }
+        val result = viewModel.intakes
+            .first { it.today.singleOrNull()?.intakeId == 2 }
+            .today
         assertEquals(2, result.single().intakeId)
     }
 
@@ -190,19 +192,16 @@ class HomeViewModelTest {
         viewModel.refreshNow(now.plusDays(1))
 
         assertEquals(now.plusDays(1), viewModel.now.value)
-        val yesterday = viewModel.yesterdayIntakes.first { list ->
-            list.any { it.intakeId == 21 }
-        }
+        val yesterday = viewModel.intakes.first { state ->
+            state.yesterday.any { it.intakeId == 21 }
+        }.yesterday
         assertEquals(listOf(21), yesterday.map { it.intakeId })
     }
 
     @Test
     fun `refreshNow en el mismo dia no vuelve a consultar las tomas`() = runTest {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.todayIntakes.collect()
-        }
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.yesterdayIntakes.collect()
+            viewModel.intakes.collect()
         }
 
         viewModel.refreshNow(now.plusHours(1))
@@ -238,25 +237,47 @@ class HomeViewModelTest {
 
         assertEquals(
             listOf(101),
-            switchedViewModel.todayIntakes.first { it.isNotEmpty() }.map { it.intakeId }
+            switchedViewModel.intakes.first { it.today.isNotEmpty() }.today.map { it.intakeId }
         )
         assertEquals(
             listOf(102),
-            switchedViewModel.yesterdayIntakes.first { it.isNotEmpty() }.map { it.intakeId }
+            switchedViewModel.intakes.first { it.yesterday.isNotEmpty() }
+                .yesterday.map { it.intakeId }
         )
 
         activeProfile.value = 2
 
         assertEquals(
             listOf(201),
-            switchedViewModel.todayIntakes
-                .first { list -> list.singleOrNull()?.intakeId == 201 }
-                .map { it.intakeId }
+            switchedViewModel.intakes
+                .first { state -> state.today.singleOrNull()?.intakeId == 201 }
+                .today.map { it.intakeId }
         )
-        val yesterday = switchedViewModel.yesterdayIntakes.first { list ->
-            list.none { it.intakeId == 102 }
-        }
+        val yesterday = switchedViewModel.intakes.first { state ->
+            state.yesterday.none { it.intakeId == 102 }
+        }.yesterday
         assertEquals(emptyList<Int>(), yesterday.map { it.intakeId })
+    }
+
+    @Test
+    fun `el estado combinado conserva las tomas de hoy que no estan en ayer`() = runTest {
+        val todayA = intakeWithMedication(id = 1, scheduledAt = now)
+        val todayB = intakeWithMedication(id = 2, scheduledAt = now.plusHours(1))
+        val yesterday = intakeWithMedication(
+            id = 3,
+            scheduledAt = now.toLocalDate().minusDays(1).atTime(23, 0)
+        )
+        every {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate())
+        } returns flowOf(listOf(todayA, todayB))
+        every {
+            intakeRepository.observeIntakesForDay(1, now.toLocalDate().minusDays(1))
+        } returns flowOf(listOf(yesterday))
+
+        val state = viewModel.intakes.first { it.today.size == 2 && it.yesterday.isNotEmpty() }
+
+        assertEquals(listOf(1, 2), state.today.map { it.intakeId })
+        assertEquals(listOf(3), state.yesterday.map { it.intakeId })
     }
 
     @Test

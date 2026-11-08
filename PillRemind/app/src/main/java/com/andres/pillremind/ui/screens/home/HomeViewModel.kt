@@ -30,6 +30,20 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 /**
+ * Estado de las tomas visibles en Inicio.
+ *
+ * Agrupa hoy y ayer en un único valor para que la pantalla los actualice de
+ * forma atómica y no pueda pintar la misma toma dos veces al cambiar de día.
+ *
+ * @property today Tomas programadas para el día actual.
+ * @property yesterday Tomas pendientes o tomadas de madrugada del día anterior.
+ */
+data class HomeIntakes(
+    val today: List<IntakeWithMedication> = emptyList(),
+    val yesterday: List<IntakeWithMedication> = emptyList(),
+)
+
+/**
  * ViewModel de la pantalla principal (`HomeScreen`).
  *
  * Expone el perfil activo y la lista de medicamentos del perfil usando flows
@@ -95,7 +109,7 @@ class HomeViewModel @Inject constructor(
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val todayIntakes: StateFlow<List<IntakeWithMedication>> =
+    private val todayIntakesForDay: StateFlow<List<IntakeWithMedication>> =
         combine(profileId.filterNotNull(), today) { id, date -> id to date }
             .flatMapLatest { (id, date) ->
                 intakeRepository.observeIntakesForDay(id, date)
@@ -113,7 +127,7 @@ class HomeViewModel @Inject constructor(
      * el día natural ya haya cambiado.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
-    val yesterdayIntakes: StateFlow<List<IntakeWithMedication>> =
+    private val yesterdayIntakesForDay: StateFlow<List<IntakeWithMedication>> =
         combine(profileId.filterNotNull(), today) { id, date ->
             id to date.minusDays(1)
         }
@@ -126,6 +140,27 @@ class HomeViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = emptyList()
             )
+
+    /**
+     * Tomas que debe mostrar Inicio, resueltas en un único estado.
+     *
+     * Al cambiar de día, las consultas de hoy y de ayer terminan en momentos
+     * distintos. Se combinan aquí para que la pantalla nunca reciba la misma
+     * toma en las dos listas: mientras la consulta del nuevo día no ha emitido,
+     * la toma que ya pertenece a ayer se descuenta de la lista de hoy.
+     */
+    val intakes: StateFlow<HomeIntakes> =
+        combine(todayIntakesForDay, yesterdayIntakesForDay) { today, yesterday ->
+            val yesterdayIds = yesterday.mapTo(HashSet()) { it.intakeId }
+            HomeIntakes(
+                today = today.filterNot { it.intakeId in yesterdayIds },
+                yesterday = yesterday,
+            )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = HomeIntakes()
+        )
 
     /**
      * Resumen de tomas de los últimos siete días para el banner de Inicio.
