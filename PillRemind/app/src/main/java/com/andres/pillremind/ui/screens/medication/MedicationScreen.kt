@@ -143,11 +143,14 @@ fun MedicationScreen(
     onStatisticsClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
-    medicationViewModel: MedicationViewModel = hiltViewModel()
+    medicationViewModel: MedicationViewModel = hiltViewModel(),
+    medicationScanViewModel: MedicationScanViewModel = hiltViewModel()
 ) {
     val medication by medicationViewModel.medication.collectAsState()
     val medicationSchedules by medicationViewModel.schedules.collectAsState()
     val nextIntake by medicationViewModel.nextIntake.collectAsStateWithLifecycle()
+    val scanState by medicationScanViewModel.state.collectAsStateWithLifecycle()
+    var showScanSheet by rememberSaveable { mutableStateOf(false) }
 
     val unitOptions = stringArrayResource(R.array.medication_units).toList()
 
@@ -294,6 +297,13 @@ fun MedicationScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                ScanCtaCard(
+                    onClick = {
+                        medicationScanViewModel.reset()
+                        showScanSheet = true
+                    },
+                    modifier = Modifier.padding(bottom = AppSpacing.md)
+                )
                 //-----IMAGEN
                 AppPhotoPicker(
                     photoUri = selectedPhotoUri,
@@ -454,6 +464,34 @@ fun MedicationScreen(
                     },
                     primaryEnabled = isFormValid,
                     supportingText = missingFieldsMessage,
+                )
+            }
+
+            if (showScanSheet) {
+                MedicationScanSheet(
+                    state = scanState,
+                    onDismiss = {
+                        showScanSheet = false
+                        medicationScanViewModel.reset()
+                    },
+                    onCnChange = medicationScanViewModel::onCnChange,
+                    onCnPhoto = medicationScanViewModel::onCnPhoto,
+                    onSearchCn = medicationScanViewModel::searchCn,
+                    onBoxPhoto = medicationScanViewModel::onBoxPhoto,
+                    onReadBox = medicationScanViewModel::readBox,
+                    onShowBox = medicationScanViewModel::showBoxInput,
+                    onBackToCn = medicationScanViewModel::backToCn,
+                    onGrantConsent = medicationScanViewModel::grantConsent,
+                    onDeclineConsent = medicationScanViewModel::declineConsent,
+                    onApply = { draft, photo ->
+                        name.value = draft.name
+                        dose.value = draft.doseText
+                        unit.value = draft.unit
+                        if (startDate.value == null) startDate.value = LocalDate.now()
+                        if (photo != null) selectedPhotoUri = photo
+                        showScanSheet = false
+                        medicationScanViewModel.reset()
+                    }
                 )
             }
         }

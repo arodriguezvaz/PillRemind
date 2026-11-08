@@ -13,6 +13,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,8 +49,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.domain.code.MedicineCodeParser
+import com.andres.pillremind.ui.screens.medication.MedicationScanSheet
+import com.andres.pillremind.ui.screens.medication.MedicationScanViewModel
 import com.andres.pillremind.ui.theme.PillRemindTheme
+import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -77,13 +82,16 @@ import org.json.JSONObject
  * Los PNG de `app/src/debug/assets/barcodes` son una copia de los de
  * `app/src/androidTest/assets/barcodes`; mantén ambos sincronizados.
  */
+@AndroidEntryPoint
 class CodeScanDemoActivity : ComponentActivity() {
+
+    private val scanViewModel: MedicationScanViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             PillRemindTheme {
-                CodeScanDemoScreen()
+                CodeScanDemoScreen(scanViewModel)
             }
         }
     }
@@ -108,10 +116,13 @@ private val testAssets = listOf(
 )
 
 @Composable
-private fun CodeScanDemoScreen() {
+private fun CodeScanDemoScreen(scanViewModel: MedicationScanViewModel) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<ScanUiState>(ScanUiState.Idle) }
+    val scanState by scanViewModel.state.collectAsStateWithLifecycle()
+    var showScanSheet by remember { mutableStateOf(false) }
+    var applied by remember { mutableStateOf<String?>(null) }
 
     val picker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
@@ -142,6 +153,22 @@ private fun CodeScanDemoScreen() {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
+            Button(
+                onClick = {
+                    scanViewModel.reset()
+                    showScanSheet = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Probar escaneo de CN del formulario")
+            }
+            if (applied != null) {
+                Text(
+                    "Aplicado: $applied",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
             Text("Códigos de prueba", style = MaterialTheme.typography.titleMedium)
             testAssets.forEach { (file, label) ->
@@ -190,6 +217,30 @@ private fun CodeScanDemoScreen() {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+
+    if (showScanSheet) {
+        MedicationScanSheet(
+            state = scanState,
+            onDismiss = {
+                showScanSheet = false
+                scanViewModel.reset()
+            },
+            onCnChange = scanViewModel::onCnChange,
+            onCnPhoto = scanViewModel::onCnPhoto,
+            onSearchCn = scanViewModel::searchCn,
+            onBoxPhoto = scanViewModel::onBoxPhoto,
+            onReadBox = scanViewModel::readBox,
+            onShowBox = scanViewModel::showBoxInput,
+            onBackToCn = scanViewModel::backToCn,
+            onGrantConsent = scanViewModel::grantConsent,
+            onDeclineConsent = scanViewModel::declineConsent,
+            onApply = { draft, _ ->
+                applied = "${draft.name} · ${draft.doseText} ${draft.unit}"
+                showScanSheet = false
+                scanViewModel.reset()
+            }
+        )
     }
 }
 
