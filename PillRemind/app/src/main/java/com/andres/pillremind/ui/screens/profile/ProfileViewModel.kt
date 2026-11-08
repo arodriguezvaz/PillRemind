@@ -17,6 +17,7 @@ import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -131,7 +132,16 @@ class ProfileViewModel @Inject constructor(
 
             profile.urlImagen?.let { File(it).delete() }
             profileRepository.deleteProfile(profile)
-            intakeNotifications.cancelAll(intakeIds)
+            runCatching { intakeNotifications.cancelAll(intakeIds) }
+                .onFailure { error ->
+                    // La cancelación del ViewModel no debe tratarse como un fallo recuperable.
+                    if (error is CancellationException) throw error
+                    Log.w(
+                        "PillDebug",
+                        "No se pudieron cancelar las notificaciones del perfil ${profile.id}",
+                        error
+                    )
+                }
 
             // Solo se limpia la sesión si el perfil borrado era el activo.
             if (sessionManager.activeProfileId.firstOrNull() == profile.id) {
