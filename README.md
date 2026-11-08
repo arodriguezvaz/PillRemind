@@ -1,9 +1,20 @@
-# PillRemind
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="doc/img/logo-oscuro.png">
+    <img src="doc/img/logo.png" width="132" alt="Logotipo de PillRemind: una pastilla semirrellena, icono de la app">
+  </picture>
+</p>
 
-[![Última versión](https://img.shields.io/github/v/release/arodriguezvaz/PillRemind?label=versi%C3%B3n&color=2ea44f)](https://github.com/arodriguezvaz/PillRemind/releases/latest)
+<h1 align="center">PillRemind</h1>
 
-Recordatorio de medicación local para Android 8.0 o superior. Sin cuentas, sin
-sincronización y sin nube: los perfiles, medicamentos y tomas se guardan en el móvil.
+<p align="center">
+  <a href="https://github.com/arodriguezvaz/PillRemind/releases/latest"><img src="https://img.shields.io/github/v/release/arodriguezvaz/PillRemind?label=versi%C3%B3n&color=2ea44f" alt="Última versión"></a>
+</p>
+
+<p align="center">
+  Recordatorio de medicación local para Android 8.0 o superior. Sin cuentas, sin
+  sincronización y sin nube: los perfiles, medicamentos y tomas se guardan en el móvil.
+</p>
 
 ## Descarga
 

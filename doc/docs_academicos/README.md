@@ -1,5 +1,1 @@
-# Sobre esta carpeta
-
-## `doc/templates/`
-
-Documentos modelo para elaborar a documentación do proxecto.
+# Este proyecto comenzó como un proyecto de fin de ciclo. Toda la documentación que se encuentra en esta carpeta corresponde a la versión entregada originalmente y se conserva aquí para mantener el trabajo realizado.
