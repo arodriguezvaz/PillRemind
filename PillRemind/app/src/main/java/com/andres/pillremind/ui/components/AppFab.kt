@@ -10,7 +10,7 @@ import com.andres.pillremind.ui.theme.AppElevation
 /**
  * Botón flotante reutilizable de la aplicación.
  *
- * Normaliza el estilo de todos los FAB: fondo con el violeta principal del tema
+ * Normaliza el estilo de todos los FAB: fondo con el color primario del tema
  * y contenido en el color de contraste, de modo que el icono se vea blanco en
  * el tema claro.
  *

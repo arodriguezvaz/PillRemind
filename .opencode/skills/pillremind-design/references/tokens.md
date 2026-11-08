@@ -9,7 +9,7 @@ fuente de verdad: si un valor cambia, actualiza también esta tabla.
 
 | Rol | Uso | Evitar |
 |---|---|---|
-| `primary` | Marca, títulos de sección, acciones principales, icono activo de la barra inferior. Violeta en claro, azul cielo en oscuro. | Usarlo como fondo de bloques grandes de información. |
+| `primary` | Marca, títulos de sección, acciones principales, icono activo de la barra inferior. Azul profundo en claro, azul cielo en oscuro. | Usarlo como fondo de bloques grandes de información. |
 | `onPrimary` | Texto e iconos sobre `primary`. | Texto secundario. |
 | `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, FAB de perfiles, badge de filtros y botón secundario (`ButtonVariant.Tonal`). | Sustituir a `surface` en cards. |
 | `secondary` | Naranja de aviso; hoy se usa sobre todo como base de `secondaryContainer`. | Decoración o texto largo. |
@@ -41,7 +41,7 @@ Reglas:
 
 | Nombre | Hex | Uso |
 |---|---|---|
-| `BrandPurple` | `#32138D` | Púrpura de marca del tema claro. No se usa en oscuro. |
+| `BrandBlue` | `#15325E` | Azul profundo de marca del tema claro. No se usa en oscuro. |
 | `ActionOrange` | `#FF6F00` | Naranja de aviso. |
 | `SuccessGreen` | `#81C784` | Verde de confirmación. |
 | `NeutralGray` | `#5F5F5F` | Texto secundario. |
@@ -57,10 +57,10 @@ estados de las tomas y a los avisos.
 
 | Rol | Hex |
 |---|---|
-| `primary` | `#32138D` |
+| `primary` | `#15325E` |
 | `onPrimary` | `#FFFFFF` |
-| `primaryContainer` | `#EDE7F6` |
-| `onPrimaryContainer` | `#32138D` |
+| `primaryContainer` | `#E1E9F2` |
+| `onPrimaryContainer` | `#102646` |
 | `secondary` | `#FF6F00` |
 | `onSecondary` | `#2B1700` |
 | `secondaryContainer` | `#FFF3E0` |
@@ -84,7 +84,7 @@ estados de las tomas y a los avisos.
 | `scrim` | `#000000` |
 | `inverseSurface` | `#303030` |
 | `inverseOnSurface` | `#F5F5F5` |
-| `inversePrimary` | `#BB9EFF` |
+| `inversePrimary` | `#A9C8FF` |
 | `surfaceDim` | `#DEDEDC` |
 | `surfaceBright` | `#FFFFFF` |
 | `surfaceContainerLowest` | `#FFFFFF` |
