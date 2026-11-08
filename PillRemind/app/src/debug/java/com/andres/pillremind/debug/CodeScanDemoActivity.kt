@@ -51,6 +51,8 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -92,6 +94,7 @@ private val testAssets = listOf(
     "ean_invalid_check.png" to "EAN con check inválido",
     "ean_cn_000000.png" to "CN 000000 (no existe en CIMA)",
     "tritace_fmd_datamatrix_3.jpg" to "Tritace (DataMatrix FMD, sin CN)",
+    "tritab_ean_no_es.jpg" to "Tritab (EAN no español, foto real)",
 )
 
 @Composable
@@ -171,8 +174,8 @@ private fun CodeScanDemoScreen() {
             }
 
             Text(
-                "Imágenes de prueba: códigos generados y una foto de Zylla / " +
-                    "Wikimedia Commons (CC BY-SA 4.0).",
+                "Imágenes de prueba: códigos generados, una foto de Zylla / " +
+                    "Wikimedia Commons (CC BY-SA 4.0) y una foto del usuario.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -253,6 +256,20 @@ private fun ScanResult(result: ScanUiState.Success) {
                     )
                 }
             }
+
+            if (!result.ocrText.isNullOrBlank()) {
+                HorizontalDivider()
+                Text("Texto del envase (OCR)", style = MaterialTheme.typography.titleSmall)
+                Text(
+                    text = result.ocrText.take(800),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    "El código no da CN; el OCR se usaría para rellenar nombre y dosis.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
@@ -321,16 +338,33 @@ private fun scan(input: InputStream, source: String): ScanUiState {
                 cima = cn?.let(::lookupCima)
             )
         }
+        val needsOcr = results.none { it.cn != null }
         ScanUiState.Success(
             source = source,
             ms = System.currentTimeMillis() - start,
             barcodes = results,
-            image = bitmap.asImageBitmap()
+            image = bitmap.asImageBitmap(),
+            ocrText = if (needsOcr) runOcr(bitmap) else null
         )
     } catch (e: Exception) {
         ScanUiState.Error(source, e.message ?: e.javaClass.simpleName)
     } finally {
         scanner.close()
+    }
+}
+
+private fun runOcr(bitmap: Bitmap): String? {
+    val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    return try {
+        Tasks.await(
+            recognizer.process(InputImage.fromBitmap(bitmap, 0)),
+            20,
+            TimeUnit.SECONDS
+        ).text
+    } catch (e: Exception) {
+        null
+    } finally {
+        recognizer.close()
     }
 }
 
@@ -444,7 +478,8 @@ private sealed interface ScanUiState {
         val source: String,
         val ms: Long,
         val barcodes: List<BarcodeUi>,
-        val image: ImageBitmap
+        val image: ImageBitmap,
+        val ocrText: String?
     ) : ScanUiState
 
     data class Error(val source: String, val message: String) : ScanUiState

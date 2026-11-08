@@ -129,6 +129,7 @@ dependencies {
     // Lector de códigos para el benchmark de la fase 0. Solo en debug: usa el
     // modelo de Google Play Services y añade ~200 KB al APK.
     debugImplementation(libs.mlkit.barcode.scanning)
+    debugImplementation(libs.mlkit.text.recognition)
     //TESTING
 //TESTING
     testImplementation(libs.junit)
