@@ -10,7 +10,9 @@ import com.andres.pillremind.data.utils.copyImageToInternalStorage
 import com.andres.pillremind.domain.model.BloodType
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.domain.model.Sex
+import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
+import com.andres.pillremind.notifications.IntakeNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -37,12 +39,16 @@ import java.time.LocalDateTime
  * @property profileRepository Repositorio de perfiles.
  * @property sessionManager Gestor de sesión con el perfil activo.
  * @property reminderScheduler Coordinador de alarmas de recordatorio.
+ * @property intakeRepository Repositorio de tomas, usado para localizar sus notificaciones.
+ * @property intakeNotifications Cancela las notificaciones de las tomas del perfil.
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val sessionManager: SessionManager,
     private val reminderScheduler: ReminderScheduler,
+    private val intakeRepository: IntakeRepository,
+    private val intakeNotifications: IntakeNotifications,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -76,12 +82,12 @@ class ProfileViewModel @Inject constructor(
         onSaved: () -> Unit = {}
     ) {
         val trimmedNombre = nombre.trim()
-        val imagePath = photoUri?.let {
-            copyImageToInternalStorage(context, it)
-        }
         if (trimmedNombre.isNotEmpty()) {
             viewModelScope.launch {
                 val userId = activeUserId.firstOrNull() ?: return@launch
+                val imagePath = photoUri?.let {
+                    copyImageToInternalStorage(context, it)
+                }
                 profileRepository.insertProfile(
                     Profile(
                         usuarioId = userId,
@@ -108,6 +114,11 @@ class ProfileViewModel @Inject constructor(
      */
     fun deleteProfile(profile: Profile, onDeleted: () -> Unit = {}) {
         viewModelScope.launch {
+            // Guardar los IDs antes de que Room borre las tomas en cascada.
+            val intakeIds = runCatching {
+                intakeRepository.getIntakeIdsByProfileId(profile.id)
+            }.getOrDefault(emptyList())
+
             // Cancelar las alarmas antes de que Room borre las tomas en cascada.
             runCatching { reminderScheduler.cancelFutureForProfile(profile.id) }
                 .onFailure {
@@ -120,6 +131,7 @@ class ProfileViewModel @Inject constructor(
 
             profile.urlImagen?.let { File(it).delete() }
             profileRepository.deleteProfile(profile)
+            intakeNotifications.cancelAll(intakeIds)
 
             // Solo se limpia la sesión si el perfil borrado era el activo.
             if (sessionManager.activeProfileId.firstOrNull() == profile.id) {
@@ -144,7 +156,8 @@ class ProfileViewModel @Inject constructor(
      * @param allergies Alergias conocidas opcionales.
      * @param medicalNotes Notas médicas opcionales.
      * @param healthCardNumber Número de tarjeta sanitaria opcional.
-     * @param onSaved Callback ejecutado cuando el perfil ya está actualizado.
+     * @param onSaved Callback ejecutado cuando el perfil ya está actualizado;
+     *   recibe la ruta de la imagen resultante.
      */
     fun updateProfile(
         nombre: String,
@@ -156,7 +169,7 @@ class ProfileViewModel @Inject constructor(
         allergies: String? = null,
         medicalNotes: String? = null,
         healthCardNumber: String? = null,
-        onSaved: () -> Unit = {}
+        onSaved: (String?) -> Unit = {}
     ) {
         val trimmedNombre = nombre.trim()
         if (trimmedNombre.isBlank()) return
@@ -166,14 +179,18 @@ class ProfileViewModel @Inject constructor(
             val currentProfile =
                 profileRepository.getProfileByIdOnce(activeProfileId) ?: return@launch
 
+            val previousImagePath = currentImagePath ?: currentProfile.urlImagen
             val imagePath = if (newPhotoUri != null) {
-                // Borrar imagen antigua si existía
-                (currentImagePath ?: currentProfile.urlImagen)?.let { File(it).delete() }
-                // Copiar la nueva al almacenamiento interno
-                copyImageToInternalStorage(context, newPhotoUri)
+                // Copia primero la nueva imagen: si falla, se conserva la anterior.
+                val copiedPath = copyImageToInternalStorage(context, newPhotoUri)
+                if (copiedPath != null) {
+                    previousImagePath?.let { File(it).delete() }
+                    copiedPath
+                } else {
+                    previousImagePath
+                }
             } else {
-                // Sin cambio, mantener la ruta actual
-                currentImagePath ?: currentProfile.urlImagen
+                previousImagePath
             }
 
             profileRepository.updateProfile(
@@ -189,7 +206,7 @@ class ProfileViewModel @Inject constructor(
                     updatedAt = LocalDateTime.now()
                 )
             )
-            onSaved()
+            onSaved(imagePath)
         }
     }
 

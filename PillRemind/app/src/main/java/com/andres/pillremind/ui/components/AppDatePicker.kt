@@ -116,6 +116,7 @@ fun AppDatePickerField(
                 disabledIndicatorColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
+                disabledPlaceholderColor = appFieldPlaceholderColor(),
             ),
             shape = MaterialTheme.shapes.medium,
         )

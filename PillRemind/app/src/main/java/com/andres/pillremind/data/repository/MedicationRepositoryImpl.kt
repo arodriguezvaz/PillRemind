@@ -55,8 +55,11 @@ class MedicationRepositoryImpl @Inject constructor(
         database.withTransaction {
             medicationDao.markDeleted(medicationId, deletedAt, deletedAt)
             intakeDao.deleteFutureIntakesByMedicationId(medicationId, deleteFutureFrom)
-            scheduleDao.deleteByMedicationId(medicationId)
         }
+    }
+
+    override suspend fun unarchiveMedication(medicationId: Int, updatedAt: LocalDateTime) {
+        medicationDao.unarchiveMedication(medicationId, updatedAt)
     }
 
     override suspend fun updateMedication(medication: Medication) {
@@ -88,5 +91,18 @@ class MedicationRepositoryImpl @Inject constructor(
 
     override fun getMedications(profileId: Int): Flow<List<Medication>> {
         return medicationDao.getMedications(profileId).map { list -> list.map { it.toDomain() } }
+    }
+
+    override fun getArchivedMedications(profileId: Int): Flow<List<Medication>> {
+        return medicationDao.getArchivedMedications(profileId)
+            .map { list -> list.map { it.toDomain() } }
+    }
+
+    override fun getAllMedications(profileId: Int): Flow<List<Medication>> {
+        return medicationDao.getAllMedications(profileId).map { list -> list.map { it.toDomain() } }
+    }
+
+    override fun hasMedications(profileId: Int): Flow<Boolean> {
+        return medicationDao.countMedications(profileId).map { count -> count > 0 }
     }
 }

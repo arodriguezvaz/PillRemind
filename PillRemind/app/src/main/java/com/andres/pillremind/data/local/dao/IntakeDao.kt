@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.andres.pillremind.data.local.entity.IntakeEntity
 import com.andres.pillremind.data.local.projections.IntakeWithMedicationRow
+import com.andres.pillremind.data.local.projections.StatisticsIntakeRow
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 
@@ -56,10 +57,10 @@ interface IntakeDao {
     suspend fun getIntakeById(intakeId: Int): IntakeEntity?
 
     /**
-     * Observa las tomas programadas del dia para un perfil, con datos del medicamento.
+     * Observa las tomas programadas de un día para un perfil, con datos del medicamento.
      *
-     * @param startOfDay Inicio del dia.
-     * @param endOfDay Fin del dia.
+     * @param startOfDay Inicio del día.
+     * @param endOfDay Fin del día.
      * @param profileId ID del perfil propietario.
      * @return Flow con la lista ordenada por fecha programada.
      */
@@ -85,11 +86,86 @@ interface IntakeDao {
     ORDER BY i.scheduledAt
     """
     )
-    fun getIntakesForToday(
+    fun observeIntakesForDay(
         startOfDay: LocalDateTime,
         endOfDay: LocalDateTime,
         profileId: Int
     ): Flow<List<IntakeWithMedicationRow>>
+
+    /**
+     * Observa las tomas de un perfil dentro de un rango para calcular
+     * estadísticas e historial.
+     *
+     * Incluye los medicamentos archivados que conservan su historial. No se
+     * filtra por `deletedAt` para no perder las tomas anteriores al archivo.
+     *
+     * @param profileId ID del perfil propietario.
+     * @param from Inicio del rango.
+     * @param to Fin del rango.
+     * @return Flow con las tomas ordenadas por fecha programada.
+     */
+    @Query(
+        """
+    SELECT
+        i.id AS intakeId,
+        i.medicationId,
+        i.scheduledAt,
+        i.takenAt,
+        i.medicationNameSnapshot AS medicationName,
+        i.doseSnapshot AS dose,
+        i.unitSnapshot AS unit,
+        m.imageUrl,
+        m.deletedAt
+    FROM intakes i
+    JOIN medications m ON m.id = i.medicationId
+    WHERE m.profileId = :profileId
+    AND i.scheduledAt BETWEEN :from AND :to
+    ORDER BY i.scheduledAt
+    """
+    )
+    fun observeStatisticsIntakes(
+        profileId: Int,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): Flow<List<StatisticsIntakeRow>>
+
+    /**
+     * Observa las tomas de un perfil para la pantalla de historial.
+     *
+     * A diferencia de [observeStatisticsIntakes], ordena de más reciente a más
+     * antigua y permite un rango abierto con `from` o `to` nulos. Incluye los
+     * medicamentos archivados que conservan su historial.
+     *
+     * @param profileId ID del perfil propietario.
+     * @param from Inicio del rango, o null para no limitar por abajo.
+     * @param to Fin del rango, o null para no limitar por arriba.
+     * @return Flow con las tomas ordenadas de más reciente a más antigua.
+     */
+    @Query(
+        """
+    SELECT
+        i.id AS intakeId,
+        i.medicationId,
+        i.scheduledAt,
+        i.takenAt,
+        i.medicationNameSnapshot AS medicationName,
+        i.doseSnapshot AS dose,
+        i.unitSnapshot AS unit,
+        m.imageUrl,
+        m.deletedAt
+    FROM intakes i
+    JOIN medications m ON m.id = i.medicationId
+    WHERE m.profileId = :profileId
+    AND (:from IS NULL OR i.scheduledAt >= :from)
+    AND (:to IS NULL OR i.scheduledAt <= :to)
+    ORDER BY i.scheduledAt DESC
+    """
+    )
+    fun observeHistoryIntakes(
+        profileId: Int,
+        from: LocalDateTime?,
+        to: LocalDateTime?
+    ): Flow<List<StatisticsIntakeRow>>
 
     /**
      * Devuelve las tomas futuras de un medicamento desde una fecha.
@@ -122,6 +198,34 @@ interface IntakeDao {
         profileId: Int,
         from: LocalDateTime
     ): List<IntakeEntity>
+
+    /**
+     * Devuelve los IDs de todas las tomas de un medicamento.
+     *
+     * Se usa para cancelar las notificaciones asociadas antes de archivar,
+     * editar o borrar el medicamento.
+     *
+     * @param medicationId ID del medicamento.
+     */
+    @Query("SELECT id FROM intakes WHERE medicationId = :medicationId")
+    suspend fun getIntakeIdsByMedicationId(medicationId: Int): List<Int>
+
+    /**
+     * Devuelve los IDs de todas las tomas de un perfil.
+     *
+     * Se usa para cancelar sus notificaciones antes de borrar el perfil y sus
+     * medicamentos en cascada.
+     *
+     * @param profileId ID del perfil propietario.
+     */
+    @Query(
+        """
+    SELECT i.id FROM intakes i
+    JOIN medications m ON m.id = i.medicationId
+    WHERE m.profileId = :profileId
+"""
+    )
+    suspend fun getIntakeIdsByProfileId(profileId: Int): List<Int>
 
     /**
      * Elimina las tomas futuras de un medicamento desde una fecha.

@@ -42,15 +42,27 @@ data class IntakeWithMedication(
  * - DELAYED: han transcurrido más de 15 minutos desde la hora programada.
  * - PENDING: la toma aún está pendiente y se encuentra dentro del margen permitido.
  *
+ * @param now Momento de referencia para decidir si la toma está retrasada.
  * @return Estado visual de la toma.
  */
-fun IntakeWithMedication.visualState(): IntakeVisualState {
+fun IntakeWithMedication.visualState(
+    now: LocalDateTime = LocalDateTime.now()
+): IntakeVisualState {
     if (takenAt != null) return IntakeVisualState.TAKEN
-    return if (LocalDateTime.now() > scheduledAt.plusMinutes(15))
+    return if (now > scheduledAt.plusMinutes(15))
         IntakeVisualState.DELAYED
     else
         IntakeVisualState.PENDING
 }
+
+/**
+ * Indica si la toma sigue pendiente o se registró en un día posterior al programado.
+ *
+ * Se usa en Inicio para mantener accesibles las tomas de ayer que se tomaron de
+ * madrugada, de modo que se puedan deshacer igual que las del día actual.
+ */
+fun IntakeWithMedication.isPendingOrTakenLate(): Boolean =
+    takenAt == null || takenAt.toLocalDate().isAfter(scheduledAt.toLocalDate())
 
 /**
  * Estados visuales posibles para una toma de medicamento.

@@ -13,13 +13,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.andres.pillremind.ui.screens.history.HistoryScreen
 import com.andres.pillremind.ui.screens.home.HomeScreen
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.screens.medication.MedicationMode
 import com.andres.pillremind.ui.screens.medication.MedicationScreen
+import com.andres.pillremind.ui.screens.medications.ArchivedMedicationsScreen
 import com.andres.pillremind.ui.screens.medications.MedicationsScreen
 import com.andres.pillremind.ui.screens.profile.ProfileMode
 import com.andres.pillremind.ui.screens.profile.ProfileScreen
+import com.andres.pillremind.ui.screens.statistics.StatisticsScreen
 
 /**
  * Grafo de navegación principal de la aplicación.
@@ -52,6 +55,17 @@ fun MainNavigationGraph(
     paddingValues: PaddingValues,
     onTopBarChange: (route: String, state: TopBarState) -> Unit
 ) {
+    val openStatistics = {
+        navController.navigate(StatisticsScreens.Statistics.route) {
+            launchSingleTop = true
+        }
+    }
+    val openHistory = {
+        navController.navigate(HistoryScreens.History.createRoute()) {
+            launchSingleTop = true
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = BottomBarScreens.Home.route,
@@ -64,7 +78,9 @@ fun MainNavigationGraph(
     ) {
         //Home screen donde se ven las tomas del día
         composable(BottomBarScreens.Home.route) {
-            HomeScreen()
+            HomeScreen(
+                onStatisticsClick = openStatistics
+            )
         }
         composable(BottomBarScreens.Medications.route) {
             MedicationsScreen(
@@ -92,7 +108,32 @@ fun MainNavigationGraph(
                     BottomBarScreens.Profile.route,
                     onTopBarChange
                 ),
+                onStatisticsClick = openStatistics,
+                onArchivedMedicationsClick = {
+                    navController.navigate(MedicationScreens.ArchivedMedicationsScreen.route)
+                },
+                onHistoryClick = openHistory,
             )
+        }
+        composable(StatisticsScreens.Statistics.route) {
+            StatisticsScreen()
+        }
+        composable(
+            route = StatisticsScreens.MedicationStatistics.route,
+            arguments = listOf(navArgument("medicationId") {
+                type = NavType.IntType
+            })
+        ) {
+            StatisticsScreen()
+        }
+        composable(
+            route = HistoryScreens.History.route,
+            arguments = listOf(navArgument("medicationId") {
+                type = NavType.IntType
+                defaultValue = -1
+            })
+        ) {
+            HistoryScreen()
         }
         medicationNavGraph(navController, onTopBarChange)
     }
@@ -142,11 +183,31 @@ fun NavGraphBuilder.medicationNavGraph(
             arguments = listOf(navArgument("medicationId") {
                 type = NavType.IntType
             })
-        ) {
+        ) { backStackEntry ->
+            val medicationId = backStackEntry.arguments?.getInt("medicationId")
+
             MedicationScreen(
                 medicationMode = MedicationMode.View,
                 onArchivedClicked = {
                     navController.popBackStack()
+                },
+                onStatisticsClick = {
+                    medicationId?.let { id ->
+                        navController.navigate(
+                            StatisticsScreens.MedicationStatistics.createRoute(id)
+                        ) {
+                            launchSingleTop = true
+                        }
+                    }
+                },
+                onHistoryClick = {
+                    medicationId?.let { id ->
+                        navController.navigate(
+                            HistoryScreens.History.createRoute(id)
+                        ) {
+                            launchSingleTop = true
+                        }
+                    }
                 },
                 onTopBarChange = topBarChangeFor(
                     MedicationScreens.MedicationSeeScreen.route,
@@ -162,6 +223,38 @@ fun NavGraphBuilder.medicationNavGraph(
                     MedicationScreens.MedicationCreateScreen.route,
                     onTopBarChange
                 )
+            )
+        }
+        composable(route = MedicationScreens.ArchivedMedicationsScreen.route) {
+            ArchivedMedicationsScreen(
+                onMedicationClick = { id ->
+                    navController.navigate(
+                        MedicationScreens.ArchivedMedicationSeeScreen.createRoute(id)
+                    )
+                },
+            )
+        }
+        composable(
+            route = MedicationScreens.ArchivedMedicationSeeScreen.route,
+            arguments = listOf(navArgument("medicationId") {
+                type = NavType.IntType
+            })
+        ) { backStackEntry ->
+            val medicationId = backStackEntry.arguments?.getInt("medicationId")
+
+            MedicationScreen(
+                medicationMode = MedicationMode.Archived,
+                onUnarchivedClicked = { navController.popBackStack() },
+                onDeletedPermanentlyClicked = { navController.popBackStack() },
+                onStatisticsClick = {
+                    medicationId?.let { id ->
+                        navController.navigate(
+                            StatisticsScreens.MedicationStatistics.createRoute(id)
+                        ) {
+                            launchSingleTop = true
+                        }
+                    }
+                },
             )
         }
     }
@@ -182,4 +275,17 @@ sealed class MedicationScreens(val route: String) {
     }
 
     object MedicationCreateScreen : MedicationScreens("medication/create")
+
+    /**
+     * Lista de medicamentos archivados del perfil activo.
+     */
+    object ArchivedMedicationsScreen : MedicationScreens("medication/archived")
+
+    /**
+     * Detalle de un medicamento archivado.
+     */
+    object ArchivedMedicationSeeScreen :
+        MedicationScreens("medication/archived/{medicationId}") {
+        fun createRoute(medicationId: Int) = "medication/archived/$medicationId"
+    }
 }

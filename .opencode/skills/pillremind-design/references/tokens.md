@@ -11,14 +11,14 @@ fuente de verdad: si un valor cambia, actualiza también esta tabla.
 |---|---|---|
 | `primary` | Marca, títulos de sección, acciones principales, icono activo de la barra inferior. Azul profundo en claro, azul cielo en oscuro. | Usarlo como fondo de bloques grandes de información. |
 | `onPrimary` | Texto e iconos sobre `primary`. | Texto secundario. |
-| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, avatar por defecto, FAB de perfiles. | Sustituir a `surface` en cards. |
+| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, FAB de perfiles, badge de filtros y botón secundario (`ButtonVariant.Tonal`). | Sustituir a `surface` en cards. |
 | `secondary` | Naranja de aviso; hoy se usa sobre todo como base de `secondaryContainer`. | Decoración o texto largo. |
-| `secondaryContainer` / `onSecondaryContainer` | Botón de una toma ya realizada (`ButtonVariant.Secondary`). | Estado pendiente. |
+| `secondaryContainer` / `onSecondaryContainer` | Solo el estado de una toma ya realizada (`ButtonVariant.Secondary` en `IntakeCard`). | Botón secundario genérico (usa `primaryContainer`) y estado pendiente. |
 | `tertiary` / `tertiaryContainer` | Verde de confirmación; uso puntual. | Acciones principales. |
 | `error` / `onError` | Acciones destructivas (`ButtonVariant.Danger`) y toma retrasada. | Texto de error sobre `surface` sin contraste. |
 | `errorContainer` / `onErrorContainer` | Fondos de error puntuales. | Sustituir a `error` en botones. |
 | `surface` | Fondo de cards, campos, chips no seleccionados y filas de horas. | Fondo general de pantalla. |
-| `surfaceVariant` | Campos deshabilitados, fondo del selector de foto y separadores suaves. | Fondo de cards. |
+| `surfaceVariant` | Campos deshabilitados, fondo del selector de foto, placeholders de imagen y separadores suaves. | Fondo de cards. |
 | `onSurface` | Texto principal y valores de lectura. | Texto secundario. |
 | `onSurfaceVariant` | Texto secundario, metadatos, descripciones y enlaces deshabilitados. | Texto principal. |
 | `outline` / `outlineVariant` | Bordes y divisores finos. | Texto. |
@@ -159,7 +159,7 @@ Familia: **Lexend** (`FontFamily.kt`). Todos los roles usan Lexend.
 
 | Rol | Uso | Evitar |
 |---|---|---|
-| `titleLarge` | Títulos de sección (`AppFormSection`, `AppInfoCard`) y título de la top bar. | Texto de párrafo. |
+| `titleLarge` | Títulos de sección (`AppFormSection`, `AppReadOnlySection`) y título de la top bar. | Texto de párrafo. |
 | `titleMedium` | Título de card (`MedicationCard`, `IntakeCard`, `PerfilCard`, `SettingsCard`). | Títulos de sección. |
 | `titleSmall` | Subtítulos y bloques secundarios. | Texto de lectura. |
 | `bodyLarge` | Texto de lectura, etiquetas de ajustes, horas. | Metadatos pequeños. |
@@ -170,7 +170,7 @@ Familia: **Lexend** (`FontFamily.kt`). Todos los roles usan Lexend.
 | `labelSmall` | Etiquetas muy compactas. | Texto de lectura. |
 | `headline*` / `display*` | Reservados; no hay uso actual. | Pantallas normales. |
 
-Lectura aumentada: `AppInfoRow` y `AppReadOnlyField` usan `bodyLarge` con
+Lectura aumentada: el valor de `AppDetailRow` usa `bodyLarge` con
 `fontSize = 18.sp`, `lineHeight = 26.sp` y peso Medium.
 
 No reduzcas el tamaño para que un texto quepa: usa `maxLines` + elipsis en
@@ -207,9 +207,9 @@ a `Shapes.kt` y documenta su uso.
 | `xl` | 24dp | Bajo la foto y entre bloques grandes del formulario de medicamento. |
 | `xxl` | 32dp | Alto visual de un estado vacío. |
 
-Excepciones que se mantienen como literales: 6dp de `AppInfoRow`, 10dp de los
-bloques de estado de `SettingsScreen`, paddings internos de `AppButton`
-(6/12/20/28), tamaños de iconos/imágenes/botones y bordes de 1/2dp.
+Excepciones que se mantienen como literales: 10dp de los bloques de estado de
+`SettingsScreen`, paddings internos de `AppButton` (6/12/20/28), tamaños de
+iconos/imágenes/botones y bordes/divisores de 1/2dp.
 
 ## Elevación
 

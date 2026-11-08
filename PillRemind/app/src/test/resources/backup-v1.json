@@ -1,0 +1,83 @@
+{
+  "format": "pillremind-backup",
+  "formatVersion": 1,
+  "appVersion": "1.0.0",
+  "exportedAt": "2026-10-31T12:00:00",
+  "users": [
+    {
+      "id": 1,
+      "createdAt": "2026-10-01T09:00:00",
+      "updatedAt": "2026-10-01T09:00:00"
+    }
+  ],
+  "profiles": [
+    {
+      "id": 1,
+      "usuarioId": 1,
+      "name": "Ana v1",
+      "imagePath": "images/profile.jpg",
+      "createdAt": "2026-10-01T09:00:00",
+      "updatedAt": "2026-10-01T09:00:00"
+    }
+  ],
+  "medications": [
+    {
+      "id": 1,
+      "profileId": 1,
+      "name": "Ibuprofeno v1",
+      "dose": 400.0,
+      "unit": "mg",
+      "isChronic": false,
+      "startDate": "2026-10-01",
+      "endDate": "2026-10-31",
+      "imagePath": "images/medication.png",
+      "leafletUrl": "https://example.com/prospecto",
+      "createdAt": "2026-10-01T09:00:00",
+      "updatedAt": "2026-10-01T09:00:00"
+    },
+    {
+      "id": 2,
+      "profileId": 1,
+      "name": "Omeprazol v1",
+      "dose": 20.0,
+      "unit": "mg",
+      "isChronic": true,
+      "startDate": "2026-10-02",
+      "createdAt": "2026-10-02T09:00:00",
+      "updatedAt": "2026-10-20T10:00:00",
+      "deletedAt": "2026-10-20T10:00:00"
+    }
+  ],
+  "schedules": [
+    {
+      "id": 1,
+      "medicationId": 1,
+      "weekDay": "MONDAY",
+      "time": "08:00"
+    }
+  ],
+  "intakes": [
+    {
+      "id": 1,
+      "medicationId": 1,
+      "scheduleId": 1,
+      "scheduledAt": "2026-10-31T08:00:00",
+      "takenAt": "2026-10-31T08:05:00",
+      "medicationNameSnapshot": "Ibuprofeno v1",
+      "doseSnapshot": 400.0,
+      "unitSnapshot": "mg",
+      "createdAt": "2026-10-31T08:00:00",
+      "updatedAt": "2026-10-31T08:05:00"
+    },
+    {
+      "id": 2,
+      "medicationId": 2,
+      "scheduledAt": "2026-10-31T09:00:00",
+      "medicationNameSnapshot": "Omeprazol v1",
+      "doseSnapshot": 20.0,
+      "unitSnapshot": "mg",
+      "createdAt": "2026-10-31T09:00:00",
+      "updatedAt": "2026-10-31T09:00:00"
+    }
+  ]
+}

@@ -15,8 +15,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.andres.pillremind.R
 import com.andres.pillremind.navigation.BottomBarScreens
+import com.andres.pillremind.navigation.HistoryScreens
 import com.andres.pillremind.navigation.MainNavigationGraph
 import com.andres.pillremind.navigation.MedicationScreens
+import com.andres.pillremind.navigation.StatisticsScreens
 import com.andres.pillremind.ui.components.AppFab
 import com.andres.pillremind.ui.screens.home.homeTopBarTitle
 
@@ -51,11 +53,24 @@ fun MainScreen(
         BottomBarScreens.Profile.route -> TopBarState(
             title = stringResource(R.string.profile_view_title)
         )
+        StatisticsScreens.Statistics.route,
+        StatisticsScreens.MedicationStatistics.route -> TopBarState(
+            title = stringResource(R.string.statistics_title)
+        )
+        HistoryScreens.History.route -> TopBarState(
+            title = stringResource(R.string.history_title)
+        )
         MedicationScreens.MedicationSeeScreen.route -> TopBarState(
             title = stringResource(R.string.medication_view_title)
         )
         MedicationScreens.MedicationCreateScreen.route -> TopBarState(
             title = stringResource(R.string.medication_add_title)
+        )
+        MedicationScreens.ArchivedMedicationsScreen.route -> TopBarState(
+            title = stringResource(R.string.medication_archived_list_title)
+        )
+        MedicationScreens.ArchivedMedicationSeeScreen.route -> TopBarState(
+            title = stringResource(R.string.medication_archived_title)
         )
         else -> TopBarState(title = homeTopBarTitle(), showLogo = true)
     }

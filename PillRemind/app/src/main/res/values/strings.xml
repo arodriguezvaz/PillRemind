@@ -61,11 +61,16 @@
     <string name="nav_medications">Medicamentos</string>
     <string name="nav_profile">Perfil</string>
     <string name="common_back">Volver</string>
+    <string name="common_close">Cerrar</string>
     <string name="brand_pill" translatable="false">PILL</string>
     <string name="brand_remind" translatable="false">REMIND</string>
     <string name="home_title_today">Hoy, %1$s</string>
     <string name="home_date_pattern">d \'de\' MMMM</string>
     <string name="home_empty_today">No hay medicamentos para tomar hoy</string>
+    <plurals name="home_pending_yesterday_notice">
+        <item quantity="one">Tienes %1$d toma pendiente de ayer</item>
+        <item quantity="other">Tienes %1$d tomas pendientes de ayer</item>
+    </plurals>
 
     <!-- Perfil -->
     <string name="profiles_title">Perfiles</string>
@@ -108,12 +113,92 @@
     <string name="profile_manage">Gestionar</string>
     <string name="profile_photo_description">Foto de perfil de %1$s</string>
     <string name="profile_avatar_description">Avatar del perfil</string>
-    <string name="profile_view_adherence">Ver adherencia</string>
-    <string name="profile_adherence_soon">Próximamente</string>
-    <string name="profile_adherence_placeholder_title">Adherencia</string>
-    <string name="profile_adherence_placeholder_message">Próximamente podrás consultar aquí las estadísticas de tomas por medicamento.</string>
+    <string name="profile_view_statistics">Ver estadísticas</string>
+    <string name="profile_tracking_section">Seguimiento</string>
+    <string name="profile_statistics_description">Adherencia y resumen de tomas</string>
+    <string name="profile_archived_medications">Medicamentos archivados</string>
+    <string name="profile_archived_medications_description">Consulta, recupera o elimina medicamentos archivados</string>
+    <string name="profile_history_section">Historial</string>
+    <string name="profile_view_history">Ver historial de tomas</string>
+    <string name="profile_history_description">Busca y filtra las tomas registradas</string>
     <string name="profile_delete_title">Eliminar perfil</string>
     <string name="profile_delete_message">¿Seguro que quieres eliminar este perfil?</string>
+
+    <!-- Estadísticas -->
+    <string name="statistics_title">Estadísticas</string>
+    <string name="statistics_period_seven">7 días</string>
+    <string name="statistics_period_thirty">30 días</string>
+    <string name="statistics_period_ninety">90 días</string>
+    <string name="statistics_adherence_label">Adherencia</string>
+    <string name="statistics_percent_value">%1$d%%</string>
+    <string name="statistics_no_data">Sin datos</string>
+    <string name="statistics_taken_label">Tomadas</string>
+    <string name="statistics_missed_label">Sin registrar</string>
+    <string name="statistics_pending_label">Pendientes</string>
+    <string name="statistics_weekly_title">Resumen semanal</string>
+    <string name="statistics_chart_title">Últimos 7 días</string>
+    <string name="statistics_chart_bar_description">%1$s. Tomadas: %2$d, sin registrar: %3$d, pendientes: %4$d.</string>
+    <string name="statistics_adherence_chart_title">Adherencia de los últimos %1$d días</string>
+    <string name="statistics_adherence_chart_subtitle">Cada punto es una semana.</string>
+    <string name="statistics_adherence_chart_description">Gráfico de adherencia. Mínimo %1$d%%, máximo %2$d%%.</string>
+    <string name="statistics_chart_no_data">Todavía no hay tomas evaluadas en este periodo.</string>
+    <string name="statistics_by_medication_title">Por medicamento</string>
+    <string name="statistics_archived">Archivado</string>
+    <string name="statistics_empty_no_medications">Todavía no hay medicamentos en este perfil.</string>
+    <string name="statistics_empty_no_intakes">No hay tomas registradas en este periodo.</string>
+    <string name="statistics_empty_no_intakes_medication">No hay tomas registradas de este medicamento en este periodo.</string>
+    <string name="statistics_footnote">Se calculan con las tomas que registras en la app.</string>
+    <string name="statistics_status_taken">Tomada</string>
+    <string name="statistics_status_missed">Sin registrar</string>
+    <string name="statistics_status_pending">Pendiente</string>
+    <plurals name="statistics_taken_of_total">
+        <item quantity="one">%1$d de %2$d toma</item>
+        <item quantity="other">%1$d de %2$d tomas</item>
+    </plurals>
+    <plurals name="statistics_pending_count">
+        <item quantity="one">%1$d pendiente</item>
+        <item quantity="other">%1$d pendientes</item>
+    </plurals>
+
+    <!-- Historial -->
+    <string name="history_title">Historial</string>
+    <string name="history_search_placeholder">Buscar por medicamento</string>
+    <string name="history_filter_title">Filtros</string>
+    <string name="history_filter_status">Estado</string>
+    <string name="history_filter_status_all">Todas</string>
+    <string name="history_filter_status_taken">Tomadas</string>
+    <string name="history_filter_status_missed">Sin registrar</string>
+    <string name="history_filter_status_pending">Pendientes</string>
+    <string name="history_filter_medication">Medicamento</string>
+    <string name="history_filter_medication_all">Todos</string>
+    <string name="history_filter_include_archived">Incluir archivados</string>
+    <string name="history_filter_custom_dates">Fechas personalizadas</string>
+    <string name="history_filter_date_from">Desde</string>
+    <string name="history_filter_date_to">Hasta</string>
+    <string name="history_filter_show_results">Ver resultados</string>
+    <string name="history_filter_clear">Limpiar filtros</string>
+    <string name="history_filter_date_error">La fecha inicial no puede ser posterior a la final</string>
+    <plurals name="history_filter_active_count">
+        <item quantity="one">%1$d activo</item>
+        <item quantity="other">%1$d activos</item>
+    </plurals>
+    <string name="history_empty_no_medications">Todavía no hay medicamentos en este perfil.</string>
+    <string name="history_empty_no_intakes">No hay tomas registradas en este rango.</string>
+    <string name="history_empty_no_results">No hay tomas que coincidan con los filtros.</string>
+    <string name="history_day_today">Hoy</string>
+    <string name="history_day_yesterday">Ayer</string>
+    <string name="history_archived">Archivado</string>
+    <string name="history_medication_archived_option">%1$s (archivado)</string>
+    <string name="history_default_range_summary">Últimos 30 días</string>
+    <string name="history_custom_range_summary">%1$s – %2$s</string>
+    <plurals name="history_result_count">
+        <item quantity="one">%1$d toma</item>
+        <item quantity="other">%1$d tomas</item>
+    </plurals>
+    <plurals name="history_result_count_filtered">
+        <item quantity="one">%1$d de %2$d toma</item>
+        <item quantity="other">%1$d de %2$d tomas</item>
+    </plurals>
 
     <!-- Ajustes -->
     <string name="settings_title">Ajustes</string>
@@ -136,6 +221,13 @@
     <string name="settings_exact_alarms_disabled">Desactivadas</string>
     <string name="settings_allow_exact_alarms">Permitir alarmas exactas</string>
     <string name="settings_open_app_settings">Abrir ajustes de la app</string>
+    <string name="settings_about_title">Acerca de</string>
+    <string name="settings_version">Versión %1$s</string>
+    <string name="settings_check_updates">Buscar actualizaciones</string>
+    <string name="settings_checking_updates">Comprobando actualizaciones…</string>
+    <string name="settings_update_up_to_date">Ya tienes la última versión</string>
+    <string name="settings_update_available">Hay una actualización disponible</string>
+    <string name="settings_update_check_error">No se pudo comprobar si hay actualizaciones</string>
     <string name="settings_data_title">Datos</string>
     <string name="settings_data_description">Copia de seguridad local de perfiles, medicamentos, horarios, historial e imágenes.</string>
     <string name="settings_export_data">Exportar datos</string>
@@ -144,10 +236,22 @@
     <string name="settings_backup_privacy_warning">El archivo contiene datos de salud. Si no lo proteges con contraseña, cualquiera que lo tenga podrá leerlo.</string>
     <string name="settings_legal_title">Legal</string>
     <string name="settings_privacy_policy">Política de privacidad</string>
-    <string name="settings_privacy_policy_body">PillRemind funciona íntegramente en este dispositivo. No recopila, transmite ni comparte datos personales o de salud, no requiere una cuenta y no se conecta a internet.\n\nLos perfiles, medicamentos, horarios, tomas e imágenes se guardan en una base de datos local. Esa información solo sale del dispositivo si tú exportas una copia de seguridad y eliges dónde guardarla o con quién compartirla. La copia puede contener datos de salud: protégela con contraseña y guárdala en un lugar seguro.\n\nAl desinstalar la aplicación o borrar sus datos se elimina toda la información almacenada. Las copias de seguridad que hayas exportado no se eliminan y quedan bajo tu control.\n\nLos permisos de notificaciones y alarmas exactas se usan únicamente para avisarte de las tomas programadas.</string>
+    <string name="settings_privacy_policy_body">PillRemind guarda los datos de perfiles, medicamentos, horarios, tomas e imágenes en este dispositivo y no los envía a ningún servidor. No recopila datos personales ni de salud y no requiere una cuenta. Para comprobar si existe una versión nueva, consulta de forma automática como máximo una vez al día un fichero público alojado en GitHub Releases; también puedes lanzar la comprobación manualmente desde Ajustes. Esa consulta no envía perfiles, medicamentos, tomas ni ningún identificador personal; como cualquier conexión a internet, GitHub recibe la dirección IP y datos técnicos de la conexión, que trata según su propia política de privacidad. Si hay una actualización, la descarga se realiza desde el navegador y solo se instala si tú lo confirmas.\n\nLos perfiles, medicamentos, horarios, tomas e imágenes se guardan en una base de datos local. Esa información solo sale del dispositivo si tú exportas una copia de seguridad y eliges dónde guardarla o con quién compartirla. La copia puede contener datos de salud: protégela con contraseña y guárdala en un lugar seguro.\n\nAl desinstalar la aplicación o borrar sus datos se elimina toda la información almacenada. Las copias de seguridad que hayas exportado no se eliminan y quedan bajo tu control.\n\nLos permisos de notificaciones y alarmas exactas se usan únicamente para avisarte de las tomas programadas.\n\nÚltima revisión: noviembre de 2026.</string>
     <string name="settings_legal_notice">Aviso legal</string>
-    <string name="settings_legal_notice_body">Titular y desarrollador: Andrés Rodríguez Vázquez.\n\nPillRemind es un proyecto personal de código abierto distribuido bajo la licencia MIT. El código fuente está disponible en github.com/arodriguezvaz/PillRemind.\n\nLa aplicación es una herramienta de apoyo para recordar la medicación. No es un producto sanitario, no emite diagnósticos ni recomendaciones médicas y no sustituye la consulta con un profesional sanitario. Ante cualquier duda sobre un tratamiento, consulta con tu médico o farmacéutico.\n\nLa aplicación se ofrece «tal cual», sin garantías de disponibilidad o funcionamiento ininterrumpido, conforme al texto de la licencia MIT.</string>
+    <string name="settings_legal_notice_body">Titular y desarrollador: Andrés Rodríguez Vázquez.\n\nPillRemind es un proyecto personal de código abierto distribuido bajo la licencia MIT. El código fuente está disponible en github.com/arodriguezvaz/PillRemind.\n\nLa aplicación es una herramienta de apoyo para recordar la medicación. No es un producto sanitario, no emite diagnósticos ni recomendaciones médicas y no sustituye la consulta con un profesional sanitario. Ante cualquier duda sobre un tratamiento, consulta con tu médico o farmacéutico.\n\nLa aplicación puede comprobar la existencia de actualizaciones y requerir su instalación para seguir funcionando. Las actualizaciones se distribuyen desde GitHub Releases y su disponibilidad no está garantizada.\n\nLa aplicación se ofrece «tal cual», sin garantías de disponibilidad o funcionamiento ininterrumpido, conforme al texto de la licencia MIT.</string>
     <string name="settings_legal_close">Cerrar</string>
+
+    <!-- Actualizaciones -->
+    <string name="update_required_title">Actualización obligatoria</string>
+    <string name="update_required_message">La versión %1$s ya no es compatible. Actualiza a la versión %2$s para seguir usando PillRemind. Tus datos se conservarán.</string>
+    <string name="update_required_footer">Los recordatorios ya programados seguirán funcionando aunque la aplicación esté bloqueada.</string>
+    <string name="update_optional_title">Nueva versión disponible</string>
+    <string name="update_optional_message">La versión %1$s ya está disponible. ¿Quieres actualizar ahora?</string>
+    <string name="update_now">Actualizar ahora</string>
+    <string name="update_later">Más tarde</string>
+    <string name="update_release_notes">Ver novedades</string>
+    <string name="update_exit">Salir de la aplicación</string>
+    <string name="update_open_error">No se pudo abrir el navegador</string>
 
     <!-- Copia de seguridad -->
     <string name="backup_export_success">Copia exportada correctamente</string>
@@ -192,20 +296,40 @@
     <string name="medication_search_no_results">No hay resultados para «%1$s»</string>
     <string name="save_missing_fields">Faltan: %1$s</string>
     <string name="medication_missing_schedule">pauta y al menos una hora</string>
+    <string name="medication_dose_invalid">La dosis debe ser un número mayor que 0. Puedes usar coma o punto.</string>
+    <string name="medication_date_range_invalid">La fecha de fin no puede ser anterior a la de inicio.</string>
+    <string name="medication_invalid_data_title">Datos no válidos</string>
+    <string name="medication_invalid_data_message">Revisa la dosis y las fechas: mientras no sean válidas, no se generarán tomas.</string>
     <string name="profile_save_name_required">Escribe un nombre para guardar</string>
     <string name="medication_view_title">Ver medicamento</string>
     <string name="medication_edit_title">Editar medicamento</string>
     <string name="medication_data_section">Datos del medicamento</string>
+    <string name="medication_treatment_section">Tratamiento</string>
     <string name="medication_schedule_section">Pauta</string>
+    <string name="medication_next_intake">Próxima toma</string>
+    <string name="medication_no_end_date">Sin fecha de fin</string>
     <string name="medication_name_placeholder">Nombre del medicamento</string>
     <string name="medication_dose_placeholder">500</string>
     <string name="medication_select_placeholder">Selecciona</string>
     <string name="medication_chronic_treatment">Tratamiento crónico</string>
     <string name="medication_archive">Archivar</string>
     <string name="medication_archive_title">Archivar medicamento</string>
-    <string name="medication_archive_message">Dejará de aparecer en la lista y no generará recordatorios. Se conservará el historial de tomas.</string>
+    <string name="medication_archive_message">Dejará de aparecer en la lista y no generará recordatorios. Se conservará el historial y podrás recuperarlo desde «Medicamentos archivados».</string>
+    <string name="medication_archived_list_title">Medicamentos archivados</string>
+    <string name="medication_archived_empty">No hay medicamentos archivados</string>
+    <string name="medication_archived_title">Medicamento archivado</string>
+    <string name="medication_archived_notice">Archivado el %1$s. No genera recordatorios.</string>
+    <string name="medication_unarchive">Desarchivar</string>
+    <string name="medication_delete_permanently">Eliminar definitivamente</string>
+    <string name="medication_delete_permanently_title">Eliminar definitivamente</string>
+    <string name="medication_delete_permanently_message">Se borrarán el medicamento, su pauta, su imagen y todo su historial de tomas. Esta acción no se puede deshacer.</string>
     <string name="medication_photo_description">Foto del medicamento %1$s</string>
     <string name="medication_icon_description">Icono de medicamento</string>
+    <string name="medication_tracking_section">Seguimiento</string>
+    <string name="medication_view_statistics">Ver estadísticas</string>
+    <string name="medication_statistics_description">Adherencia y resumen de este medicamento</string>
+    <string name="medication_view_history">Ver historial</string>
+    <string name="medication_history_description">Tomas registradas de este medicamento</string>
     <string-array name="medication_units">
         <item>mg</item>
         <item>g</item>
@@ -268,8 +392,6 @@
     <string name="schedule_summary_cycle">%1$d días de toma y %2$d de descanso</string>
     <string name="schedule_summary_monthly_weekday">%1$s %2$s</string>
     <string name="schedule_summary_no_times">Sin horas</string>
-    <string name="schedule_selected_days">Días seleccionados</string>
-    <string name="schedule_cycle_detail">Ciclo</string>
 
     <!-- Acciones y fotos -->
     <string name="common_ok">OK</string>
@@ -277,15 +399,32 @@
     <string name="common_not_specified">Sin dato</string>
     <string name="common_yes">Sí</string>
     <string name="common_no">No</string>
+    <string name="common_today">Hoy</string>
+    <string name="common_tomorrow">Mañana</string>
     <string name="common_date_pattern">dd/MM/yyyy</string>
+    <string name="common_short_date_pattern">dd/MM</string>
+    <string name="common_day_month_pattern">d MMM</string>
     <string name="common_time_pattern">HH:mm</string>
-    <string name="common_info_row_format">%1$s:\u0020</string>
+    <string name="common_datetime_short">%1$s · %2$s</string>
     <string name="search_clear">Limpiar búsqueda</string>
     <string name="photo_profile">Foto de perfil</string>
     <string name="photo_medication">Foto del medicamento</string>
     <string name="photo_none">Sin foto</string>
     <string name="photo_edit">Editar foto</string>
     <string name="photo_add">Añadir foto</string>
+    <string name="photo_change">Cambiar foto</string>
+    <string name="photo_source_camera">Hacer una foto</string>
+    <string name="photo_source_gallery">Elegir de la galería</string>
+    <string name="photo_crop_title">Recortar foto</string>
+    <string name="photo_crop_hint">Arrastra, pellizca o gira para encuadrar la foto.</string>
+    <string name="photo_crop_rotate">Girar</string>
+    <string name="photo_crop_reset">Restablecer</string>
+    <string name="photo_crop_use">Usar foto</string>
+    <string name="photo_crop_loading">Cargando imagen…</string>
+    <string name="photo_crop_load_error">No se pudo cargar la imagen.</string>
+    <string name="photo_crop_save_error">No se pudo guardar la foto. Inténtalo de nuevo.</string>
+    <string name="photo_view">Ver foto</string>
+    <string name="photo_view_close">Cerrar foto</string>
     <string name="delete_time">Eliminar</string>
     <string name="edit_time">Editar hora</string>
     <string name="add_time">Añadir hora</string>

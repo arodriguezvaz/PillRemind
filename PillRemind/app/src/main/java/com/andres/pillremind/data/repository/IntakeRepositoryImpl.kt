@@ -8,6 +8,7 @@ import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.IntakeWithMedication
+import com.andres.pillremind.domain.model.StatisticsIntake
 import com.andres.pillremind.domain.model.occursOn
 import com.andres.pillremind.domain.repository.IntakeRepository
 import javax.inject.Inject
@@ -91,13 +92,13 @@ class IntakeRepositoryImpl @Inject constructor(
         return intakeDao.getIntakeById(intakeId)?.toDomain()
     }
 
-    override fun getIntakesForToday(
-        today: LocalDate,
-        profileId: Int
+    override fun observeIntakesForDay(
+        profileId: Int,
+        date: LocalDate
     ): Flow<List<IntakeWithMedication>> {
-        return intakeDao.getIntakesForToday(
-            today.atStartOfDay(),
-            today.atTime(LocalTime.MAX),
+        return intakeDao.observeIntakesForDay(
+            date.atStartOfDay(),
+            date.atTime(LocalTime.MAX),
             profileId
         ).map { rows -> rows.map { it.toDomain() } }
     }
@@ -125,6 +126,32 @@ class IntakeRepositoryImpl @Inject constructor(
         date: LocalDateTime
     ): List<Intake> {
         return intakeDao.getFutureIntakesByProfileId(profileId, date).map { it.toDomain() }
+    }
+
+    override suspend fun getIntakeIdsByMedicationId(medicationId: Int): List<Int> {
+        return intakeDao.getIntakeIdsByMedicationId(medicationId)
+    }
+
+    override suspend fun getIntakeIdsByProfileId(profileId: Int): List<Int> {
+        return intakeDao.getIntakeIdsByProfileId(profileId)
+    }
+
+    override fun observeStatisticsIntakes(
+        profileId: Int,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): Flow<List<StatisticsIntake>> {
+        return intakeDao.observeStatisticsIntakes(profileId, from, to)
+            .map { rows -> rows.map { it.toDomain() } }
+    }
+
+    override fun observeHistoryIntakes(
+        profileId: Int,
+        from: LocalDateTime?,
+        to: LocalDateTime?
+    ): Flow<List<StatisticsIntake>> {
+        return intakeDao.observeHistoryIntakes(profileId, from, to)
+            .map { rows -> rows.map { it.toDomain() } }
     }
 
     override suspend fun deleteFutureIntakesByMedicationId(medicationId: Int, date: LocalDateTime) {

@@ -2,6 +2,7 @@ package com.andres.pillremind.domain.repository
 
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.IntakeWithMedication
+import com.andres.pillremind.domain.model.StatisticsIntake
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -21,11 +22,14 @@ interface IntakeRepository {
     suspend fun getIntakeById(intakeId: Int): Intake?
 
     /**
-     * Obtiene todas las tomas de un perfil para hoy
+     * Observa todas las tomas de un perfil para el día indicado.
+     *
+     * @param profileId ID del perfil propietario.
+     * @param date Día del que se obtienen las tomas.
      */
-    fun getIntakesForToday(
-        today: LocalDate,
-        profileId: Int
+    fun observeIntakesForDay(
+        profileId: Int,
+        date: LocalDate
     ): Flow<List<IntakeWithMedication>>
 
     /**
@@ -60,6 +64,57 @@ interface IntakeRepository {
      * @param date a partir de la que obtener las tomas
      */
     suspend fun getFutureIntakesByProfileId(profileId: Int, date: LocalDateTime): List<Intake>
+
+    /**
+     * Obtiene los IDs de todas las tomas de un medicamento.
+     *
+     * Se usa para cancelar sus notificaciones al archivar, editar o borrar.
+     *
+     * @param medicationId ID de la medicación.
+     */
+    suspend fun getIntakeIdsByMedicationId(medicationId: Int): List<Int>
+
+    /**
+     * Obtiene los IDs de todas las tomas de un perfil.
+     *
+     * Se usa para cancelar sus notificaciones antes de borrar el perfil.
+     *
+     * @param profileId ID del perfil.
+     */
+    suspend fun getIntakeIdsByProfileId(profileId: Int): List<Int>
+
+    /**
+     * Observa las tomas de un perfil dentro de un rango para calcular
+     * estadísticas e historial.
+     *
+     * Incluye los medicamentos archivados que conservan su historial.
+     *
+     * @param profileId ID del perfil propietario.
+     * @param from Inicio del rango.
+     * @param to Fin del rango.
+     */
+    fun observeStatisticsIntakes(
+        profileId: Int,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): Flow<List<StatisticsIntake>>
+
+    /**
+     * Observa las tomas de un perfil para la pantalla de historial.
+     *
+     * A diferencia de [observeStatisticsIntakes], ordena de más reciente a más
+     * antigua y permite un rango abierto con `from` o `to` nulos. Incluye los
+     * medicamentos archivados que conservan su historial.
+     *
+     * @param profileId ID del perfil propietario.
+     * @param from Inicio del rango, o null para no limitar por abajo.
+     * @param to Fin del rango, o null para no limitar por arriba.
+     */
+    fun observeHistoryIntakes(
+        profileId: Int,
+        from: LocalDateTime?,
+        to: LocalDateTime?
+    ): Flow<List<StatisticsIntake>>
 
     /**
      * Elimina las tomas futuras de una medicación

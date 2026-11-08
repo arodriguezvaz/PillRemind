@@ -1,9 +1,10 @@
 # Catálogo de componentes
 
 Todos viven en `PillRemind/app/src/main/java/com/andres/pillremind/ui/components/`
-(salvo los de ajustes, en `components/settings/`, y los de horarios, en
-`components/timeeditor/`). Reutiliza estos componentes antes de crear uno nuevo.
-Los textos que reciben son siempre cadenas ya resueltas con `stringResource`.
+(salvo los de ajustes, en `components/settings/`, los de horarios, en
+`components/timeeditor/`, y los de estadísticas, en `components/statistics/`).
+Reutiliza estos componentes antes de crear uno nuevo. Los textos que reciben
+son siempre cadenas ya resueltas con `stringResource`.
 
 ## Botones
 
@@ -11,16 +12,26 @@ Los textos que reciben son siempre cadenas ya resueltas con `stringResource`.
 
 ```kotlin
 AppButton(
-    text, onClick, modifier, variant, size, enabled, isLoading, leadingIcon
+    text, onClick, modifier, variant, size, enabled, isLoading, leadingIcon,
+    looksDisabled
 )
 ```
 
-- Variantes: `Primary` (`primary`), `Secondary` (`secondaryContainer`),
-  `Tonal` (`primaryContainer`), `Ghost` (transparente + `primary`),
-  `Danger` (`error`).
+- Variantes y cuándo usarlas:
+  - `Primary` (`primary`): acción principal de la pantalla o del formulario.
+  - `Tonal` (`primaryContainer`): **acción secundaria con texto**, como
+    `AddTimeItem` o «Limpiar filtros»; en hojas y formularios, `Large`.
+  - `Ghost` (transparente + `primary`): acción inline o discreta que no debe
+    competir con una card; hoy no se usa en ninguna pantalla.
+  - `Danger` (`error`): acción destructiva.
+  - `Secondary` (`secondaryContainer`): solo para el estado «Tomado» de
+    `IntakeCard`; el naranja es de aviso y no sirve para una acción neutra.
 - Tamaños: `Small` 110dp, `Medium` 160dp, `Large` ancho completo.
 - `isLoading` deshabilita el botón y muestra un spinner de 16dp.
-- `leadingIcon` es decorativo (`contentDescription = null`).
+- `leadingIcon` es decorativo (`contentDescription = null`) y solo se añade si
+  aporta significado (`Add` en «Añadir hora»); el texto ya describe la acción.
+- `looksDisabled` mantiene los colores y la elevación del estado deshabilitado
+  aunque el botón siga siendo pulsable; se usa en el estado «Tomado».
 - Elevación `AppElevation`; deshabilitado sin elevación.
 
 ### `AppFab` (`AppFab.kt`)
@@ -39,6 +50,11 @@ AppFab(onClick, modifier, content)
   `Scaffold`.
 
 ## Campos y formularios
+
+Los textos de ayuda (placeholder) de los campos usan `appFieldPlaceholderColor()`
+(`FieldColors.kt`): `onSurface` al 38 %, el mismo tono que el marcador de
+posición de `AppDatePickerField`. No dejes que un campo herede el placeholder
+por defecto de Material 3 (`onSurfaceVariant`), que se ve más oscuro.
 
 ### `AppTextField` (`AppTextField.kt`)
 
@@ -94,20 +110,12 @@ AppFormActions(
 - Se coloca al final del formulario, dentro del contenido desplazable.
 - La acción principal es un `AppButton` `Large` que ocupa el ancho disponible.
 - La acción secundaria es un cuadrado con icono a la derecha; úsala para
-  acciones destructivas o de cierre, con `secondaryContentColor = error` si
-  corresponde.
+  acciones secundarias o destructivas. Reserva `secondaryContentColor = error`
+  para las destructivas (borrar); archivar, desarchivar o cerrar usan el
+  `primary` por defecto.
 - `supportingText` avisa de campos pendientes; usa `bodySmall` y
   `onSurfaceVariant`.
 - No inventes una fila de botones propia para guardar/editar/eliminar.
-
-### `AppReadOnlyField` (`AppReadOnlyField.kt`)
-
-```kotlin
-AppReadOnlyField(label, value, modifier, valueColor)
-```
-
-- Para modo lectura: etiqueta `labelLarge` Medium y valor `bodyLarge` a 18sp/26sp
-  Medium. No simula un input deshabilitado.
 
 ### `AppDropdownField` (`AppDropdownField.kt`)
 
@@ -116,7 +124,8 @@ AppDropdownField(value, options, onOptionSelected, modifier, placeholder, enable
 ```
 
 - `Surface` con `shapes.medium`, `AppElevation` y `surface`.
-- `TextField` de solo lectura y menú desplegable.
+- `TextField` de solo lectura y menú desplegable; placeholder con
+  `appFieldPlaceholderColor()`.
 
 ### `AppDatePickerField` (`AppDatePicker.kt`)
 
@@ -140,30 +149,97 @@ AppPhotoPicker(
 ```
 
 - Recorte con `AppImageShape`, fondo `surfaceVariant`.
-- Badge de edición de 26dp (solo si `enabled`) con icono de 13dp.
-- `size` por defecto 96dp; en las cards se usa 64dp.
+- En edición abre un diálogo con cámara (si hay) y galería; después abre
+  `AppPhotoCropDialog` y devuelve el JPEG cuadrado ya recortado.
+- En solo lectura, si hay foto, al pulsarla se abre `AppPhotoViewerDialog`.
+- Badge de 26dp con icono de 13dp solo al editar (lápiz); en solo lectura no
+  hay insignia, aunque la foto sigue siendo pulsable.
+- `size` por defecto 96dp.
+- Sin foto, delega en `AppImagePlaceholder` (mismo aspecto que las cards).
+- La cámara usa `FileProvider` y `cacheDir/photos`; no se declara el permiso
+  `CAMERA` porque se delega en la app de cámara del sistema.
+
+### `AppPhotoCropDialog` (`AppPhotoCropDialog.kt`)
+
+```kotlin
+AppPhotoCropDialog(sourceUri, onDismiss, onCropped)
+```
+
+- Diálogo a pantalla completa con un cuadrado fijo y la imagen por debajo.
+- Arrastrar, pellizcar, girar 90° y restablecer. La imagen siempre cubre el
+  cuadrado y no se pueden dejar huecos.
+- Salida siempre 1:1, como máximo 1024×1024 y JPEG calidad 90.
+- Decodifica con Coil a 2048 px y `allowHardware(false)` para respetar el EXIF.
+- Los cálculos viven en `PhotoCropMath`, con tests de JVM.
+
+### `AppPhotoViewerDialog` (`AppPhotoViewerDialog.kt`)
+
+```kotlin
+AppPhotoViewerDialog(photoUri, photoDescriptionRes, onDismiss)
+```
+
+- Visor a pantalla completa sobre `scrim`, con la imagen en `ContentScale.Fit`.
+- Se cierra con el botón, tocando fuera o con el gesto de volver.
+
+### `AppImagePlaceholder` (`AppImagePlaceholder.kt`)
+
+```kotlin
+AppImagePlaceholder(icon, contentDescription, modifier, size = 64.dp)
+```
+
+- Hueco común para imágenes sin foto: fondo `surfaceVariant`, recorte
+  `AppImageShape` e icono `onSurfaceVariant` al 40 % del tamaño.
+- Lo usan `AppPhotoPicker`, `DefaultPill()` (medicamentos) y `DefaultAvatar()`
+  (perfiles), así que las cards y las fichas de solo lectura se ven igual.
+
+## Solo lectura
+
+### `AppReadOnlySection` (`AppReadOnlySection.kt`)
+
+```kotlin
+AppReadOnlySection(title, modifier, content)
+```
+
+- Sección sin card: título `titleLarge` en `primary`, 8dp, divisor de 1dp
+  `outlineVariant` y 4dp hasta el contenido.
+- Para separar secciones, el contenedor usa `Arrangement.spacedBy(AppSpacing.lg)`.
+
+### `AppDetailRow` (`AppDetailRow.kt`)
+
+```kotlin
+AppDetailRow(label, value, modifier, stacked = false, showDivider = true)
+```
+
+- Etiqueta `bodyLarge` en `onSurfaceVariant` y valor 18sp/26sp Medium en
+  `onSurface`, alineado a la derecha; alto mínimo 48dp.
+- `stacked` coloca el valor debajo para textos largos (notas médicas).
+- Si `value` es nulo o está en blanco, la fila no se muestra.
+
+### `AppNoticeBlock` (`AppNoticeBlock.kt`)
+
+```kotlin
+AppNoticeBlock(icon, title, text, modifier)
+```
+
+- Bloque de aviso sin elevación: `secondaryContainer`/`onSecondaryContainer`,
+  `shapes.medium` y padding 16dp; el icono va en `secondary`.
+- Uso previsto: información que debe destacar, como las alergias de un perfil.
+
+### `AppScrollWithFooter` (`AppScrollWithFooter.kt`)
+
+```kotlin
+AppScrollWithFooter(modifier, scrollState, footer, content)
+```
+
+- Contenido desplazable con el footer al final: si no llena la pantalla, las
+  acciones se anclan abajo; si es más alto, se van con el scroll.
+- Mide el footer con `onSizeChanged` para no asumir su alto con texto grande.
+- Aplica `AppSpacing.md` de margen y separa el contenido con
+  `AppSpacing.lg`; el footer llevará su propio `AppFormActions`.
 
 ## Cards
 
 Todas usan `MaterialTheme.shapes.large` (20dp), `surface` y `AppElevation`.
-
-### `AppInfoCard` (`AppInfoCard.kt`)
-
-```kotlin
-AppInfoCard(title, modifier, content)
-```
-
-- Título `titleLarge` en `primary`, divisor de 1dp `outlineVariant`, padding 16dp.
-- Contenido típico: filas `AppInfoRow`.
-
-### `AppInfoRow` (`AppInfoRow.kt`)
-
-```kotlin
-AppInfoRow(label, value, modifier)
-```
-
-- Etiqueta en `onSurfaceVariant` y valor en `onSurface`, ambos Medium a 18sp/26sp.
-- Si `value` es nulo o está en blanco, no se muestra.
 
 ### `BlankCard` (`BlankCard.kt`)
 
@@ -181,7 +257,7 @@ MedicationCard(medication, accion, modifier, buttonText, buttonVariant)
 ```
 
 - Imagen de 64dp con `AppImageShape`, nombre `titleMedium` y botón `Small`.
-- Si no hay imagen, `DefaultPill()` con `primaryContainer`.
+- Si no hay imagen, `DefaultPill()` con `AppImagePlaceholder`.
 
 ### `IntakeCard` (`IntakeCard.kt`)
 
@@ -190,8 +266,10 @@ IntakeCard(intake, visualState, onTake, modifier)
 ```
 
 - Misma estructura que `MedicationCard`.
-- Estado `PENDING` → botón `Primary`; `TAKEN` → `Secondary` deshabilitado;
-  `DELAYED` → `Danger`.
+- Estado `PENDING` → botón `Primary`; `TAKEN` → `Secondary` «Tomado», habilitado
+  para deshacer la toma pero con `looksDisabled` para conservar su aspecto
+  original (única excepción a la regla de acción secundaria); `DELAYED` →
+  `Danger`.
 - Metadatos de dosis y hora en `bodySmall` / `onSurfaceVariant`.
 
 ### `PerfilCard` (`PerfilCard.kt`)
@@ -200,8 +278,134 @@ IntakeCard(intake, visualState, onTake, modifier)
 PerfilCard(profile, gestionar, modifier, buttonText, buttonVariant)
 ```
 
-- Imagen de 64dp con `AppImageShape`; si no hay, `DefaultAvatar()`.
+- Imagen de 64dp con `AppImageShape`; si no hay, `DefaultAvatar()` con
+  `AppImagePlaceholder`.
 - Nombre `titleMedium` y botón `Small`.
+
+## Estadísticas
+
+Viven en `components/statistics/` y se usan en `StatisticsScreen` y en el
+banner de Inicio.
+
+### `StatisticsBanner` (`statistics/StatisticsBanner.kt`)
+
+```kotlin
+StatisticsBanner(summary, onClick, modifier)
+```
+
+- Card pulsable con icono, «Resumen semanal», «X de Y tomas» y porcentaje.
+- Se oculta desde la pantalla si `summary.evaluated == 0`.
+
+### `StatisticsPeriodSelector` (`statistics/StatisticsPeriodSelector.kt`)
+
+```kotlin
+StatisticsPeriodSelector(selectedPeriod, onPeriodSelected, modifier)
+```
+
+- Tres chips con el estilo de `WeekDayChipGroup`: `primary` seleccionado,
+  `surface` no seleccionado y `AppElevation`.
+
+### `StatisticsSummaryCard` (`statistics/StatisticsSummaryCard.kt`)
+
+```kotlin
+StatisticsSummaryCard(summary, modifier)
+```
+
+- Porcentaje en chip `primaryContainer`; conteos con punto de color
+  (`tertiary`, `error`, `outline`).
+
+### `WeeklyStatisticsChart` (`statistics/WeeklyStatisticsChart.kt`)
+
+```kotlin
+WeeklyStatisticsChart(days, modifier)
+```
+
+- Barras apiladas al 100 % con Compose puro, sin librerías.
+- Cada barra tiene `contentDescription` con el día y los conteos.
+- La leyenda usa `FlowRow` para envolver a fuente grande.
+
+### `AdherenceLineChart` (`statistics/AdherenceLineChart.kt`)
+
+```kotlin
+AdherenceLineChart(points, title, modifier)
+```
+
+- Card con gráfico de líneas de adherencia (0–100 %), guías horizontales,
+  etiquetas de fecha en los extremos y el centro, y puntos en la línea.
+- La línea se dibuja con curvas suaves entre los puntos y un relleno suave
+  debajo; los puntos sin tomas evaluadas dejan un hueco.
+- La serie se recibe ya calculada (`AdherencePoint`) y los textos ya resueltos;
+  el subtítulo indica que cada punto es una semana.
+- Se usa en 30 y 90 días con puntos semanales; en 7 días se mantiene
+  `WeeklyStatisticsChart`.
+
+### `MedicationStatisticsCard` (`statistics/MedicationStatisticsCard.kt`)
+
+```kotlin
+MedicationStatisticsCard(statistics, modifier)
+```
+
+- Imagen o `DefaultPill` (con `AppImagePlaceholder`), nombre, dosis, «X de Y
+  tomas», pendientes y porcentaje. Etiqueta «Archivado» cuando corresponde.
+
+### `AppNavigationRow` (`AppNavigationRow.kt`)
+
+```kotlin
+AppNavigationRow(icon, label, description, onClick, modifier)
+```
+
+- Fila pulsable con icono configurable (`BarChart`, `Archive` o `History`),
+  etiqueta `bodyLarge` en `primary`, descripción `bodySmall` en
+  `onSurfaceVariant` y chevron final.
+- Se usa en las fichas de perfil y de medicamento para abrir estadísticas e
+  historial, y con `Icons.Rounded.Archive` para abrir los medicamentos
+  archivados desde el perfil. Recibe los textos ya resueltos con
+  `stringResource`.
+
+### `HistoryIntakeItem` (`history/HistoryIntakeItem.kt`)
+
+```kotlin
+HistoryIntakeItem(intake, status, modifier)
+```
+
+- Hora, medicamento, dosis, chip de estado con colores semánticos y badge
+  «Archivado» cuando la toma pertenece a un medicamento archivado.
+
+### `HistoryDayHeader` (`history/HistoryDayHeader.kt`)
+
+```kotlin
+HistoryDayHeader(date, today, modifier)
+```
+
+- Cabecera `titleSmall` en `onSurfaceVariant`; muestra «Hoy», «Ayer» o el día
+  y mes abreviados.
+
+### `HistoryFiltersButton` (`history/HistoryFiltersButton.kt`)
+
+```kotlin
+HistoryFiltersButton(activeFilterCount, dateRangeSummary, onClick, modifier)
+```
+
+- Card pulsable que abre la hoja de filtros. Muestra el rango de fechas activo
+  («Últimos 30 días» o las fechas personalizadas) y un badge con el número de
+  filtros.
+
+### `HistoryFiltersSheet` (`history/HistoryFiltersSheet.kt`)
+
+```kotlin
+HistoryFiltersSheet(
+    filters, medications, today, onDismiss, onStatusSelected,
+    onMedicationSelected, onIncludeArchivedChange, onApplyCustomRange,
+    onClearFilters
+)
+```
+
+- `ModalBottomSheet` con estado, medicamento, «Incluir archivados» y rango
+  personalizado con `AppDatePickerField`. Las fechas se guardan al cerrar
+  («Ver resultados», X, arrastre o atrás) si son válidas; «Limpiar filtros» es
+  la acción secundaria (`Tonal` `Large`, sin icono), vuelve al rango por
+  defecto y cierra la hoja. El contenido se separa en
+  `HistoryFiltersSheetContent` para previsualizarlo.
 
 ## Ajustes
 

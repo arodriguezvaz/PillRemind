@@ -11,9 +11,11 @@ import com.andres.pillremind.data.utils.copyImageToInternalStorage
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.ScheduleRule
+import com.andres.pillremind.domain.model.nextIntake
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ScheduleRepository
+import com.andres.pillremind.notifications.IntakeNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,6 +23,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -39,6 +42,8 @@ import java.time.LocalTime
  * @param medicationRepository Repositorio para operaciones CRUD sobre medicaciones.
  * @param scheduleRepository Repositorio para los horarios asociados a medicamentos.
  * @param reminderScheduler Coordina la generación de tomas y la programación de alarmas.
+ * @param intakeRepository Repositorio de tomas, usado para localizar sus notificaciones.
+ * @param intakeNotifications Cancela las notificaciones de las tomas afectadas.
  * @param sessionManager Gestor de sesión que expone el perfil activo.
  */
 @HiltViewModel
@@ -48,6 +53,7 @@ class MedicationViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val reminderScheduler: ReminderScheduler,
     private val intakeRepository: IntakeRepository,
+    private val intakeNotifications: IntakeNotifications,
     sessionManager: SessionManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -76,6 +82,20 @@ class MedicationViewModel @Inject constructor(
         ) ?: MutableStateFlow(emptyList())
 
     /**
+     * Próxima toma futura del medicamento, calculada a partir de sus horarios.
+     *
+     * Se recalcula cuando cambia el medicamento o su pauta. Si no quedan tomas
+     * futuras (tratamiento terminado o archivado), vale `null`.
+     */
+    val nextIntake: StateFlow<LocalDateTime?> = combine(medication, schedules) { med, horarios ->
+        med?.let { horarios.nextIntake(it) }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    /**
      * Crea un nuevo medicamento con sus horarios y programa las alarmas.
      *
      * La inserción del medicamento y de sus horarios se hace en una sola
@@ -98,12 +118,12 @@ class MedicationViewModel @Inject constructor(
 
         val trimmedName = nombre.trim()
         val normalizedUnit = unit.trim()
-        val imagePath = photoUri?.let {
-            copyImageToInternalStorage(context, it)
-        }
 
         viewModelScope.launch {
             val profileId = profileId.firstOrNull() ?: return@launch
+            val imagePath = photoUri?.let {
+                copyImageToInternalStorage(context, it)
+            }
             val medication = Medication(
                 name = trimmedName,
                 profileId = profileId,
@@ -140,7 +160,7 @@ class MedicationViewModel @Inject constructor(
      * si el commit va bien, se cancelan las alarmas antiguas y se regeneran.
      *
      * @param onSaved Callback ejecutado cuando la actualización y la generación
-     * de tomas ya han terminado.
+     *   de tomas ya han terminado; recibe la ruta de la imagen resultante.
      */
     fun updateMedication(
         name: String,
@@ -153,23 +173,31 @@ class MedicationViewModel @Inject constructor(
         scheduleRules: List<ScheduleRule>,
         times: List<LocalTime>,
         isChronic: Boolean,
-        onSaved: () -> Unit = {}
+        onSaved: (String?) -> Unit = {}
     ) {
         val trimmedName = name.trim()
         val normalizedUnit = unit.trim()
-        val imagePath = if (newPhotoUri != null) {
-            currentImagePath?.let { File(it).delete() }
-            copyImageToInternalStorage(context, newPhotoUri)
-        } else {
-            currentImagePath
-        }
         viewModelScope.launch {
             val id = medicationId ?: return@launch
             val currentMedication = medicationRepository.getMedicationByIdOnce(id) ?: return@launch
+            val previousImagePath = currentImagePath ?: currentMedication.imageUrl
+            val imagePath = if (newPhotoUri != null) {
+                // Copia primero la nueva imagen: si falla, se conserva la anterior.
+                val copiedPath = copyImageToInternalStorage(context, newPhotoUri)
+                if (copiedPath != null) {
+                    previousImagePath?.let { File(it).delete() }
+                    copiedPath
+                } else {
+                    previousImagePath
+                }
+            } else {
+                previousImagePath
+            }
             val now = LocalDateTime.now()
             val futureIntakeIds = intakeRepository
                 .getFutureIntakesByMedicationId(id, now)
                 .map { it.id }
+            val intakeIds = intakeRepository.getIntakeIdsByMedicationId(id)
 
             val updatedMedication = currentMedication.copy(
                 name = trimmedName,
@@ -196,19 +224,20 @@ class MedicationViewModel @Inject constructor(
             if (!saved) return@launch
 
             reminderScheduler.cancelAlarms(futureIntakeIds)
+            intakeNotifications.cancelAll(intakeIds)
             runCatching { reminderScheduler.generateWindow() }
                 .onFailure {
                     Log.e("PillDebug", "No se pudieron regenerar las tomas al editar", it)
                 }
-            onSaved()
+            onSaved(imagePath)
         }
     }
 
     /**
      * Archiva el medicamento y cancela sus alarmas futuras.
      *
-     * No se borra el historial de tomas ni la imagen, para poder conservar
-     * las estadísticas y el historial.
+     * No se borra el historial de tomas, la imagen ni la pauta, para poder
+     * recuperar el medicamento y conservar sus estadísticas.
      *
      * @param medication Medicamento que se desea archivar.
      * @param onArchived Callback ejecutado cuando el archivado se completa.
@@ -219,6 +248,7 @@ class MedicationViewModel @Inject constructor(
             val futureIntakeIds = intakeRepository
                 .getFutureIntakesByMedicationId(medication.id, now)
                 .map { it.id }
+            val intakeIds = intakeRepository.getIntakeIdsByMedicationId(medication.id)
 
             val archived = runCatching {
                 medicationRepository.softDeleteMedication(
@@ -233,7 +263,76 @@ class MedicationViewModel @Inject constructor(
             if (!archived) return@launch
 
             reminderScheduler.cancelAlarms(futureIntakeIds)
+            intakeNotifications.cancelAll(intakeIds)
             onArchived()
+        }
+    }
+
+    /**
+     * Desarchiva el medicamento y regenera su ventana de tomas.
+     *
+     * La pauta se conserva al archivar, así que tras limpiar `deletedAt` se
+     * vuelven a generar las tomas y sus alarmas.
+     *
+     * @param medication Medicamento que se desea recuperar.
+     * @param onRestored Callback ejecutado cuando el medicamento vuelve a estar activo.
+     */
+    fun restoreMedication(medication: Medication, onRestored: () -> Unit = {}) {
+        viewModelScope.launch {
+            val restored = runCatching {
+                medicationRepository.unarchiveMedication(
+                    medicationId = medication.id,
+                    updatedAt = LocalDateTime.now()
+                )
+            }.onFailure {
+                Log.e("PillDebug", "No se pudo desarchivar el medicamento", it)
+            }.isSuccess
+
+            if (!restored) return@launch
+
+            runCatching { reminderScheduler.generateWindow() }
+                .onFailure {
+                    Log.e("PillDebug", "No se pudieron regenerar las tomas al desarchivar", it)
+                }
+            onRestored()
+        }
+    }
+
+    /**
+     * Elimina definitivamente el medicamento y todo su historial.
+     *
+     * Primero guarda las tomas futuras para cancelar sus alarmas, después
+     * borra el medicamento (Room elimina en cascada su pauta y sus tomas) y
+     * finalmente borra la imagen asociada.
+     *
+     * @param medication Medicamento que se desea eliminar.
+     * @param onDeleted Callback ejecutado cuando el borrado se completa.
+     */
+    fun deleteMedicationPermanently(medication: Medication, onDeleted: () -> Unit = {}) {
+        viewModelScope.launch {
+            val now = LocalDateTime.now()
+            val futureIntakeIds = intakeRepository
+                .getFutureIntakesByMedicationId(medication.id, now)
+                .map { it.id }
+            val intakeIds = intakeRepository.getIntakeIdsByMedicationId(medication.id)
+
+            val deleted = runCatching {
+                medicationRepository.deleteMedication(medication)
+            }.onFailure {
+                Log.e("PillDebug", "No se pudo eliminar el medicamento", it)
+            }.isSuccess
+
+            if (!deleted) return@launch
+
+            medication.imageUrl?.let { imagePath ->
+                runCatching { File(imagePath).delete() }
+                    .onFailure {
+                        Log.w("PillDebug", "No se pudo borrar la imagen del medicamento", it)
+                    }
+            }
+            reminderScheduler.cancelAlarms(futureIntakeIds)
+            intakeNotifications.cancelAll(intakeIds)
+            onDeleted()
         }
     }
 

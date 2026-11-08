@@ -1,63 +1,62 @@
-# Proyecto fin de ciclo
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="doc/img/logo-oscuro.png">
+    <img src="doc/img/logo.png" width="132" alt="Logotipo de PillRemind: una pastilla semirrellena, icono de la app">
+  </picture>
+</p>
 
- **PILLRemind**
- 
-## Descrición
+<h1 align="center">PillRemind</h1>
 
+<p align="center">
+  <a href="https://github.com/arodriguezvaz/PillRemind/releases/latest"><img src="https://img.shields.io/github/v/release/arodriguezvaz/PillRemind?label=versi%C3%B3n&color=2ea44f" alt="Última versión"></a>
+</p>
 
-A aplicación desenvolvida é un sistema de recordatorio de medicación cuxo obxectivo principal é axudar ás persoas a 
-xestionar de maneira sinxela e segura os seus tratamentos (medicamentos, suplementación, etc.). Está pensada tanto 
-para usuarios que controlan a súa propia medicación como para aqueles que deben administrar ou supervisar a doutras persoas, 
-como familiares ou persoas dependentes.
+<p align="center">
+  Recordatorio de medicación local para Android 8.0 o superior. Sin cuentas, sin
+  sincronización y sin nube: los perfiles, medicamentos y tomas se guardan en el móvil.
+</p>
 
-A aplicación permite rexistrar medicamentos indicando datos como o nome, a dose, a frecuencia e os horarios de toma. 
-A partir desta información, o sistema xera recordatorios e notificacións no momento adecuado para evitar esquecementos. 
-Ademais, o usuario pode confirmar a toma da medicación, o que permite levar un control do cumprimento do tratamento.
+## Descarga
 
-Outro dos aspectos importantes é a xestión de perfís, que permite organizar a medicación de diferentes persoas dentro 
-dun mesmo dispositivo. A aplicación funciona integramente de forma local: non require conta nin conexión a internet,
-e os datos gárdanse só no dispositivo. Tamén conta con funcionalidades de modificación e eliminación de medicamentos,
-así como recordatorios e notificacións para cada toma.
+La aplicación se distribuye como APK desde las
+[releases de GitHub](https://github.com/arodriguezvaz/PillRemind/releases/latest).
+No está publicada en Google Play.
 
-Cada perfil pode gardar información médica opcional: data de nacemento, sexo, grupo sanguíneo, alerxias, notas e
-número de tarxeta sanitaria. Estes datos móstranse desde «Ver perfil» e inclúense na copia de seguridade local. O botón
-«Ver adherencia» queda preparado como acceso ás futuras estatísticas de tomas por medicamento.
+- Requiere Android 8.0 (API 26) o superior.
+- Descarga `PillRemind-x.y.z.apk` y ábrelo. Android pedirá permiso para instalar
+  apps de fuentes desconocidas y puede mostrar un aviso de Play Protect.
+- Las actualizaciones se avisan desde la propia app y se instalan sobre la versión
+  anterior conservando los datos.
 
-## Almacenamento local
+**Guía paso a paso, con capturas:**
+[Manual de descarga e instalación](doc/docs/manual-instalacion.md)
 
-Todos os datos (perfís, medicamentos, horarios e tomas) gárdanse nunha base de datos Room no propio dispositivo.
-A aplicación non envía información a servidores externos nin sincroniza datos entre dispositivos.
+## Qué hace
 
-Desde Axustes pódese exportar e importar unha copia de seguridade local que inclúe perfís, medicamentos,
-horarios, historial e imaxes. A copia pódese protexer cun contrasinal; a importación substitúe todos os
-datos actuais.
+- **Perfiles**: medicación separada para varias personas en el mismo móvil.
+- **Medicamentos**: dosis, unidad, foto y pauta por días, intervalos o ciclos.
+- **Recordatorios**: notificación a la hora de cada toma, con acción para marcarla.
+- **Historial y adherencia**: búsqueda y filtros de tomas, resumen de 7, 30 y 90 días.
+- **Copia de seguridad local**: exportación e importación con contraseña opcional.
 
-## Sobre a autoría
+**Guía de uso, con capturas:** [Manual de uso](doc/docs/manual-uso.md)
 
-O autor deste proxecto é Andrés Rodríguez Vázquez, estudante de 2º DAM no IES San Clemente. 
-Está interesado no ámbito tecnolóxico e científico. Os seus puntos fortes son a detección 
-de problemas da vida real, o traballo en equipo e o pensamento lóxico.
+## Privacidad
 
-As tecnoloxías que máis domina son Kotlin e Java. Ademais, durante as prácticas en empresa 
-traballou con React, o que lle permitiu familiarizarse co desenvolvemento de interfaces de usuario reactivas, 
-como Jetpack Compose. Debido a isto, escolleu realizar unha aplicación en Kotlin e Jetpack Compose, 
-xa que son tecnoloxías modernas e en uso, con gran respaldo por parte de Google e da comunidade de Kotlin Multiplatform.
+Todos los datos se guardan en una base de datos Room del dispositivo. La única
+conexión a internet es la comprobación diaria de actualizaciones contra GitHub
+Releases, que no envía datos de salud ni identificadores personales.
 
-O motivo da realización deste proxecto foi persoal: decatouse de que con frecuencia se 
-esquece de tomar a medicación e non quería que outras empresas tivesen información sobre a súa medicación. 
-Por iso, decidiu crear unha aplicación que lle resultase útil a nivel persoal e familiar.
+## Desarrollo
 
-## Licencia
+Android con Kotlin, Jetpack Compose, Hilt, Room y WorkManager. El APK de release se
+compila, firma y publica con GitHub Actions.
 
-- [Ficheiro License](LICENSE)
+**Detalles técnicos, compilación y publicación:**
+[Guía de desarrollo](doc/docs/desarrollo.md)
 
-## Índice
+## Autoría y licencia
 
-1. [Estudo preliminar](doc/templates/1_estudo_preliminar.md)
-2. [Análise](doc/templates/2_analise.md)
-   - [Planificación](doc/templates/21_planificacion.md)
-   - [Orzamento](doc/templates/22_orzamento.md)
-3. [Deseño](doc/templates/3_deseño.md)
-4. [Codificación e probas](doc/templates/4_codificacion_probas.md)
-5. [Manuais do proxecto](doc/templates/5_manuais.md)
-   - [Referencias](doc/templates/51_referencias.md)
+Proyecto personal de [Andrés Rodríguez Vázquez](https://github.com/arodriguezvaz),
+nacido como proyecto de fin de ciclo DAM y mantenido desde entonces. Se distribuye
+bajo licencia MIT; consulta [LICENSE](LICENSE).

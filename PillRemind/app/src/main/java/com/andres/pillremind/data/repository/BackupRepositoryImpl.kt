@@ -17,6 +17,7 @@ import com.andres.pillremind.data.local.dao.BackupDao
 import com.andres.pillremind.data.local.database.AppDatabase
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.repository.BackupRepository
+import com.andres.pillremind.notifications.IntakeNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayInputStream
@@ -40,6 +41,7 @@ class BackupRepositoryImpl @Inject constructor(
     private val imageStore: BackupImageStore,
     private val sessionManager: SessionManager,
     private val reminderScheduler: ReminderScheduler,
+    private val intakeNotifications: IntakeNotifications,
     @ApplicationContext private val context: Context
 ) : BackupRepository {
 
@@ -171,6 +173,11 @@ class BackupRepositoryImpl @Inject constructor(
             }
 
             reminderScheduler.cancelAlarms(oldFutureIntakeIds)
+
+            // Los datos anteriores ya no existen y sus notificaciones pueden
+            // apuntar a IDs reutilizados por las tomas importadas (BUG-06).
+            intakeNotifications.cancelAll()
+
             sessionManager.clearActiveProfile()
             sessionManager.setActiveUser(entities.users.first().id)
             sessionManager.clearLastGeneratedDate()

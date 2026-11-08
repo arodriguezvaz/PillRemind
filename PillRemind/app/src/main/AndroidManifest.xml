@@ -6,10 +6,23 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Solo se usa para consultar el manifiesto de actualizaciones de GitHub
+         Releases. El resto de la aplicación funciona sin conexión. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- La cámara se abre con la app del sistema, así que no se pide el permiso
+         CAMERA; esta característica opcional permite instalar en dispositivos sin ella. -->
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" />
+
     <!-- Necesario para comprobar si el sistema ofrece la pantalla de alarmas exactas. -->
     <queries>
         <intent>
             <action android:name="android.settings.REQUEST_SCHEDULE_EXACT_ALARM" />
+        </intent>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
         </intent>
     </queries>
 
@@ -63,6 +76,16 @@
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
+        </provider>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
         </provider>
     </application>
 

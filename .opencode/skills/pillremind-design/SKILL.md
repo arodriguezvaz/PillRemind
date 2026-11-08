@@ -38,9 +38,8 @@ el mismo cambio.
 
 1. **Pensada para personas mayores.** El texto de lectura usa `bodyLarge`
    (16sp); `bodyMedium` (14sp) se reserva para descripciones y `bodySmall`
-   (12sp) para metadatos. Los datos de lectura de `AppInfoRow` y
-   `AppReadOnlyField` suben a 18sp/26sp. No reduzcas texto para que quepa:
-   reordena el layout.
+   (12sp) para metadatos. Los valores de `AppDetailRow` suben a 18sp/26sp.
+   No reduzcas texto para que quepa: reordena el layout.
 2. **Una sola elevación.** `AppElevation` (4dp) en cards, campos, chips, filas
    de horas, botones y FAB. No añadas 8dp, 12dp ni sombras propias.
 3. **Superficies limpias.** Fondo `background`, cards y campos `surface`, texto
@@ -65,13 +64,13 @@ Resumen operativo; los valores completos están en `references/tokens.md`.
 
 | Rol | Uso |
 |---|---|
-| `primary` | Marca, títulos de sección, acción principal, icono activo. Negro en claro, blanco en oscuro. |
+| `primary` | Marca, títulos de sección, acción principal, icono activo. Negro en claro, azul cielo en oscuro. |
 | `onPrimary` | Texto e iconos sobre `primary`. |
-| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, avatar por defecto. |
-| `secondaryContainer` / `onSecondaryContainer` | Botón de una toma ya realizada. |
+| `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado y acción secundaria (`ButtonVariant.Tonal`). |
+| `secondaryContainer` / `onSecondaryContainer` | Solo el estado de una toma ya realizada (`IntakeCard`); no es el botón secundario genérico. |
 | `error` / `onError` | Acciones destructivas y toma retrasada. |
 | `surface` | Fondo de cards, campos, chips no seleccionados y filas. |
-| `surfaceVariant` | Campos deshabilitados y fondo del selector de foto. |
+| `surfaceVariant` | Campos deshabilitados, fondo del selector de foto y de los placeholders de imagen. |
 | `onSurfaceVariant` | Texto secundario, metadatos y descripciones. |
 | `outlineVariant` | Divisores y bordes finos. |
 | `background` | Fondo general y barra superior. |
@@ -83,7 +82,7 @@ No uses `secondary`/`tertiary` para decorar: cada rol tiene un significado.
 
 | Rol | Uso |
 |---|---|
-| `titleLarge` | Títulos de sección (`AppFormSection`, `AppInfoCard`) y título de la top bar. |
+| `titleLarge` | Títulos de sección (`AppFormSection`, `AppReadOnlySection`) y título de la top bar. |
 | `titleMedium` | Título de card (`MedicationCard`, `IntakeCard`, `PerfilCard`, `SettingsCard`). |
 | `bodyLarge` | Texto de lectura, etiquetas de ajustes, horas. |
 | `bodyMedium` | Descripciones, enlaces de ajustes y estado vacío. |
@@ -107,20 +106,29 @@ No uses `secondary`/`tertiary` para decorar: cada rol tiene un significado.
 
 No escribas `RoundedCornerShape(...)` en pantallas o componentes: usa un token.
 Excepciones que se mantienen como literales: tamaños de iconos/imágenes/botones,
-paddings internos de `AppButton`, 6dp de `AppInfoRow`, 10dp de un bloque de
-`SettingsScreen` y bordes de 1/2dp.
+paddings internos de `AppButton`, 10dp de un bloque de `SettingsScreen` y
+bordes/divisores de 1/2dp.
 
 ## Componentes
 
 Catálogo detallado en `references/components.md`.
 
 - **Botones:** `AppButton` (`Primary`, `Secondary`, `Tonal`, `Ghost`, `Danger`;
-  `Small` 110dp, `Medium` 160dp, `Large` ancho completo) y `AppFab`.
+  `Small` 110dp, `Medium` 160dp, `Large` ancho completo) y `AppFab`. La acción
+  secundaria con texto usa `Tonal` (`primaryContainer`), como `AddTimeItem` y
+  «Limpiar filtros»; `Secondary` queda para el estado «Tomado» de `IntakeCard`
+  y `Ghost` para acciones inline. El icono inicial solo si aporta significado
+  (`Add` en «Añadir hora»).
 - **Campos:** `AppTextField` + `AppFormField`; `AppSearchField` para búsqueda;
-  `AppDropdownField`, `AppDatePickerField`, `AppPhotoPicker`.
-- **Formularios:** `AppFormSection`, `AppReadOnlyField` y `AppFormActions`.
-- **Cards:** `AppInfoCard`/`AppInfoRow`, `BlankCard`, `MedicationCard`,
-  `IntakeCard`, `PerfilCard`.
+  `AppDropdownField`, `AppDatePickerField`, `AppPhotoPicker` (con
+  `AppPhotoCropDialog` y `AppPhotoViewerDialog`) y `AppImagePlaceholder` para el
+  hueco de las imágenes sin foto.
+- **Formularios:** `AppFormSection` y `AppFormActions`.
+- **Solo lectura:** `AppReadOnlySection`, `AppDetailRow` (con variante
+  `stacked`), `AppNoticeBlock`, `AppNavigationRow` y `AppScrollWithFooter`.
+- **Cards:** `BlankCard`, `MedicationCard`, `IntakeCard`, `PerfilCard`.
+- **Historial:** `HistoryIntakeItem`, `HistoryDayHeader`,
+  `HistoryFiltersButton` y `HistoryFiltersSheet`.
 - **Ajustes:** `SettingsCard`, `SettingsRadioItem`, `SettingsToggleItem`,
   `SettingsLinkItem`.
 - **Horarios:** `WeekDayChipGroup`, `TimeListEditor`, `TimeItem`, `AddTimeItem`.
@@ -203,6 +211,7 @@ JAVA_HOME=/opt/android-studio/jbr ./gradlew assembleDebug
 - [ ] Leí `ui/theme` y reutilizo tokens y componentes.
 - [ ] No hay `Color(0x...)` ni formas literales fuera de las excepciones.
 - [ ] `AppSpacing` en paddings, spacers y separaciones.
+- [ ] Las acciones secundarias usan `Tonal`; `Secondary` solo marca «Tomado».
 - [ ] Textos en `strings.xml` y `contentDescription` correctos.
 - [ ] Comprobado en claro y oscuro, y con texto grande.
 - [ ] La pestaña nueva está en el resolver de `TopBarState` de `MainScreen`;
