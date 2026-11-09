@@ -282,7 +282,9 @@ Column(fillMaxSize + padding(AppSpacing.md))
   `vertical = AppSpacing.lg`, separada con `AppSpacing.lg`.
 - `BrandHeader` + título `titleMedium` Bold en `primary` + descripción
   `bodyMedium` en `onSurfaceVariant`.
-- `PermissionCard` por permiso, con `PermissionStatusChip`.
+- `PermissionCard` por permiso, con `PermissionStatusChip`: concedido en
+  `primaryContainer`, pendiente en `secondaryContainer`, bloqueado en
+  `errorContainer` y no requerido en `surfaceVariant`.
 - Acciones inferiores: `AppButton` `Large` y avisos en `bodySmall`.
 
 ## Reglas al añadir una pantalla

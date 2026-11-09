@@ -130,7 +130,7 @@ private fun DayBar(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(day.pending.toFloat())
-                            .background(MaterialTheme.colorScheme.outline)
+                            .background(MaterialTheme.colorScheme.secondary)
                     )
                 }
                 if (day.missed > 0) {
@@ -189,7 +189,7 @@ private fun ChartLegend() {
         )
         ChartLegendItem(
             label = stringResource(R.string.statistics_pending_label),
-            color = MaterialTheme.colorScheme.outline
+            color = MaterialTheme.colorScheme.secondary
         )
     }
 }

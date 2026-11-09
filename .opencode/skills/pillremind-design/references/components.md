@@ -312,7 +312,7 @@ StatisticsSummaryCard(summary, modifier)
 ```
 
 - Porcentaje en chip `primaryContainer`; conteos con punto de color
-  (`tertiary`, `error`, `outline`).
+  (`tertiary` tomadas, `error` sin registrar, `secondary` pendientes).
 
 ### `WeeklyStatisticsChart` (`statistics/WeeklyStatisticsChart.kt`)
 
@@ -320,7 +320,8 @@ StatisticsSummaryCard(summary, modifier)
 WeeklyStatisticsChart(days, modifier)
 ```
 
-- Barras apiladas al 100 % con Compose puro, sin librerías.
+- Barras apiladas al 100 % con Compose puro, sin librerías: tomadas en
+  `tertiary`, sin registrar en `error` y pendientes en `secondary`.
 - Cada barra tiene `contentDescription` con el día y los conteos.
 - La leyenda usa `FlowRow` para envolver a fuente grande.
 
@@ -371,6 +372,8 @@ HistoryIntakeItem(intake, status, modifier)
 - Hora, medicamento y dosis a la izquierda; chip de estado con colores
   semánticos y badge «Archivado» (si procede) a la derecha, centrados
   verticalmente y separados 8dp.
+- El chip usa `tertiaryContainer` para tomada, `secondaryContainer` para
+  pendiente y `errorContainer` para sin registrar.
 - Con texto grande (desde 1,3×) y medicamento archivado, los badges pasan a
   una línea inferior alineada a la derecha para no recortar el nombre.
 

@@ -173,8 +173,8 @@ private fun StatusBadge(status: StatisticsStatus) {
         StatisticsStatus.MISSED -> MaterialTheme.colorScheme.errorContainer to
             MaterialTheme.colorScheme.onErrorContainer
 
-        StatisticsStatus.PENDING -> MaterialTheme.colorScheme.surfaceVariant to
-            MaterialTheme.colorScheme.onSurfaceVariant
+        StatisticsStatus.PENDING -> MaterialTheme.colorScheme.secondaryContainer to
+            MaterialTheme.colorScheme.onSecondaryContainer
     }
 
     Surface(
