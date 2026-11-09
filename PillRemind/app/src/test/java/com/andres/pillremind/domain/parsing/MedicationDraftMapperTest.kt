@@ -52,7 +52,7 @@ class MedicationDraftMapperTest {
     }
 
     @Test
-    fun `mucibron usa la concentracion al ser liquido`() {
+    fun `mucibron deja la dosis vacia porque solo da una concentracion`() {
         val draft = MedicationDraftMapper.fromCima(
             cima(
                 name = "MUCIBRON FORTE 6 MG/ML SOLUCION ORAL",
@@ -62,11 +62,12 @@ class MedicationDraftMapperTest {
         )
 
         assertEquals("MUCIBRON FORTE 6 MG/ML", draft.name)
-        assertEquals("6", draft.doseText)
-        assertEquals("mg", draft.unit)
+        assertEquals("", draft.doseText)
+        assertEquals("", draft.unit)
         assertNull(draft.intakeDoseText)
         assertEquals("6", draft.strengthDoseText)
         assertEquals("mg", draft.strengthUnit)
+        assertEquals("6 mg/ml", draft.strengthText)
     }
 
     @Test
@@ -108,6 +109,25 @@ class MedicationDraftMapperTest {
         assertEquals("663526", draft.cn)
         assertEquals(DraftSource.OCR, draft.source)
         assertTrue(draft.notCatalogued)
+    }
+
+    @Test
+    fun `el ocr con concentracion compuesta no inventa una dosis`() {
+        val draft = MedicationDraftMapper.fromOcr(
+            fields = BoxFields(
+                name = "Tritab",
+                strengthDoseText = "200",
+                strengthUnit = "mg",
+                strengthText = "200 mg/5 ml",
+                form = "polvo"
+            ),
+            cn = null
+        )
+
+        assertEquals("Tritab", draft.name)
+        assertEquals("", draft.doseText)
+        assertEquals("", draft.unit)
+        assertEquals("200 mg/5 ml", draft.strengthText)
     }
 
     @Test

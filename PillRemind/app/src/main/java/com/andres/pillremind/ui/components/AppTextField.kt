@@ -13,6 +13,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
@@ -28,6 +30,7 @@ import com.andres.pillremind.ui.theme.PillRemindTheme
  * @param onValueChange Función a ejecutar cuando se cambia el valor del campo de texto.
  * @param modifier Modificador para personalizar la vista.
  * @param placeholder Texto a mostrar como marcador de posición.
+ * @param focusRequester Permite pedir el foco desde la pantalla que lo contiene.
  * @param enabled Indica si el campo de texto está habilitado.
  * @param keyboardType Tipo de teclado que se muestra al editar el campo.
  * @param singleLine Indica si el campo debe ocupar una sola línea.
@@ -51,6 +54,7 @@ fun AppTextField(
     leadingIcon: ImageVector? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
     imeAction: ImeAction = ImeAction.Default,
+    focusRequester: FocusRequester? = null,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -62,7 +66,8 @@ fun AppTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier),
             placeholder = placeholder?.let {
                 {
                     Text(

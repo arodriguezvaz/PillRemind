@@ -109,6 +109,19 @@ class BoxTextParserTest {
     }
 
     @Test
+    fun `no usa prosa de la caja como nombre`() {
+        val fields = BoxTextParser.parse(
+            """
+                ojos y mucosas. Mantener
+                C.N. 205642.8
+                8 470002 056428
+            """.trimIndent()
+        )
+
+        assertNull(fields.name)
+    }
+
+    @Test
     fun `paracetamol en gramos`() {
         val fields = BoxTextParser.parse("PARACETAMOL 1 G COMPRIMIDOS")
 

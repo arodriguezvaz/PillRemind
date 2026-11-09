@@ -120,6 +120,9 @@ object BoxTextParser {
         val candidates = lines.filter { line ->
             line.length in 3..40 &&
                 line.any(Char::isLetter) &&
+                line.firstOrNull()?.isLowerCase() != true &&
+                !line.trimEnd().endsWith(".") &&
+                line.count(Char::isWhitespace) <= 4 &&
                 (strengthMatch == null || !line.contains(strengthMatch.value, true)) &&
                 (formLine == null || line != formLine) &&
                 (intakeMatch == null || !line.contains(intakeMatch.value, true))

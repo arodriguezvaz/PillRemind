@@ -150,7 +150,7 @@ fun MedicationScreen(
     val medicationSchedules by medicationViewModel.schedules.collectAsState()
     val nextIntake by medicationViewModel.nextIntake.collectAsStateWithLifecycle()
     val scanState by medicationScanViewModel.state.collectAsStateWithLifecycle()
-    var showScanFlow by remember { mutableStateOf(false) }
+    var showScanFlow by rememberSaveable { mutableStateOf(false) }
 
     val unitOptions = stringArrayResource(R.array.medication_units).toList()
 

@@ -1,7 +1,6 @@
 package com.andres.pillremind.ui.screens.medication
 
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,6 +54,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -164,20 +164,17 @@ fun MedicationScanFlow(
 ) {
     var scrollToCn by remember { mutableStateOf(false) }
 
-    BackHandler {
-        when (state.stage) {
-            ScanStage.PHOTOS -> onDismiss()
-            ScanStage.ANALYZING,
-            ScanStage.RESULT -> onBackToPhotos()
-        }
-    }
-
     Dialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            when (state.stage) {
+                ScanStage.PHOTOS -> onDismiss()
+                ScanStage.ANALYZING,
+                ScanStage.RESULT -> onBackToPhotos()
+            }
+        },
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false,
-            dismissOnBackPress = false
+            decorFitsSystemWindows = false
         )
     ) {
         Surface(
@@ -291,10 +288,14 @@ private fun ScanPhotosContent(
     onDismiss: () -> Unit
 ) {
     val scrollState = rememberScrollState()
+    val cnFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(scrollToCn, scrollState.maxValue) {
-        if (scrollToCn && scrollState.maxValue > 0) {
-            scrollState.animateScrollTo(scrollState.maxValue)
+        if (scrollToCn) {
+            runCatching { cnFocusRequester.requestFocus() }
+            if (scrollState.maxValue > 0) {
+                scrollState.animateScrollTo(scrollState.maxValue)
+            }
             onScrollHandled()
         }
     }
@@ -352,7 +353,8 @@ private fun ScanPhotosContent(
                 value = state.manualCn,
                 onValueChange = onManualCnChange,
                 placeholder = stringResource(R.string.scan_manual_cn_placeholder),
-                keyboardType = KeyboardType.Number
+                keyboardType = KeyboardType.Number,
+                focusRequester = cnFocusRequester
             )
             if (state.manualCnInvalid) {
                 Text(
@@ -711,9 +713,10 @@ private fun ScanResultContent(
         val intakeUnit = draft?.intakeUnit
         val strengthDose = draft?.strengthDoseText
         val strengthUnit = draft?.strengthUnit
-        if (intakeDose != null && intakeUnit != null &&
-            strengthDose != null && strengthUnit != null
-        ) {
+        val showStrengthChip = draft?.strengthText?.contains('/') != true
+        val hasIntakeChip = intakeDose != null && intakeUnit != null
+        val hasStrengthChip = strengthDose != null && strengthUnit != null && showStrengthChip
+        if (hasIntakeChip || hasStrengthChip) {
             Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
                 Text(
                     text = stringResource(R.string.scan_result_choose_dose),
@@ -723,40 +726,44 @@ private fun ScanResultContent(
                     horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
                     verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)
                 ) {
-                    FilterChip(
-                        selected = dose == intakeDose && unit == intakeUnit,
-                        onClick = {
-                            dose = intakeDose
-                            unit = intakeUnit
-                        },
-                        label = {
-                            Text(
-                                stringResource(
-                                    R.string.scan_cn_dose_intake,
-                                    intakeDose,
-                                    intakeUnit
+                    if (intakeDose != null && intakeUnit != null) {
+                        FilterChip(
+                            selected = dose == intakeDose && unit == intakeUnit,
+                            onClick = {
+                                dose = intakeDose
+                                unit = intakeUnit
+                            },
+                            label = {
+                                Text(
+                                    stringResource(
+                                        R.string.scan_cn_dose_intake,
+                                        intakeDose,
+                                        intakeUnit
+                                    )
                                 )
-                            )
-                        },
-                        colors = doseChipColors
-                    )
-                    FilterChip(
-                        selected = dose == strengthDose && unit == strengthUnit,
-                        onClick = {
-                            dose = strengthDose
-                            unit = strengthUnit
-                        },
-                        label = {
-                            Text(
-                                stringResource(
-                                    R.string.scan_cn_dose_strength,
-                                    strengthDose,
-                                    strengthUnit
+                            },
+                            colors = doseChipColors
+                        )
+                    }
+                    if (strengthDose != null && strengthUnit != null && showStrengthChip) {
+                        FilterChip(
+                            selected = dose == strengthDose && unit == strengthUnit,
+                            onClick = {
+                                dose = strengthDose
+                                unit = strengthUnit
+                            },
+                            label = {
+                                Text(
+                                    stringResource(
+                                        R.string.scan_cn_dose_strength,
+                                        strengthDose,
+                                        strengthUnit
+                                    )
                                 )
-                            )
-                        },
-                        colors = doseChipColors
-                    )
+                            },
+                            colors = doseChipColors
+                        )
+                    }
                 }
             }
         }
@@ -863,6 +870,7 @@ private fun ScanNoticeCard(
         ScanNotice.NONE -> return
     }
     val datePattern = stringResource(R.string.common_date_pattern)
+    val detectedCn = draft?.cn
     val text = when (notice) {
         ScanNotice.CIMA_FOUND -> stringResource(
             R.string.scan_cn_attribution,
@@ -909,6 +917,13 @@ private fun ScanNoticeCard(
                     text = stringResource(title),
                     style = MaterialTheme.typography.labelLarge
                 )
+                if (notice == ScanNotice.CIMA_FOUND && detectedCn != null) {
+                    Spacer(modifier = Modifier.height(AppSpacing.xxs))
+                    Text(
+                        text = stringResource(R.string.scan_notice_cn_detected, detectedCn),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 Spacer(modifier = Modifier.height(AppSpacing.xxs))
                 Text(
                     text = text,

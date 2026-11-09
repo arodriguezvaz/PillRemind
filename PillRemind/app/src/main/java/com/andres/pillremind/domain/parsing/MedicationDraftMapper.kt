@@ -36,11 +36,12 @@ object MedicationDraftMapper {
     fun fromCima(medication: CimaMedication): MedicationDraft {
         val strength = parseDose(medication.dosis)
         val intake = formToIntake(medication.form)
+        val dose = intake ?: simpleStrength(medication.dosis, strength)
 
         return MedicationDraft(
             name = shortName(medication.name),
-            doseText = intake?.first ?: strength?.first.orEmpty(),
-            unit = intake?.second ?: strength?.second.orEmpty(),
+            doseText = dose?.first.orEmpty(),
+            unit = dose?.second.orEmpty(),
             form = medication.form,
             strengthText = medication.dosis,
             presentation = medication.presentation,
@@ -64,11 +65,12 @@ object MedicationDraftMapper {
         val strength = fields.strengthDoseText?.let { dose ->
             fields.strengthUnit?.let { unit -> dose to unit }
         }
+        val dose = intake ?: simpleStrength(fields.strengthText, strength)
 
         return MedicationDraft(
             name = fields.name.orEmpty(),
-            doseText = intake?.first ?: strength?.first.orEmpty(),
-            unit = intake?.second ?: strength?.second.orEmpty(),
+            doseText = dose?.first.orEmpty(),
+            unit = dose?.second.orEmpty(),
             form = fields.form,
             strengthText = fields.strengthText,
             cn = cn,
@@ -79,6 +81,23 @@ object MedicationDraftMapper {
             strengthDoseText = strength?.first,
             strengthUnit = strength?.second
         )
+    }
+
+    /**
+     * Usa la concentración como dosis solo cuando es un valor simple.
+     *
+     * Los textos con `/` (por ejemplo `6 mg/ml` o `25 µg/600 µg/dosis`)
+     * describen una concentración o una combinación, no la cantidad de una
+     * toma. En esos casos es más seguro dejar la dosis vacía para que el
+     * usuario la escriba.
+     */
+    private fun simpleStrength(
+        strengthText: String?,
+        strength: Pair<String, String>?
+    ): Pair<String, String>? {
+        if (strength == null) return null
+        if (strengthText?.contains('/') == true) return null
+        return strength
     }
 
     /**
