@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
  * @param leadingIcon Icono opcional a la izquierda del texto. Es decorativo: el
  *   texto del botón ya describe la acción.
  * @param looksDisabled Si es true, usa los colores y la elevación del estado
- *   deshabilitado aunque el botón siga siendo pulsable.
+ *   deshabilitado (0dp) aunque el botón siga siendo pulsable.
  */
 @Composable
 fun AppButton(
@@ -95,6 +95,7 @@ fun AppButton(
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = effectiveElevation,
             pressedElevation = effectiveElevation,
+            // Deshabilitado sin elevación: el botón atenuado no debe parecer pulsable.
             disabledElevation = 0.dp,
         ),
         contentPadding = PaddingValues(

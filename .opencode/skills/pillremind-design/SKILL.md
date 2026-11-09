@@ -41,7 +41,9 @@ el mismo cambio.
    (12sp) para metadatos. Los valores de `AppDetailRow` suben a 18sp/26sp.
    No reduzcas texto para que quepa: reordena el layout.
 2. **Una sola elevación.** `AppElevation` (4dp) en cards, campos, chips, filas
-   de horas, botones y FAB. No añadas 8dp, 12dp ni sombras propias.
+   de horas, botones y FAB. No añadas 8dp, 12dp ni sombras propias. El estado
+   deshabilitado no lleva elevación (0dp); no uses `disabledElevation =
+   AppElevation`.
 3. **Superficies limpias.** Fondo `background`, cards y campos `surface`, texto
    principal `onSurface`, secundario `onSurfaceVariant`.
 4. **Claro y oscuro.** Comprueba ambos; no uses blanco/negro fijos. El tema
