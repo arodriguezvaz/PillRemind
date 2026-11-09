@@ -69,7 +69,9 @@ Resumen operativo; los valores completos están en `references/tokens.md`.
 | `primary` | Marca, títulos de sección, acción principal, icono activo. Azul profundo en claro, azul cielo en oscuro. |
 | `onPrimary` | Texto e iconos sobre `primary`. |
 | `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado y acción secundaria (`ButtonVariant.Tonal`). |
-| `secondaryContainer` / `onSecondaryContainer` | Solo el estado de una toma ya realizada (`IntakeCard`); no es el botón secundario genérico. |
+| `secondary` | Naranja/amarillo de aviso: puntos, barras e iconos de pendiente; no para texto pequeño en claro. |
+| `secondaryContainer` / `onSecondaryContainer` | Fondos de aviso: chip de pendiente en historial y onboarding, `AppNoticeBlock` y estado «Tomado» de `IntakeCard`; no es el botón secundario genérico. |
+| `tertiary` / `tertiaryContainer` | Verde de confirmación: estado «Tomada» y barras de tomadas. |
 | `error` / `onError` | Acciones destructivas y toma retrasada. |
 | `surface` | Fondo de cards, campos, chips no seleccionados y filas. |
 | `surfaceVariant` | Campos deshabilitados, fondo del selector de foto y de los placeholders de imagen. |
@@ -78,7 +80,8 @@ Resumen operativo; los valores completos están en `references/tokens.md`.
 | `background` | Fondo general y barra superior. |
 
 No uses `secondary`/`tertiary` para decorar: cada rol tiene un significado.
-`tertiary` es el verde de confirmación y hoy apenas se usa.
+`secondary` es el naranja/amarillo de aviso o pendiente y `tertiary` el verde
+de confirmación.
 
 ### Tipografía (Lexend)
 

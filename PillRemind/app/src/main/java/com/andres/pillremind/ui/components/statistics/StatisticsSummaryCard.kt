@@ -105,7 +105,7 @@ fun StatisticsSummaryCard(
             StatisticsCountRow(
                 label = stringResource(R.string.statistics_pending_label),
                 value = summary.pending,
-                color = MaterialTheme.colorScheme.outline
+                color = MaterialTheme.colorScheme.secondary
             )
         }
     }

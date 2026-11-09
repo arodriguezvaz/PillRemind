@@ -12,9 +12,9 @@ fuente de verdad: si un valor cambia, actualiza también esta tabla.
 | `primary` | Marca, títulos de sección, acciones principales, icono activo de la barra inferior. Azul profundo en claro, azul cielo en oscuro. | Usarlo como fondo de bloques grandes de información. |
 | `onPrimary` | Texto e iconos sobre `primary`. | Texto secundario. |
 | `primaryContainer` / `onPrimaryContainer` | Fondos suaves: chip seleccionado, FAB de perfiles, badge de filtros y botón secundario (`ButtonVariant.Tonal`). | Sustituir a `surface` en cards. |
-| `secondary` | Naranja de aviso; hoy se usa sobre todo como base de `secondaryContainer`. | Decoración o texto largo. |
-| `secondaryContainer` / `onSecondaryContainer` | Solo el estado de una toma ya realizada (`ButtonVariant.Secondary` en `IntakeCard`). | Botón secundario genérico (usa `primaryContainer`) y estado pendiente. |
-| `tertiary` / `tertiaryContainer` | Verde de confirmación; uso puntual. | Acciones principales. |
+| `secondary` | Naranja/amarillo de aviso: puntos, barras e iconos de pendiente. | Decoración o texto pequeño (2,8:1 sobre blanco en claro). |
+| `secondaryContainer` / `onSecondaryContainer` | Fondos de aviso: chip de pendiente en historial y onboarding, `AppNoticeBlock` y `ButtonVariant.Secondary` de `IntakeCard` para «Tomado». | Botón secundario genérico (usa `primaryContainer`). |
+| `tertiary` / `tertiaryContainer` | Verde de confirmación: estado «Tomada» y barras de tomadas. | Acciones principales y estados pendientes. |
 | `error` / `onError` | Acciones destructivas (`ButtonVariant.Danger`) y toma retrasada. | Texto de error sobre `surface` sin contraste. |
 | `errorContainer` / `onErrorContainer` | Fondos de error puntuales. | Sustituir a `error` en botones. |
 | `surface` | Fondo de cards, campos, chips no seleccionados y filas de horas. | Fondo general de pantalla. |

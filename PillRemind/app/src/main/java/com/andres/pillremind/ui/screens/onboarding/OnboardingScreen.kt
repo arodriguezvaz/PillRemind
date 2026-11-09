@@ -333,7 +333,7 @@ private fun PermissionStatusChip(status: PermissionStatusUi) {
             MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
 
         PermissionStatusUi.PENDING ->
-            MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
+            MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
 
         PermissionStatusUi.BLOCKED,
         PermissionStatusUi.UNAVAILABLE ->
