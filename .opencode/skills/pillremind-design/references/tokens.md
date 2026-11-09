@@ -215,4 +215,5 @@ iconos/imágenes/botones y bordes/divisores de 1/2dp.
 
 `AppElevation` = **4dp** (`Elevation.kt`). Única elevación de la app: cards,
 campos, chips, filas de horas, botones y FAB. No uses otra elevación ni sombras
-propias.
+propias. El estado deshabilitado no lleva elevación (0dp): no uses
+`disabledElevation = AppElevation`.

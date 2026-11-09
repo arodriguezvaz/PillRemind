@@ -30,7 +30,7 @@ AppButton(
 - `isLoading` deshabilita el botón y muestra un spinner de 16dp.
 - `leadingIcon` es decorativo (`contentDescription = null`) y solo se añade si
   aporta significado (`Add` en «Añadir hora»); el texto ya describe la acción.
-- `looksDisabled` mantiene los colores y la elevación del estado deshabilitado
+- `looksDisabled` usa los colores y la elevación del estado deshabilitado (0dp)
   aunque el botón siga siendo pulsable; se usa en el estado «Tomado».
 - Elevación `AppElevation`; deshabilitado sin elevación.
 
