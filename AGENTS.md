@@ -40,6 +40,7 @@ cd PillRemind
 ./gradlew lintDebug
 ```
 
+- Las estadísticas de descargas del README se consultan con `python3 scripts/release_stats.py` desde la raíz del repositorio (no requiere Gradle ni token).
 - Builds need a full JDK with `javac`, not just a JRE. On this machine the system Java 17 is JRE-only and `/opt/android-studio/jbr` is Java 25, which breaks Robolectric 4.13 (`Unsupported class file major version 69`). Use a full JDK 17 for `testDebugUnitTest`; `assembleDebug` works with the Studio JBR.
 - `local.properties` is Git-ignored but mandatory (`sdk.dir` is enough). Never commit it.
 - Versions live in `gradle/libs.versions.toml`. AGP 9 uses built-in Kotlin; `android.disallowKotlinSourceSets=false` in `gradle.properties` is required for KSP, and KSP must stay aligned with the Kotlin version.

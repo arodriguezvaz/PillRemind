@@ -101,6 +101,40 @@ keystore están en `.gitignore`.
 Si el token del repositorio es de solo lectura, hay que activar «Read and write
 permissions» en Settings → Actions → General.
 
+## Estadísticas de descargas
+
+El badge de descargas del README se calcula con la API de GitHub Releases y solo
+suma los assets `*.apk`. No cuenta los `update.json`, que la app descarga para
+comprobar actualizaciones.
+
+Para ver el desglose completo:
+
+```bash
+python3 scripts/release_stats.py
+```
+
+El script usa solo la biblioteca estándar de Python y no necesita token; si
+existe `GITHUB_TOKEN` o `GH_TOKEN` en el entorno, lo usa para ampliar el límite
+de peticiones. Con `--json` genera el payload que consume
+`shields.io/endpoint`.
+
+El workflow `.github/workflows/stats.yml` publica `estadisticas.json` en la rama
+`stats` a diario y a mano desde Actions. Las releases creadas por
+`release.yml` no disparan el evento `release` (GitHub no encadena workflows
+iniciados con `GITHUB_TOKEN`), así que el contador se pone al día en la
+siguiente ejecución diaria. El historial de la rama sirve como serie temporal.
+
+Qué no mide:
+
+- **Instalaciones únicas**: GitHub no identifica dispositivos.
+- **Actualizaciones**: cada actualización vuelve a descargar el APK y suma.
+- **APK compartidos fuera de GitHub** (por ejemplo, por mensajería).
+- **Tus propias descargas de prueba**.
+
+Como aproximación de uso, el asset `update.json` de la última release cuenta las
+comprobaciones que hace la app (como máximo una cada 24 h por instalación). No son
+usuarios únicos, pero sí un indicador de dispositivos activos.
+
 ## Actualizaciones
 
 - La app consulta como máximo **una vez al día** el `update.json` de la última

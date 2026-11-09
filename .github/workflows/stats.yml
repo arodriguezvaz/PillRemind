@@ -1,0 +1,65 @@
+name: Estadísticas de descargas
+
+# Actualiza el contador de descargas del README a partir de la API de GitHub.
+# Las releases creadas con GITHUB_TOKEN no disparan el evento `release`, así que
+# el contador se refresca igualmente con la ejecución diaria o a mano.
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-stats
+  cancel-in-progress: false
+
+jobs:
+  stats:
+    name: Actualizar contador
+    if: github.repository == 'arodriguezvaz/PillRemind'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Generar estadísticas
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/release_stats.py --json > "$RUNNER_TEMP/estadisticas.json"
+          python3 -m json.tool "$RUNNER_TEMP/estadisticas.json" > /dev/null
+          {
+            echo "## Descargas de releases"
+            echo '```'
+            python3 scripts/release_stats.py
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publicar en la rama stats
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git ls-remote --exit-code --heads origin stats > /dev/null 2>&1; then
+            git fetch origin stats
+            git checkout -B stats FETCH_HEAD
+          else
+            git checkout --orphan stats
+            git rm -rf .
+          fi
+
+          cp "$RUNNER_TEMP/estadisticas.json" estadisticas.json
+          git add estadisticas.json
+
+          if git diff --cached --quiet; then
+            echo "Las descargas no han cambiado; no se crea commit."
+            exit 0
+          fi
+
+          git commit -m "chore(stats): actualizar descargas"
+          git push origin stats

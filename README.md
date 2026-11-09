@@ -9,6 +9,7 @@
 
 <p align="center">
   <a href="https://github.com/arodriguezvaz/PillRemind/releases/latest"><img src="https://img.shields.io/github/v/release/arodriguezvaz/PillRemind?label=versi%C3%B3n&color=2ea44f" alt="Última versión"></a>
+  <a href="https://github.com/arodriguezvaz/PillRemind/releases"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/arodriguezvaz/PillRemind/stats/estadisticas.json" alt="Descargas APK"></a>
 </p>
 
 <p align="center">
