@@ -47,7 +47,7 @@ jobs:
 
           if git ls-remote --exit-code --heads origin stats > /dev/null 2>&1; then
             git fetch origin stats
-            git checkout -B stats origin/stats
+            git checkout -B stats FETCH_HEAD
           else
             git checkout --orphan stats
             git rm -rf .
