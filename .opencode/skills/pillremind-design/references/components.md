@@ -368,8 +368,11 @@ AppNavigationRow(icon, label, description, onClick, modifier)
 HistoryIntakeItem(intake, status, modifier)
 ```
 
-- Hora, medicamento, dosis, chip de estado con colores semánticos y badge
-  «Archivado» cuando la toma pertenece a un medicamento archivado.
+- Hora, medicamento y dosis a la izquierda; chip de estado con colores
+  semánticos y badge «Archivado» (si procede) a la derecha, centrados
+  verticalmente y separados 8dp.
+- Con texto grande (desde 1,3×) y medicamento archivado, los badges pasan a
+  una línea inferior alineada a la derecha para no recortar el nombre.
 
 ### `HistoryDayHeader` (`history/HistoryDayHeader.kt`)
 

@@ -16,10 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.StatisticsIntake
 import com.andres.pillremind.domain.model.StatisticsStatus
@@ -30,7 +30,17 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 /**
+ * Escala de fuente a partir de la cual los badges de una toma archivada pasan
+ * a una línea inferior para no recortar el nombre del medicamento.
+ */
+private const val LARGE_FONT_SCALE = 1.3f
+
+/**
  * Fila del historial de tomas.
+ *
+ * La hora, el medicamento y la dosis se muestran a la izquierda. A la derecha
+ * quedan el estado y, si procede, el badge de archivado, centrados
+ * verticalmente en la card.
  *
  * @param intake Toma que se muestra.
  * @param status Estado calculado de la toma.
@@ -44,6 +54,118 @@ fun HistoryIntakeItem(
 ) {
     val timePattern = stringResource(R.string.common_time_pattern)
     val timeFormatter = DateTimeFormatter.ofPattern(timePattern)
+    val timeText = intake.scheduledAt.format(timeFormatter)
+    val useStackedBadges = intake.isArchived &&
+        LocalDensity.current.fontScale >= LARGE_FONT_SCALE
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppElevation)
+    ) {
+        if (useStackedBadges) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm)
+            ) {
+                IntakeSummary(
+                    time = timeText,
+                    intake = intake,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = AppSpacing.xxs),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    IntakeBadges(status = status, isArchived = true)
+                }
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+            ) {
+                IntakeSummary(
+                    time = timeText,
+                    intake = intake,
+                    modifier = Modifier.weight(1f),
+                )
+                IntakeBadges(status = status, isArchived = intake.isArchived)
+            }
+        }
+    }
+}
+
+/**
+ * Hora, nombre y dosis de la toma.
+ */
+@Composable
+private fun IntakeSummary(
+    time: String,
+    intake: StatisticsIntake,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = time,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.width(AppSpacing.xs))
+            Text(
+                text = intake.medicationName,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Text(
+            text = "${intake.dose} ${intake.unit}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+/**
+ * Badges de estado y archivado de una toma.
+ */
+@Composable
+private fun IntakeBadges(
+    status: StatisticsStatus,
+    isArchived: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+    ) {
+        StatusBadge(status = status)
+        if (isArchived) {
+            ArchivedBadge()
+        }
+    }
+}
+
+/**
+ * Etiqueta compacta con el estado de la toma.
+ */
+@Composable
+private fun StatusBadge(status: StatisticsStatus) {
     val (containerColor, contentColor) = when (status) {
         StatisticsStatus.TAKEN -> MaterialTheme.colorScheme.tertiaryContainer to
             MaterialTheme.colorScheme.onTertiaryContainer
@@ -55,69 +177,19 @@ fun HistoryIntakeItem(
             MaterialTheme.colorScheme.onSurfaceVariant
     }
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = AppElevation)
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = containerColor,
+        contentColor = contentColor
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = intake.scheduledAt.format(timeFormatter),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.width(AppSpacing.xs))
-                Text(
-                    text = intake.medicationName,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    modifier = Modifier.weight(1f)
-                )
-                if (intake.isArchived) {
-                    Spacer(modifier = Modifier.width(AppSpacing.xs))
-                    ArchivedBadge()
-                }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)
-            ) {
-                Text(
-                    text = "${intake.dose} ${intake.unit}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f)
-                )
-                Surface(
-                    shape = MaterialTheme.shapes.medium,
-                    color = containerColor,
-                    contentColor = contentColor
-                ) {
-                    Text(
-                        text = stringResource(status.labelRes()),
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.padding(
-                            horizontal = AppSpacing.xs,
-                            vertical = AppSpacing.xxs
-                        )
-                    )
-                }
-            }
-        }
+        Text(
+            text = stringResource(status.labelRes()),
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(
+                horizontal = AppSpacing.xs,
+                vertical = AppSpacing.xxs
+            )
+        )
     }
 }
 
@@ -169,6 +241,10 @@ private fun HistoryIntakeItemPreview() {
                 intake = previewIntake(taken = false, archived = true),
                 status = StatisticsStatus.PENDING
             )
+            HistoryIntakeItem(
+                intake = previewIntake(taken = true, archived = true),
+                status = StatisticsStatus.TAKEN
+            )
         }
     }
 }
@@ -177,10 +253,16 @@ private fun HistoryIntakeItemPreview() {
 @Composable
 private fun HistoryIntakeItemLargeTextPreview() {
     PillRemindTheme(darkTheme = true) {
-        HistoryIntakeItem(
-            intake = previewIntake(taken = false, archived = true),
-            status = StatisticsStatus.MISSED
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
+            HistoryIntakeItem(
+                intake = previewIntake(taken = false, archived = true),
+                status = StatisticsStatus.MISSED
+            )
+            HistoryIntakeItem(
+                intake = previewIntake(taken = true, archived = true),
+                status = StatisticsStatus.TAKEN
+            )
+        }
     }
 }
 
