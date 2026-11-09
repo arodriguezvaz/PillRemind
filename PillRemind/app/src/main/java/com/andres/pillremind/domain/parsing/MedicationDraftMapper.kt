@@ -143,6 +143,7 @@ object MedicationDraftMapper {
         "mcg", "µg", "μg", "microgramos", "microgramo" -> "mcg"
         "ml", "mililitros", "mililitro" -> "ml"
         "ui" -> "UI"
+        "%" -> "%"
         else -> null
     }
 }

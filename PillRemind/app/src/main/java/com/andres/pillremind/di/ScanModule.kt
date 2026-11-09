@@ -3,6 +3,8 @@ package com.andres.pillremind.di
 import com.andres.pillremind.data.ocr.MlKitOcrEngine
 import com.andres.pillremind.data.ocr.OcrEngine
 import com.andres.pillremind.data.repository.MedicationLookupRepositoryImpl
+import com.andres.pillremind.data.scan.BarcodeEngine
+import com.andres.pillremind.data.scan.MlKitBarcodeEngine
 import com.andres.pillremind.domain.repository.MedicationLookupRepository
 import dagger.Binds
 import dagger.Module
@@ -20,6 +22,10 @@ abstract class ScanModule {
     @Binds
     @Singleton
     abstract fun bindOcrEngine(impl: MlKitOcrEngine): OcrEngine
+
+    @Binds
+    @Singleton
+    abstract fun bindBarcodeEngine(impl: MlKitBarcodeEngine): BarcodeEngine
 
     @Binds
     @Singleton

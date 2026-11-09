@@ -132,6 +132,7 @@ class MedicationDraftMapperTest {
     fun `parseDose acepta microgramos y combinaciones`() {
         assertEquals("50" to "mcg", MedicationDraftMapper.parseDose("50 µg"))
         assertEquals("6" to "mg", MedicationDraftMapper.parseDose("6 mg/ml"))
+        assertEquals("10" to "%", MedicationDraftMapper.parseDose("10 %"))
         assertEquals(
             "25" to "mcg",
             MedicationDraftMapper.parseDose("25 microgramos/600 microgramos/dosis")

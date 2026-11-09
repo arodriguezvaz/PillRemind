@@ -94,7 +94,7 @@ sealed class MedicationMode {
  * las fechas se partan en dos líneas dentro de un campo de una sola línea.
  */
 @Composable
-private fun AdaptiveFieldPair(
+internal fun AdaptiveFieldPair(
     modifier: Modifier = Modifier,
     first: @Composable (Modifier) -> Unit,
     second: @Composable (Modifier) -> Unit,
@@ -150,7 +150,7 @@ fun MedicationScreen(
     val medicationSchedules by medicationViewModel.schedules.collectAsState()
     val nextIntake by medicationViewModel.nextIntake.collectAsStateWithLifecycle()
     val scanState by medicationScanViewModel.state.collectAsStateWithLifecycle()
-    var showScanSheet by rememberSaveable { mutableStateOf(false) }
+    var showScanFlow by remember { mutableStateOf(false) }
 
     val unitOptions = stringArrayResource(R.array.medication_units).toList()
 
@@ -297,13 +297,6 @@ fun MedicationScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ScanCtaCard(
-                    onClick = {
-                        medicationScanViewModel.reset()
-                        showScanSheet = true
-                    },
-                    modifier = Modifier.padding(bottom = AppSpacing.md)
-                )
                 //-----IMAGEN
                 AppPhotoPicker(
                     photoUri = selectedPhotoUri,
@@ -311,6 +304,13 @@ fun MedicationScreen(
                     enabled = true,
                     placeholderIcon = Icons.Default.AddAPhoto,
                     photoDescriptionRes = R.string.photo_medication,
+                    modifier = Modifier.padding(bottom = AppSpacing.md)
+                )
+                ScanCtaCard(
+                    onClick = {
+                        medicationScanViewModel.reset()
+                        showScanFlow = true
+                    },
                     modifier = Modifier.padding(bottom = AppSpacing.xl)
                 )
                 //-----------NOMBRE
@@ -467,20 +467,18 @@ fun MedicationScreen(
                 )
             }
 
-            if (showScanSheet) {
-                MedicationScanSheet(
+            if (showScanFlow) {
+                MedicationScanFlow(
                     state = scanState,
                     onDismiss = {
-                        showScanSheet = false
+                        showScanFlow = false
                         medicationScanViewModel.reset()
                     },
-                    onCnChange = medicationScanViewModel::onCnChange,
-                    onCnPhoto = medicationScanViewModel::onCnPhoto,
-                    onSearchCn = medicationScanViewModel::searchCn,
                     onBoxPhoto = medicationScanViewModel::onBoxPhoto,
-                    onReadBox = medicationScanViewModel::readBox,
-                    onShowBox = medicationScanViewModel::showBoxInput,
-                    onBackToCn = medicationScanViewModel::backToCn,
+                    onCodePhoto = medicationScanViewModel::onCodePhoto,
+                    onManualCnChange = medicationScanViewModel::onManualCnChange,
+                    onAnalyze = medicationScanViewModel::analyze,
+                    onBackToPhotos = medicationScanViewModel::backToPhotos,
                     onGrantConsent = medicationScanViewModel::grantConsent,
                     onDeclineConsent = medicationScanViewModel::declineConsent,
                     onApply = { draft, photo ->
@@ -489,7 +487,7 @@ fun MedicationScreen(
                         unit.value = draft.unit
                         if (startDate.value == null) startDate.value = LocalDate.now()
                         if (photo != null) selectedPhotoUri = photo
-                        showScanSheet = false
+                        showScanFlow = false
                         medicationScanViewModel.reset()
                     }
                 )

@@ -134,7 +134,8 @@ dependencies {
     implementation(libs.coil.compose)
     // Lector de códigos para el benchmark de la fase 0. Solo en debug: usa el
     // modelo de Google Play Services y añade ~200 KB al APK.
-    debugImplementation(libs.mlkit.barcode.scanning)
+    // El lector de códigos forma parte del flujo de escaneo.
+    implementation(libs.mlkit.barcode.scanning)
     // OCR de envases y del CN: forma parte de la app.
     implementation(libs.mlkit.text.recognition)
     //TESTING

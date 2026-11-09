@@ -7,14 +7,20 @@ import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.R
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.data.ocr.OcrEngine
+import com.andres.pillremind.data.scan.BarcodeEngine
 import com.andres.pillremind.domain.model.CnLookupResult
 import com.andres.pillremind.domain.model.MedicationDraft
+import com.andres.pillremind.domain.parsing.BoxFields
 import com.andres.pillremind.domain.parsing.BoxTextParser
 import com.andres.pillremind.domain.parsing.CnParser
 import com.andres.pillremind.domain.parsing.MedicationDraftMapper
 import com.andres.pillremind.domain.repository.MedicationLookupRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,38 +29,86 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
- * Pasos del escaneo.
+ * Pantalla del flujo de escaneo.
  */
 enum class ScanStage {
-    CN_INPUT,
-    BOX_INPUT,
-    REVIEW
+    PHOTOS,
+    ANALYZING,
+    RESULT
 }
 
 /**
- * Estado del flujo de escaneo de CN y caja.
+ * Estado de cada paso del análisis.
  */
-data class ScanUiState(
-    val stage: ScanStage = ScanStage.CN_INPUT,
-    val cnInput: String = "",
-    val cnPhotoUri: Uri? = null,
-    val boxPhotoUri: Uri? = null,
-    val loading: Boolean = false,
-    @StringRes val errorRes: Int? = null,
-    val notFoundCn: String? = null,
-    val draft: MedicationDraft? = null,
-    val consentRequired: Boolean = false
-)
+enum class StepState {
+    PENDING,
+    RUNNING,
+    DONE,
+    FAILED,
+    SKIPPED
+}
 
 /**
- * Orquesta el escaneo del CN, la consulta a CIMA y el OCR de la caja.
+ * Resultado que se muestra como tarjeta breve bajo el formulario.
+ */
+enum class ScanNotice {
+    NONE,
+    CIMA_FOUND,
+    CIMA_NOT_FOUND,
+    CIMA_NOT_FOUND_EMPTY,
+    CIMA_ERROR,
+    CIMA_NOT_CONSULTED,
+    CN_NOT_DETECTED,
+    CODE_UNREADABLE,
+    NOTHING
+}
+
+/**
+ * Estado del escaneo de dos fotos.
  *
- * El CN no se persiste: solo se usa para la consulta y se descarta al cerrar
- * el flujo.
+ * El CN y la respuesta de CIMA no se persisten: viven en este estado y se
+ * descartan al cerrar el flujo. Los valores que el usuario acepta sí pasan al
+ * formulario del medicamento y se guardan como campos normales.
+ */
+data class ScanUiState(
+    val stage: ScanStage = ScanStage.PHOTOS,
+    val boxPhotoUri: Uri? = null,
+    val codePhotoUri: Uri? = null,
+    val manualCn: String = "",
+    val analyzing: Boolean = false,
+    @StringRes val errorRes: Int? = null,
+    val draft: MedicationDraft? = null,
+    val notice: ScanNotice = ScanNotice.NONE,
+    val codeStep: StepState = StepState.PENDING,
+    val boxStep: StepState = StepState.PENDING,
+    val cimaStep: StepState = StepState.PENDING,
+    val consentRequired: Boolean = false
+) {
+    /** CN que se pueden obtener del texto escrito a mano. */
+    val manualCnCandidates: List<String>
+        get() = buildList {
+            if (manualCn.isBlank()) return@buildList
+            CnParser.normalize(manualCn)?.let(::add)
+            CnParser.fromAnyCode(manualCn)?.let(::add)
+        }.distinct()
+
+    /** El campo manual tiene texto pero no contiene un CN válido. */
+    val manualCnInvalid: Boolean
+        get() = manualCn.isNotBlank() && manualCnCandidates.isEmpty()
+
+    /** Hay al menos una fuente válida que analizar. */
+    val canAnalyze: Boolean
+        get() = !manualCnInvalid &&
+            (boxPhotoUri != null || codePhotoUri != null || manualCnCandidates.isNotEmpty())
+}
+
+/**
+ * Orquesta el flujo: fotos de caja/código, OCR, códigos de barras y CIMA.
  */
 @HiltViewModel
 class MedicationScanViewModel @Inject constructor(
     private val ocrEngine: OcrEngine,
+    private val barcodeEngine: BarcodeEngine,
     private val lookupRepository: MedicationLookupRepository,
     private val sessionManager: SessionManager
 ) : ViewModel() {
@@ -62,184 +116,334 @@ class MedicationScanViewModel @Inject constructor(
     private val _state = MutableStateFlow(ScanUiState())
     val state: StateFlow<ScanUiState> = _state.asStateFlow()
 
-    private var pendingSearch = false
-
-    fun onCnChange(value: String) {
-        _state.update {
-            it.copy(cnInput = value.filter(Char::isDigit).take(7), errorRes = null)
-        }
-    }
-
-    fun onCnPhoto(uri: Uri) {
-        _state.update { it.copy(cnPhotoUri = uri, errorRes = null) }
-    }
+    private var analysisJob: Job? = null
+    private var pendingCns: List<String> = emptyList()
+    private var pendingBox: BoxFields? = null
+    private var pendingBoxHasData = false
 
     fun onBoxPhoto(uri: Uri) {
         _state.update { it.copy(boxPhotoUri = uri, errorRes = null) }
     }
 
-    fun searchCn() {
-        viewModelScope.launch {
-            if (!sessionManager.cimaConsent.first()) {
-                pendingSearch = true
-                _state.update { it.copy(consentRequired = true, errorRes = null) }
-                return@launch
-            }
-            doSearchCn()
+    fun onCodePhoto(uri: Uri) {
+        _state.update { it.copy(codePhotoUri = uri, errorRes = null) }
+    }
+
+    fun onManualCnChange(value: String) {
+        _state.update {
+            it.copy(
+                manualCn = value.filter(Char::isDigit).take(MAX_MANUAL_CN_INPUT),
+                errorRes = null
+            )
         }
     }
 
-    private suspend fun doSearchCn() {
+    /**
+     * Analiza las fotos y, si hay algún CN, consulta CIMA.
+     */
+    fun analyze() {
         val current = _state.value
-        val cn = CnParser.normalize(current.cnInput)
-        if (cn != null) {
-            lookup(cn)
-            return
-        }
-
-        val photo = current.cnPhotoUri
-        if (photo == null) {
-            _state.update { it.copy(errorRes = R.string.scan_cn_error_empty) }
-            return
-        }
-
-        _state.update { it.copy(loading = true, errorRes = null) }
-        val text = ocrEngine.recognize(photo)
-        if (text.isNullOrBlank()) {
+        if (!current.canAnalyze) {
             _state.update {
-                it.copy(loading = false, errorRes = R.string.scan_cn_error_ocr)
+                it.copy(
+                    errorRes = if (current.manualCnInvalid) {
+                        R.string.scan_error_invalid_cn
+                    } else {
+                        R.string.scan_error_need_photo
+                    }
+                )
             }
             return
         }
 
-        val candidates = CnParser.extractCandidates(text)
-        if (candidates.isEmpty()) {
+        analysisJob?.cancel()
+        analysisJob = viewModelScope.launch {
             _state.update {
-                it.copy(loading = false, errorRes = R.string.scan_cn_error_cn)
+                it.copy(
+                    stage = ScanStage.ANALYZING,
+                    analyzing = true,
+                    errorRes = null,
+                    draft = null,
+                    notice = ScanNotice.NONE,
+                    codeStep = StepState.PENDING,
+                    boxStep = StepState.PENDING,
+                    cimaStep = StepState.PENDING
+                )
             }
-            return
-        }
 
-        lookupCandidates(candidates)
-    }
+            try {
+                val candidates = LinkedHashSet<String>()
+                candidates.addAll(current.manualCnCandidates)
 
-    private suspend fun lookup(cn: String) {
-        _state.update { it.copy(loading = true, errorRes = null) }
-        when (val result = lookupRepository.findByCn(cn)) {
-            is CnLookupResult.Found -> showReview(result)
-            is CnLookupResult.NotFound -> showNotFound(cn)
-            is CnLookupResult.Error -> _state.update {
-                it.copy(loading = false, errorRes = R.string.scan_cn_error_network)
-            }
-        }
-    }
+                var boxFields: BoxFields? = null
+                var boxHasData = false
+                var codeAttempted = false
+                var codeFound = false
 
-    private suspend fun lookupCandidates(candidates: List<String>) {
-        for (cn in candidates) {
-            when (val result = lookupRepository.findByCn(cn)) {
-                is CnLookupResult.Found -> {
-                    showReview(result)
-                    return
+                val codePhoto = current.codePhotoUri
+                if (codePhoto != null) {
+                    _state.update { it.copy(codeStep = StepState.RUNNING) }
+                    codeAttempted = true
+                    val codes = barcodeEngine.scan(codePhoto)
+                    currentCoroutineContext().ensureActive()
+
+                    val codeCns = codes
+                        .mapNotNull { CnParser.fromAnyCode(it.raw) }
+                        .toMutableList()
+                    if (codeCns.isEmpty()) {
+                        val codeText = ocrEngine.recognize(codePhoto)
+                        currentCoroutineContext().ensureActive()
+                        codeCns.addAll(codeText?.let(CnParser::extractCandidates).orEmpty())
+                    }
+                    codeCns.take(MAX_CNS_PER_SOURCE).forEach { candidates.add(it) }
+
+                    codeFound = codeCns.isNotEmpty()
+                    _state.update {
+                        it.copy(
+                            codeStep = if (codeFound) StepState.DONE else StepState.FAILED
+                        )
+                    }
+                } else {
+                    _state.update { it.copy(codeStep = StepState.SKIPPED) }
                 }
 
-                is CnLookupResult.NotFound -> continue
+                val boxPhoto = current.boxPhotoUri
+                if (boxPhoto != null) {
+                    _state.update { it.copy(boxStep = StepState.RUNNING) }
+                    val boxText = ocrEngine.recognize(boxPhoto)
+                    currentCoroutineContext().ensureActive()
+                    boxFields = boxText?.let(BoxTextParser::parse)
+                    boxHasData = boxFields?.let { fields ->
+                        fields.name != null ||
+                            fields.strengthDoseText != null ||
+                            fields.intakeDoseText != null
+                    } == true
 
-                is CnLookupResult.Error -> {
+                    val boxCns = boxText
+                        ?.let(CnParser::extractCandidates)
+                        .orEmpty()
+                        .take(MAX_CNS_PER_SOURCE)
+                    candidates.addAll(boxCns)
+                    val boxRead = boxHasData || boxCns.isNotEmpty()
                     _state.update {
-                        it.copy(loading = false, errorRes = R.string.scan_cn_error_network)
+                        it.copy(boxStep = if (boxRead) StepState.DONE else StepState.FAILED)
+                    }
+                } else {
+                    _state.update { it.copy(boxStep = StepState.SKIPPED) }
+                }
+
+                val finalCns = candidates.take(MAX_TOTAL_CNS).toList()
+                if (finalCns.isEmpty()) {
+                    finishWithBox(
+                        boxFields = boxFields,
+                        boxHasData = boxHasData,
+                        notice = when {
+                            !boxHasData -> ScanNotice.NOTHING
+                            codeAttempted || current.manualCn.isNotBlank() ->
+                                ScanNotice.CODE_UNREADABLE
+
+                            else -> ScanNotice.CN_NOT_DETECTED
+                        },
+                        cimaStep = StepState.SKIPPED
+                    )
+                    return@launch
+                }
+
+                if (!sessionManager.cimaConsent.first()) {
+                    currentCoroutineContext().ensureActive()
+                    pendingCns = finalCns
+                    pendingBox = boxFields
+                    pendingBoxHasData = boxHasData
+                    _state.update {
+                        it.copy(
+                            analyzing = false,
+                            cimaStep = StepState.PENDING,
+                            consentRequired = true
+                        )
+                    }
+                    return@launch
+                }
+
+                currentCoroutineContext().ensureActive()
+                lookupAndFinish(
+                    cns = finalCns,
+                    boxFields = boxFields,
+                    boxHasData = boxHasData
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        stage = ScanStage.PHOTOS,
+                        analyzing = false,
+                        errorRes = R.string.scan_error_generic,
+                        codeStep = StepState.PENDING,
+                        boxStep = StepState.PENDING,
+                        cimaStep = StepState.PENDING
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Prueba los CN en orden y se queda con el primero que exista en CIMA.
+     */
+    private suspend fun lookupAndFinish(
+        cns: List<String>,
+        boxFields: BoxFields?,
+        boxHasData: Boolean
+    ) {
+        _state.update { it.copy(cimaStep = StepState.RUNNING) }
+
+        for (cn in cns) {
+            currentCoroutineContext().ensureActive()
+            when (val result = lookupRepository.findByCn(cn)) {
+                is CnLookupResult.Found -> {
+                    currentCoroutineContext().ensureActive()
+                    _state.update {
+                        it.copy(
+                            analyzing = false,
+                            stage = ScanStage.RESULT,
+                            cimaStep = StepState.DONE,
+                            draft = MedicationDraftMapper.fromCima(result.medication),
+                            notice = ScanNotice.CIMA_FOUND
+                        )
                     }
                     return
                 }
-            }
-        }
-        showNotFound(candidates.first())
-    }
 
-    private fun showReview(result: CnLookupResult.Found) {
-        _state.update {
-            it.copy(
-                loading = false,
-                stage = ScanStage.REVIEW,
-                draft = MedicationDraftMapper.fromCima(result.medication),
-                notFoundCn = null,
-                errorRes = null
-            )
-        }
-    }
+                is CnLookupResult.NotFound -> Unit
 
-    private fun showNotFound(cn: String) {
-        _state.update {
-            it.copy(
-                loading = false,
-                stage = ScanStage.BOX_INPUT,
-                notFoundCn = cn,
-                errorRes = null
-            )
-        }
-    }
-
-    fun readBox() {
-        val uri = _state.value.boxPhotoUri
-        if (uri == null) {
-            _state.update { it.copy(errorRes = R.string.scan_cn_box_empty) }
-            return
-        }
-
-        viewModelScope.launch {
-            _state.update { it.copy(loading = true, errorRes = null) }
-            val text = ocrEngine.recognize(uri)
-            if (text.isNullOrBlank()) {
-                _state.update {
-                    it.copy(loading = false, errorRes = R.string.scan_cn_error_ocr)
+                is CnLookupResult.Error -> {
+                    currentCoroutineContext().ensureActive()
+                    finishWithBox(
+                        boxFields = boxFields,
+                        boxHasData = boxHasData,
+                        notice = ScanNotice.CIMA_ERROR,
+                        cimaStep = StepState.FAILED
+                    )
+                    return
                 }
-                return@launch
             }
+        }
 
-            val fields = BoxTextParser.parse(text)
-            val draft = MedicationDraftMapper.fromOcr(fields, _state.value.notFoundCn)
-            _state.update {
-                it.copy(
-                    loading = false,
-                    stage = ScanStage.REVIEW,
-                    draft = draft,
-                    errorRes = null
-                )
-            }
+        currentCoroutineContext().ensureActive()
+        finishWithBox(
+            boxFields = boxFields,
+            boxHasData = boxHasData,
+            notice = if (boxHasData) {
+                ScanNotice.CIMA_NOT_FOUND
+            } else {
+                ScanNotice.CIMA_NOT_FOUND_EMPTY
+            },
+            cimaStep = StepState.FAILED
+        )
+    }
+
+    private fun finishWithBox(
+        boxFields: BoxFields?,
+        boxHasData: Boolean,
+        notice: ScanNotice,
+        cimaStep: StepState
+    ) {
+        val draft = if (boxHasData && boxFields != null) {
+            MedicationDraftMapper.fromOcr(boxFields, cn = null)
+        } else {
+            null
+        }
+        _state.update {
+            it.copy(
+                analyzing = false,
+                stage = ScanStage.RESULT,
+                draft = draft,
+                notice = notice,
+                cimaStep = cimaStep
+            )
         }
     }
 
-    fun showBoxInput() {
-        _state.update { it.copy(stage = ScanStage.BOX_INPUT, errorRes = null) }
-    }
-
-    fun backToCn() {
-        _state.update { it.copy(stage = ScanStage.CN_INPUT, errorRes = null) }
+    /**
+     * Vuelve a las fotos conservando las imágenes y el CN escrito.
+     */
+    fun backToPhotos() {
+        analysisJob?.cancel()
+        analysisJob = null
+        clearPending()
+        _state.update {
+            it.copy(
+                stage = ScanStage.PHOTOS,
+                analyzing = false,
+                errorRes = null,
+                draft = null,
+                notice = ScanNotice.NONE,
+                codeStep = StepState.PENDING,
+                boxStep = StepState.PENDING,
+                cimaStep = StepState.PENDING,
+                consentRequired = false
+            )
+        }
     }
 
     fun reset() {
-        pendingSearch = false
+        analysisJob?.cancel()
+        analysisJob = null
+        clearPending()
         _state.value = ScanUiState()
     }
 
+    /**
+     * Acepta la consulta a CIMA y continúa con los CN pendientes.
+     *
+     * El diálogo se oculta de forma síncrona para que una segunda pulsación no
+     * lance otra consulta.
+     */
     fun grantConsent() {
-        viewModelScope.launch {
-            sessionManager.setCimaConsent(true)
-            _state.update { it.copy(consentRequired = false) }
-            if (pendingSearch) {
-                pendingSearch = false
-                doSearchCn()
-            }
+        if (pendingCns.isEmpty()) return
+
+        val cns = pendingCns
+        val box = pendingBox
+        val hasBox = pendingBoxHasData
+        clearPending()
+        _state.update {
+            it.copy(
+                consentRequired = false,
+                analyzing = true,
+                errorRes = null
+            )
+        }
+
+        analysisJob = viewModelScope.launch {
+            runCatching { sessionManager.setCimaConsent(true) }
+            currentCoroutineContext().ensureActive()
+            lookupAndFinish(cns, box, hasBox)
         }
     }
 
     fun declineConsent() {
-        pendingSearch = false
-        _state.update {
-            it.copy(
-                consentRequired = false,
-                stage = ScanStage.BOX_INPUT,
-                errorRes = R.string.scan_cn_consent_disabled
-            )
-        }
+        val box = pendingBox
+        val hasBox = pendingBoxHasData
+        clearPending()
+        _state.update { it.copy(consentRequired = false, analyzing = false) }
+
+        finishWithBox(
+            boxFields = box,
+            boxHasData = hasBox,
+            notice = ScanNotice.CIMA_NOT_CONSULTED,
+            cimaStep = StepState.SKIPPED
+        )
+    }
+
+    private fun clearPending() {
+        pendingCns = emptyList()
+        pendingBox = null
+        pendingBoxHasData = false
+    }
+
+    private companion object {
+        const val MAX_MANUAL_CN_INPUT = 20
+        const val MAX_CNS_PER_SOURCE = 3
+        const val MAX_TOTAL_CNS = 5
     }
 }

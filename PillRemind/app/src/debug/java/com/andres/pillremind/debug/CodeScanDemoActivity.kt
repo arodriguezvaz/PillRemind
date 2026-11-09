@@ -51,7 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.domain.code.MedicineCodeParser
-import com.andres.pillremind.ui.screens.medication.MedicationScanSheet
+import com.andres.pillremind.ui.screens.medication.MedicationScanFlow
 import com.andres.pillremind.ui.screens.medication.MedicationScanViewModel
 import com.andres.pillremind.ui.theme.PillRemindTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -121,7 +121,7 @@ private fun CodeScanDemoScreen(scanViewModel: MedicationScanViewModel) {
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<ScanUiState>(ScanUiState.Idle) }
     val scanState by scanViewModel.state.collectAsStateWithLifecycle()
-    var showScanSheet by remember { mutableStateOf(false) }
+    var showScanFlow by remember { mutableStateOf(false) }
     var applied by remember { mutableStateOf<String?>(null) }
 
     val picker = rememberLauncherForActivityResult(
@@ -157,7 +157,7 @@ private fun CodeScanDemoScreen(scanViewModel: MedicationScanViewModel) {
             Button(
                 onClick = {
                     scanViewModel.reset()
-                    showScanSheet = true
+                    showScanFlow = true
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -219,25 +219,23 @@ private fun CodeScanDemoScreen(scanViewModel: MedicationScanViewModel) {
         }
     }
 
-    if (showScanSheet) {
-        MedicationScanSheet(
+    if (showScanFlow) {
+        MedicationScanFlow(
             state = scanState,
             onDismiss = {
-                showScanSheet = false
+                showScanFlow = false
                 scanViewModel.reset()
             },
-            onCnChange = scanViewModel::onCnChange,
-            onCnPhoto = scanViewModel::onCnPhoto,
-            onSearchCn = scanViewModel::searchCn,
             onBoxPhoto = scanViewModel::onBoxPhoto,
-            onReadBox = scanViewModel::readBox,
-            onShowBox = scanViewModel::showBoxInput,
-            onBackToCn = scanViewModel::backToCn,
+            onCodePhoto = scanViewModel::onCodePhoto,
+            onManualCnChange = scanViewModel::onManualCnChange,
+            onAnalyze = scanViewModel::analyze,
+            onBackToPhotos = scanViewModel::backToPhotos,
             onGrantConsent = scanViewModel::grantConsent,
             onDeclineConsent = scanViewModel::declineConsent,
             onApply = { draft, _ ->
                 applied = "${draft.name} · ${draft.doseText} ${draft.unit}"
-                showScanSheet = false
+                showScanFlow = false
                 scanViewModel.reset()
             }
         )

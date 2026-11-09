@@ -4,6 +4,7 @@ import com.andres.pillremind.data.remote.CimaDataSource
 import com.andres.pillremind.domain.model.CnLookupResult
 import com.andres.pillremind.domain.repository.MedicationLookupRepository
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 
 /**
  * Implementación de la consulta de medicamentos por CN.
@@ -19,6 +20,8 @@ class MedicationLookupRepositoryImpl @Inject constructor(
         } else {
             CnLookupResult.Found(medication)
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         CnLookupResult.Error(cn, e)
     }

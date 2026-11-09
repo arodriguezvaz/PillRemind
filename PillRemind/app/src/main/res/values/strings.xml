@@ -332,43 +332,64 @@
     <string name="medication_history_description">Tomas registradas de este medicamento</string>
     <string name="scan_cn_cta_title">¿Tienes el CN o la caja?</string>
     <string name="scan_cn_cta_text">Rellena el nombre, la dosis y la unidad automáticamente.</string>
-    <string name="scan_cn_button">Escanear CN</string>
-    <string name="scan_cn_title">Escanear el CN</string>
-    <string name="scan_cn_help">Enfoca el Código Nacional (CN) del envase o escríbelo a mano.</string>
-    <string name="scan_cn_manual_label">CN (6 dígitos)</string>
-    <string name="scan_cn_manual_placeholder">Ej. 663526</string>
-    <string name="scan_cn_photo">Foto del CN</string>
-    <string name="scan_cn_search">Buscar CN</string>
-    <string name="scan_cn_loading">Consultando CIMA…</string>
-    <string name="scan_cn_not_found_title">CN no catalogado</string>
-    <string name="scan_cn_not_found_message">El CN %1$s no está en CIMA. Puedes hacer una foto de la caja para intentar rellenar los datos.</string>
-    <string name="scan_cn_box_photo">Hacer foto de la caja</string>
-    <string name="scan_cn_box_help">Haz una foto de la cara frontal donde se vean el nombre y la dosis.</string>
-    <string name="scan_cn_read_box">Leer la caja</string>
-    <string name="scan_cn_back">Volver al CN</string>
-    <string name="scan_cn_source_cima">Datos de CIMA</string>
-    <string name="scan_cn_source_ocr">Datos detectados por OCR</string>
-    <string name="scan_cn_source_manual">Datos manuales</string>
-    <string name="scan_cn_cn">CN: %1$s</string>
-    <string name="scan_cn_strength">Concentración: %1$s</string>
-    <string name="scan_cn_presentation">Presentación: %1$s</string>
-    <string name="scan_cn_not_catalogued">CN %1$s no catalogado en CIMA</string>
-    <string name="scan_cn_dose_section">Dosis</string>
+    <string name="scan_cn_button">Escanear</string>
     <string name="scan_cn_dose_intake">%1$s %2$s</string>
     <string name="scan_cn_dose_strength">%1$s %2$s</string>
-    <string name="scan_cn_apply">Aplicar al formulario</string>
     <string name="scan_cn_attribution">Fuente: AEMPS - CIMA. Consultado el %1$s.</string>
     <string name="scan_cn_consent_title">Consultar CIMA</string>
     <string name="scan_cn_consent_message">Para comprobar el CN se consultará la API pública de la AEMPS. Solo se envía el código del medicamento; no se envían datos personales.</string>
     <string name="scan_cn_consent_accept">Consultar</string>
     <string name="scan_cn_consent_decline">Ahora no</string>
-    <string name="scan_cn_consent_disabled">Consulta a CIMA desactivada. Puedes usar la foto de la caja o rellenar los datos a mano.</string>
-    <string name="scan_cn_error_empty">Escribe el CN o haz una foto.</string>
-    <string name="scan_cn_error_cn">No se ha encontrado un CN válido en el texto.</string>
-    <string name="scan_cn_error_ocr">No se pudo leer la imagen. Prueba con otra foto más nítida.</string>
-    <string name="scan_cn_error_network">No se pudo consultar CIMA. Revisa la conexión o usa la foto de la caja.</string>
-    <string name="scan_cn_box_empty">Haz una foto de la caja.</string>
-    <string name="scan_cn_no_data">No se han podido extraer datos. Rellena el nombre y la dosis a mano.</string>
+    <string name="scan_photos_title">Añadir fotos</string>
+    <string name="scan_photos_help">Haz una foto de la caja y otra del código. Puedes analizar con una sola; con las dos es más fiable.</string>
+    <string name="scan_box_title">Caja</string>
+    <string name="scan_box_hint">Cara frontal: nombre y dosis</string>
+    <string name="scan_box_photo">Foto de la caja</string>
+    <string name="scan_add_box_photo">Añadir foto de la caja</string>
+    <string name="scan_code_title">Código</string>
+    <string name="scan_code_hint">CN impreso o código de barras</string>
+    <string name="scan_code_photo">Foto del código</string>
+    <string name="scan_add_code_photo">Añadir foto del código</string>
+    <string name="scan_manual_cn_label">CN (opcional)</string>
+    <string name="scan_manual_cn_placeholder">Ej. 663526</string>
+    <string name="scan_analyze">Analizar</string>
+    <string name="scan_fill_manual">Rellenar a mano</string>
+    <string name="scan_write_cn">Escribir CN</string>
+    <string name="scan_analyzing_title">Analizando</string>
+    <string name="scan_analyzing_text">Analizando las fotos…</string>
+    <string name="scan_step_code">Código</string>
+    <string name="scan_step_box">Caja</string>
+    <string name="scan_step_cima">CIMA</string>
+    <string name="scan_step_reading_code">Leyendo código…</string>
+    <string name="scan_step_reading_box">Leyendo nombre y dosis…</string>
+    <string name="scan_step_consulting_cima">Consultando CIMA…</string>
+    <string name="scan_step_pending">En espera</string>
+    <string name="scan_step_done">Leído</string>
+    <string name="scan_step_failed">No legible</string>
+    <string name="scan_step_found">Encontrado</string>
+    <string name="scan_step_not_available">No disponible</string>
+    <string name="scan_step_skipped">No consultado</string>
+    <string name="scan_result_title">Revisar medicamento</string>
+    <string name="scan_result_choose_dose">Elegir dosis</string>
+    <string name="scan_result_incomplete">Completa el nombre, la dosis y la unidad para continuar.</string>
+    <string name="scan_result_strength">Concentración: %1$s</string>
+    <string name="scan_notice_cima_found_title">Hemos detectado un CN que está en CIMA</string>
+    <string name="scan_notice_cima_not_found_title">No hemos podido obtener información de CIMA</string>
+    <string name="scan_notice_box_text">Esta es la información que hemos podido leer de la foto de la caja; revísala.</string>
+    <string name="scan_notice_cima_empty_text">No hemos leído datos de la caja. Rellena el formulario a mano.</string>
+    <string name="scan_notice_cima_not_consulted_title">No se ha consultado CIMA</string>
+    <string name="scan_notice_cima_not_consulted_text">No se ha enviado el CN a la AEMPS. Puedes usar los datos de la caja o rellenar el formulario a mano.</string>
+    <string name="scan_notice_cn_not_detected_title">No hemos podido detectar el CN</string>
+    <string name="scan_notice_cima_error_title">No se pudo consultar CIMA</string>
+    <string name="scan_notice_code_unreadable_title">No se pudo leer el código</string>
+    <string name="scan_notice_nothing_title">No hemos podido leer nada</string>
+    <string name="scan_notice_nothing_text">Prueba con más luz, acerca la cámara al CN o escribe los datos a mano.</string>
+    <string name="scan_use_data">Usar estos datos</string>
+    <string name="scan_back_to_photos">Volver a las fotos</string>
+    <string name="scan_use_box_photo">Usar la foto de la caja como imagen</string>
+    <string name="scan_error_generic">No se pudo analizar las fotos. Inténtalo de nuevo.</string>
+    <string name="scan_error_need_photo">Añade una foto o escribe el CN.</string>
+    <string name="scan_error_invalid_cn">El CN debe tener 6 o 7 dígitos, o ser un código EAN válido.</string>
     <string-array name="medication_units">
         <item>mg</item>
         <item>g</item>
@@ -389,6 +410,7 @@
         <item>puffs</item>
         <item>sprays</item>
         <item>UI</item>
+        <item>%</item>
         <item>mEq</item>
         <item>mmol</item>
         <item>parches</item>
