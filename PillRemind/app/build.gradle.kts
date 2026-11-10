@@ -138,6 +138,8 @@ dependencies {
     implementation(libs.mlkit.barcode.scanning)
     // OCR de envases y del CN: forma parte de la app.
     implementation(libs.mlkit.text.recognition)
+    // Extracción de texto de la hoja de medicación en PDF.
+    implementation(libs.pdfbox.android)
     //TESTING
 //TESTING
     testImplementation(libs.junit)

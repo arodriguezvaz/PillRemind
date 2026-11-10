@@ -1,0 +1,1610 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PillRemind · Mock · Importar medicamentos desde PDF</title>
+<style>
+  @font-face {
+    font-family: 'Lexend';
+    src: url('fonts/lexend_regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Lexend';
+    src: url('fonts/lexend_medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Lexend';
+    src: url('fonts/lexend_semibold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Lexend';
+    src: url('fonts/lexend_bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --page-bg: #e8edf4;
+    --page-ink: #15325e;
+    --page-muted: #667085;
+
+    --background: #f7f7f6;
+    --surface: #ffffff;
+    --on-surface: #1a1a1a;
+    --on-surface-variant: #5f5f5f;
+    --surface-variant: #eeeeee;
+
+    --primary: #15325e;
+    --on-primary: #ffffff;
+    --primary-container: #e1e9f2;
+    --on-primary-container: #102646;
+
+    --secondary: #ff6f00;
+    --on-secondary: #2b1700;
+    --secondary-container: #fff3e0;
+    --on-secondary-container: #6b2e00;
+
+    --tertiary: #81c784;
+    --on-tertiary: #00391c;
+    --tertiary-container: #e8f5e9;
+    --on-tertiary-container: #1b5e20;
+
+    --error: #b3261e;
+    --on-error: #ffffff;
+    --error-container: #f9dedc;
+    --on-error-container: #410e0b;
+
+    --outline: #7a7a7a;
+    --outline-variant: #d9d9d7;
+    --scrim: rgba(0, 0, 0, .42);
+    --inverse-surface: #303030;
+    --inverse-on-surface: #f5f5f5;
+
+    --elevation-4: 0 1px 2px rgba(16, 38, 70, .08), 0 2px 4px rgba(16, 38, 70, .10);
+    --phone-shadow: 0 24px 70px rgba(21, 50, 94, .24), 0 8px 24px rgba(21, 50, 94, .14);
+    --button-shadow: 0 2px 4px rgba(21, 50, 94, .22);
+  }
+
+  body[data-theme="dark"] {
+    --page-bg: #0b0f14;
+    --page-ink: #d6e6ff;
+    --page-muted: #8e9aab;
+
+    --background: #000000;
+    --surface: #121212;
+    --on-surface: #f2f2f2;
+    --on-surface-variant: #bdbdbd;
+    --surface-variant: #242424;
+
+    --primary: #a9c8ff;
+    --on-primary: #0a2a4d;
+    --primary-container: #1e3550;
+    --on-primary-container: #d6e6ff;
+
+    --secondary: #ffb74d;
+    --on-secondary: #4d2c00;
+    --secondary-container: #704000;
+    --on-secondary-container: #ffddb3;
+
+    --tertiary: #b9f6ca;
+    --on-tertiary: #00391c;
+    --tertiary-container: #00522c;
+    --on-tertiary-container: #d7ffd9;
+
+    --error: #f2b8b5;
+    --on-error: #601410;
+    --error-container: #8c1d18;
+    --on-error-container: #f9dedc;
+
+    --outline: #8a8a8a;
+    --outline-variant: #3a3a3a;
+    --scrim: rgba(0, 0, 0, .62);
+    --inverse-surface: #f2f2f2;
+    --inverse-on-surface: #1a1a1a;
+
+    --elevation-4: 0 1px 2px rgba(0, 0, 0, .5), 0 2px 4px rgba(0, 0, 0, .4);
+    --phone-shadow: 0 24px 70px rgba(0, 0, 0, .65), 0 8px 24px rgba(0, 0, 0, .5);
+    --button-shadow: 0 2px 4px rgba(0, 0, 0, .45);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background:
+      radial-gradient(1100px 600px at 12% -10%, rgba(21, 50, 94, .10), transparent 60%),
+      radial-gradient(900px 500px at 100% 10%, rgba(255, 111, 0, .07), transparent 55%),
+      var(--page-bg);
+    color: var(--page-ink);
+    font-family: 'Lexend', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color .25s ease, color .25s ease;
+  }
+
+  button, input, select { font-family: inherit; }
+  button { cursor: pointer; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  }
+
+  /* ── Página de presentación ─────────────────────────── */
+  .page {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 38px 0 56px;
+  }
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--page-muted);
+    margin-bottom: 8px;
+  }
+  .eyebrow .brand-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--page-ink);
+    letter-spacing: .08em;
+  }
+  .eyebrow .brand-mark b { font-weight: 700; }
+  .eyebrow .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--secondary); }
+  .page-title {
+    margin: 0;
+    font-size: clamp(26px, 3vw, 38px);
+    line-height: 1.12;
+    font-weight: 600;
+    letter-spacing: -.02em;
+  }
+  .page-subtitle {
+    margin: 8px 0 0;
+    color: var(--page-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 650px;
+  }
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    border: 1px solid color-mix(in srgb, var(--page-ink) 18%, transparent);
+    background: color-mix(in srgb, var(--surface) 38%, transparent);
+    color: var(--page-ink);
+    border-radius: 999px;
+    padding: 9px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+  }
+  .theme-toggle svg { width: 17px; height: 17px; }
+
+  .layout {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 52px;
+    flex-wrap: wrap;
+  }
+
+  /* ── Marco del móvil ────────────────────────────────── */
+  .phone-wrap { flex: 0 0 auto; }
+  .phone {
+    position: relative;
+    width: 412px;
+    height: 884px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--background);
+    border-radius: 34px;
+    box-shadow: var(--phone-shadow);
+    isolation: isolate;
+    transition: background-color .25s ease;
+  }
+
+  .status-bar {
+    height: 30px;
+    flex: 0 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    color: var(--on-surface);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+  .status-icons { display: flex; align-items: center; gap: 5px; opacity: .85; }
+  .status-icons svg { display: block; }
+
+  /* Material3 TopAppBar: 64dp, título 18sp bold, icono 24dp */
+  .top-app-bar {
+    height: 64px;
+    flex: 0 0 64px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 4px;
+    background: var(--background);
+  }
+  .top-app-bar h1 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 700;
+    color: var(--on-surface);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .icon-button {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--on-surface);
+  }
+  .icon-button:hover { background: color-mix(in srgb, var(--on-surface) 7%, transparent); }
+  .icon-button:focus-visible,
+  .app-button:focus-visible,
+  .text-button:focus-visible,
+  .field:focus-visible,
+  .check-row:focus-within,
+  .theme-toggle:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent);
+    outline-offset: 2px;
+  }
+
+  .screen-scroll {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 16px 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--on-surface) 18%, transparent) transparent;
+  }
+  .screen-scroll::-webkit-scrollbar { width: 4px; }
+  .screen-scroll::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--on-surface) 18%, transparent);
+    border-radius: 99px;
+  }
+
+  /* ── AppDetailRow ───────────────────────────────────── */
+  .section-title {
+    margin: 0;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .detail-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 48px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--outline-variant);
+  }
+  .detail-row:last-child { border-bottom: 0; }
+  .detail-label {
+    flex: 1;
+    min-width: 0;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--on-surface-variant);
+  }
+  .detail-value {
+    flex: 1;
+    min-width: 0;
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 500;
+    color: var(--on-surface);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  .detail-value strong { font-weight: 600; }
+
+  /* ── AppFormSection + AppFormField ──────────────────── */
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+  }
+  .two-col > * { min-width: 0; }
+  .field-label {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 700;
+    color: var(--on-surface);
+  }
+  .field {
+    width: 100%;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--on-surface);
+    box-shadow: var(--elevation-4);
+    font-size: 16px;
+    line-height: 24px;
+    text-align: left;
+  }
+  .field input {
+    width: 100%;
+    height: 56px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--on-surface);
+    font-size: 16px;
+    line-height: 24px;
+    padding: 0;
+  }
+  .field input::placeholder { color: color-mix(in srgb, var(--on-surface-variant) 80%, transparent); }
+  .field select {
+    width: 100%;
+    height: 56px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--on-surface);
+    font-size: 16px;
+    line-height: 24px;
+    appearance: none;
+    padding: 0;
+  }
+  .field .trailing {
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--on-surface-variant);
+  }
+  .field .trailing svg { width: 22px; height: 22px; }
+  .field-action { color: var(--primary); font-size: 14px; font-weight: 700; }
+  .date-field { justify-content: space-between; }
+
+  /* ── AppNoticeBlock ─────────────────────────────────── */
+  .notice-block {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--secondary-container);
+    color: var(--on-secondary-container);
+  }
+  .notice-block > svg {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    margin-top: 1px;
+    color: var(--secondary);
+  }
+  .notice-title {
+    display: block;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .notice-text {
+    margin: 0;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  /* ── Cards de medicamento ───────────────────────────── */
+  .med-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  .med-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border-radius: 20px;
+    background: var(--surface);
+    box-shadow: var(--elevation-4);
+  }
+  .med-card.is-muted { background: color-mix(in srgb, var(--surface) 88%, var(--background)); }
+
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 48px;
+    cursor: pointer;
+  }
+  .check-row.is-disabled { cursor: default; }
+  .check-hit {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .check-box {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--on-surface-variant);
+    border-radius: 2px;
+    background: transparent;
+    color: transparent;
+  }
+  .check-box svg { width: 14px; height: 14px; }
+  .check-row input { position: absolute; opacity: 0; pointer-events: none; }
+  .check-row input:checked + .check-hit .check-box {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--on-primary);
+  }
+  .check-row input:disabled + .check-hit .check-box {
+    border-color: color-mix(in srgb, var(--on-surface-variant) 45%, transparent);
+  }
+  .check-row input:disabled:checked + .check-hit .check-box {
+    background: color-mix(in srgb, var(--primary) 38%, transparent);
+    border-color: transparent;
+  }
+  .check-label {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    padding: 4px 0;
+  }
+  .med-name {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+    color: var(--on-surface);
+    overflow-wrap: anywhere;
+  }
+  .med-status {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+  }
+  .status-new { color: var(--on-tertiary-container); }
+  .status-existing, .status-review { color: var(--on-secondary-container); }
+  .is-muted .med-name { color: var(--on-surface-variant); }
+
+  .med-details { display: flex; flex-direction: column; width: 100%; }
+  .med-details .detail-label { font-size: 16px; }
+  .med-details .detail-value { font-size: 18px; }
+
+  .card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-top: 2px;
+  }
+  .card-actions .app-button { width: 100%; }
+
+  /* ── AppButton ──────────────────────────────────────── */
+  .app-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 0;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    min-height: 40px;
+    padding: 8px 20px;
+    box-shadow: var(--elevation-4);
+    transition: filter .15s ease, transform .12s ease;
+  }
+  .app-button svg { width: 18px; height: 18px; flex: 0 0 18px; }
+  .app-button.primary { background: var(--primary); color: var(--on-primary); box-shadow: var(--button-shadow); }
+  .app-button.tonal { background: var(--primary-container); color: var(--on-primary-container); }
+  .app-button.ghost { background: transparent; color: var(--primary); box-shadow: none; }
+  .app-button.small { min-width: 110px; min-height: 40px; padding: 6px 12px; font-size: 12px; line-height: 16px; font-weight: 500; border-radius: 12px; }
+  .app-button.medium { min-width: 160px; min-height: 44px; padding: 12px 20px; font-size: 14px; line-height: 20px; font-weight: 700; }
+  .app-button.large { width: 100%; min-height: 52px; padding: 16px 28px; font-size: 14px; line-height: 20px; font-weight: 600; }
+  .app-button:hover { filter: brightness(1.04); }
+  .app-button:active { transform: translateY(1px); }
+  .app-button:disabled {
+    background: color-mix(in srgb, var(--on-surface) 12%, transparent);
+    color: color-mix(in srgb, var(--on-surface) 38%, transparent);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* ── AppFormActions ─────────────────────────────────── */
+  .form-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 4px;
+    padding-bottom: 8px;
+  }
+  .supporting-text {
+    margin: 0;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--on-surface-variant);
+  }
+  .supporting-text strong { color: var(--on-surface); font-weight: 600; }
+
+  /* ── ModalBottomSheet ───────────────────────────────── */
+  .scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    background: var(--scrim);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s ease;
+  }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+
+  .modal-sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    height: 92%;
+    max-height: 92%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 28px 28px 0 0;
+    background: var(--background);
+    color: var(--on-surface);
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, .28);
+    transform: translateY(105%);
+    transition: transform .26s cubic-bezier(.2, .8, .2, 1);
+  }
+  .modal-sheet.open { transform: translateY(0); }
+  .sheet-handle {
+    width: 32px;
+    height: 4px;
+    flex: 0 0 4px;
+    margin: 10px auto 2px;
+    border-radius: 999px;
+    background: var(--on-surface-variant);
+    opacity: .4;
+  }
+  .sheet-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 8px 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .sheet-header h2 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .sheet-footer {
+    flex: 0 0 auto;
+    padding: 8px 16px 16px;
+    background: var(--background);
+    border-top: 1px solid var(--outline-variant);
+  }
+
+  /* ── TimeListEditor ─────────────────────────────────── */
+  .time-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  .time-item {
+    width: 100%;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 4px 4px 16px;
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--elevation-4);
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--on-surface);
+  }
+  .time-item .icon-button { color: var(--error); }
+  .time-item .icon-button:hover { background: color-mix(in srgb, var(--error) 8%, transparent); }
+
+  /* ── SettingsToggleItem ─────────────────────────────── */
+  .settings-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 48px;
+    width: 100%;
+    cursor: pointer;
+  }
+  .settings-toggle span:first-child {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 500;
+    color: var(--on-surface);
+  }
+  .settings-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+  .switch {
+    position: relative;
+    width: 52px;
+    height: 32px;
+    flex: 0 0 52px;
+    border-radius: 999px;
+    border: 2px solid var(--outline);
+    background: transparent;
+    transition: background-color .18s ease, border-color .18s ease;
+  }
+  .switch::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--outline);
+    transition: left .18s ease, background-color .18s ease, width .18s ease, height .18s ease;
+  }
+  .settings-toggle input:checked + .switch {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  .settings-toggle input:checked + .switch::after {
+    left: 24px;
+    width: 24px;
+    height: 24px;
+    top: 2px;
+    background: var(--on-primary);
+  }
+
+  /* ── AlertDialog ────────────────────────────────────── */
+  .dialog {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 50;
+    width: calc(100% - 56px);
+    max-width: 340px;
+    transform: translate(-50%, -46%) scale(.97);
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 28px;
+    background: var(--surface);
+    color: var(--on-surface);
+    padding: 24px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .34);
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .dialog.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .dialog h2 {
+    margin: 0 0 16px;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+    color: var(--on-surface);
+  }
+  .dialog p {
+    margin: 0;
+    color: var(--on-surface-variant);
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  .text-button {
+    border: 0;
+    background: transparent;
+    color: var(--primary);
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 700;
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+  .text-button:hover { background: color-mix(in srgb, var(--primary) 8%, transparent); }
+  .text-button.danger { color: var(--error); }
+
+  /* ── Snackbar ───────────────────────────────────────── */
+  .snackbar {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 24px;
+    z-index: 60;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 4px;
+    background: var(--inverse-surface);
+    color: var(--inverse-on-surface);
+    font-size: 14px;
+    line-height: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .30);
+    transform: translateY(14px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .snackbar.show { opacity: 1; transform: translateY(0); }
+  .snackbar svg { width: 20px; height: 20px; flex: 0 0 20px; margin-top: 0; }
+
+  .gesture-bar {
+    height: 20px;
+    flex: 0 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background);
+  }
+  .gesture-bar span {
+    width: 108px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--on-surface);
+    opacity: .28;
+  }
+
+  /* ── Notas de la presentación ───────────────────────── */
+  .notes {
+    width: 330px;
+    max-width: 100%;
+    padding-top: 6px;
+  }
+  .notes h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 700;
+    color: var(--page-ink);
+  }
+  .notes > p {
+    margin: 0 0 18px;
+    color: var(--page-muted);
+    font-size: 13px;
+    line-height: 20px;
+  }
+  .note-block {
+    padding: 15px 16px;
+    border: 1px solid color-mix(in srgb, var(--page-ink) 12%, transparent);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--surface) 46%, transparent);
+    backdrop-filter: blur(8px);
+    margin-bottom: 12px;
+  }
+  .note-block h3 {
+    margin: 0 0 6px;
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 700;
+    color: var(--page-ink);
+  }
+  .note-block p {
+    margin: 0;
+    color: var(--page-muted);
+    font-size: 12px;
+    line-height: 18px;
+  }
+  .note-block p + p { margin-top: 7px; }
+  .component-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .component-list code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 10.5px;
+    line-height: 15px;
+    padding: 3px 6px;
+    border-radius: 6px;
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+    white-space: nowrap;
+  }
+  .status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .status-line {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    align-items: center;
+    gap: 10px;
+    color: var(--page-muted);
+    font-size: 12px;
+    line-height: 17px;
+  }
+  .status-line b {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .mock-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    border: 1px dashed color-mix(in srgb, var(--page-ink) 25%, transparent);
+    color: var(--page-muted);
+    font-size: 10.5px;
+    line-height: 15px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 860px) {
+    .page { width: calc(100% - 24px); padding-top: 22px; }
+    .page-header { align-items: flex-start; flex-direction: column; gap: 16px; }
+    .theme-toggle { align-self: flex-start; }
+    .layout { gap: 28px; }
+    .phone { width: min(412px, calc(100vw - 24px)); height: min(884px, 88vh); }
+    .notes { width: min(412px, calc(100vw - 24px)); }
+  }
+
+  .no-motion *, .no-motion *::before, .no-motion *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body data-theme="light">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-back" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 24 24"><path fill="currentColor" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><path fill="currentColor" d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></symbol>
+    <symbol id="i-pill" viewBox="0 0 24 24"><path fill="currentColor" d="M10.5 3.5a7 7 0 0 0-9.9 9.9l6.4 6.4a7 7 0 0 0 9.9-9.9l-6.4-6.4zm-2.1 14.9-6.4-6.4a5 5 0 0 1 7.1-7.1l6.4 6.4a5 5 0 0 1-7.1 7.1z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 13a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zm0-9a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/></symbol>
+    <symbol id="i-add" viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
+    <symbol id="i-delete" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><path fill="currentColor" d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-5h-1v3h1V2zm0 17h-1v3h1v-3zM4.22 4.22l-.7.7 2.12 2.12.7-.7-2.12-2.12zm13.44 13.44-.7.7 2.12 2.12.7-.7-2.12-2.12zM2 11v1h3v-1H2zm17 0v1h3v-1h-3zM4.22 19.78l-.7-.7 2.12-2.12.7.7-2.12 2.12zM17.66 6.34l-.7-.7 2.12-2.12.7.7-2.12 2.12z"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.74-9.25c-.25-.05-.5-.08-.76-.08z"/></symbol>
+  </defs>
+</svg>
+
+<div class="page">
+  <header class="page-header">
+    <div>
+      <div class="eyebrow">
+        <span class="brand-mark"><b>PILL</b>REMIND</span>
+        <span class="dot"></span>
+        <span>Mock de diseño</span>
+      </div>
+      <h1 class="page-title">Importar medicamentos desde PDF</h1>
+      <p class="page-subtitle">Revisión con los componentes reales de la app: <code>AppFormSection</code>, <code>AppFormField</code>, <code>AppTextField</code>, <code>AppDetailRow</code>, <code>AppNoticeBlock</code>, <code>AppButton</code> y <code>AppFormActions</code>.</p>
+    </div>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">
+      <svg id="themeIcon"><use href="#i-moon"></use></svg>
+      <span id="themeLabel">Modo oscuro</span>
+    </button>
+  </header>
+
+  <main class="layout">
+    <section class="phone-wrap" aria-label="Mock de la pantalla de revisión">
+      <div class="phone">
+        <div class="status-bar" aria-hidden="true">
+          <span>9:41</span>
+          <span class="status-icons">
+            <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><path d="M1 10V7M4.2 10V5M7.4 10V3M10.6 10V1.5M13.8 10V.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><path d="M1 4.2C4.6.8 10.4.8 14 4.2M3.2 6.5c2.4-2.2 6.2-2.2 8.6 0M5.5 8.8c1.2-1.1 2.8-1.1 4 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7.5" cy="10" r=".9" fill="currentColor"/></svg>
+            <svg width="19" height="10" viewBox="0 0 19 10" fill="none"><rect x=".5" y=".5" width="15" height="9" rx="2.2" stroke="currentColor" opacity=".55"/><rect x="2" y="2" width="12" height="6" rx="1.2" fill="currentColor"/><path d="M17 3.2v3.6c1-.3 1.4-.9 1.4-1.8s-.4-1.5-1.4-1.8z" fill="currentColor" opacity=".55"/></svg>
+          </span>
+        </div>
+
+        <header class="top-app-bar">
+          <button class="icon-button" type="button" aria-label="Volver" id="backButton">
+            <svg width="24" height="24"><use href="#i-back"></use></svg>
+          </button>
+          <h1>Importar medicamentos</h1>
+        </header>
+
+        <div class="screen-scroll" id="screenScroll">
+          <div class="form-field">
+            <span class="field-label">Fecha de inicio</span>
+            <button class="field date-field" type="button" id="startDateField">
+              <span>10/11/2026</span>
+              <span class="trailing" aria-hidden="true"><svg><use href="#i-calendar"></use></svg></span>
+            </button>
+          </div>
+
+          <div class="notice-block" role="note">
+            <svg aria-hidden="true"><use href="#i-warning"></use></svg>
+            <div>
+              <span class="notice-title">Revisa antes de guardar</span>
+              <p class="notice-text">Los medicamentos que ya existen no se modificarán.</p>
+            </div>
+          </div>
+
+          <section class="form-section" aria-label="Medicamentos encontrados">
+            <h2 class="section-title">Medicamentos</h2>
+
+            <div class="med-list" id="medList">
+              <!-- Nuevo -->
+              <article class="med-card" data-id="ryaltr" data-status="new">
+                <label class="check-row">
+                  <input type="checkbox" checked data-selectable="true" aria-label="Seleccionar RYALTRIS 25/600MCG/PULSACION">
+                  <span class="check-hit" aria-hidden="true"><span class="check-box"><svg><use href="#i-check"></use></svg></span></span>
+                  <span class="check-label">
+                    <span class="med-name">RYALTRIS 25/600MCG/PULSACION</span>
+                    <span class="med-status status-new">Se añadirá</span>
+                  </span>
+                </label>
+                <div class="med-details">
+                  <div class="detail-row"><span class="detail-label">Dosis</span><span class="detail-value">2 pulsaciones</span></div>
+                  <div class="detail-row"><span class="detail-label">Pauta</span><span class="detail-value">Todos los días · 09:00</span></div>
+                  <div class="detail-row"><span class="detail-label">Tratamiento</span><span class="detail-value">Larga duración</span></div>
+                </div>
+                <div class="card-actions">
+                  <button class="app-button tonal large" type="button" data-edit="ryaltr">Editar</button>
+                </div>
+              </article>
+
+              <!-- Nuevo -->
+              <article class="med-card" data-id="relvar" data-status="new">
+                <label class="check-row">
+                  <input type="checkbox" checked data-selectable="true" aria-label="Seleccionar RELVAR ELLIPTA 92/22MCG">
+                  <span class="check-hit" aria-hidden="true"><span class="check-box"><svg><use href="#i-check"></use></svg></span></span>
+                  <span class="check-label">
+                    <span class="med-name">RELVAR ELLIPTA 92/22MCG</span>
+                    <span class="med-status status-new">Se añadirá</span>
+                  </span>
+                </label>
+                <div class="med-details">
+                  <div class="detail-row"><span class="detail-label">Dosis</span><span class="detail-value">1 dosis</span></div>
+                  <div class="detail-row"><span class="detail-label">Pauta</span><span class="detail-value">Todos los días · 09:00</span></div>
+                  <div class="detail-row"><span class="detail-label">Tratamiento</span><span class="detail-value">Larga duración</span></div>
+                </div>
+                <div class="card-actions">
+                  <button class="app-button tonal large" type="button" data-edit="relvar">Editar</button>
+                </div>
+              </article>
+
+              <!-- Duplicado -->
+              <article class="med-card is-muted" data-id="enalapril" data-status="existing">
+                <div class="check-row">
+                  <input type="checkbox" data-duplicate="enalapril" aria-label="ENALAPRIL 5 MG ya existe; pulsa para añadirlo igualmente">
+                  <span class="check-hit" aria-hidden="true"><span class="check-box"><svg><use href="#i-check"></use></svg></span></span>
+                  <span class="check-label">
+                    <span class="med-name">ENALAPRIL 5 MG</span>
+                    <span class="med-status status-existing">Ya existe</span>
+                  </span>
+                </div>
+                <div class="med-details">
+                  <div class="detail-row"><span class="detail-label">Dosis</span><span class="detail-value">1 comprimido</span></div>
+                  <div class="detail-row"><span class="detail-label">Pauta</span><span class="detail-value">Todos los días · 09:00</span></div>
+                  <div class="detail-row"><span class="detail-label">Tratamiento</span><span class="detail-value">Larga duración</span></div>
+                </div>
+                <div class="notice-block">
+                  <svg aria-hidden="true"><use href="#i-info"></use></svg>
+                  <div>
+                    <span class="notice-title">Ya existe en el perfil</span>
+                    <p class="notice-text">Tienes ENALAPRIL 5 MG con otra pauta. No se añadirá.</p>
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <button class="app-button tonal large" type="button" data-view="enalapril">Ver ficha</button>
+                </div>
+              </article>
+
+              <!-- Falta pauta -->
+              <article class="med-card is-muted" data-id="ibuprofeno" data-status="incomplete">
+                <div class="check-row is-disabled">
+                  <input type="checkbox" disabled aria-label="IBUPROFENO 600 MG no se puede seleccionar hasta completar la pauta">
+                  <span class="check-hit" aria-hidden="true"><span class="check-box"><svg><use href="#i-check"></use></svg></span></span>
+                  <span class="check-label">
+                    <span class="med-name">IBUPROFENO 600 MG</span>
+                    <span class="med-status status-review">Falta pauta</span>
+                  </span>
+                </div>
+                <div class="med-details">
+                  <div class="detail-row"><span class="detail-label">Dosis</span><span class="detail-value">1 comprimido</span></div>
+                  <div class="detail-row"><span class="detail-label">Pauta</span><span class="detail-value">Sin horario</span></div>
+                  <div class="detail-row"><span class="detail-label">Tratamiento</span><span class="detail-value">Tratamiento puntual</span></div>
+                </div>
+                <div class="notice-block">
+                  <svg aria-hidden="true"><use href="#i-warning"></use></svg>
+                  <div>
+                    <span class="notice-title">Falta la pauta</span>
+                    <p class="notice-text">No se detectó el horario. Añádelo para poder guardarlo.</p>
+                  </div>
+                </div>
+                <div class="card-actions">
+                  <button class="app-button tonal large" type="button" data-complete="ibuprofeno">Completar</button>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <div class="form-actions">
+            <button class="app-button primary large" type="button" id="saveButton">
+              <svg aria-hidden="true"><use href="#i-check"></use></svg>
+              <span id="saveLabel">Añadir 2 medicamentos</span>
+            </button>
+            <p class="supporting-text" id="footerNote" aria-live="polite">Se añadirán <strong>2 medicamentos nuevos</strong>. Los que ya existen no se modificarán.</p>
+          </div>
+        </div>
+
+        <div class="gesture-bar" aria-hidden="true"><span></span></div>
+
+        <div class="scrim" id="scrim"></div>
+
+        <section class="modal-sheet" id="editSheet" role="dialog" aria-modal="true" aria-labelledby="editTitle" aria-hidden="true">
+          <div class="sheet-handle" aria-hidden="true"></div>
+          <div class="sheet-content">
+            <div class="sheet-header">
+              <h2 id="editTitle">Editar medicamento</h2>
+              <button class="icon-button" type="button" data-close-sheet aria-label="Cerrar">
+                <svg width="24" height="24"><use href="#i-close"></use></svg>
+              </button>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label" for="editName">Nombre</label>
+              <div class="field"><input id="editName" type="text" autocomplete="off"></div>
+            </div>
+
+            <div class="two-col">
+              <div class="form-field">
+                <label class="field-label" for="editDose">Dosis</label>
+                <div class="field"><input id="editDose" type="text" inputmode="decimal" autocomplete="off"></div>
+              </div>
+              <div class="form-field">
+                <label class="field-label" for="editUnit">Unidad</label>
+                <div class="field">
+                  <select id="editUnit">
+                    <option>mg</option>
+                    <option>g</option>
+                    <option>mcg</option>
+                    <option>ml</option>
+                    <option>comprimidos</option>
+                    <option>cápsulas</option>
+                    <option>gotas</option>
+                    <option>sobres</option>
+                    <option>dosis</option>
+                    <option>pulsaciones</option>
+                    <option>puffs</option>
+                    <option>sprays</option>
+                    <option>parches</option>
+                    <option>supositorios</option>
+                    <option>UI</option>
+                    <option>%</option>
+                  </select>
+                  <span class="trailing" aria-hidden="true"><svg><use href="#i-chevron"></use></svg></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <span class="field-label">Periodicidad</span>
+              <div class="field">
+                <select id="editPeriodicity">
+                  <option>Todos los días</option>
+                  <option>Días de la semana</option>
+                  <option>Cada N días</option>
+                  <option>Mensual (día del mes)</option>
+                  <option>Mensual (día de la semana)</option>
+                  <option>Ciclo de toma y descanso</option>
+                  <option>Toma única</option>
+                </select>
+                <span class="trailing" aria-hidden="true"><svg><use href="#i-chevron"></use></svg></span>
+              </div>
+              <p class="sheet-hint">La app muestra los campos de la opción elegida: días, intervalo, día del mes o ciclo.</p>
+            </div>
+
+            <div class="form-field">
+              <span class="field-label">Horas de toma</span>
+              <div class="time-list" id="timeList"></div>
+              <button class="app-button tonal large" type="button" id="addTime">
+                <svg aria-hidden="true"><use href="#i-add"></use></svg>Añadir hora
+              </button>
+            </div>
+
+            <label class="settings-toggle">
+              <span>Tratamiento de larga duración</span>
+              <input type="checkbox" id="editChronic" checked>
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+          </div>
+          <div class="sheet-footer">
+            <button class="app-button primary large" type="button" id="applyEdit">Aplicar cambios</button>
+          </div>
+        </section>
+
+        <div class="dialog" id="detailDialog" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true">
+          <h2 id="detailTitle">ENALAPRIL 5 MG</h2>
+          <p>Esta ficha ya existe en el perfil. La importación no la modificará.</p>
+          <p style="margin-top: 12px;"><strong>Dosis:</strong> 1 comprimido<br><strong>Pauta:</strong> Todos los días · 09:00<br><strong>Inicio:</strong> 12/03/2026</p>
+          <div class="dialog-actions">
+            <button class="text-button" type="button" data-close-dialog>Cerrar</button>
+          </div>
+        </div>
+
+        <div class="dialog" id="forceDialog" role="dialog" aria-modal="true" aria-labelledby="forceTitle" aria-hidden="true">
+          <h2 id="forceTitle">¿Añadir de todos modos?</h2>
+          <p>Ya existe un medicamento con la misma marca y concentración. Si lo añades, tendrás dos fichas del mismo producto.</p>
+          <div class="dialog-actions">
+            <button class="text-button" type="button" data-close-dialog>Cancelar</button>
+            <button class="text-button danger" type="button" id="confirmForce">Añadir igualmente</button>
+          </div>
+        </div>
+
+        <div class="snackbar" id="snackbar" role="status" aria-live="polite">
+          <svg aria-hidden="true"><use href="#i-check"></use></svg>
+          <span id="snackbarText">2 medicamentos añadidos. Los existentes no se han modificado.</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="notes" aria-label="Notas del mock">
+      <h2>Componentes reales</h2>
+      <p>El mock ya no inventa campos, botones ni hojas: reproduce los componentes que ya usa la app.</p>
+
+      <div class="note-block">
+        <h3>Estructura</h3>
+        <p>Fecha con <code>AppFormField</code> y <code>AppDatePickerField</code>. Avisos con <code>AppNoticeBlock</code>. Datos con <code>AppDetailRow</code>. Acciones con <code>AppButton</code> y <code>AppFormActions</code>.</p>
+        <div class="component-list">
+          <code>AppFormSection</code>
+          <code>AppFormField</code>
+          <code>AppTextField</code>
+          <code>AppDropdownField</code>
+          <code>AppDatePickerField</code>
+          <code>AppDetailRow</code>
+          <code>AppNoticeBlock</code>
+          <code>AppButton</code>
+          <code>AppFormActions</code>
+          <code>SettingsToggleItem</code>
+          <code>ScheduleEditor</code>
+          <code>TimeListEditor</code>
+          <code>ModalBottomSheet</code>
+        </div>
+      </div>
+
+      <div class="note-block">
+        <h3>Estados</h3>
+        <div class="status-list">
+          <div class="status-line"><b style="color: var(--on-tertiary-container);">Se añadirá</b><span>Marcado y se guardará.</span></div>
+          <div class="status-line"><b style="color: var(--on-secondary-container);">Ya existe</b><span>No se marca y no se inserta.</span></div>
+          <div class="status-line"><b style="color: var(--on-secondary-container);">Falta pauta</b><span>Hay que completarla antes de guardar.</span></div>
+        </div>
+      </div>
+
+      <div class="note-block">
+        <h3>Reglas</h3>
+        <p>Los existentes no se crean, no se actualizan y no se borran. Nada se guarda hasta pulsar el botón. El PDF se procesa en el dispositivo y no se almacena.</p>
+      </div>
+
+      <span class="mock-tag">Mock HTML · No es la app real</span>
+    </aside>
+  </main>
+</div>
+
+<script>
+  (() => {
+    'use strict';
+
+    const body = document.body;
+    const scrim = document.getElementById('scrim');
+    const sheet = document.getElementById('editSheet');
+    const detailDialog = document.getElementById('detailDialog');
+    const forceDialog = document.getElementById('forceDialog');
+    const snackbar = document.getElementById('snackbar');
+    const snackbarText = document.getElementById('snackbarText');
+    const footerNote = document.getElementById('footerNote');
+    const saveButton = document.getElementById('saveButton');
+    const saveLabel = document.getElementById('saveLabel');
+    const editName = document.getElementById('editName');
+    const editDose = document.getElementById('editDose');
+    const editUnit = document.getElementById('editUnit');
+    const editPeriodicity = document.getElementById('editPeriodicity');
+    const editChronic = document.getElementById('editChronic');
+    const timeList = document.getElementById('timeList');
+    const addTimeButton = document.getElementById('addTime');
+    const applyEdit = document.getElementById('applyEdit');
+    const screenScroll = document.getElementById('screenScroll');
+
+    const state = {
+      editingId: null,
+      forcingId: null,
+      times: ['09:00'],
+      meds: {
+        ryaltr: {
+          name: 'RYALTRIS 25/600MCG/PULSACION',
+          dose: '2',
+          unit: 'pulsaciones',
+          periodicity: 'Todos los días',
+          times: ['09:00'],
+          chronic: true,
+          status: 'new'
+        },
+        relvar: {
+          name: 'RELVAR ELLIPTA 92/22MCG',
+          dose: '1',
+          unit: 'dosis',
+          periodicity: 'Todos los días',
+          times: ['09:00'],
+          chronic: true,
+          status: 'new'
+        },
+        enalapril: {
+          name: 'ENALAPRIL 5 MG',
+          dose: '1',
+          unit: 'comprimidos',
+          periodicity: 'Todos los días',
+          times: ['09:00'],
+          chronic: true,
+          status: 'existing'
+        },
+        ibuprofeno: {
+          name: 'IBUPROFENO 600 MG',
+          dose: '1',
+          unit: 'comprimidos',
+          periodicity: 'Todos los días',
+          times: [],
+          chronic: false,
+          status: 'incomplete'
+        }
+      }
+    };
+
+    const cardFor = (id) => document.querySelector(`.med-card[data-id="${id}"]`);
+
+    const scheduleText = (med) => {
+      if (!med.times.length) return 'Sin horario';
+      if (med.periodicity !== 'Todos los días') {
+        return `${med.periodicity} · ${med.times.join(', ')}`;
+      }
+      return `Todos los días · ${med.times.join(', ')}`;
+    };
+
+    const doseText = (med) => `${med.dose} ${med.unit}`;
+
+    const updateFooter = () => {
+      const selected = [...document.querySelectorAll('.med-card input[type="checkbox"][data-selectable="true"]:checked')].length;
+      if (selected === 0) {
+        footerNote.textContent = 'No hay medicamentos nuevos seleccionados.';
+        saveButton.disabled = true;
+        saveLabel.textContent = 'No hay medicamentos que añadir';
+        return;
+      }
+      saveButton.disabled = false;
+      const word = selected === 1 ? 'medicamento nuevo' : 'medicamentos nuevos';
+      footerNote.innerHTML = `Se añadirán <strong>${selected} ${word}</strong>. Los que ya existen no se modificarán.`;
+      saveLabel.textContent = selected === 1 ? 'Añadir 1 medicamento' : `Añadir ${selected} medicamentos`;
+    };
+
+    const renderTimes = () => {
+      timeList.innerHTML = '';
+      state.times.forEach((time) => {
+        const item = document.createElement('div');
+        item.className = 'time-item';
+        item.innerHTML = `
+          <span>${time}</span>
+          <button class="icon-button" type="button" aria-label="Eliminar la hora ${time}">
+            <svg width="24" height="24" aria-hidden="true"><use href="#i-delete"></use></svg>
+          </button>`;
+        item.querySelector('button').addEventListener('click', () => {
+          if (state.times.length <= 1) return;
+          state.times = state.times.filter((t) => t !== time);
+          renderTimes();
+        });
+        timeList.appendChild(item);
+      });
+    };
+
+    const openSheet = (id) => {
+      const med = state.meds[id];
+      if (!med) return;
+      state.editingId = id;
+      state.times = med.times.length ? [...med.times] : ['09:00'];
+      editName.value = med.name;
+      editDose.value = med.dose;
+      editUnit.value = med.unit;
+      editPeriodicity.value = med.periodicity;
+      editChronic.checked = med.chronic;
+      renderTimes();
+      scrim.classList.add('open');
+      sheet.classList.add('open');
+      sheet.setAttribute('aria-hidden', 'false');
+      setTimeout(() => editName.focus(), 180);
+    };
+
+    const closeSheet = () => {
+      scrim.classList.remove('open');
+      sheet.classList.remove('open');
+      sheet.setAttribute('aria-hidden', 'true');
+      state.editingId = null;
+    };
+
+    const closeDialogs = () => {
+      detailDialog.classList.remove('open');
+      detailDialog.setAttribute('aria-hidden', 'true');
+      forceDialog.classList.remove('open');
+      forceDialog.setAttribute('aria-hidden', 'true');
+      state.forcingId = null;
+      scrim.classList.remove('open');
+    };
+
+    const updateCard = (id) => {
+      const med = state.meds[id];
+      const card = cardFor(id);
+      if (!med || !card) return;
+
+      card.querySelector('.med-name').textContent = med.name;
+      const rows = card.querySelectorAll('.med-details .detail-row');
+      if (rows[0]) rows[0].querySelector('.detail-value').textContent = doseText(med);
+      if (rows[1]) rows[1].querySelector('.detail-value').textContent = scheduleText(med);
+      if (rows[2]) {
+        rows[2].querySelector('.detail-value').textContent = med.chronic
+          ? 'Larga duración'
+          : 'Tratamiento puntual';
+      }
+    };
+
+    const markAsNew = (id, statusLabel) => {
+      const med = state.meds[id];
+      const card = cardFor(id);
+      if (!med || !card) return;
+      med.status = 'new';
+      card.dataset.status = 'new';
+      card.classList.remove('is-muted');
+      const status = card.querySelector('.med-status');
+      status.className = 'med-status status-new';
+      status.textContent = statusLabel;
+      const notice = card.querySelector('.notice-block');
+      if (notice) notice.remove();
+      const checkbox = card.querySelector('input[type="checkbox"]');
+      checkbox.disabled = false;
+      checkbox.dataset.selectable = 'true';
+      checkbox.checked = true;
+      const actions = card.querySelector('.card-actions');
+      actions.innerHTML = `
+        <button class="app-button tonal large" type="button" data-edit="${id}">Editar</button>`;
+      actions.querySelector('[data-edit]').addEventListener('click', () => openSheet(id));
+    };
+
+    const applyChanges = () => {
+      const id = state.editingId;
+      if (!id) return;
+      const med = state.meds[id];
+      if (!med) return;
+
+      med.name = editName.value.trim() || med.name;
+      med.dose = editDose.value.trim() || med.dose;
+      med.unit = editUnit.value;
+      med.periodicity = editPeriodicity.value;
+      med.times = [...state.times];
+      med.chronic = editChronic.checked;
+
+      updateCard(id);
+
+      if (med.status === 'incomplete' && med.times.length) {
+        markAsNew(id, 'Se añadirá');
+      }
+
+      closeSheet();
+      updateFooter();
+    };
+
+    const showSnackbar = (message) => {
+      snackbarText.textContent = message;
+      snackbar.classList.add('show');
+      window.clearTimeout(showSnackbar.timer);
+      showSnackbar.timer = window.setTimeout(() => snackbar.classList.remove('show'), 4200);
+    };
+
+    const setTheme = (theme) => {
+      body.dataset.theme = theme;
+      const dark = theme === 'dark';
+      document.getElementById('themeIcon').innerHTML = `<use href="#i-${dark ? 'sun' : 'moon'}"></use>`;
+      document.getElementById('themeLabel').textContent = dark ? 'Modo claro' : 'Modo oscuro';
+      document.getElementById('themeToggle').setAttribute('aria-pressed', String(dark));
+    };
+
+    document.getElementById('medList').addEventListener('change', (event) => {
+      const input = event.target;
+      if (input.matches('input[data-duplicate]')) {
+        input.checked = false;
+        state.forcingId = input.dataset.duplicate;
+        forceDialog.classList.add('open');
+        forceDialog.setAttribute('aria-hidden', 'false');
+        scrim.classList.add('open');
+        return;
+      }
+      if (input.matches('input[type="checkbox"]')) updateFooter();
+    });
+
+    document.querySelectorAll('[data-edit]').forEach((button) => {
+      button.addEventListener('click', () => openSheet(button.dataset.edit));
+    });
+
+    document.querySelectorAll('[data-complete]').forEach((button) => {
+      button.addEventListener('click', () => openSheet(button.dataset.complete));
+    });
+
+    document.querySelectorAll('[data-view]').forEach((button) => {
+      button.addEventListener('click', () => {
+        detailDialog.classList.add('open');
+        detailDialog.setAttribute('aria-hidden', 'false');
+        scrim.classList.add('open');
+      });
+    });
+
+    document.getElementById('confirmForce').addEventListener('click', () => {
+      const id = state.forcingId;
+      if (!id) return;
+      markAsNew(id, 'Se añadirá');
+      closeDialogs();
+      updateFooter();
+    });
+
+    document.querySelectorAll('[data-close-sheet]').forEach((button) => {
+      button.addEventListener('click', closeSheet);
+    });
+
+    document.querySelectorAll('[data-close-dialog]').forEach((button) => {
+      button.addEventListener('click', closeDialogs);
+    });
+
+    scrim.addEventListener('click', () => {
+      if (sheet.classList.contains('open')) closeSheet();
+      else closeDialogs();
+    });
+
+    addTimeButton.addEventListener('click', () => {
+      const candidate = state.times.includes('09:00') ? '21:00' : '09:00';
+      if (!state.times.includes(candidate)) state.times.push(candidate);
+      state.times.sort();
+      renderTimes();
+    });
+
+    applyEdit.addEventListener('click', applyChanges);
+
+    saveButton.addEventListener('click', () => {
+      const selected = document.querySelectorAll('.med-card input[type="checkbox"][data-selectable="true"]:checked').length;
+      if (!selected) return;
+      showSnackbar(`${selected} ${selected === 1 ? 'medicamento añadido' : 'medicamentos añadidos'}. Los existentes no se han modificado.`);
+    });
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      setTheme(body.dataset.theme === 'dark' ? 'light' : 'dark');
+    });
+
+    document.getElementById('backButton').addEventListener('click', () => {
+      showSnackbar('Volvería al perfil sin guardar nada.');
+    });
+
+    document.getElementById('startDateField').addEventListener('click', () => {
+      showSnackbar('Abriría el selector de fecha de Android.');
+    });
+
+    const params = new URLSearchParams(location.search);
+
+    if (params.get('theme') === 'dark') {
+      setTheme('dark');
+    }
+
+    const instant = params.get('instant') === '1';
+    if (instant) body.classList.add('no-motion');
+
+    const sheetId = params.get('sheet');
+    if (sheetId && state.meds[sheetId]) {
+      setTimeout(() => openSheet(sheetId), instant ? 0 : 180);
+    }
+
+    if (location.hash === '#duplicates' || location.hash === '#incomplete') {
+      requestAnimationFrame(() => {
+        const id = location.hash === '#duplicates' ? 'enalapril' : 'ibuprofeno';
+        const card = cardFor(id);
+        if (!card) return;
+        const top = card.getBoundingClientRect().top -
+          screenScroll.getBoundingClientRect().top +
+          screenScroll.scrollTop - 12;
+        screenScroll.scrollTop = Math.max(0, top);
+      });
+    }
+
+    updateFooter();
+  })();
+</script>
+</body>
+</html>

@@ -236,9 +236,9 @@
     <string name="settings_backup_privacy_warning">El archivo contiene datos de salud. Si no lo proteges con contraseña, cualquiera que lo tenga podrá leerlo.</string>
     <string name="settings_legal_title">Legal</string>
     <string name="settings_privacy_policy">Política de privacidad</string>
-    <string name="settings_privacy_policy_body">PillRemind guarda los datos de perfiles, medicamentos, horarios, tomas e imágenes en este dispositivo. No requiere una cuenta, no tiene servidor propio y no sincroniza datos entre dispositivos.\n\nLa aplicación usa internet en dos casos:\n\n1. Comprobar actualizaciones: consulta como máximo una vez al día un fichero público alojado en GitHub Releases; también puedes lanzar la comprobación manualmente desde Ajustes. Esa consulta no envía perfiles, medicamentos, tomas ni datos de la app. Como cualquier conexión a internet, GitHub recibe la dirección IP y datos técnicos de la conexión, que trata según su propia política de privacidad.\n\n2. Consultar CIMA: solo si escaneas un medicamento y aceptas el diálogo de consentimiento. Se envía únicamente el CN a la API pública de la AEMPS; no se envían perfiles, medicamentos, tomas ni fotos. El CN no se guarda en la base de datos ni en las copias de seguridad y el resultado se descarta al terminar la revisión. La AEMPS recibe la dirección IP y datos técnicos de la conexión, que trata según su propia política.\n\nLas fotos de la caja y del código se procesan en el dispositivo con ML Kit y no se suben a ningún servidor.\n\nLos perfiles, medicamentos, horarios, tomas e imágenes se guardan en una base de datos local. Esa información solo sale del dispositivo si tú exportas una copia de seguridad y eliges dónde guardarla o con quién compartirla. La copia puede contener datos de salud: protégela con contraseña y guárdala en un lugar seguro.\n\nAl desinstalar la aplicación o borrar sus datos se elimina toda la información almacenada. Las copias de seguridad que hayas exportado no se eliminan y quedan bajo tu control.\n\nLos permisos de notificaciones y alarmas exactas se usan únicamente para avisarte de las tomas programadas.\n\nÚltima revisión: noviembre de 2026.</string>
+    <string name="settings_privacy_policy_body">PillRemind guarda los datos de perfiles, medicamentos, horarios, tomas e imágenes en este dispositivo. No requiere una cuenta, no tiene servidor propio y no sincroniza datos entre dispositivos.\n\nLa aplicación usa internet en dos casos:\n\n1. Comprobar actualizaciones: consulta como máximo una vez al día un fichero público alojado en GitHub Releases; también puedes lanzar la comprobación manualmente desde Ajustes. Esa consulta no envía perfiles, medicamentos, tomas ni datos de la app. Como cualquier conexión a internet, GitHub recibe la dirección IP y datos técnicos de la conexión, que trata según su propia política de privacidad.\n\n2. Consultar CIMA: solo si escaneas un medicamento y aceptas el diálogo de consentimiento. Se envía únicamente el CN a la API pública de la AEMPS; no se envían perfiles, medicamentos, tomas ni fotos. El CN no se guarda en la base de datos ni en las copias de seguridad y el resultado se descarta al terminar la revisión. La AEMPS recibe la dirección IP y datos técnicos de la conexión, que trata según su propia política.\n\nLas fotos de la caja y del código se procesan en el dispositivo con ML Kit y no se suben a ningún servidor. Los PDF de la hoja de medicación se procesan también en el dispositivo, no se guardan y no se envían a ningún servidor.\n\nLos perfiles, medicamentos, horarios, tomas e imágenes se guardan en una base de datos local. Esa información solo sale del dispositivo si tú exportas una copia de seguridad y eliges dónde guardarla o con quién compartirla. La copia puede contener datos de salud: protégela con contraseña y guárdala en un lugar seguro.\n\nAl desinstalar la aplicación o borrar sus datos se elimina toda la información almacenada. Las copias de seguridad que hayas exportado no se eliminan y quedan bajo tu control.\n\nLos permisos de notificaciones y alarmas exactas se usan únicamente para avisarte de las tomas programadas.\n\nÚltima revisión: noviembre de 2026.</string>
     <string name="settings_legal_notice">Aviso legal</string>
-    <string name="settings_legal_notice_body">Titular y desarrollador: Andrés Rodríguez Vázquez.\n\nPillRemind es un proyecto personal de código abierto distribuido bajo la licencia MIT. El código fuente está disponible en github.com/arodriguezvaz/PillRemind.\n\nLa aplicación es una herramienta de apoyo para recordar la medicación. No es un producto sanitario, no emite diagnósticos ni recomendaciones médicas y no sustituye la consulta con un profesional sanitario. Ante cualquier duda sobre un tratamiento, consulta con tu médico o farmacéutico.\n\nEl escaneo de cajas y códigos es una ayuda y puede fallar: el OCR puede leer mal el nombre, la dosis o la forma farmacéutica, y CIMA puede no contener el producto o no estar actualizado. Revisa siempre los datos antes de guardar. La información de CIMA procede de la Agencia Española de Medicamentos y Productos Sanitarios (AEMPS) y se ofrece tal cual, sin garantía de exactitud, integridad o actualización. La consulta solo se realiza con el CN y con tu consentimiento; no se envían perfiles, medicamentos, tomas ni fotos. La AEMPS recibe la dirección IP y datos técnicos de la conexión.\n\nLa aplicación puede comprobar la existencia de actualizaciones y requerir su instalación para seguir funcionando. Las actualizaciones se distribuyen desde GitHub Releases y su disponibilidad no está garantizada.\n\nLa aplicación se ofrece «tal cual», sin garantías de disponibilidad o funcionamiento ininterrumpido, conforme al texto de la licencia MIT.\n\nÚltima revisión: noviembre de 2026.</string>
+    <string name="settings_legal_notice_body">Titular y desarrollador: Andrés Rodríguez Vázquez.\n\nPillRemind es un proyecto personal de código abierto distribuido bajo la licencia MIT. El código fuente está disponible en github.com/arodriguezvaz/PillRemind.\n\nLa aplicación es una herramienta de apoyo para recordar la medicación. No es un producto sanitario, no emite diagnósticos ni recomendaciones médicas y no sustituye la consulta con un profesional sanitario. Ante cualquier duda sobre un tratamiento, consulta con tu médico o farmacéutico.\n\nEl escaneo de cajas y códigos es una ayuda y puede fallar: el OCR puede leer mal el nombre, la dosis o la forma farmacéutica, y CIMA puede no contener el producto o no estar actualizado. Revisa siempre los datos antes de guardar. La importación desde PDF también es una ayuda: el documento puede tener un formato distinto o contener una pauta que no se interprete bien. Revisa siempre el nombre, la dosis y las horas antes de guardar. La información de CIMA procede de la Agencia Española de Medicamentos y Productos Sanitarios (AEMPS) y se ofrece tal cual, sin garantía de exactitud, integridad o actualización. La consulta solo se realiza con el CN y con tu consentimiento; no se envían perfiles, medicamentos, tomas ni fotos. La AEMPS recibe la dirección IP y datos técnicos de la conexión.\n\nLa aplicación puede comprobar la existencia de actualizaciones y requerir su instalación para seguir funcionando. Las actualizaciones se distribuyen desde GitHub Releases y su disponibilidad no está garantizada.\n\nLa aplicación se ofrece «tal cual», sin garantías de disponibilidad o funcionamiento ininterrumpido, conforme al texto de la licencia MIT.\n\nÚltima revisión: noviembre de 2026.</string>
     <string name="settings_legal_close">Cerrar</string>
 
     <!-- Actualizaciones -->
@@ -395,6 +395,73 @@
     <string name="scan_error_generic">No se pudo analizar las fotos. Inténtalo de nuevo.</string>
     <string name="scan_error_need_photo">Añade una foto o escribe el CN.</string>
     <string name="scan_error_invalid_cn">El CN debe tener 6 o 7 dígitos, o ser un código EAN válido.</string>
+
+    <!-- Importar medicamentos desde PDF -->
+    <string name="profile_medications_section">Medicamentos</string>
+    <string name="profile_import_medications">Importar desde PDF</string>
+    <string name="profile_import_medications_description">Añade varios medicamentos desde la hoja de medicación activa</string>
+    <string name="medication_import_title">Importar medicamentos</string>
+    <string name="medication_import_pick_title">Importar desde PDF</string>
+    <string name="medication_import_pick_text">Selecciona la hoja de medicación activa en PDF. Después revisarás los medicamentos antes de guardarlos.</string>
+    <string name="medication_import_privacy_title">Se procesa en el dispositivo</string>
+    <string name="medication_import_privacy_text">El PDF no se guarda ni se envía a ningún servidor. Solo se usan los medicamentos que aceptes en la revisión.</string>
+    <string name="medication_import_select_pdf">Seleccionar PDF</string>
+    <string name="medication_import_reading">Leyendo el PDF…</string>
+    <string name="medication_import_error_title">No se pudo importar</string>
+    <string name="medication_import_review_title">Revisa antes de guardar</string>
+    <string name="medication_import_review_text">Comprueba el nombre y la dosis. Los medicamentos que ya existen no se modificarán.</string>
+    <string name="medication_import_list_title">Medicamentos encontrados</string>
+    <string name="medication_import_status_new">Se añadirá</string>
+    <string name="medication_import_status_existing">Ya existe</string>
+    <string name="medication_import_status_review">Falta pauta</string>
+    <string name="medication_import_schedule_label">Pauta</string>
+    <string name="medication_import_treatment_label">Tratamiento</string>
+    <string name="medication_import_acute_treatment">Tratamiento puntual</string>
+    <string name="medication_import_no_dose">Sin dosis</string>
+    <string name="medication_import_no_schedule">Sin horario</string>
+    <string name="medication_import_existing_title">Ya existe en el perfil</string>
+    <string name="medication_import_existing_text">Ya tienes %1$s en el perfil. No se añadirá.</string>
+    <string name="medication_import_existing_pdf_text">Ya aparece otra vez en este PDF. No se añadirá.</string>
+    <string name="medication_import_incomplete_title">Falta la pauta</string>
+    <string name="medication_import_incomplete_text">No se detectó el horario. Añádelo para poder guardarlo.</string>
+    <string name="medication_import_incomplete_edit">Completa el nombre, la dosis, la unidad y al menos una hora.</string>
+    <string name="medication_import_warning_interval">No se pudo interpretar el intervalo; se ha usado una toma diaria a las 09:00. Revísalo.</string>
+    <string name="medication_import_warning_unit">No se reconoció la unidad; se ha usado «dosis». Revísalo.</string>
+    <string name="medication_import_edit">Editar</string>
+    <string name="medication_import_view_existing">Ver ficha</string>
+    <string name="medication_import_complete">Completar</string>
+    <string name="medication_import_force_title">¿Añadir de todos modos?</string>
+    <string name="medication_import_force_text">Ya existe un medicamento con la misma marca y concentración. Si lo añades, tendrás dos fichas del mismo producto.</string>
+    <string name="medication_import_force_confirm">Añadir igualmente</string>
+    <string name="medication_import_edit_title">Editar medicamento</string>
+    <string name="medication_import_apply">Aplicar cambios</string>
+    <string name="medication_import_saved_title">Medicamentos añadidos</string>
+    <plurals name="medication_import_saved_message">
+        <item quantity="one">Se ha añadido 1 medicamento.</item>
+        <item quantity="other">Se han añadido %1$d medicamentos.</item>
+    </plurals>
+    <string name="medication_import_close">Cerrar</string>
+    <string name="medication_import_save_none">No hay medicamentos que añadir</string>
+    <plurals name="medication_import_save">
+        <item quantity="one">Añadir 1 medicamento</item>
+        <item quantity="other">Añadir %1$d medicamentos</item>
+    </plurals>
+    <plurals name="medication_import_save_support">
+        <item quantity="one">Se añadirá 1 medicamento nuevo. Los que ya existen no se modificarán.</item>
+        <item quantity="other">Se añadirán %1$d medicamentos nuevos. Los que ya existen no se modificarán.</item>
+    </plurals>
+    <string name="medication_import_save_support_none">No hay medicamentos nuevos seleccionados.</string>
+    <string name="medication_import_error_no_text">El PDF no contiene texto. Por ahora no se pueden leer PDFs escaneados.</string>
+    <string name="medication_import_error_no_medications">No se han encontrado medicamentos en el PDF.</string>
+    <string name="medication_import_error_encrypted">El PDF está protegido con contraseña.</string>
+    <string name="medication_import_error_too_large">El PDF es demasiado grande.</string>
+    <string name="medication_import_error_too_many_pages">El PDF tiene demasiadas páginas.</string>
+    <string name="medication_import_error_corrupt">No se pudo leer el PDF.</string>
+    <string name="medication_import_error_io">No se pudo abrir el archivo.</string>
+    <string name="medication_import_error_save">No se pudieron guardar los medicamentos.</string>
+    <string name="medication_import_error_no_profile">No hay un perfil activo.</string>
+    <string name="medication_import_error_generic">No se pudo completar la importación.</string>
+
     <string-array name="medication_units">
         <item>mg</item>
         <item>g</item>
@@ -412,6 +479,8 @@
         <item>viales</item>
         <item>inyecciones</item>
         <item>dosis</item>
+        <item>pulsaciones</item>
+        <item>aplicaciones</item>
         <item>puffs</item>
         <item>sprays</item>
         <item>UI</item>

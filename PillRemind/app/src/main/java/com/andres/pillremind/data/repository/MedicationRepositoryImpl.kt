@@ -8,6 +8,7 @@ import com.andres.pillremind.data.local.database.AppDatabase
 import com.andres.pillremind.data.mapper.toDomain
 import com.andres.pillremind.data.mapper.toEntity
 import com.andres.pillremind.domain.model.Medication
+import com.andres.pillremind.domain.model.MedicationWithSchedules
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.repository.MedicationRepository
 import javax.inject.Inject
@@ -41,6 +42,20 @@ class MedicationRepositoryImpl @Inject constructor(
             )
         }
         medicationId
+    }
+
+    override suspend fun insertMedicationsWithSchedules(
+        items: List<MedicationWithSchedules>
+    ): List<Long> = database.withTransaction {
+        items.map { item ->
+            val medicationId = medicationDao.insertMedication(item.medication.toEntity())
+            item.schedules.forEach { schedule ->
+                scheduleDao.insertSchedule(
+                    schedule.copy(medicationId = medicationId.toInt()).toEntity()
+                )
+            }
+            medicationId
+        }
     }
 
     override suspend fun deleteMedication(medication: Medication) {

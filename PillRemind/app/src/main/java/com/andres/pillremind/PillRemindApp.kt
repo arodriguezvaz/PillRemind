@@ -14,6 +14,7 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.andres.pillremind.notifications.DailyIntakeWorker
 import com.andres.pillremind.notifications.NotificationChannels
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import java.util.concurrent.TimeUnit
@@ -38,6 +39,7 @@ class PillRemindApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+        PDFBoxResourceLoader.init(applicationContext)
         createNotificationChannel()
         scheduleDailyIntakeWorker()
         setupImageLoader()

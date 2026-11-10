@@ -23,6 +23,7 @@ import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.PictureAsPdf
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -94,6 +95,7 @@ sealed class ProfileMode {
  * @param profileMode Modo inicial de la pantalla (crear, ver o editar).
  * @param onDeletedClicked Callback ejecutado tras eliminar el perfil.
  * @param onStatisticsClick Callback ejecutado al abrir las estadísticas.
+ * @param onImportMedicationsClick Callback ejecutado al abrir la importación desde PDF.
  * @param onArchivedMedicationsClick Callback ejecutado al abrir los medicamentos archivados.
  * @param onHistoryClick Callback ejecutado al abrir el historial de tomas.
  * @param onTopBarChange Callback para modificar la TopBar.
@@ -106,6 +108,7 @@ fun ProfileScreen(
     profileMode: ProfileMode = ProfileMode.Create,
     onDeletedClicked: () -> Unit = {},
     onStatisticsClick: () -> Unit = {},
+    onImportMedicationsClick: () -> Unit = {},
     onArchivedMedicationsClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
@@ -304,6 +307,7 @@ fun ProfileScreen(
                 onEditClick = { currentMode = ProfileMode.Edit },
                 onDeleteClick = { perfil?.let { showDeleteDialog = true } },
                 onStatisticsClick = onStatisticsClick,
+                onImportMedicationsClick = onImportMedicationsClick,
                 onArchivedMedicationsClick = onArchivedMedicationsClick,
                 onHistoryClick = onHistoryClick,
             )
@@ -542,6 +546,7 @@ private fun ProfileViewContent(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onStatisticsClick: () -> Unit,
+    onImportMedicationsClick: () -> Unit,
     onArchivedMedicationsClick: () -> Unit,
     onHistoryClick: () -> Unit,
 ) {
@@ -628,18 +633,27 @@ private fun ProfileViewContent(
             }
         }
 
-        AppReadOnlySection(title = stringResource(R.string.profile_tracking_section)) {
+        AppReadOnlySection(title = stringResource(R.string.profile_medications_section)) {
             AppNavigationRow(
-                icon = Icons.Rounded.BarChart,
-                label = stringResource(R.string.profile_view_statistics),
-                description = stringResource(R.string.profile_statistics_description),
-                onClick = onStatisticsClick,
+                icon = Icons.Rounded.PictureAsPdf,
+                label = stringResource(R.string.profile_import_medications),
+                description = stringResource(R.string.profile_import_medications_description),
+                onClick = onImportMedicationsClick,
             )
             AppNavigationRow(
                 icon = Icons.Rounded.Archive,
                 label = stringResource(R.string.profile_archived_medications),
                 description = stringResource(R.string.profile_archived_medications_description),
                 onClick = onArchivedMedicationsClick,
+            )
+        }
+
+        AppReadOnlySection(title = stringResource(R.string.profile_tracking_section)) {
+            AppNavigationRow(
+                icon = Icons.Rounded.BarChart,
+                label = stringResource(R.string.profile_view_statistics),
+                description = stringResource(R.string.profile_statistics_description),
+                onClick = onStatisticsClick,
             )
             AppNavigationRow(
                 icon = Icons.Rounded.History,
@@ -707,6 +721,7 @@ private fun ProfileViewContentPreview() {
             onEditClick = {},
             onDeleteClick = {},
             onStatisticsClick = {},
+            onImportMedicationsClick = {},
             onArchivedMedicationsClick = {},
             onHistoryClick = {},
         )

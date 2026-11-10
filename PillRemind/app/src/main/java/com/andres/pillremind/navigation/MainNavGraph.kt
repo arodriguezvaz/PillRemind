@@ -15,6 +15,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.andres.pillremind.ui.screens.history.HistoryScreen
 import com.andres.pillremind.ui.screens.home.HomeScreen
+import com.andres.pillremind.ui.screens.importer.MedicationImportScreen
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.screens.medication.MedicationMode
 import com.andres.pillremind.ui.screens.medication.MedicationScreen
@@ -109,6 +110,11 @@ fun MainNavigationGraph(
                     onTopBarChange
                 ),
                 onStatisticsClick = openStatistics,
+                onImportMedicationsClick = {
+                    navController.navigate(MedicationScreens.MedicationImportScreen.route) {
+                        launchSingleTop = true
+                    }
+                },
                 onArchivedMedicationsClick = {
                     navController.navigate(MedicationScreens.ArchivedMedicationsScreen.route)
                 },
@@ -225,6 +231,21 @@ fun NavGraphBuilder.medicationNavGraph(
                 )
             )
         }
+        composable(route = MedicationScreens.MedicationImportScreen.route) {
+            MedicationImportScreen(
+                onSaved = { navController.popBackStack() },
+                onOpenMedication = { id, archived ->
+                    val route = if (archived) {
+                        MedicationScreens.ArchivedMedicationSeeScreen.createRoute(id)
+                    } else {
+                        MedicationScreens.MedicationSeeScreen.createRoute(id)
+                    }
+                    navController.navigate(route) {
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
         composable(route = MedicationScreens.ArchivedMedicationsScreen.route) {
             ArchivedMedicationsScreen(
                 onMedicationClick = { id ->
@@ -275,6 +296,11 @@ sealed class MedicationScreens(val route: String) {
     }
 
     object MedicationCreateScreen : MedicationScreens("medication/create")
+
+    /**
+     * Importación de medicamentos desde una hoja de medicación en PDF.
+     */
+    object MedicationImportScreen : MedicationScreens("medication/import")
 
     /**
      * Lista de medicamentos archivados del perfil activo.
