@@ -66,6 +66,9 @@ fun MainScreen(
         MedicationScreens.MedicationCreateScreen.route -> TopBarState(
             title = stringResource(R.string.medication_add_title)
         )
+        MedicationScreens.MedicationImportScreen.route -> TopBarState(
+            title = stringResource(R.string.medication_import_title)
+        )
         MedicationScreens.ArchivedMedicationsScreen.route -> TopBarState(
             title = stringResource(R.string.medication_archived_list_title)
         )

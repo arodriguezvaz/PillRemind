@@ -24,6 +24,7 @@ robolectric = "4.13"
 androidxTestCore = "1.6.1"
 mlkitBarcodeScanning = "18.3.1"
 mlkitTextRecognition = "19.0.2"
+pdfbox = "2.0.27.0"
 
 
 [libraries]
@@ -67,6 +68,8 @@ androidx-test-core = { group = "androidx.test", name = "core", version.ref = "an
 mlkit-barcode-scanning = { group = "com.google.android.gms", name = "play-services-mlkit-barcode-scanning", version.ref = "mlkitBarcodeScanning" }
 # OCR de reserva para envases sin CN español.
 mlkit-text-recognition = { group = "com.google.android.gms", name = "play-services-mlkit-text-recognition", version.ref = "mlkitTextRecognition" }
+# Extracción de texto de la hoja de medicación en PDF.
+pdfbox-android = { group = "com.tom-roush", name = "pdfbox-android", version.ref = "pdfbox" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

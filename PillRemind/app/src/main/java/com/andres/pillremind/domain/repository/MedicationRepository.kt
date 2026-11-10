@@ -1,6 +1,7 @@
 package com.andres.pillremind.domain.repository
 
 import com.andres.pillremind.domain.model.Medication
+import com.andres.pillremind.domain.model.MedicationWithSchedules
 import com.andres.pillremind.domain.model.Schedule
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
@@ -22,6 +23,19 @@ interface MedicationRepository {
         medication: Medication,
         schedules: List<Schedule>
     ): Long
+
+    /**
+     * Inserta varios medicamentos y sus horarios en una sola transacción.
+     *
+     * Se usa en la importación desde PDF: si una inserción falla, no se guarda
+     * ninguno a medias.
+     *
+     * @param items Medicamentos con sus pautas.
+     * @return IDs generados, en el mismo orden.
+     */
+    suspend fun insertMedicationsWithSchedules(
+        items: List<MedicationWithSchedules>
+    ): List<Long>
 
     /**
      * Elimina un medicamento de la base de datos.
