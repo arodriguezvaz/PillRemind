@@ -217,6 +217,8 @@ class MedicationScanViewModel @Inject constructor(
                     boxFields = boxText?.let(BoxTextParser::parse)
                     boxHasData = boxFields?.let { fields ->
                         fields.name != null ||
+                            fields.nameCandidates.isNotEmpty() ||
+                            fields.presentationText != null ||
                             fields.strengthDoseText != null ||
                             fields.intakeDoseText != null
                     } == true

@@ -20,7 +20,8 @@ object MedicationDraftMapper {
 
     private val doseRegex = Regex(
         "(\\d{1,4}(?:[.,]\\d+)?)\\s*" +
-            "(mg|g|mcg|µg|μg|microgramos?|miligramos?|mililitros?|ml|ui|%)",
+            "(mg|g|mcg|µg|μg|microgramos?|miligramos?|mililitros?|ml|ui|%)" +
+            "(?![a-záéíóúüñ])",
         RegexOption.IGNORE_CASE
     )
 

@@ -131,9 +131,12 @@ pequeña arriba y el nombre del producto grande debajo, la geometría suele eleg
 bien el producto (`MABOdol` frente a `EFECTO`), pero puede fallar si el OCR no lee
 el nombre grande o si dos líneas tienen un tamaño parecido.
 
-En ese caso el nombre no se rellena a ciegas: la pantalla de revisión muestra
-hasta tres candidatos y el usuario elige o escribe el correcto. La revisión
-manual sigue siendo obligatoria.
+Si el mejor candidato está en la franja superior, aunque sea grande, tampoco se da
+por seguro: puede ser la marca y no el producto. En ese caso el nombre no se
+rellena a ciegas: la pantalla de revisión muestra hasta tres candidatos y el
+usuario elige o escribe el correcto. Las líneas sin caja se conservan como
+candidatos, pero no puntúan por geometría. La revisión manual sigue siendo
+obligatoria.
 
 ## 6. Construcción del borrador
 
@@ -153,6 +156,9 @@ Reglas de dosis:
 - Un volumen suelto (`120 ml`) sin `/` ni toma explícita se guarda como
   presentación, no como dosis.
 - Un porcentaje (`10%`) es una concentración, no una dosis.
+- Un recuento como `20 comprimidos` sin contexto de pauta se interpreta como
+  tamaño del envase; la toma explícita exige contexto (`cada`, `al día`,
+  `tomar`, `dosis`...).
 - Si no hay toma ni concentración utilizable, la dosis queda vacía y el usuario
   la escribe en la revisión.
 
@@ -228,6 +234,8 @@ Pruebas unitarias:
 - `CnParserTest`: CN etiquetado, con separador, de seis/siete dígitos y códigos.
 - `MedicationDraftMapperTest`: reglas de dosis, presentación, concentración
   compuesta, porcentaje y nombre corto.
+- `MedicationScanViewModelTest`: los candidatos y la presentación llegan a la
+  pantalla de revisión.
 - `CimaDataSourceTest`: parseo del JSON y respuestas 204/404.
 - `MedicationLookupRepositoryImplTest`: fallback y errores de la consulta.
 
