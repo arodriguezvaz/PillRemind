@@ -21,16 +21,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material.icons.rounded.ErrorOutline
-import androidx.compose.material.icons.rounded.Medication
-import androidx.compose.material.icons.rounded.RemoveCircleOutline
-import androidx.compose.material.icons.rounded.Schedule
-import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -55,8 +45,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -110,7 +102,7 @@ fun ScanCtaCard(
                 horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.Medication,
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_medication),
                     contentDescription = null
                 )
                 Text(
@@ -255,9 +247,9 @@ private fun ScanTopBar(
         IconButton(onClick = onBack) {
             Icon(
                 imageVector = if (backIsClose) {
-                    Icons.Default.Close
+                    ImageVector.vectorResource(R.drawable.ic_close)
                 } else {
-                    Icons.AutoMirrored.Filled.ArrowBack
+                    ImageVector.vectorResource(R.drawable.ic_arrow_back)
                 },
                 contentDescription = stringResource(
                     if (backIsClose) R.string.common_close else R.string.common_back
@@ -401,7 +393,7 @@ private fun ScanPhotoSlot(
                 photoUri = photoUri,
                 onPhotoSelected = onPhotoSelected,
                 size = 128.dp,
-                placeholderIcon = Icons.Default.AddAPhoto,
+                placeholderIcon = ImageVector.vectorResource(R.drawable.ic_add_a_photo),
                 photoDescriptionRes = photoDescriptionRes,
                 cropEnabled = false,
                 placeholderDescriptionRes = placeholderDescriptionRes
@@ -516,7 +508,7 @@ private fun ScanProgressRow(
         ) {
             when (step) {
                 StepState.PENDING -> Icon(
-                    imageVector = Icons.Rounded.Schedule,
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -527,19 +519,19 @@ private fun ScanProgressRow(
                 )
 
                 StepState.DONE -> Icon(
-                    imageVector = Icons.Rounded.CheckCircle,
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_check_circle),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onTertiaryContainer
                 )
 
                 StepState.FAILED -> Icon(
-                    imageVector = Icons.Rounded.ErrorOutline,
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_error),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.error
                 )
 
                 StepState.SKIPPED -> Icon(
-                    imageVector = Icons.Rounded.RemoveCircleOutline,
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_remove_circle),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -903,8 +895,8 @@ private fun ScanNoticeCard(
         else -> MaterialTheme.colorScheme.onSecondaryContainer
     }
     val icon = when (notice) {
-        ScanNotice.CIMA_FOUND -> Icons.Rounded.CheckCircle
-        else -> Icons.Rounded.Warning
+        ScanNotice.CIMA_FOUND -> ImageVector.vectorResource(R.drawable.ic_check_circle)
+        else -> ImageVector.vectorResource(R.drawable.ic_warning)
     }
     val title = when (notice) {
         ScanNotice.CIMA_FOUND -> R.string.scan_notice_cima_found_title

@@ -1,10 +1,7 @@
 package com.andres.pillremind.ui.components
-import com.andres.pillremind.ui.theme.AppElevation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
@@ -23,9 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.andres.pillremind.R
+import com.andres.pillremind.ui.theme.AppElevation
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -78,7 +78,7 @@ fun AppDatePickerField(
     val trailingIcon: (@Composable () -> Unit)? = if (enabled) {
         {
             Icon(
-                imageVector = Icons.Default.DateRange,
+                imageVector = ImageVector.vectorResource(R.drawable.ic_date_range),
                 contentDescription = stringResource(R.string.date_picker_content_description)
             )
         }

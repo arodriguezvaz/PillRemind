@@ -1,9 +1,9 @@
 package com.andres.pillremind.ui.components.timeeditor
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import com.andres.pillremind.R
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.ButtonSize
@@ -26,6 +26,6 @@ fun AddTimeItem(
         onClick = onClick,
         variant = ButtonVariant.Tonal,
         size = ButtonSize.Large,
-        leadingIcon = Icons.Rounded.Add,
+        leadingIcon = ImageVector.vectorResource(R.drawable.ic_add),
     )
 }

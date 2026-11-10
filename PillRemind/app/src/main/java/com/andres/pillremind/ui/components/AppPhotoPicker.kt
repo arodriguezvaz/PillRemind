@@ -23,11 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +41,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -87,7 +83,7 @@ fun AppPhotoPicker(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     size: Dp = 96.dp,
-    placeholderIcon: ImageVector = Icons.Default.AddAPhoto,
+    placeholderIcon: ImageVector = ImageVector.vectorResource(R.drawable.ic_add_a_photo),
     @StringRes photoDescriptionRes: Int = R.string.photo_profile,
     cropEnabled: Boolean = true,
     @StringRes placeholderDescriptionRes: Int? = null,
@@ -211,7 +207,7 @@ fun AppPhotoPicker(
             )
             if (enabled) {
                 PhotoBadge(
-                    icon = Icons.Default.Edit,
+                    icon = ImageVector.vectorResource(R.drawable.ic_edit),
                     contentDescription = stringResource(R.string.photo_edit),
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -290,13 +286,13 @@ private fun PhotoSourceDialog(
             Column {
                 if (hasCamera) {
                     PhotoSourceOption(
-                        icon = Icons.Default.PhotoCamera,
+                        icon = ImageVector.vectorResource(R.drawable.ic_photo_camera),
                         text = stringResource(R.string.photo_source_camera),
                         onClick = onCamera,
                     )
                 }
                 PhotoSourceOption(
-                    icon = Icons.Default.PhotoLibrary,
+                    icon = ImageVector.vectorResource(R.drawable.ic_photo_library),
                     text = stringResource(R.string.photo_source_gallery),
                     onClick = onGallery,
                 )

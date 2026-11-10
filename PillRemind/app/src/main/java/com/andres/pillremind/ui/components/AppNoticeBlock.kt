@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -17,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.andres.pillremind.R
 import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
@@ -77,7 +77,7 @@ fun AppNoticeBlock(
 private fun AppNoticeBlockPreview() {
     PillRemindTheme {
         AppNoticeBlock(
-            icon = Icons.Rounded.Warning,
+            icon = ImageVector.vectorResource(R.drawable.ic_warning),
             title = "Alergias",
             text = "Penicilina y polen",
             modifier = Modifier.padding(AppSpacing.md),

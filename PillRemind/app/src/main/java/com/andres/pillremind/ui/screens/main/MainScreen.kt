@@ -1,15 +1,15 @@
 package com.andres.pillremind.ui.screens.main
 
 import android.annotation.SuppressLint
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -110,7 +110,7 @@ fun MainScreen(
                     onClick = { navController.navigate(MedicationScreens.MedicationCreateScreen.route) },
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.Add,
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_add),
                         contentDescription = stringResource(R.string.medication_add_title)
                     )
                 }

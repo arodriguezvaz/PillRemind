@@ -1,11 +1,10 @@
 package com.andres.pillremind.ui.components
-import com.andres.pillremind.ui.theme.AppElevation
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -17,9 +16,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import com.andres.pillremind.R
+import com.andres.pillremind.ui.theme.AppElevation
 
 /**
  * Composable que representa un selector desplegable personalizado.
@@ -68,7 +72,11 @@ fun AppDropdownField(
                     }
                 },
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded && enabled)
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_drop_down),
+                        contentDescription = null,
+                        modifier = Modifier.rotate(if (expanded && enabled) 180f else 0f),
+                    )
                 },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surface,

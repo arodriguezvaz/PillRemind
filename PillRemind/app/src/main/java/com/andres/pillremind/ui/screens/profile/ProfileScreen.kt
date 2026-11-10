@@ -15,16 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.rounded.Archive
-import androidx.compose.material.icons.rounded.BarChart
-import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.History
-import androidx.compose.material.icons.rounded.PictureAsPdf
-import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -40,8 +30,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -154,6 +146,7 @@ fun ProfileScreen(
         ProfileMode.Edit -> stringResource(R.string.profile_edit_title)
     }
     val backContentDescription = stringResource(R.string.common_back)
+    val backIcon = ImageVector.vectorResource(R.drawable.ic_arrow_back)
 
     LaunchedEffect(currentMode, topBarTitle) {
         onTopBarChange(
@@ -161,7 +154,7 @@ fun ProfileScreen(
                 title = topBarTitle,
                 navigationAction = if (currentMode == ProfileMode.Edit) {
                     TopBarAction(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
+                        icon = backIcon,
                         contentDescription = backContentDescription,
                         onClick = { currentMode = ProfileMode.View }
                     )
@@ -432,7 +425,7 @@ private fun ProfileForm(
             photoUri = photoUri,
             onPhotoSelected = { uri -> onPhotoSelected(uri) },
             enabled = true,
-            placeholderIcon = Icons.Default.AddAPhoto,
+            placeholderIcon = ImageVector.vectorResource(R.drawable.ic_add_a_photo),
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
@@ -569,7 +562,7 @@ private fun ProfileViewContent(
             AppFormActions(
                 primaryText = stringResource(R.string.editar),
                 onPrimaryClick = onEditClick,
-                secondaryIcon = Icons.Rounded.Delete,
+                secondaryIcon = ImageVector.vectorResource(R.drawable.ic_delete),
                 secondaryContentDescription = stringResource(R.string.eliminar),
                 secondaryContentColor = MaterialTheme.colorScheme.error,
                 onSecondaryClick = onDeleteClick,
@@ -603,7 +596,7 @@ private fun ProfileViewContent(
                 }
                 if (showAllergies) {
                     AppNoticeBlock(
-                        icon = Icons.Rounded.Warning,
+                        icon = ImageVector.vectorResource(R.drawable.ic_warning),
                         title = stringResource(R.string.profile_allergies),
                         text = allergies,
                         modifier = Modifier.padding(
@@ -635,13 +628,13 @@ private fun ProfileViewContent(
 
         AppReadOnlySection(title = stringResource(R.string.profile_medications_section)) {
             AppNavigationRow(
-                icon = Icons.Rounded.PictureAsPdf,
+                icon = ImageVector.vectorResource(R.drawable.ic_picture_as_pdf),
                 label = stringResource(R.string.profile_import_medications),
                 description = stringResource(R.string.profile_import_medications_description),
                 onClick = onImportMedicationsClick,
             )
             AppNavigationRow(
-                icon = Icons.Rounded.Archive,
+                icon = ImageVector.vectorResource(R.drawable.ic_archive),
                 label = stringResource(R.string.profile_archived_medications),
                 description = stringResource(R.string.profile_archived_medications_description),
                 onClick = onArchivedMedicationsClick,
@@ -650,13 +643,13 @@ private fun ProfileViewContent(
 
         AppReadOnlySection(title = stringResource(R.string.profile_tracking_section)) {
             AppNavigationRow(
-                icon = Icons.Rounded.BarChart,
+                icon = ImageVector.vectorResource(R.drawable.ic_bar_chart),
                 label = stringResource(R.string.profile_view_statistics),
                 description = stringResource(R.string.profile_statistics_description),
                 onClick = onStatisticsClick,
             )
             AppNavigationRow(
-                icon = Icons.Rounded.History,
+                icon = ImageVector.vectorResource(R.drawable.ic_history),
                 label = stringResource(R.string.profile_view_history),
                 description = stringResource(R.string.profile_history_description),
                 onClick = onHistoryClick,
@@ -682,7 +675,7 @@ private fun ProfileHeader(
             photoUri = photoUri,
             onPhotoSelected = {},
             enabled = false,
-            placeholderIcon = Icons.Default.Person,
+            placeholderIcon = ImageVector.vectorResource(R.drawable.ic_person),
         )
         Spacer(modifier = Modifier.width(AppSpacing.md))
         Column(modifier = Modifier.weight(1f)) {
