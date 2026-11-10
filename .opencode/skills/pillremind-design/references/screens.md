@@ -97,14 +97,19 @@ Column(fillMaxSize + padding(AppSpacing.md), spacedBy = AppSpacing.sm)
 `MedicationsScreen.kt`
 
 ```text
-Column(fillMaxSize + padding(AppSpacing.md))
-├── AppSearchField(bottom = AppSpacing.sm)
-└── LazyColumn(vertical = AppSpacing.sm, spacedBy = AppSpacing.sm)
-    └── MedicationCard(...)
+Column(fillMaxSize)
+├── AppSearchField(padding md + bottom sm)
+└── when
+    ├── carga → CircularProgressIndicator
+    ├── sin medicamentos → AppEmptyState
+    ├── búsqueda sin resultados → BlankCard
+    └── LazyColumn(horizontal = md, vertical = sm, spacedBy = sm)
+        └── MedicationCard(...)
 ```
 
-- Estado vacío: `BlankCard(medication_empty)` o
-  `BlankCard(medication_search_no_results, query)`.
+- Estado vacío: `AppEmptyState` con mensaje central y flecha al FAB cuando el
+  perfil no tiene medicamentos; `BlankCard(medication_search_no_results)`
+  cuando el filtro no devuelve resultados.
 - El texto de `AppSearchField` es transitorio: se limpia al salir de la
   pantalla (cambio de pestaña o ficha), no al rotar ni al cambiar de tema.
 - Cada item lleva `key = { it.id }`.
@@ -167,7 +172,7 @@ Column(fillMaxSize + padding(AppSpacing.md))
   con `AppFab`.
 - Lista:
   `LazyColumn(contentPadding = horizontal 16dp + vertical 12dp, spacedBy 12dp)`.
-- `PerfilCard` por perfil; estado vacío `ProfilesEmptyState`, con un mensaje
+- `PerfilCard` por perfil; estado vacío `AppEmptyState`, con un mensaje
   central y una flecha que lleva la mirada al FAB de añadir perfil.
 - Es el patrón de referencia para una pantalla con `Scaffold` propio y FAB
   local.

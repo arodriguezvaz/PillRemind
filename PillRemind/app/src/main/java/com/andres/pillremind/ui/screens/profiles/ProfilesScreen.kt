@@ -24,9 +24,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Profile
+import com.andres.pillremind.ui.components.AppEmptyState
 import com.andres.pillremind.ui.components.AppFab
 import com.andres.pillremind.ui.components.PerfilCard
-import com.andres.pillremind.ui.components.ProfilesEmptyState
 import com.andres.pillremind.ui.screens.main.MainTopBar
 import com.andres.pillremind.ui.screens.main.TopBarAction
 import com.andres.pillremind.ui.screens.main.TopBarState
@@ -105,7 +105,13 @@ fun ProfilesScreen(
                 }
 
                 uiState.profiles.isEmpty() -> {
-                    ProfilesEmptyState(modifier = Modifier.fillMaxSize())
+                    AppEmptyState(
+                        icon = ImageVector.vectorResource(R.drawable.ic_person_add),
+                        title = stringResource(R.string.profiles_empty_title),
+                        description = stringResource(R.string.profiles_empty_body),
+                        hint = stringResource(R.string.profiles_empty_hint),
+                        modifier = Modifier.fillMaxSize(),
+                    )
                 }
 
                 else -> {

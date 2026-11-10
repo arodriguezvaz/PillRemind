@@ -46,15 +46,23 @@ private val HintIconSize = 48.dp
 private val HintIconAnimation = AppSpacing.xxs
 
 /**
- * Estado vacío de la pantalla de selección de perfiles.
+ * Estado vacío para pantallas con FAB de añadir.
  *
- * Centra el mensaje para crear el primer perfil y coloca debajo una flecha
- * grande que lleva la mirada hacia el FAB de añadir.
+ * Centra un mensaje con icono, título y descripción, y coloca debajo una
+ * flecha grande que lleva la mirada hacia el FAB.
  *
+ * @param icon Icono decorativo del estado vacío.
+ * @param title Título del estado vacío.
+ * @param description Descripción del estado vacío.
+ * @param hint Texto que indica cómo crear el primer elemento.
  * @param modifier Modificador para el estado vacío.
  */
 @Composable
-fun ProfilesEmptyState(
+fun AppEmptyState(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    hint: String,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -84,7 +92,7 @@ fun ProfilesEmptyState(
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.ic_person_add),
+                        imageVector = icon,
                         contentDescription = null,
                         modifier = Modifier
                             .padding(AppSpacing.md)
@@ -93,13 +101,13 @@ fun ProfilesEmptyState(
                 }
                 Spacer(modifier = Modifier.height(AppSpacing.sm))
                 Text(
-                    text = stringResource(R.string.profiles_empty_title),
+                    text = title,
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center,
                 )
                 Spacer(modifier = Modifier.height(AppSpacing.xs))
                 Text(
-                    text = stringResource(R.string.profiles_empty_body),
+                    text = description,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -115,7 +123,7 @@ fun ProfilesEmptyState(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(R.string.profiles_empty_hint),
+                text = hint,
                 modifier = Modifier.weight(1f, fill = false),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary,
@@ -156,18 +164,30 @@ private fun ArrowToAddButton() {
     )
 }
 
-@Preview(showBackground = true, name = "Perfiles vacío")
+@Preview(showBackground = true, name = "Estado vacío con flecha")
 @Composable
-private fun ProfilesEmptyStatePreview() {
+private fun AppEmptyStatePreview() {
     PillRemindTheme {
-        ProfilesEmptyState(modifier = Modifier.fillMaxSize())
+        AppEmptyState(
+            icon = ImageVector.vectorResource(R.drawable.ic_person_add),
+            title = stringResource(R.string.profiles_empty_title),
+            description = stringResource(R.string.profiles_empty_body),
+            hint = stringResource(R.string.profiles_empty_hint),
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }
 
-@Preview(showBackground = true, fontScale = 1.5f, name = "Perfiles vacío oscuro")
+@Preview(showBackground = true, fontScale = 1.5f, name = "Estado vacío oscuro")
 @Composable
-private fun ProfilesEmptyStateDarkPreview() {
+private fun AppEmptyStateDarkPreview() {
     PillRemindTheme(darkTheme = true) {
-        ProfilesEmptyState(modifier = Modifier.fillMaxSize())
+        AppEmptyState(
+            icon = ImageVector.vectorResource(R.drawable.ic_person_add),
+            title = stringResource(R.string.profiles_empty_title),
+            description = stringResource(R.string.profiles_empty_body),
+            hint = stringResource(R.string.profiles_empty_hint),
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }

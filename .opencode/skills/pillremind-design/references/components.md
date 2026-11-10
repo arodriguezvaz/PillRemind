@@ -250,17 +250,18 @@ BlankCard(text, modifier)
 - Estado vacío o mensaje centrado; 32dp (`AppSpacing.xxl`) de alto visual.
 - Texto `bodyMedium` en `onSurfaceVariant`.
 
-### `ProfilesEmptyState` (`ProfilesEmptyState.kt`)
+### `AppEmptyState` (`AppEmptyState.kt`)
 
 ```kotlin
-ProfilesEmptyState(modifier)
+AppEmptyState(icon, title, description, hint, modifier)
 ```
 
-- Estado vacío de la selección de perfiles: card centrada con icono
-  `ic_person_add`, título y descripción; debajo, aviso con flecha
-  `ic_arrow_downward` que apunta al FAB de añadir.
+- Estado vacío para pantallas con FAB de añadir: card centrada con icono,
+  título y descripción; debajo, aviso con flecha `ic_arrow_downward` que apunta
+  al FAB.
 - La flecha es grande, usa `primary` y tiene un movimiento sutil para dirigir
   la mirada desde el mensaje central hasta el FAB.
+- Se usa en Perfiles con `ic_person_add` y en Medicamentos con `ic_medication`.
 
 ### `MedicationCard` (`MedicationCard.kt`)
 
