@@ -41,8 +41,8 @@ AppFab(onClick, modifier, content)
 ```
 
 - `FloatingActionButton` con `primary`/`onPrimary` y `AppElevation`.
-- `content` suele ser un icono `Icons.Rounded.Add` con `contentDescription`
-  desde recursos.
+- `content` suele ser un icono `ic_add` (Material Symbols Rounded) con
+  `contentDescription` desde recursos.
 - El FAB de `MainScreen` solo aparece en Home y Medicamentos, y siempre navega
   a la creación de medicamento. Para una pantalla fuera de `MainScreen` con
   acción propia, usa un `Scaffold` de pantalla + `AppFab` (patrón
@@ -355,11 +355,11 @@ MedicationStatisticsCard(statistics, modifier)
 AppNavigationRow(icon, label, description, onClick, modifier)
 ```
 
-- Fila pulsable con icono configurable (`BarChart`, `Archive` o `History`),
-  etiqueta `bodyLarge` en `primary`, descripción `bodySmall` en
+- Fila pulsable con icono configurable (`ic_bar_chart`, `ic_archive` o
+  `ic_history`), etiqueta `bodyLarge` en `primary`, descripción `bodySmall` en
   `onSurfaceVariant` y chevron final.
 - Se usa en las fichas de perfil y de medicamento para abrir estadísticas e
-  historial, y con `Icons.Rounded.Archive` para abrir los medicamentos
+  historial, y con `R.drawable.ic_archive` para abrir los medicamentos
   archivados desde el perfil. Recibe los textos ya resueltos con
   `stringResource`.
 

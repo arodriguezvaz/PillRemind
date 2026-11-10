@@ -21,6 +21,13 @@
 - ViewModels and other layers should expose `@StringRes` IDs (or an error type mapped in the UI) instead of literal user-facing messages.
 - This applies to new code and to any screen or file being modified. When touching a screen with legacy hardcoded strings, move its texts to resources as part of that change.
 
+## UI icons
+
+- In-app icons are Google **Material Symbols Rounded**, stored as vector drawables in `PillRemind/app/src/main/res/drawable/ic_*.xml` (24dp, viewport 960). Use them with `ImageVector.vectorResource(R.drawable.ic_*)` in Compose and `@DrawableRes` in holders such as `BottomBarScreens`.
+- Do not use `androidx.compose.material.icons` (`Icons.Default`, `Icons.Rounded`, etc.): the library is deprecated. Add the XML from Google Fonts' Android tab or `google/material-design-icons` instead.
+- Directional icons (`ic_arrow_back`, `ic_keyboard_arrow_right`) set `android:autoMirrored="true"`. Decorative icons use `contentDescription = null`; action icons take their text from `strings.xml`.
+- The app/notification icon (`ic_pill`, `ic_launcher_foreground`) is already Material Symbols; do not change it without a product decision.
+
 ## Branches
 
 - `master` is the current local-only app and `local/sin-nube` mirrors it. Archived branches keep the old Supabase version: `respaldo/nube`, `respaldo/integridad`, `fix/integridad` and `fix/notificaciones`.

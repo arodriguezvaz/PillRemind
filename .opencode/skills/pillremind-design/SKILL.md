@@ -114,6 +114,25 @@ Excepciones que se mantienen como literales: tamaños de iconos/imágenes/botone
 paddings internos de `AppButton`, 10dp de un bloque de `SettingsScreen` y
 bordes/divisores de 1/2dp.
 
+### Iconografía
+
+- Los iconos de la interfaz son **Material Symbols Rounded**, en
+  `app/src/main/res/drawable/ic_*.xml` (24dp, viewport 960). No uses
+  `androidx.compose.material.icons` (`Icons.Default`, `Icons.Rounded`, etc.):
+  la librería está descontinuada.
+- En Compose, resuelve el recurso con
+  `ImageVector.vectorResource(R.drawable.ic_*)`. En clases que no son
+  composables (por ejemplo `BottomBarScreens`), guarda el `@DrawableRes Int`.
+- Los iconos direccionales (`ic_arrow_back`, `ic_keyboard_arrow_right`) llevan
+  `android:autoMirrored="true"`.
+- Los XML se descargan de la pestaña Android de Google Fonts o del repositorio
+  `google/material-design-icons` (`symbols/android/<icono>/materialsymbolsrounded`,
+  licencia Apache 2.0). No los dibujes a mano.
+- Iconos decorativos con `contentDescription = null`; los que comunican una
+  acción usan texto de `strings.xml`.
+- Excepción: los iconos internos de componentes de Material3 (por ejemplo, el
+  calendario de `DatePickerDialog`) los pinta la librería.
+
 ## Componentes
 
 Catálogo detallado en `references/components.md`.

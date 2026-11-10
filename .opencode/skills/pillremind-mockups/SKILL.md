@@ -26,6 +26,7 @@ patrón más cercano y anótalo. El código manda; el mock se adapta a él.
 | Componentes | `PillRemind/app/src/main/java/com/andres/pillremind/ui/components/` |
 | Pantallas | `PillRemind/app/src/main/java/com/andres/pillremind/ui/screens/` |
 | Textos | `PillRemind/app/src/main/res/values/strings.xml` |
+| Iconos | `PillRemind/app/src/main/res/drawable/ic_*.xml` (Material Symbols Rounded) |
 | Capturas reales | `doc/img/` (comprueba que estén al día) |
 | Mockups locales | `doc/mockups/` (ignorado por Git; no se versiona) |
 
@@ -91,6 +92,8 @@ que encaje con un mock salvo que el usuario lo pida expresamente.
 - **Cards:** radio 20 dp, `surface`, 4 dp de elevación y 16 dp de padding.
 - **Espaciado:** 4/8/12/16/20/24/32 dp; margen de pantalla 16 dp.
 - **Color:** solo roles del tema. Claro y oscuro. No uses blanco o negro fijos.
+- **Iconos:** Material Symbols Rounded, los mismos `ic_*.xml` que usa la app.
+  No uses Material Icons, emojis ni iconos de otra familia.
 - **Texto visible:** siempre desde `strings.xml`; en el mock, copia los textos
   reales, no inventes etiquetas.
 
