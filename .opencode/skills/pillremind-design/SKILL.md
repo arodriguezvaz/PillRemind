@@ -198,6 +198,13 @@ Reglas rápidas:
 - Deshabilitado: alpha 0.5 o colores `disabled` del tema, no grises inventados.
 - Textos largos: `maxLines` y elipsis en títulos; envuelve descripciones.
 
+## Mockups
+
+Para crear o revisar un mockup HTML, carga también `pillremind-mockups`
+(`.opencode/skills/pillremind-mockups/SKILL.md`). Los mockups viven en
+`doc/mockups/` (ignorado por Git) y deben reproducir los componentes reales,
+no inventar una interfaz paralela.
+
 ## Previews y verificación
 
 - Todo componente nuevo lleva `@Preview(showBackground = true)`.
