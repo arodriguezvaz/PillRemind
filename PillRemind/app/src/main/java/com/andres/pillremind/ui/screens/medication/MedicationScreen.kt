@@ -1,6 +1,5 @@
 package com.andres.pillremind.ui.screens.medication
 
-
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -15,15 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.Medication
-import androidx.compose.material.icons.rounded.Archive
-import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.BarChart
-import androidx.compose.material.icons.rounded.History
-import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -41,9 +31,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,8 +49,8 @@ import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormActions
 import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppFormSection
-import com.andres.pillremind.ui.components.AppNoticeBlock
 import com.andres.pillremind.ui.components.AppNavigationRow
+import com.andres.pillremind.ui.components.AppNoticeBlock
 import com.andres.pillremind.ui.components.AppPhotoPicker
 import com.andres.pillremind.ui.components.AppReadOnlySection
 import com.andres.pillremind.ui.components.AppScrollWithFooter
@@ -72,7 +64,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-
 
 /**
  * Modos en los que puede estar la pantalla de medicamento.
@@ -235,13 +226,14 @@ fun MedicationScreen(
         MedicationMode.Archived -> stringResource(R.string.medication_archived_title)
     }
     val backContentDescription = stringResource(R.string.common_back)
+    val backIcon = ImageVector.vectorResource(R.drawable.ic_arrow_back)
     LaunchedEffect(currentMode, topBarTitle) {
         onTopBarChange(
             TopBarState(
                 title = topBarTitle,
                 navigationAction = if (currentMode == MedicationMode.Edit) {
                     TopBarAction(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
+                        icon = backIcon,
                         contentDescription = backContentDescription,
                         onClick = { currentMode = MedicationMode.View }
                     )
@@ -302,7 +294,7 @@ fun MedicationScreen(
                     photoUri = selectedPhotoUri,
                     onPhotoSelected = { selectedPhotoUri = it },
                     enabled = true,
-                    placeholderIcon = Icons.Default.AddAPhoto,
+                    placeholderIcon = ImageVector.vectorResource(R.drawable.ic_add_a_photo),
                     photoDescriptionRes = R.string.photo_medication,
                     modifier = Modifier.padding(bottom = AppSpacing.md)
                 )
@@ -507,7 +499,7 @@ fun MedicationScreen(
                     photoUri = newPhotoUri ?: currentImagePath?.let { Uri.fromFile(File(it)) },
                     onPhotoSelected = { newPhotoUri = it },
                     enabled = true,
-                    placeholderIcon = Icons.Default.AddAPhoto,
+                    placeholderIcon = ImageVector.vectorResource(R.drawable.ic_add_a_photo),
                     photoDescriptionRes = R.string.photo_medication,
                     modifier = Modifier.padding(bottom = AppSpacing.xl)
                 )
@@ -668,7 +660,7 @@ fun MedicationScreen(
                     },
                     primaryEnabled = isFormValid,
                     supportingText = missingFieldsMessage,
-                    secondaryIcon = Icons.Rounded.Archive,
+                    secondaryIcon = ImageVector.vectorResource(R.drawable.ic_archive),
                     secondaryContentDescription = stringResource(R.string.medication_archive),
                     onSecondaryClick = { showArchiveDialog = true },
                 )
@@ -835,7 +827,7 @@ private fun MedicationArchivedContent(
             AppFormActions(
                 primaryText = stringResource(R.string.medication_unarchive),
                 onPrimaryClick = onUnarchiveClick,
-                secondaryIcon = Icons.Rounded.Delete,
+                secondaryIcon = ImageVector.vectorResource(R.drawable.ic_delete),
                 secondaryContentDescription = stringResource(
                     R.string.medication_delete_permanently
                 ),
@@ -852,7 +844,7 @@ private fun MedicationArchivedContent(
 
         if (archivedDate != null) {
             AppNoticeBlock(
-                icon = Icons.Rounded.Archive,
+                icon = ImageVector.vectorResource(R.drawable.ic_archive),
                 title = stringResource(R.string.medication_archived_title),
                 text = stringResource(R.string.medication_archived_notice, archivedDate),
             )
@@ -887,7 +879,7 @@ private fun MedicationArchivedContent(
 
         AppReadOnlySection(title = stringResource(R.string.medication_tracking_section)) {
             AppNavigationRow(
-                icon = Icons.Rounded.BarChart,
+                icon = ImageVector.vectorResource(R.drawable.ic_bar_chart),
                 label = stringResource(R.string.medication_view_statistics),
                 description = stringResource(R.string.medication_statistics_description),
                 onClick = onStatisticsClick,
@@ -933,7 +925,7 @@ private fun MedicationViewContent(
             AppFormActions(
                 primaryText = stringResource(R.string.editar),
                 onPrimaryClick = onEditClick,
-                secondaryIcon = Icons.Rounded.Archive,
+                secondaryIcon = ImageVector.vectorResource(R.drawable.ic_archive),
                 secondaryContentDescription = stringResource(R.string.medication_archive),
                 onSecondaryClick = onArchiveClick,
             )
@@ -947,7 +939,7 @@ private fun MedicationViewContent(
 
         if (hasInvalidData) {
             AppNoticeBlock(
-                icon = Icons.Rounded.Warning,
+                icon = ImageVector.vectorResource(R.drawable.ic_warning),
                 title = stringResource(R.string.medication_invalid_data_title),
                 text = stringResource(R.string.medication_invalid_data_message),
             )
@@ -980,13 +972,13 @@ private fun MedicationViewContent(
 
         AppReadOnlySection(title = stringResource(R.string.medication_tracking_section)) {
             AppNavigationRow(
-                icon = Icons.Rounded.BarChart,
+                icon = ImageVector.vectorResource(R.drawable.ic_bar_chart),
                 label = stringResource(R.string.medication_view_statistics),
                 description = stringResource(R.string.medication_statistics_description),
                 onClick = onStatisticsClick,
             )
             AppNavigationRow(
-                icon = Icons.Rounded.History,
+                icon = ImageVector.vectorResource(R.drawable.ic_history),
                 label = stringResource(R.string.medication_view_history),
                 description = stringResource(R.string.medication_history_description),
                 onClick = onHistoryClick,
@@ -1012,7 +1004,7 @@ private fun MedicationHeader(
             photoUri = photoUri,
             onPhotoSelected = {},
             enabled = false,
-            placeholderIcon = Icons.Default.Medication,
+            placeholderIcon = ImageVector.vectorResource(R.drawable.ic_medication),
             photoDescriptionRes = R.string.photo_medication,
         )
         Spacer(modifier = Modifier.width(AppSpacing.md))

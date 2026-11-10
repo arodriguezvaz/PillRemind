@@ -1,14 +1,10 @@
 package com.andres.pillremind.ui.components.timeeditor
-import com.andres.pillremind.ui.theme.AppElevation
-import com.andres.pillremind.ui.theme.AppSpacing
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -17,8 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import com.andres.pillremind.R
+import com.andres.pillremind.ui.theme.AppElevation
+import com.andres.pillremind.ui.theme.AppSpacing
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
@@ -72,7 +72,7 @@ fun TimeItem(
             if (enabled) {
                 IconButton(onClick = onRemove) {
                     Icon(
-                        imageVector = Icons.Rounded.DeleteOutline,
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_delete),
                         contentDescription = stringResource(R.string.delete_time),
                         tint = MaterialTheme.colorScheme.error,
                     )

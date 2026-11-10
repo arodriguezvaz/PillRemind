@@ -1,27 +1,23 @@
 package com.andres.pillremind.navigation
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.Medication
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.andres.pillremind.R
 
 /**
  * Destinos disponibles en la barra de navegación inferior.
  *
  * Cada objeto define la ruta de navegación, el título mostrado al usuario
- * y el icono asociado a una sección principal de la aplicación.
+ * y el recurso del icono asociado a una sección principal de la aplicación.
  *
  * @property route Ruta utilizada por Navigation Compose.
  * @property titleRes Recurso de texto mostrado en la barra de navegación.
- * @property icon Icono representativo de la sección.
+ * @property iconRes Recurso drawable del icono representativo de la sección.
  */
 sealed class BottomBarScreens(
     val route: String,
     @StringRes val titleRes: Int,
-    val icon: ImageVector
+    @DrawableRes val iconRes: Int
 ) {
     /**
      * Pantalla principal de la aplicación.
@@ -29,7 +25,7 @@ sealed class BottomBarScreens(
     object Home : BottomBarScreens(
         route = "home",
         titleRes = R.string.nav_home,
-        icon = Icons.Rounded.Home
+        iconRes = R.drawable.ic_home
     )
 
     /**
@@ -38,7 +34,7 @@ sealed class BottomBarScreens(
     object Medications : BottomBarScreens(
         route = "medications",
         titleRes = R.string.nav_medications,
-        icon = Icons.Rounded.Medication
+        iconRes = R.drawable.ic_medication
     )
 
     /**
@@ -47,6 +43,6 @@ sealed class BottomBarScreens(
     object Profile : BottomBarScreens(
         route = "profile/see",
         titleRes = R.string.nav_profile,
-        icon = Icons.Rounded.Person
+        iconRes = R.drawable.ic_person
     )
 }

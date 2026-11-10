@@ -189,7 +189,7 @@ Column(fillMaxSize + padding(AppSpacing.md))
   `ProfileHeader`, `AppReadOnlySection` + `AppDetailRow` por sección,
   `AppNoticeBlock` para las alergias, las filas de «Ver estadísticas» y
   «Medicamentos archivados» en «Seguimiento» (`AppNavigationRow` con
-  `Icons.Rounded.Archive`) y la fila de «Ver historial de tomas» en
+  `R.drawable.ic_archive`) y la fila de «Ver historial de tomas» en
   «Historial». La foto de la cabecera abre `AppPhotoViewerDialog`. Las acciones
   (`editar` + eliminar) cierran el contenido.
 - El diálogo de eliminación usa `AlertDialog` con textos de `strings.xml`.

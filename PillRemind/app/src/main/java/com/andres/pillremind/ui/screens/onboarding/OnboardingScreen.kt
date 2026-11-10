@@ -16,9 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Alarm
-import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -34,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
@@ -181,7 +179,7 @@ fun OnboardingScreen(
                     )
 
                     PermissionCard(
-                        icon = Icons.Rounded.Notifications,
+                        icon = ImageVector.vectorResource(R.drawable.ic_notifications),
                         title = stringResource(R.string.onboarding_notifications_title),
                         description = stringResource(R.string.onboarding_notifications_description),
                         status = uiState.notificationStatus.toUiStatus(),
@@ -191,7 +189,7 @@ fun OnboardingScreen(
 
                     if (uiState.exactAlarmStatus != ExactAlarmStatus.NOT_REQUIRED) {
                         PermissionCard(
-                            icon = Icons.Rounded.Alarm,
+                            icon = ImageVector.vectorResource(R.drawable.ic_alarm),
                             title = stringResource(R.string.onboarding_exact_alarms_title),
                             description = stringResource(R.string.onboarding_exact_alarms_description),
                             status = uiState.exactAlarmStatus.toUiStatus(),

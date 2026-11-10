@@ -112,8 +112,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    //ICONOS
-    implementation(libs.androidx.compose.material.icons.extended)
     //ROOM
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

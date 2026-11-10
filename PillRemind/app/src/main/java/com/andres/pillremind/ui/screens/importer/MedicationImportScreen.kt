@@ -12,11 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -38,9 +33,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -49,9 +46,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.MedicationImportStatus
+import com.andres.pillremind.domain.model.MedicationImportWarning
 import com.andres.pillremind.domain.model.Schedule
 import com.andres.pillremind.domain.model.ScheduleRule
-import com.andres.pillremind.domain.model.MedicationImportWarning
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppDatePickerField
 import com.andres.pillremind.ui.components.AppDetailRow
@@ -197,13 +194,13 @@ private fun ImportPickFileContent(
             color = MaterialTheme.colorScheme.onSurface
         )
         AppNoticeBlock(
-            icon = Icons.Rounded.Lock,
+            icon = ImageVector.vectorResource(R.drawable.ic_lock),
             title = stringResource(R.string.medication_import_privacy_title),
             text = stringResource(R.string.medication_import_privacy_text)
         )
         errorRes?.let { messageRes ->
             AppNoticeBlock(
-                icon = Icons.Rounded.Warning,
+                icon = ImageVector.vectorResource(R.drawable.ic_warning),
                 title = stringResource(R.string.medication_import_error_title),
                 text = stringResource(messageRes)
             )
@@ -276,7 +273,7 @@ private fun ImportReviewContent(
     ) {
         state.errorRes?.let { messageRes ->
             AppNoticeBlock(
-                icon = Icons.Rounded.Warning,
+                icon = ImageVector.vectorResource(R.drawable.ic_warning),
                 title = stringResource(R.string.medication_import_error_title),
                 text = stringResource(messageRes)
             )
@@ -290,7 +287,7 @@ private fun ImportReviewContent(
         }
 
         AppNoticeBlock(
-            icon = Icons.Rounded.Info,
+            icon = ImageVector.vectorResource(R.drawable.ic_info),
             title = stringResource(R.string.medication_import_review_title),
             text = stringResource(R.string.medication_import_review_text)
         )
@@ -371,7 +368,7 @@ private fun ImportMedicationCard(
 
             if (item.status == MedicationImportStatus.EXISTING) {
                 AppNoticeBlock(
-                    icon = Icons.Rounded.Info,
+                    icon = ImageVector.vectorResource(R.drawable.ic_info),
                     title = stringResource(R.string.medication_import_existing_title),
                     text = item.existingName?.let { name ->
                         stringResource(R.string.medication_import_existing_text, name)
@@ -381,7 +378,7 @@ private fun ImportMedicationCard(
 
             if (item.status == MedicationImportStatus.INCOMPLETE) {
                 AppNoticeBlock(
-                    icon = Icons.Rounded.Warning,
+                    icon = ImageVector.vectorResource(R.drawable.ic_warning),
                     title = stringResource(R.string.medication_import_incomplete_title),
                     text = stringResource(R.string.medication_import_incomplete_text)
                 )
@@ -639,7 +636,7 @@ private fun MedicationImportEditSheet(
                 )
                 IconButton(onClick = onDismiss) {
                     Icon(
-                        imageVector = Icons.Rounded.Close,
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_close),
                         contentDescription = stringResource(R.string.common_close)
                     )
                 }

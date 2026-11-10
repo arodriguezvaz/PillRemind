@@ -70,12 +70,13 @@ En `navigation/BottomBarScreens.kt`:
 object History : BottomBarScreens(
     route = "history",
     titleRes = R.string.nav_history,
-    icon = Icons.Rounded.History,
+    iconRes = R.drawable.ic_history,
 )
 ```
 
 - La ruta es corta, en minúsculas y sin parámetros.
-- El icono es `Icons.Rounded.*`, como en Home, Medications y Profile.
+- El icono es un `@DrawableRes` de `res/drawable/ic_*.xml` (Material Symbols
+  Rounded), como en Home, Medications y Profile.
 - El título sale siempre de `R.string.nav_*`.
 
 ## 3. `MainBottomBar`
@@ -333,7 +334,7 @@ JAVA_HOME=/opt/android-studio/jbr ./gradlew assembleDebug
 Checklist específica de pestaña:
 
 - [ ] `nav_<feature>` existe en `strings.xml`.
-- [ ] `BottomBarScreens` tiene ruta, `titleRes` e icono.
+- [ ] `BottomBarScreens` tiene ruta, `titleRes` e `iconRes` (`ic_*.xml`).
 - [ ] `MainBottomBar` incluye la pestaña.
 - [ ] `MainNavigationGraph` tiene su `composable` y no pasa `onTopBarChange`.
 - [ ] `MainScreen.topLevelRoutes` incluye la ruta raíz.
