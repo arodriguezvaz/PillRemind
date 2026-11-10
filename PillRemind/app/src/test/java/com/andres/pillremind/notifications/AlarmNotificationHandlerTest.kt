@@ -1,11 +1,13 @@
 package com.andres.pillremind.notifications
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.test.core.app.ApplicationProvider
+import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Intake
 import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.model.Profile
@@ -161,6 +163,66 @@ class AlarmNotificationHandlerTest {
 
         assertEquals(1, shadowOf(notificationManager).size())
         coVerify(exactly = 1) { reminderScheduler.generateWindow(any(), any()) }
+
+        val notification = shadowOf(notificationManager).allNotifications.single()
+        assertEquals(
+            context.getString(R.string.notification_title, "Ibuprofeno"),
+            notification.extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
+        )
+        assertEquals(
+            context.getString(R.string.notification_text, "09:00", "600 mg"),
+            notification.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
+        )
+        assertEquals(
+            context.getString(R.string.notification_subtext, "Andrés"),
+            notification.extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
+        )
+        assertEquals(
+            context.getString(R.string.notification_action_mark_taken),
+            notification.actions.single().title.toString()
+        )
+    }
+
+    @Test
+    fun `muestra la dosis en singular cuando la toma es una unidad`() = runTest {
+        notificationPermissionGranted = true
+        coEvery { intakeRepository.getIntakeById(INTAKE_ID) } returns createIntake()
+        coEvery { medicationRepository.getMedicationByIdOnce(MEDICATION_ID) } returns
+            createMedication(dose = 1.0, unit = "comprimidos")
+        coEvery { profileRepository.getProfileByIdOnce(PROFILE_ID) } returns createProfile()
+
+        handler.handle(INTAKE_ID)
+
+        val notification = shadowOf(notificationManager).allNotifications.single()
+        assertEquals(
+            context.getString(R.string.notification_text, "09:00", "1 comprimido"),
+            notification.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
+        )
+    }
+
+    @Test
+    fun `las unidades singular y plural estan alineadas`() {
+        val plural = context.resources.getStringArray(R.array.medication_units)
+        val singular = context.resources.getStringArray(R.array.medication_units_singular)
+
+        assertEquals(plural.size, singular.size)
+    }
+
+    @Test
+    fun `conserva los decimales de la dosis`() = runTest {
+        notificationPermissionGranted = true
+        coEvery { intakeRepository.getIntakeById(INTAKE_ID) } returns createIntake()
+        coEvery { medicationRepository.getMedicationByIdOnce(MEDICATION_ID) } returns
+            createMedication(dose = 0.5)
+        coEvery { profileRepository.getProfileByIdOnce(PROFILE_ID) } returns createProfile()
+
+        handler.handle(INTAKE_ID)
+
+        val notification = shadowOf(notificationManager).allNotifications.single()
+        assertEquals(
+            context.getString(R.string.notification_text, "09:00", "0.5 mg"),
+            notification.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
+        )
     }
 
     @Test
@@ -180,12 +242,16 @@ class AlarmNotificationHandlerTest {
         takenAt = takenAt
     )
 
-    private fun createMedication(deletedAt: LocalDateTime? = null) = Medication(
+    private fun createMedication(
+        deletedAt: LocalDateTime? = null,
+        dose: Double = 600.0,
+        unit: String = "mg"
+    ) = Medication(
         id = MEDICATION_ID,
         profileId = PROFILE_ID,
         name = "Ibuprofeno",
-        dose = 600.0,
-        unit = "mg",
+        dose = dose,
+        unit = unit,
         startDate = LocalDate.of(2026, 10, 1),
         deletedAt = deletedAt
     )
