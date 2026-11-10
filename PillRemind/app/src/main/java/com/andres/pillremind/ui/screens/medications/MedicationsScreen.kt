@@ -94,10 +94,10 @@ fun MedicationsScreen(
                     icon = ImageVector.vectorResource(R.drawable.ic_medication),
                     title = stringResource(R.string.medication_empty_title),
                     description = stringResource(R.string.medication_empty_body),
-                    hint = stringResource(R.string.medication_empty_hint),
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(horizontal = AppSpacing.md),
                 )
             }
 

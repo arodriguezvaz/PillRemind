@@ -3,6 +3,7 @@ package com.andres.pillremind.ui.screens.home
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.IntakeWithMedication
 import com.andres.pillremind.domain.repository.IntakeRepository
+import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.notifications.IntakeNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
@@ -51,6 +52,7 @@ class HomeViewModelMidnightRaceTest {
     private val now = LocalDateTime.of(2026, 11, 5, 23, 59)
     private val profileRepository = mockk<ProfileRepository>(relaxed = true)
     private val intakeRepository = mockk<IntakeRepository>()
+    private val medicationRepository = mockk<MedicationRepository>(relaxed = true)
     private val sessionManager = mockk<SessionManager>(relaxed = true)
     private val reminderScheduler = mockk<ReminderScheduler>(relaxed = true)
     private val intakeNotifications = mockk<IntakeNotifications>(relaxed = true)
@@ -67,6 +69,7 @@ class HomeViewModelMidnightRaceTest {
         viewModel = HomeViewModel(
             profileRepository = profileRepository,
             intakeRepository = intakeRepository,
+            medicationRepository = medicationRepository,
             sessionManager = sessionManager,
             reminderScheduler = reminderScheduler,
             intakeNotifications = intakeNotifications

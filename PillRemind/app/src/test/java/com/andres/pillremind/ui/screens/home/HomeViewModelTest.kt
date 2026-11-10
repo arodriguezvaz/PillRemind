@@ -4,6 +4,7 @@ import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.IntakeWithMedication
 import com.andres.pillremind.domain.model.StatisticsIntake
 import com.andres.pillremind.domain.repository.IntakeRepository
+import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.notifications.IntakeNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
@@ -42,6 +43,7 @@ class HomeViewModelTest {
     private val now = LocalDateTime.of(2026, 11, 5, 12, 0)
     private val profileRepository = mockk<ProfileRepository>(relaxed = true)
     private val intakeRepository = mockk<IntakeRepository>()
+    private val medicationRepository = mockk<MedicationRepository>()
     private val sessionManager = mockk<SessionManager>(relaxed = true)
     private val reminderScheduler = mockk<ReminderScheduler>(relaxed = true)
     private val intakeNotifications = mockk<IntakeNotifications>(relaxed = true)
@@ -66,6 +68,7 @@ class HomeViewModelTest {
                 intake(id = 3, scheduledAt = now.minusMinutes(30))
             )
         )
+        every { medicationRepository.getMedications(1) } returns flowOf(emptyList())
         viewModel = createViewModel()
         viewModel.refreshNow(now)
     }
@@ -308,6 +311,7 @@ class HomeViewModelTest {
     private fun createViewModel(): HomeViewModel = HomeViewModel(
         profileRepository = profileRepository,
         intakeRepository = intakeRepository,
+        medicationRepository = medicationRepository,
         sessionManager = sessionManager,
         reminderScheduler = reminderScheduler,
         intakeNotifications = intakeNotifications

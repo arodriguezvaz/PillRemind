@@ -1,22 +1,13 @@
 package com.andres.pillremind.ui.components
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -39,22 +29,14 @@ import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
-/** Tamaño de la flecha que señala el FAB. */
-private val HintIconSize = 48.dp
-
-/** Desplazamiento de la flecha para dirigir la mirada hacia el FAB. */
-private val HintIconAnimation = AppSpacing.xxs
-
 /**
- * Estado vacío para pantallas con FAB de añadir.
+ * Estado vacío con una card centrada, un icono, un título y una descripción.
  *
- * Centra un mensaje con icono, título y descripción, y coloca debajo una
- * flecha grande que lleva la mirada hacia el FAB.
+ * No añade margen horizontal: el llamador debe aplicar el espaciado lateral.
  *
  * @param icon Icono decorativo del estado vacío.
  * @param title Título del estado vacío.
  * @param description Descripción del estado vacío.
- * @param hint Texto que indica cómo crear el primer elemento.
  * @param modifier Modificador para el estado vacío.
  */
 @Composable
@@ -62,13 +44,10 @@ fun AppEmptyState(
     icon: ImageVector,
     title: String,
     description: String,
-    hint: String,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = AppSpacing.md),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -114,57 +93,10 @@ fun AppEmptyState(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(AppSpacing.lg))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = AppSpacing.xxs),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = hint,
-                modifier = Modifier.weight(1f, fill = false),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.End,
-            )
-            Spacer(modifier = Modifier.width(AppSpacing.xs))
-            ArrowToAddButton()
-        }
     }
 }
 
-/**
- * Flecha hacia abajo que apunta al FAB con un pequeño movimiento repetido.
- */
-@Composable
-private fun ArrowToAddButton() {
-    val transition = rememberInfiniteTransition(label = "flecha_perfil")
-    val offset by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = HintIconAnimation.value,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 700,
-                easing = FastOutSlowInEasing,
-            ),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "desplazamiento_flecha",
-    )
-
-    Icon(
-        imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_downward),
-        contentDescription = null,
-        tint = MaterialTheme.colorScheme.primary,
-        modifier = Modifier
-            .size(HintIconSize)
-            .offset(y = offset.dp),
-    )
-}
-
-@Preview(showBackground = true, name = "Estado vacío con flecha")
+@Preview(showBackground = true, name = "Estado vacío")
 @Composable
 private fun AppEmptyStatePreview() {
     PillRemindTheme {
@@ -172,8 +104,9 @@ private fun AppEmptyStatePreview() {
             icon = ImageVector.vectorResource(R.drawable.ic_person_add),
             title = stringResource(R.string.profiles_empty_title),
             description = stringResource(R.string.profiles_empty_body),
-            hint = stringResource(R.string.profiles_empty_hint),
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(AppSpacing.md),
         )
     }
 }
@@ -186,8 +119,9 @@ private fun AppEmptyStateDarkPreview() {
             icon = ImageVector.vectorResource(R.drawable.ic_person_add),
             title = stringResource(R.string.profiles_empty_title),
             description = stringResource(R.string.profiles_empty_body),
-            hint = stringResource(R.string.profiles_empty_hint),
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(AppSpacing.md),
         )
     }
 }

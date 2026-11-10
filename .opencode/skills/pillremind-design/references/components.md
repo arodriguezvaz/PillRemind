@@ -253,15 +253,12 @@ BlankCard(text, modifier)
 ### `AppEmptyState` (`AppEmptyState.kt`)
 
 ```kotlin
-AppEmptyState(icon, title, description, hint, modifier)
+AppEmptyState(icon, title, description, modifier)
 ```
 
-- Estado vacío para pantallas con FAB de añadir: card centrada con icono,
-  título y descripción; debajo, aviso con flecha `ic_arrow_downward` que apunta
-  al FAB.
-- La flecha es grande, usa `primary` y tiene un movimiento sutil para dirigir
-  la mirada desde el mensaje central hasta el FAB.
-- Se usa en Perfiles con `ic_person_add` y en Medicamentos con `ic_medication`.
+- Card centrada con icono, título y descripción para estados vacíos.
+- Se usa en Perfiles con `ic_person_add`, en Medicamentos con `ic_medication`
+  y en Inicio cuando el perfil no tiene ningún medicamento.
 
 ### `MedicationCard` (`MedicationCard.kt`)
 

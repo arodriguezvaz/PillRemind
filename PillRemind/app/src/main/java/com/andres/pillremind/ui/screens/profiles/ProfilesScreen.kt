@@ -109,8 +109,9 @@ fun ProfilesScreen(
                         icon = ImageVector.vectorResource(R.drawable.ic_person_add),
                         title = stringResource(R.string.profiles_empty_title),
                         description = stringResource(R.string.profiles_empty_body),
-                        hint = stringResource(R.string.profiles_empty_hint),
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = AppSpacing.md),
                     )
                 }
 
