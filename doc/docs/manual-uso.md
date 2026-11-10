@@ -58,7 +58,8 @@ caja?».
 2. Pulsa **Analizar**. La app lee el código, busca el CN en CIMA y, si no hay
    ficha, lee el texto de la caja con OCR.
 3. La primera vez te pedirá permiso para consultar CIMA. Solo se envía el CN a la
-   AEMPS; no se envían datos personales ni se guarda el CN.
+   AEMPS; no se envían perfiles, medicamentos ni tomas, y el CN no se guarda. La
+   AEMPS recibe la IP y datos técnicos de la conexión.
 4. En **Revisar medicamento**, comprueba el nombre, la dosis y la unidad. El OCR
    es una ayuda y puede equivocarse, por ejemplo confundiendo la marca con el
    nombre del producto. Corrige lo que haga falta y pulsa **Usar estos datos**.
