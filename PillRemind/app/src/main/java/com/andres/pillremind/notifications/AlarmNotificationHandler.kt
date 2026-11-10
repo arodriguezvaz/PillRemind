@@ -13,10 +13,12 @@ import androidx.core.content.ContextCompat
 import com.andres.pillremind.MainActivity
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Intake
+import com.andres.pillremind.domain.model.Medication
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 /**
@@ -68,7 +70,7 @@ class AlarmNotificationHandler @Inject constructor(
                         Manifest.permission.POST_NOTIFICATIONS
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    showNotification(intake, medication.name, profile.name)
+                    showNotification(intake, medication, profile.name)
                 }
             }
         } catch (e: Exception) {
@@ -96,13 +98,13 @@ class AlarmNotificationHandler @Inject constructor(
      * notificaciones mediante un [PendingIntent] asociado a [MarkAsTakenReceiver].
      *
      * @param intake Toma programada asociada a la notificación.
-     * @param medicationName Nombre del medicamento que debe tomarse.
+     * @param medication Medicamento que debe tomarse.
      * @param profileName Nombre del perfil al que pertenece el tratamiento.
      */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun showNotification(
         intake: Intake,
-        medicationName: String,
+        medication: Medication,
         profileName: String
     ) {
         // Abre la app al tocar el cuerpo de la notificación.
@@ -126,28 +128,59 @@ class AlarmNotificationHandler @Inject constructor(
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        // Construye la notificación mostrando la información de la toma pendiente
-        // e incorpora una acción rápida para registrar la medicación como tomada.
+        val timeFormatter = DateTimeFormatter.ofPattern(
+            context.getString(R.string.common_time_pattern)
+        )
+        val scheduledTime = intake.scheduledAt.toLocalTime().format(timeFormatter)
+
+        // Construye la notificación mostrando la dosis y la hora de la toma,
+        // con el perfil como subtexto, e incorpora una acción rápida para
+        // registrar la medicación como tomada.
         val notification = NotificationCompat.Builder(context, NotificationChannels.REMINDERS)
             .setSmallIcon(R.drawable.ic_pill)
-            .setContentTitle(context.getString(R.string.notification_title, medicationName))
+            .setContentTitle(context.getString(R.string.notification_title, medication.name))
             .setContentText(
                 context.getString(
                     R.string.notification_text,
-                    intake.scheduledAt.toLocalTime().toString(),
-                    profileName
+                    scheduledTime,
+                    formatDose(medication.dose, medication.unit)
                 )
             )
+            .setSubText(context.getString(R.string.notification_subtext, profileName))
             .setContentIntent(contentPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .addAction(
                 R.drawable.ic_pill,
-                context.getString(R.string.notification_action_take),
+                context.getString(R.string.notification_action_mark_taken),
                 takenPendingIntent
             )
             .build()
 
         NotificationManagerCompat.from(context).notify(intake.id, notification)
+    }
+
+    /**
+     * Formatea la dosis para el aviso.
+     *
+     * Quita los decimales cuando no aportan información (`600.0` → `600`) y
+     * usa la forma singular de la unidad cuando la dosis es exactamente 1.
+     *
+     * @param dose Cantidad que debe administrarse en cada toma.
+     * @param unit Unidad guardada en el medicamento.
+     * @return Dosis lista para mostrar, por ejemplo `600 mg` o `1 comprimido`.
+     */
+    private fun formatDose(dose: Double, unit: String): String {
+        val value = if (dose % 1.0 == 0.0) dose.toLong().toString() else dose.toString()
+        val label = if (dose == 1.0) {
+            val units = context.resources.getStringArray(R.array.medication_units)
+            val singularUnits = context.resources.getStringArray(
+                R.array.medication_units_singular
+            )
+            singularUnits.getOrNull(units.indexOf(unit)) ?: unit
+        } else {
+            unit
+        }
+        return "$value $label"
     }
 }
