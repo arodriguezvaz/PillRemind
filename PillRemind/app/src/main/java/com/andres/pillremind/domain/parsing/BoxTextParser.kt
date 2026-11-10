@@ -167,7 +167,13 @@ object BoxTextParser {
             strengthUnit = strengthMatch?.groupValues?.get(2)?.let(::normalizeUnit),
             strengthText = when {
                 strengthMatch == null -> null
-                strengthLine?.contains('/') == true -> strengthLine
+                strengthLine?.contains('/') == true -> {
+                    val start = strengthLine.indexOf(
+                        strengthMatch.value,
+                        ignoreCase = true
+                    )
+                    if (start > 0) strengthLine.substring(start).trim() else strengthLine
+                }
                 else -> strengthMatch.value
             },
             presentationText = presentationText,
@@ -371,7 +377,7 @@ object BoxTextParser {
     private fun cleanName(line: String): String =
         line
             .replace("®", "")
-            .replace(Regex("[\\s\\d().,-]+$"), "")
+            .replace(Regex("[\\s\\d().,\\-'\"’‘“”´`*+;:!?]+$"), "")
             .trim()
 
     private fun formatPresentation(match: MatchResult): String {

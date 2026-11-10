@@ -429,6 +429,36 @@ class BoxTextParserTest {
         assertEquals("comprimidos", fields.intakeUnit)
     }
 
+    @Test
+    fun `limpia comillas al final del nombre`() {
+        val fields = BoxTextParser.parse(
+            OcrResult(
+                text = "IRBOSYN'\"",
+                lines = listOf(
+                    ocrLine("IRBOSYN'\"", 0.10f, 0.30f, 0.90f, 0.42f)
+                )
+            )
+        )
+
+        assertEquals("IRBOSYN", fields.name)
+    }
+
+    @Test
+    fun `la concentracion compuesta no arrastra texto anterior`() {
+        val fields = BoxTextParser.parse(
+            OcrResult(
+                text = "Silvederma\nA 10 mg/g Crema",
+                lines = listOf(
+                    ocrLine("Silvederma", 0.10f, 0.30f, 0.55f, 0.42f),
+                    ocrLine("A 10 mg/g Crema", 0.10f, 0.50f, 0.60f, 0.60f)
+                )
+            )
+        )
+
+        assertEquals("Silvederma", fields.name)
+        assertEquals("10 mg/g Crema", fields.strengthText)
+    }
+
     private fun ocrLine(
         text: String,
         left: Float,
