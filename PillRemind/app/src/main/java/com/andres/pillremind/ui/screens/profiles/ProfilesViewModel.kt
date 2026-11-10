@@ -8,9 +8,21 @@ import com.andres.pillremind.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+/**
+ * Estado de la pantalla de selección de perfiles.
+ *
+ * @property profiles Perfiles disponibles.
+ * @property isLoading Indica si aún no se ha recibido la primera emisión.
+ */
+data class ProfilesUiState(
+    val profiles: List<Profile> = emptyList(),
+    val isLoading: Boolean = true,
+)
 
 /**
  * ViewModel que expone la lista de perfiles disponibles.
@@ -34,14 +46,18 @@ class ProfilesViewModel @Inject constructor(
     }
 
     /**
-     * Flow con la lista de perfiles actualmente disponibles (initialValue = emptyList()).
+     * Estado con los perfiles disponibles.
+     *
+     * Arranca en [ProfilesUiState.isLoading] para no mostrar el estado vacío
+     * antes de la primera emisión de Room.
      */
-    val perfiles: StateFlow<List<Profile>> = repository.getProfiles()
+    val uiState: StateFlow<ProfilesUiState> = repository.getProfiles()
+        .map { profiles -> ProfilesUiState(profiles = profiles, isLoading = false) }
         .stateIn(
             scope = viewModelScope,
             // Se mantiene la observación activa mientras viva el ViewModel para
             // que la lista se actualice al volver de crear o editar un perfil.
             started = SharingStarted.Eagerly,
-            initialValue = emptyList()
+            initialValue = ProfilesUiState()
         )
 }

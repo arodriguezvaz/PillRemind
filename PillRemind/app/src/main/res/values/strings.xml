@@ -75,7 +75,9 @@
     <!-- Perfil -->
     <string name="profiles_title">Perfiles</string>
     <string name="profiles_add">Agregar perfil</string>
-    <string name="profiles_empty">No hay perfiles creados todavía :(</string>
+    <string name="profiles_empty_title">Aún no tienes perfiles</string>
+    <string name="profiles_empty_body">Crea un perfil para empezar a añadir medicamentos.</string>
+    <string name="profiles_empty_hint">Pulsa el botón + para crear tu primer perfil</string>
     <string name="profile_create_title">Crear perfil</string>
     <string name="profile_view_title">Ver perfil</string>
     <string name="profile_edit_title">Editar perfil</string>
