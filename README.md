@@ -56,10 +56,12 @@ propio.
 Hay dos conexiones a internet:
 
 - **Actualizaciones**: como máximo una vez al día se consulta un fichero público
-  de GitHub Releases. No se envían datos de salud ni identificadores personales.
+  de GitHub Releases. No se envían datos de salud ni datos de la app; como en
+  cualquier conexión, GitHub recibe la IP y datos técnicos.
 - **CIMA**: solo cuando escaneas un medicamento y aceptas el diálogo de
   consentimiento. Se envía únicamente el CN a la API pública de la AEMPS; no se
-  envían perfiles, medicamentos, tomas, fotos ni identificadores personales. El CN
+  envían perfiles, medicamentos, tomas ni fotos. Como en cualquier conexión a
+  internet, la AEMPS recibe la dirección IP y datos técnicos de la conexión. El CN
   no se guarda en la base de datos ni en las copias de seguridad y el resultado se
   descarta al terminar la revisión.
 

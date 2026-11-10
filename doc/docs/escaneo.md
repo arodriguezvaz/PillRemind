@@ -167,10 +167,10 @@ Antes de la primera consulta se muestra un diálogo de consentimiento
 `SessionManager.cimaConsent` y no se vuelve a preguntar. Si rechaza, no se envía
 nada y se usa el OCR o el formulario manual.
 
-La consulta solo envía el **CN**. No se envían perfiles, medicamentos, tomas,
-fotos ni identificadores personales. El CN no se persiste y el resultado se
-descarta al terminar la revisión. Como cualquier conexión a internet, la AEMPS
-recibe la dirección IP y datos técnicos de la conexión.
+La consulta solo envía el **CN**. No se envían perfiles, medicamentos, tomas ni
+fotos. La AEMPS recibe la dirección IP y datos técnicos de la conexión, como en
+cualquier petición HTTP. El CN no se persiste y el resultado se descarta al
+terminar la revisión.
 
 ## 8. Estados y errores
 
