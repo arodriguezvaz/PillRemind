@@ -77,7 +77,11 @@ fun AppButton(
     } else {
         contentColor
     }
-    val effectiveElevation = if (looksDisabled) 0.dp else AppElevation
+    val effectiveElevation = if (looksDisabled || variant == ButtonVariant.Ghost) {
+        0.dp
+    } else {
+        AppElevation
+    }
 
     Button(
         onClick = onClick,

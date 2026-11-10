@@ -7,7 +7,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Solo se usa para consultar el manifiesto de actualizaciones de GitHub
-         Releases. El resto de la aplicación funciona sin conexión. -->
+         Releases y la API pública de CIMA al escanear un CN con consentimiento.
+         El resto de la aplicación funciona sin conexión. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- La cámara se abre con la app del sistema, así que no se pide el permiso

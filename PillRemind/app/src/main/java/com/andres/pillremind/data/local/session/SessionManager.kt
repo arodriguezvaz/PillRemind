@@ -45,6 +45,23 @@ class SessionManager @Inject constructor(@ApplicationContext private val context
         val LEGACY_DARK_MODE = booleanPreferencesKey("dark_mode")
         val LAST_GENERATED_DATE = stringPreferencesKey("ultima_generacion")
         val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+        val CIMA_CONSENT = booleanPreferencesKey("cima_consent")
+    }
+
+    /**
+     * Indica si el usuario aceptó consultar la API pública de CIMA al
+     * escanear un código nacional.
+     */
+    val cimaConsent: Flow<Boolean> = context.dataStore.data
+        .map { preferences -> preferences[Keys.CIMA_CONSENT] ?: false }
+
+    /**
+     * Guarda la decisión del usuario sobre las consultas a CIMA.
+     */
+    suspend fun setCimaConsent(granted: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[Keys.CIMA_CONSENT] = granted
+        }
     }
 
     /**

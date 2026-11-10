@@ -94,7 +94,7 @@ sealed class MedicationMode {
  * las fechas se partan en dos líneas dentro de un campo de una sola línea.
  */
 @Composable
-private fun AdaptiveFieldPair(
+internal fun AdaptiveFieldPair(
     modifier: Modifier = Modifier,
     first: @Composable (Modifier) -> Unit,
     second: @Composable (Modifier) -> Unit,
@@ -143,11 +143,14 @@ fun MedicationScreen(
     onStatisticsClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
-    medicationViewModel: MedicationViewModel = hiltViewModel()
+    medicationViewModel: MedicationViewModel = hiltViewModel(),
+    medicationScanViewModel: MedicationScanViewModel = hiltViewModel()
 ) {
     val medication by medicationViewModel.medication.collectAsState()
     val medicationSchedules by medicationViewModel.schedules.collectAsState()
     val nextIntake by medicationViewModel.nextIntake.collectAsStateWithLifecycle()
+    val scanState by medicationScanViewModel.state.collectAsStateWithLifecycle()
+    var showScanFlow by rememberSaveable { mutableStateOf(false) }
 
     val unitOptions = stringArrayResource(R.array.medication_units).toList()
 
@@ -301,6 +304,13 @@ fun MedicationScreen(
                     enabled = true,
                     placeholderIcon = Icons.Default.AddAPhoto,
                     photoDescriptionRes = R.string.photo_medication,
+                    modifier = Modifier.padding(bottom = AppSpacing.md)
+                )
+                ScanCtaCard(
+                    onClick = {
+                        medicationScanViewModel.reset()
+                        showScanFlow = true
+                    },
                     modifier = Modifier.padding(bottom = AppSpacing.xl)
                 )
                 //-----------NOMBRE
@@ -454,6 +464,32 @@ fun MedicationScreen(
                     },
                     primaryEnabled = isFormValid,
                     supportingText = missingFieldsMessage,
+                )
+            }
+
+            if (showScanFlow) {
+                MedicationScanFlow(
+                    state = scanState,
+                    onDismiss = {
+                        showScanFlow = false
+                        medicationScanViewModel.reset()
+                    },
+                    onBoxPhoto = medicationScanViewModel::onBoxPhoto,
+                    onCodePhoto = medicationScanViewModel::onCodePhoto,
+                    onManualCnChange = medicationScanViewModel::onManualCnChange,
+                    onAnalyze = medicationScanViewModel::analyze,
+                    onBackToPhotos = medicationScanViewModel::backToPhotos,
+                    onGrantConsent = medicationScanViewModel::grantConsent,
+                    onDeclineConsent = medicationScanViewModel::declineConsent,
+                    onApply = { draft, photo ->
+                        name.value = draft.name
+                        dose.value = draft.doseText
+                        unit.value = draft.unit
+                        if (startDate.value == null) startDate.value = LocalDate.now()
+                        if (photo != null) selectedPhotoUri = photo
+                        showScanFlow = false
+                        medicationScanViewModel.reset()
+                    }
                 )
             }
         }

@@ -62,17 +62,23 @@ import java.io.File
  * medicamento.
  *
  * En modo edición permite hacer una foto con la cámara o elegir una de la
- * galería; después abre siempre el recorte cuadrado de [AppPhotoCropDialog]. En
- * modo lectura, si hay foto, al pulsarla se abre [AppPhotoViewerDialog] a
- * pantalla completa.
+ * galería; después abre el recorte cuadrado de [AppPhotoCropDialog], salvo que
+ * [cropEnabled] sea `false`, en cuyo caso entrega la imagen original. En modo
+ * lectura, si hay foto, al pulsarla se abre [AppPhotoViewerDialog] a pantalla
+ * completa.
  *
  * @param photoUri URI de la imagen seleccionada (si existe).
- * @param onPhotoSelected Callback que se ejecuta al terminar el recorte.
+ * @param onPhotoSelected Callback que se ejecuta al terminar el recorte o al
+ *   elegir la imagen original.
  * @param modifier Modificador para personalizar el layout.
  * @param enabled Indica si el selector está habilitado para editar la foto.
  * @param size Tamaño del componente.
  * @param placeholderIcon Icono mostrado cuando no hay imagen seleccionada.
  * @param photoDescriptionRes Recurso que describe la imagen según su contexto.
+ * @param cropEnabled Si es `true`, abre el recorte cuadrado; si es `false`,
+ *   entrega la imagen original (útil para OCR y códigos de barras).
+ * @param placeholderDescriptionRes Descripción accesible específica del hueco
+ *   vacío; si es `null` se usa la genérica de añadir foto.
  */
 @Composable
 fun AppPhotoPicker(
@@ -83,6 +89,8 @@ fun AppPhotoPicker(
     size: Dp = 96.dp,
     placeholderIcon: ImageVector = Icons.Default.AddAPhoto,
     @StringRes photoDescriptionRes: Int = R.string.photo_profile,
+    cropEnabled: Boolean = true,
+    @StringRes placeholderDescriptionRes: Int? = null,
 ) {
     val context = LocalContext.current
     var showSourceDialog by rememberSaveable { mutableStateOf(false) }
@@ -98,7 +106,11 @@ fun AppPhotoPicker(
             if (uri != null) {
                 pendingCameraPath?.let { File(it).delete() }
                 pendingCameraPath = null
-                cropSourceUri = uri
+                if (cropEnabled) {
+                    cropSourceUri = uri
+                } else {
+                    onPhotoSelected(uri)
+                }
             }
         }
     } else {
@@ -108,9 +120,14 @@ fun AppPhotoPicker(
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             val path = pendingCameraPath
             if (success && path != null) {
-                // El temporal se conserva hasta que termine el recorte: si se
-                // cancela, clearCameraTemp() lo borra.
-                cropSourceUri = Uri.fromFile(File(path))
+                if (cropEnabled) {
+                    // El temporal se conserva hasta que termine el recorte: si
+                    // se cancela, clearCameraTemp() lo borra.
+                    cropSourceUri = Uri.fromFile(File(path))
+                } else {
+                    pendingCameraPath = null
+                    onPhotoSelected(Uri.fromFile(File(path)))
+                }
             } else {
                 path?.let { File(it).delete() }
                 pendingCameraPath = null
@@ -168,11 +185,12 @@ fun AppPhotoPicker(
     }
 
     if (photoUri == null) {
+        val placeholderDescription = placeholderDescriptionRes
+            ?.let { stringResource(it) }
+            ?: stringResource(if (enabled) R.string.photo_add else R.string.photo_none)
         AppImagePlaceholder(
             icon = placeholderIcon,
-            contentDescription = stringResource(
-                if (enabled) R.string.photo_add else R.string.photo_none
-            ),
+            contentDescription = placeholderDescription,
             modifier = modifier.then(clickModifier),
             size = size
         )
