@@ -167,7 +167,8 @@ Column(fillMaxSize + padding(AppSpacing.md))
   con `AppFab`.
 - Lista:
   `LazyColumn(contentPadding = horizontal 16dp + vertical 12dp, spacedBy 12dp)`.
-- `PerfilCard` por perfil; estado vacío `BlankCard(profiles_empty)`.
+- `PerfilCard` por perfil; estado vacío `ProfilesEmptyState`, con un aviso y
+  una flecha que señalan el FAB de añadir perfil.
 - Es el patrón de referencia para una pantalla con `Scaffold` propio y FAB
   local.
 

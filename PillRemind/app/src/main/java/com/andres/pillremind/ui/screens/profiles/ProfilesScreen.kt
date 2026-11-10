@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -24,8 +25,8 @@ import androidx.navigation.NavHostController
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.Profile
 import com.andres.pillremind.ui.components.AppFab
-import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.PerfilCard
+import com.andres.pillremind.ui.components.ProfilesEmptyState
 import com.andres.pillremind.ui.screens.main.MainTopBar
 import com.andres.pillremind.ui.screens.main.TopBarAction
 import com.andres.pillremind.ui.screens.main.TopBarState
@@ -56,7 +57,7 @@ fun ProfilesScreen(
     LaunchedEffect(Unit) {
         profilesViewModel.clearActiveProfile()
     }
-    val perfiles by profilesViewModel.perfiles.collectAsStateWithLifecycle()
+    val uiState by profilesViewModel.uiState.collectAsStateWithLifecycle()
     val topBarState = TopBarState(
         title = stringResource(R.string.profiles_title),
         showLogo = true,
@@ -93,30 +94,39 @@ fun ProfilesScreen(
                 .padding(padding)
         ) {
 
-            if (perfiles.isEmpty()) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-                    BlankCard(stringResource(R.string.profiles_empty))
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(
-                        horizontal = AppSpacing.md,
-                        vertical = AppSpacing.sm,
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
-                ) {
-                    items(
-                        items = perfiles,
-                        key = { it.id }
-                    ) { perfil ->
-                        PerfilCard(
-                            profile = perfil,
-                            gestionar = {
-                                onProfileSelected(perfil)
-                            }
-                        )
+
+                uiState.profiles.isEmpty() -> {
+                    ProfilesEmptyState(modifier = Modifier.fillMaxSize())
+                }
+
+                else -> {
+                    LazyColumn(
+                        contentPadding = PaddingValues(
+                            horizontal = AppSpacing.md,
+                            vertical = AppSpacing.sm,
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+                    ) {
+                        items(
+                            items = uiState.profiles,
+                            key = { it.id }
+                        ) { perfil ->
+                            PerfilCard(
+                                profile = perfil,
+                                gestionar = {
+                                    onProfileSelected(perfil)
+                                }
+                            )
+                        }
                     }
                 }
             }
