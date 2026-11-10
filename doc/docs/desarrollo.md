@@ -56,8 +56,11 @@ El flujo está en `MedicationScanViewModel` y `MedicationScanFlow`:
 2. `MlKitBarcodeEngine` lee EAN-13, DataMatrix y QR. `MedicineCodeParser` extrae
    el CN de los formatos OSS (`847000...`) y GS1 (`712`/NTIN); si no hay código
    legible, `CnParser` busca candidatos en el OCR de la foto del código.
-3. `MlKitOcrEngine` lee la caja. `BoxTextParser` extrae nombre, concentración,
-   forma y toma; `MedicationDraftMapper` construye un `MedicationDraft` efímero.
+3. `MlKitOcrEngine` lee la caja y devuelve un `OcrResult` con las líneas y sus
+   cajas. `BoxTextParser` puntúa el nombre por tamaño y posición, extrae
+   concentración, forma y toma, separa presentación de dosis y marca
+   `nameConfident`; `MedicationDraftMapper` construye un `MedicationDraft`
+   efímero.
 4. Antes de la primera consulta a CIMA se pide consentimiento
    (`SessionManager.cimaConsent`). Solo se envía el CN.
 5. `CimaDataSource` consulta la API pública. Si el CN no está catalogado
@@ -67,10 +70,11 @@ El flujo está en `MedicationScanViewModel` y `MedicationScanFlow`:
    formulario. El CN y el borrador no se guardan en Room ni en las copias de
    seguridad.
 
-El OCR es heurístico: elige la primera línea candidata como nombre y puede
-confundir la marca con el nombre del producto, o tomar el tamaño del envase como
-dosis. La
-revisión manual es obligatoria. Las pruebas del flujo están en
+El OCR es heurístico: si el nombre no destaca con claridad, `BoxTextParser` deja
+`name` vacío y devuelve candidatos; la revisión los muestra para que el usuario
+elija. Un volumen suelto (`120 ml`) se trata como presentación, no como dosis. En
+debug, las líneas OCR y sus cajas se registran en logcat con la etiqueta
+`PillRemindOcr`. La revisión manual es obligatoria. Las pruebas del flujo están en
 `BoxTextParserTest`, `CnParserTest`, `MedicationDraftMapperTest`,
 `CimaDataSourceTest` y `MedicationLookupRepositoryImplTest`; los assets de códigos
 para las pruebas instrumentadas están en `app/src/androidTest/assets/barcodes`.

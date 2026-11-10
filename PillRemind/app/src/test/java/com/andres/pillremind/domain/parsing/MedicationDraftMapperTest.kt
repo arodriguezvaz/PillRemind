@@ -131,6 +131,56 @@ class MedicationDraftMapperTest {
     }
 
     @Test
+    fun `cima no usa un porcentaje como dosis`() {
+        val draft = MedicationDraftMapper.fromCima(
+            cima(
+                name = "GEL DERMATOLÓGICO 10 %",
+                dosis = "10 %",
+                form = "GEL"
+            )
+        )
+
+        assertEquals("", draft.doseText)
+        assertEquals("", draft.unit)
+        assertEquals("10", draft.strengthDoseText)
+        assertEquals("%", draft.strengthUnit)
+    }
+
+    @Test
+    fun `cima no usa un volumen como dosis`() {
+        val draft = MedicationDraftMapper.fromCima(
+            cima(
+                name = "SOLUCIÓN ORAL 120 ML",
+                dosis = "120 ml",
+                form = "SOLUCIÓN ORAL"
+            )
+        )
+
+        assertEquals("", draft.doseText)
+        assertEquals("", draft.unit)
+        assertEquals("120", draft.strengthDoseText)
+        assertEquals("ml", draft.strengthUnit)
+    }
+
+    @Test
+    fun `el ocr no usa un volumen como dosis`() {
+        val draft = MedicationDraftMapper.fromOcr(
+            fields = BoxFields(
+                name = "MABOdol",
+                strengthDoseText = "120",
+                strengthUnit = "ml",
+                strengthText = "120 ml"
+            ),
+            cn = null
+        )
+
+        assertEquals("MABOdol", draft.name)
+        assertEquals("", draft.doseText)
+        assertEquals("", draft.unit)
+        assertEquals("120 ml", draft.strengthText)
+    }
+
+    @Test
     fun `shortName corta antes de la forma farmaceutica`() {
         assertEquals(
             "ESOMEPRAZOL CINFA 20 MG",
@@ -159,5 +209,44 @@ class MedicationDraftMapperTest {
         )
         assertNull(MedicationDraftMapper.parseDose(null))
         assertNull(MedicationDraftMapper.parseDose("sin dosis"))
+    }
+
+    @Test
+    fun `el ocr separa la presentacion de la dosis`() {
+        val draft = MedicationDraftMapper.fromOcr(
+            fields = BoxFields(
+                name = "MABOdol",
+                nameCandidates = listOf("MABOdol", "EFECTO"),
+                nameConfident = true,
+                presentationText = "120 ml"
+            ),
+            cn = null
+        )
+
+        assertEquals("MABOdol", draft.name)
+        assertEquals(listOf("MABOdol", "EFECTO"), draft.nameCandidates)
+        assertTrue(draft.nameConfident)
+        assertEquals("120 ml", draft.presentation)
+        assertEquals("", draft.doseText)
+        assertEquals("", draft.unit)
+        assertNull(draft.strengthText)
+    }
+
+    @Test
+    fun `el ocr no usa un porcentaje como dosis`() {
+        val draft = MedicationDraftMapper.fromOcr(
+            fields = BoxFields(
+                name = "Producto",
+                strengthDoseText = "10",
+                strengthUnit = "%",
+                strengthText = "10%"
+            ),
+            cn = null
+        )
+
+        assertEquals("Producto", draft.name)
+        assertEquals("", draft.doseText)
+        assertEquals("", draft.unit)
+        assertEquals("10%", draft.strengthText)
     }
 }

@@ -657,6 +657,38 @@ private fun ScanResultContent(
                         .padding(bottom = AppSpacing.md)
                 )
             }
+            val nameCandidates = draft?.nameCandidates.orEmpty()
+            if (draft?.nameConfident == false) {
+                if (nameCandidates.isNotEmpty()) {
+                    Text(
+                        text = stringResource(R.string.scan_result_name_candidates),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+                        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+                        modifier = Modifier.padding(bottom = AppSpacing.md)
+                    ) {
+                        nameCandidates.take(3).forEach { candidate ->
+                            FilterChip(
+                                selected = name.equals(candidate, ignoreCase = true),
+                                onClick = { name = candidate },
+                                label = { Text(candidate) },
+                                colors = doseChipColors
+                            )
+                        }
+                    }
+                } else {
+                    Text(
+                        text = stringResource(R.string.scan_result_name_missing),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = AppSpacing.md)
+                    )
+                }
+            }
             AdaptiveFieldPair(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -701,6 +733,13 @@ private fun ScanResultContent(
         }
 
         val draftDetails = draft
+        if (draftDetails?.presentation != null) {
+            Text(
+                text = stringResource(R.string.scan_result_presentation, draftDetails.presentation),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
         if (draftDetails?.strengthText != null) {
             Text(
                 text = stringResource(R.string.scan_result_strength, draftDetails.strengthText),
@@ -713,7 +752,8 @@ private fun ScanResultContent(
         val intakeUnit = draft?.intakeUnit
         val strengthDose = draft?.strengthDoseText
         val strengthUnit = draft?.strengthUnit
-        val showStrengthChip = draft?.strengthText?.contains('/') != true
+        val showStrengthChip = draft?.strengthText?.contains('/') != true &&
+            strengthUnit != "%" && strengthUnit != "ml"
         val hasIntakeChip = intakeDose != null && intakeUnit != null
         val hasStrengthChip = strengthDose != null && strengthUnit != null && showStrengthChip
         if (hasIntakeChip || hasStrengthChip) {
@@ -766,6 +806,15 @@ private fun ScanResultContent(
                     }
                 }
             }
+        }
+
+        if (draft?.presentation != null && dose.isBlank() && unit.isBlank()) {
+            Text(
+                text = stringResource(R.string.scan_result_no_dose),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = AppSpacing.md)
+            )
         }
 
         if (state.boxPhotoUri != null) {

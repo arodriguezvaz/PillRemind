@@ -193,7 +193,9 @@ class MedicationScanViewModel @Inject constructor(
                     if (codeCns.isEmpty()) {
                         val codeText = ocrEngine.recognize(codePhoto)
                         currentCoroutineContext().ensureActive()
-                        codeCns.addAll(codeText?.let(CnParser::extractCandidates).orEmpty())
+                        codeCns.addAll(
+                            codeText?.text?.let(CnParser::extractCandidates).orEmpty()
+                        )
                     }
                     codeCns.take(MAX_CNS_PER_SOURCE).forEach { candidates.add(it) }
 
@@ -215,11 +217,14 @@ class MedicationScanViewModel @Inject constructor(
                     boxFields = boxText?.let(BoxTextParser::parse)
                     boxHasData = boxFields?.let { fields ->
                         fields.name != null ||
+                            fields.nameCandidates.isNotEmpty() ||
+                            fields.presentationText != null ||
                             fields.strengthDoseText != null ||
                             fields.intakeDoseText != null
                     } == true
 
                     val boxCns = boxText
+                        ?.text
                         ?.let(CnParser::extractCandidates)
                         .orEmpty()
                         .take(MAX_CNS_PER_SOURCE)
