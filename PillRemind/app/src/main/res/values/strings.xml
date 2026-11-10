@@ -78,7 +78,6 @@
     <string name="profiles_add">Agregar perfil</string>
     <string name="profiles_empty_title">Aún no tienes perfiles</string>
     <string name="profiles_empty_body">Crea un perfil para empezar a añadir medicamentos.</string>
-    <string name="profiles_empty_hint">Pulsa el botón + para crear tu primer perfil</string>
     <string name="profile_create_title">Crear perfil</string>
     <string name="profile_view_title">Ver perfil</string>
     <string name="profile_edit_title">Editar perfil</string>
@@ -295,7 +294,8 @@
     <!-- Medicamentos -->
     <string name="medication_add_title">Añadir medicamento</string>
     <string name="medication_search_placeholder">Buscar medicamento…</string>
-    <string name="medication_empty">No hay medicamentos aún</string>
+    <string name="medication_empty_title">Aún no tienes medicamentos</string>
+    <string name="medication_empty_body">Crea un medicamento para empezar a organizar tus tomas.</string>
     <string name="medication_search_no_results">No hay resultados para «%1$s»</string>
     <string name="save_missing_fields">Faltan: %1$s</string>
     <string name="medication_missing_schedule">pauta y al menos una hora</string>

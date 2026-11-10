@@ -9,6 +9,7 @@ import com.andres.pillremind.domain.model.StatisticsSummary
 import com.andres.pillremind.domain.model.isPendingOrTakenLate
 import com.andres.pillremind.domain.model.toStatisticsSummary
 import com.andres.pillremind.domain.repository.IntakeRepository
+import com.andres.pillremind.domain.repository.MedicationRepository
 import com.andres.pillremind.domain.repository.ProfileRepository
 import com.andres.pillremind.notifications.IntakeNotifications
 import com.andres.pillremind.notifications.ReminderScheduler
@@ -51,6 +52,7 @@ data class HomeIntakes(
  *
  * @param profileRepository Repositorio para obtener datos de perfil.
  * @param intakeRepository Repositorio de tomas.
+ * @param medicationRepository Repositorio para comprobar si hay medicamentos.
  * @param sessionManager Gestor de sesión que expone el perfil activo.
  * @param reminderScheduler Coordina la generación de tomas y la programación de alarmas.
  * @param intakeNotifications Cancela la notificación de las tomas marcadas desde Inicio.
@@ -59,6 +61,7 @@ data class HomeIntakes(
 class HomeViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val intakeRepository: IntakeRepository,
+    private val medicationRepository: MedicationRepository,
     private val sessionManager: SessionManager,
     private val reminderScheduler: ReminderScheduler,
     private val intakeNotifications: IntakeNotifications,
@@ -107,6 +110,23 @@ class HomeViewModel @Inject constructor(
                 initialValue = null
             )
 
+
+    /**
+     * Indica si el perfil activo tiene medicamentos activos.
+     *
+     * Es null mientras se recibe la primera emisión para no confundir "sin
+     * datos" con "sin medicamentos".
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val hasActiveMedications: StateFlow<Boolean?> =
+        profileId.filterNotNull()
+            .flatMapLatest { id -> medicationRepository.getMedications(id) }
+            .map { medications -> medications.isNotEmpty() }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = null
+            )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val todayIntakesForDay: StateFlow<List<IntakeWithMedication>> =

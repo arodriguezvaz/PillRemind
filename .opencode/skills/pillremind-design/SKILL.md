@@ -165,8 +165,9 @@ Catálogo detallado en `references/components.md`.
 - **Lista:** `LazyColumn` con
   `contentPadding = PaddingValues(vertical = AppSpacing.sm)`,
   `verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)` y `key` estable.
-- **Vacío:** `BlankCard` centrada en el espacio disponible. La selección de
-  perfiles usa `ProfilesEmptyState` para señalar el FAB de añadir perfil.
+- **Vacío:** `BlankCard` centrada en el espacio disponible. Perfiles y
+  Medicamentos usan `AppEmptyState`; Inicio lo usa cuando el perfil no tiene
+  ningún medicamento.
 - **Formulario:** `Column` con `verticalScroll` + `imePadding` + `padding(md)`;
   secciones con `AppFormSection`; cierre con `AppFormActions`.
 - **Card:** `Card(shape = MaterialTheme.shapes.large,

@@ -78,15 +78,20 @@ migración y el patrón correcto están en `top-bar.md`.
 ```text
 Column(fillMaxSize + padding(AppSpacing.md), spacedBy = AppSpacing.sm)
 ├── StatisticsBanner(...)  // solo si hay tomas evaluadas en 7 días
-└── LazyColumn(
-│     contentPadding = PaddingValues(vertical = AppSpacing.sm),
-│     verticalArrangement = spacedBy(AppSpacing.sm))
-│   └── IntakeCard(...)
-└── o BlankCard(home_empty_today) centrada (weight(1f))
+├── aviso de tomas pendientes de ayer
+└── when
+    ├── sin medicamentos → AppEmptyState (weight(1f))
+    ├── sin tomas pero con medicamentos → BlankCard(home_empty_today)
+    └── LazyColumn(
+          contentPadding = PaddingValues(vertical = AppSpacing.sm),
+          verticalArrangement = spacedBy(AppSpacing.sm))
+        └── IntakeCard(...)
 ```
 
 - Título de la top bar: `home_title_today` con la fecha formateada en español;
   `showLogo = true`, resuelto en `MainScreen` a partir de la ruta.
+- El estado vacío distingue un perfil sin medicamentos (`hasActiveMedications`)
+  de un perfil con medicamentos pero sin tomas para hoy.
 - Usa `collectAsStateWithLifecycle()` y refresca el resumen con
   `LifecycleEventEffect(ON_RESUME)`.
 - El banner abre `StatisticsScreens.Statistics`; se oculta si no hay ninguna
@@ -97,14 +102,19 @@ Column(fillMaxSize + padding(AppSpacing.md), spacedBy = AppSpacing.sm)
 `MedicationsScreen.kt`
 
 ```text
-Column(fillMaxSize + padding(AppSpacing.md))
-├── AppSearchField(bottom = AppSpacing.sm)
-└── LazyColumn(vertical = AppSpacing.sm, spacedBy = AppSpacing.sm)
-    └── MedicationCard(...)
+Column(fillMaxSize)
+├── AppSearchField(padding md + bottom sm)
+└── when
+    ├── carga → CircularProgressIndicator
+    ├── sin medicamentos → AppEmptyState
+    ├── búsqueda sin resultados → BlankCard
+    └── LazyColumn(horizontal = md, vertical = sm, spacedBy = sm)
+        └── MedicationCard(...)
 ```
 
-- Estado vacío: `BlankCard(medication_empty)` o
-  `BlankCard(medication_search_no_results, query)`.
+- Estado vacío: `AppEmptyState` cuando el perfil no tiene medicamentos;
+  `BlankCard(medication_search_no_results)` cuando el filtro no devuelve
+  resultados.
 - El texto de `AppSearchField` es transitorio: se limpia al salir de la
   pantalla (cambio de pestaña o ficha), no al rotar ni al cambiar de tema.
 - Cada item lleva `key = { it.id }`.
@@ -167,8 +177,7 @@ Column(fillMaxSize + padding(AppSpacing.md))
   con `AppFab`.
 - Lista:
   `LazyColumn(contentPadding = horizontal 16dp + vertical 12dp, spacedBy 12dp)`.
-- `PerfilCard` por perfil; estado vacío `ProfilesEmptyState`, con un aviso y
-  una flecha que señalan el FAB de añadir perfil.
+- `PerfilCard` por perfil; estado vacío `AppEmptyState` centrado.
 - Es el patrón de referencia para una pantalla con `Scaffold` propio y FAB
   local.
 

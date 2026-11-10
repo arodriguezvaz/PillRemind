@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,14 +20,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.visualState
+import com.andres.pillremind.ui.components.AppEmptyState
 import com.andres.pillremind.ui.components.BlankCard
 import com.andres.pillremind.ui.components.IntakeCard
 import com.andres.pillremind.ui.components.history.HistoryDayHeader
@@ -82,6 +86,7 @@ fun HomeScreen(
     val now by homeViewModel.now.collectAsStateWithLifecycle()
     val intakes by homeViewModel.intakes.collectAsStateWithLifecycle()
     val weeklySummary by homeViewModel.weeklySummary.collectAsStateWithLifecycle()
+    val hasActiveMedications by homeViewModel.hasActiveMedications.collectAsStateWithLifecycle()
     val todayIntakes = intakes.today
     val yesterdayIntakes = intakes.yesterday
     val pendingYesterdayCount = yesterdayIntakes.count { it.takenAt == null }
@@ -127,13 +132,39 @@ fun HomeScreen(
         }
 
         if (todayIntakes.isEmpty() && yesterdayIntakes.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                BlankCard(stringResource(R.string.home_empty_today))
+            when (hasActiveMedications) {
+                false -> {
+                    AppEmptyState(
+                        icon = ImageVector.vectorResource(R.drawable.ic_medication),
+                        title = stringResource(R.string.medication_empty_title),
+                        description = stringResource(R.string.medication_empty_body),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                    )
+                }
+
+                true -> {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        BlankCard(stringResource(R.string.home_empty_today))
+                    }
+                }
+
+                null -> {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
         } else {
             LazyColumn(
