@@ -47,6 +47,28 @@ ficha:
 Pulsa **Guardar**. El medicamento aparecerá en la lista y sus tomas se generarán
 para los próximos días.
 
+### Añadir un medicamento con el escáner
+
+En la ficha del medicamento, pulsa **Escanear** en la tarjeta «¿Tienes el CN o la
+caja?».
+
+1. Añade una foto de la cara frontal de la caja y, si la tienes, otra del CN o del
+   código de barras. Con las dos es más fiable; también puedes escribir el CN a
+   mano.
+2. Pulsa **Analizar**. La app lee el código, busca el CN en CIMA y, si no hay
+   ficha, lee el texto de la caja con OCR.
+3. La primera vez te pedirá permiso para consultar CIMA. Solo se envía el CN a la
+   AEMPS; no se envían datos personales ni se guarda el CN.
+4. En **Revisar medicamento**, comprueba el nombre, la dosis y la unidad. El OCR
+   es una ayuda y puede equivocarse, por ejemplo confundiendo la marca con el
+   nombre del producto. Corrige lo que haga falta y pulsa **Usar estos datos**.
+5. Completa la pauta y pulsa **Guardar**.
+
+Las fotos se procesan en el móvil y no se suben a ningún servidor. El escaneo usa
+los modelos de ML Kit de Google Play Services; en un móvil sin Play Services puede
+no estar disponible. Si CIMA no encuentra el CN, la app usa el texto de la caja; si
+no se puede leer nada, puedes rellenar la ficha a mano.
+
 ## 4. Inicio: las tomas de hoy
 
 La pantalla **Inicio** muestra las tomas del día y un resumen semanal de adherencia.

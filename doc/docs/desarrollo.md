@@ -33,17 +33,49 @@ antes de atribuirlo a un cambio.
 
 La aplicación sigue una separación por capas:
 
-- `domain/model` y `domain/repository`: modelos y contratos en Kotlin puro, sin
-  dependencias de Android.
+- `domain/model`, `domain/repository` y `domain/parsing`: modelos, contratos y
+  lógica de extracción en Kotlin puro, sin dependencias de Android.
 - `data/local`: base de datos Room (entidades, DAOs, relaciones y conversores) y
   `SessionManager` sobre DataStore.
-- `data/mapper`, `data/repository`: mapeadores y implementaciones de los contratos.
+- `data/ocr` y `data/scan`: OCR y lectura de códigos con ML Kit.
+- `data/mapper`, `data/repository`: mapeadores e implementaciones de los contratos.
 - `ui/screens/<feature>`: pantallas Compose con su ViewModel (`@HiltViewModel`).
 - `ui/components`, `navigation`, `di` y `notifications`.
 
-La aplicación es **local-only**: no hay autenticación, base de datos remota ni
-sincronización. La única petición de red es la comprobación de actualizaciones
-(`data/remote/GitHubUpdateDataSource`).
+Los datos son **local-only**: no hay autenticación, base de datos remota ni
+sincronización. La app solo hace dos peticiones de red: la comprobación de
+actualizaciones (`data/remote/GitHubUpdateDataSource`) y la consulta a CIMA
+(`data/remote/CimaDataSource`) cuando el usuario escanea y acepta el
+consentimiento. CIMA solo recibe el CN.
+
+## Escaneo de medicamentos
+
+El flujo está en `MedicationScanViewModel` y `MedicationScanFlow`:
+
+1. El usuario añade una foto de la caja y/o del código, o escribe el CN.
+2. `MlKitBarcodeEngine` lee EAN-13, DataMatrix y QR. `MedicineCodeParser` extrae
+   el CN de los formatos OSS (`847000...`) y GS1 (`712`/NTIN); si no hay código
+   legible, `CnParser` busca candidatos en el OCR de la foto del código.
+3. `MlKitOcrEngine` lee la caja. `BoxTextParser` extrae nombre, concentración,
+   forma y toma; `MedicationDraftMapper` construye un `MedicationDraft` efímero.
+4. Antes de la primera consulta a CIMA se pide consentimiento
+   (`SessionManager.cimaConsent`). Solo se envía el CN.
+5. `CimaDataSource` consulta la API pública. Si el CN no está catalogado
+   (204/404) o falla la red, se usa el borrador del OCR; si el usuario rechaza el
+   consentimiento, no se consulta.
+6. La pantalla de revisión permite corregir los datos antes de pasarlos al
+   formulario. El CN y el borrador no se guardan en Room ni en las copias de
+   seguridad.
+
+El OCR es heurístico: elige la primera línea candidata como nombre y puede
+confundir la marca con el nombre del producto, o tomar el tamaño del envase como
+dosis. La
+revisión manual es obligatoria. Las pruebas del flujo están en
+`BoxTextParserTest`, `CnParserTest`, `MedicationDraftMapperTest`,
+`CimaDataSourceTest` y `MedicationLookupRepositoryImplTest`; los assets de códigos
+para las pruebas instrumentadas están en `app/src/androidTest/assets/barcodes`.
+
+El detalle completo está en [Escaneo de medicamentos](escaneo.md).
 
 ## Base de datos y migraciones
 
