@@ -3,8 +3,9 @@
     <string name="notification_channel_name">Recordatorios de medicamentos</string>
     <string name="notification_channel_description">Avisos para tomar la medicación</string>
     <string name="notification_title">Hora de tomar %1$s</string>
-    <string name="notification_text">%1$s — no olvides la dosis de %2$s</string>
-    <string name="notification_action_take">Tomar</string>
+    <string name="notification_text">%1$s · %2$s</string>
+    <string name="notification_subtext">Para %1$s</string>
+    <string name="notification_action_mark_taken">Ya la he tomado</string>
 
     <!-- Bienvenida -->
     <string name="onboarding_tagline">Tu medicación, a tiempo</string>
@@ -494,6 +495,43 @@
         <item>óvulos</item>
         <item>cucharadas</item>
         <item>cucharaditas</item>
+    </string-array>
+
+    <!--
+        Mismo orden y tamaño que medication_units. Se usa para escribir una
+        unidad contable en singular cuando la dosis es 1 (por ejemplo,
+        «1 comprimido»). Mantén ambas listas sincronizadas.
+    -->
+    <string-array name="medication_units_singular">
+        <item>mg</item>
+        <item>g</item>
+        <item>mcg</item>
+        <item>kg</item>
+        <item>ml</item>
+        <item>l</item>
+        <item>comprimido</item>
+        <item>cápsula</item>
+        <item>pastilla</item>
+        <item>tableta</item>
+        <item>gota</item>
+        <item>sobre</item>
+        <item>ampolla</item>
+        <item>vial</item>
+        <item>inyección</item>
+        <item>dosis</item>
+        <item>pulsación</item>
+        <item>aplicación</item>
+        <item>puff</item>
+        <item>spray</item>
+        <item>UI</item>
+        <item>%</item>
+        <item>mEq</item>
+        <item>mmol</item>
+        <item>parche</item>
+        <item>supositorio</item>
+        <item>óvulo</item>
+        <item>cucharada</item>
+        <item>cucharadita</item>
     </string-array>
 
     <!-- Pautas -->
