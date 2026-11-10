@@ -1,7 +1,9 @@
 package com.andres.pillremind.domain.parsing
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -130,4 +132,78 @@ class BoxTextParserTest {
         assertEquals("g", fields.strengthUnit)
         assertEquals("comprimidos", fields.form)
     }
+
+    @Test
+    fun `mabodol elige el nombre grande y no la marca pequena`() {
+        val fields = BoxTextParser.parse(
+            OcrResult(
+                text = "EFECTO\nCANNABIDIOL\nMABOdol\n120 ml",
+                lines = listOf(
+                    ocrLine("EFECTO", 0.04f, 0.03f, 0.18f, 0.07f),
+                    ocrLine("CANNABIDIOL", 0.04f, 0.12f, 0.30f, 0.16f),
+                    ocrLine("MABOdol", 0.30f, 0.30f, 0.75f, 0.42f),
+                    ocrLine("120 ml", 0.04f, 0.70f, 0.20f, 0.74f)
+                )
+            )
+        )
+
+        assertEquals("MABOdol", fields.name)
+        assertTrue(fields.nameConfident)
+        assertTrue(fields.nameCandidates.contains("MABOdol"))
+        assertFalse(fields.nameCandidates.contains("CANNABIDIOL"))
+        assertNull(fields.strengthDoseText)
+        assertNull(fields.strengthText)
+        assertEquals("120 ml", fields.presentationText)
+        assertNull(fields.intakeDoseText)
+    }
+
+    @Test
+    fun `dos nombres parecidos dejan el nombre vacio y candidatos`() {
+        val fields = BoxTextParser.parse(
+            OcrResult(
+                text = "ALFA\nBETA",
+                lines = listOf(
+                    ocrLine("ALFA", 0.20f, 0.30f, 0.50f, 0.42f),
+                    ocrLine("BETA", 0.20f, 0.50f, 0.50f, 0.62f)
+                )
+            )
+        )
+
+        assertNull(fields.name)
+        assertFalse(fields.nameConfident)
+        assertEquals(setOf("ALFA", "BETA"), fields.nameCandidates.take(2).toSet())
+    }
+
+    @Test
+    fun `sin geometria el ocr no rellena el nombre`() {
+        val fields = BoxTextParser.parse(
+            OcrResult(text = "Nasonex\n50 microgramos\nsuspensión para pulverización nasal")
+        )
+
+        assertNull(fields.name)
+        assertFalse(fields.nameConfident)
+        assertTrue(fields.nameCandidates.contains("Nasonex"))
+    }
+
+    @Test
+    fun `un unico texto pequeno arriba no se da por seguro`() {
+        val fields = BoxTextParser.parse(
+            OcrResult(
+                text = "EFECTO",
+                lines = listOf(ocrLine("EFECTO", 0.04f, 0.03f, 0.18f, 0.07f))
+            )
+        )
+
+        assertNull(fields.name)
+        assertFalse(fields.nameConfident)
+        assertEquals(listOf("EFECTO"), fields.nameCandidates)
+    }
+
+    private fun ocrLine(
+        text: String,
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float
+    ) = OcrLine(text, left, top, right, bottom)
 }

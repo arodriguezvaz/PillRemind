@@ -160,4 +160,43 @@ class MedicationDraftMapperTest {
         assertNull(MedicationDraftMapper.parseDose(null))
         assertNull(MedicationDraftMapper.parseDose("sin dosis"))
     }
+
+    @Test
+    fun `el ocr separa la presentacion de la dosis`() {
+        val draft = MedicationDraftMapper.fromOcr(
+            fields = BoxFields(
+                name = "MABOdol",
+                nameCandidates = listOf("MABOdol", "EFECTO"),
+                nameConfident = true,
+                presentationText = "120 ml"
+            ),
+            cn = null
+        )
+
+        assertEquals("MABOdol", draft.name)
+        assertEquals(listOf("MABOdol", "EFECTO"), draft.nameCandidates)
+        assertTrue(draft.nameConfident)
+        assertEquals("120 ml", draft.presentation)
+        assertEquals("", draft.doseText)
+        assertEquals("", draft.unit)
+        assertNull(draft.strengthText)
+    }
+
+    @Test
+    fun `el ocr no usa un porcentaje como dosis`() {
+        val draft = MedicationDraftMapper.fromOcr(
+            fields = BoxFields(
+                name = "Producto",
+                strengthDoseText = "10",
+                strengthUnit = "%",
+                strengthText = "10%"
+            ),
+            cn = null
+        )
+
+        assertEquals("Producto", draft.name)
+        assertEquals("", draft.doseText)
+        assertEquals("", draft.unit)
+        assertEquals("10%", draft.strengthText)
+    }
 }

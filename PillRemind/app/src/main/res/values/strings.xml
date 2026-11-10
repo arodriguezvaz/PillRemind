@@ -373,6 +373,10 @@
     <string name="scan_result_choose_dose">Elegir dosis</string>
     <string name="scan_result_incomplete">Completa el nombre, la dosis y la unidad para continuar.</string>
     <string name="scan_result_strength">Concentración: %1$s</string>
+    <string name="scan_result_presentation">Presentación: %1$s</string>
+    <string name="scan_result_name_candidates">Hemos leído varios nombres. Elige el correcto:</string>
+    <string name="scan_result_name_missing">No hemos podido identificar el nombre. Escríbelo tú.</string>
+    <string name="scan_result_no_dose">No hemos detectado la dosis. Indícala tú.</string>
     <string name="scan_notice_cima_found_title">Hemos detectado un CN que está en CIMA</string>
     <string name="scan_notice_cn_detected">CN detectado: %1$s</string>
     <string name="scan_notice_cima_not_found_title">No hemos podido obtener información de CIMA</string>

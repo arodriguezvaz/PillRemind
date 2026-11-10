@@ -10,7 +10,8 @@ import com.andres.pillremind.domain.model.MedicationDraft
  *
  * La regla de dosis acordada:
  * - formas sólidas: una toma (`1` + comprimidos/cápsulas...),
- * - líquidos e inhaladores: la concentración o la dosis que indique la pauta.
+ * - líquidos e inhaladores: una toma explícita o la concentración,
+ * - un volumen suelto o un porcentaje no se usan como dosis.
  *
  * El borrador guarda las dos opciones cuando existen para que la pantalla de
  * revisión permita cambiar de una a otra.
@@ -69,10 +70,13 @@ object MedicationDraftMapper {
 
         return MedicationDraft(
             name = fields.name.orEmpty(),
+            nameCandidates = fields.nameCandidates,
+            nameConfident = fields.nameConfident,
             doseText = dose?.first.orEmpty(),
             unit = dose?.second.orEmpty(),
             form = fields.form,
             strengthText = fields.strengthText,
+            presentation = fields.presentationText,
             cn = cn,
             source = DraftSource.OCR,
             notCatalogued = true,
@@ -96,6 +100,7 @@ object MedicationDraftMapper {
         strength: Pair<String, String>?
     ): Pair<String, String>? {
         if (strength == null) return null
+        if (strength.second == "%" || strength.second == "ml") return null
         if (strengthText?.contains('/') == true) return null
         return strength
     }

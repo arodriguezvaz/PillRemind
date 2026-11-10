@@ -60,9 +60,12 @@ caja?».
 3. La primera vez te pedirá permiso para consultar CIMA. Solo se envía el CN a la
    AEMPS; no se envían perfiles, medicamentos ni tomas, y el CN no se guarda. La
    AEMPS recibe la IP y datos técnicos de la conexión.
-4. En **Revisar medicamento**, comprueba el nombre, la dosis y la unidad. El OCR
-   es una ayuda y puede equivocarse, por ejemplo confundiendo la marca con el
-   nombre del producto. Corrige lo que haga falta y pulsa **Usar estos datos**.
+4. En **Revisar medicamento**, comprueba el nombre, la dosis y la unidad. Si la
+   app no está segura del nombre, el campo aparece vacío y verás varios
+   candidatos: elige el correcto o escríbelo. Si detecta un volumen como
+   `120 ml`, lo muestra como presentación, no como dosis; indica tú la dosis.
+   El OCR es una ayuda y puede equivocarse. Corrige lo que haga falta y pulsa
+   **Usar estos datos**.
 5. Completa la pauta y pulsa **Guardar**.
 
 Las fotos se procesan en el móvil y no se suben a ningún servidor. El escaneo usa

@@ -1,5 +1,7 @@
 package com.andres.pillremind.domain.parsing
 
+import kotlin.math.abs
+
 /**
  * Campos que se pueden extraer del OCR de la caja de un medicamento.
  *
@@ -7,9 +9,12 @@ package com.andres.pillremind.domain.parsing
  */
 data class BoxFields(
     val name: String? = null,
+    val nameCandidates: List<String> = emptyList(),
+    val nameConfident: Boolean = true,
     val strengthDoseText: String? = null,
     val strengthUnit: String? = null,
     val strengthText: String? = null,
+    val presentationText: String? = null,
     val form: String? = null,
     val intakeDoseText: String? = null,
     val intakeUnit: String? = null
@@ -19,7 +24,9 @@ data class BoxFields(
  * Parser heurístico del texto de la cara frontal de una caja.
  *
  * No pretende ser perfecto: busca el nombre, la concentración y la forma
- * farmacéutica, y deja el resto para la revisión manual.
+ * farmacéutica, y deja el resto para la revisión manual. Cuando recibe la
+ * geometría que devuelve el OCR, elige el nombre por tamaño y posición en lugar
+ * de por orden de aparición.
  */
 object BoxTextParser {
 
@@ -28,6 +35,16 @@ object BoxTextParser {
             "certificado|dirección|direccion|tel|farmacéutico|farmaceutico|" +
             "laboratorio|S\\.?A\\.?|EFG|ORGANON|SIDUS|SANDOZ|NOVARTIS|STADA|" +
             "ASTRAZENECA|CINFA|NORMON|conservar|agitar|leer|medicamento)\\b"
+    )
+
+    /**
+     * Palabras que describen el producto o el envase, no su nombre comercial.
+     * Se filtran solo al elegir el nombre; la concentración y la forma se siguen
+     * leyendo de esas líneas.
+     */
+    private val genericNameNoise = Regex(
+        "(?i)\\b(cannabidiol|cbd|thc|sin sabor|hidr[oó]fila|f[ií]sica|" +
+            "sabor|aroma)\\b"
     )
 
     private val strength = Regex(
@@ -52,22 +69,52 @@ object BoxTextParser {
     )
 
     /**
-     * Analiza el texto completo de la caja.
+     * Analiza el texto completo de la caja sin geometría.
+     *
+     * Es el modo que usan los tests y las fuentes de texto que no conservan
+     * posiciones. Mantiene el comportamiento anterior.
      */
-    fun parse(text: String): BoxFields {
-        val lines = text.lines().map { it.trim() }.filter { it.isNotBlank() }
-        val useful = lines.filterNot(::isNoise)
+    fun parse(text: String): BoxFields = parse(text, emptyList(), requireGeometry = false)
 
-        val strengthMatch = useful.firstNotNullOfOrNull { strength.find(it) }
-        val strengthLine = strengthMatch?.let { match ->
-            useful.firstOrNull { it.contains(match.value, ignoreCase = true) }
+    /**
+     * Analiza el resultado del OCR conservando la posición de cada línea.
+     *
+     * Si ML Kit no devuelve geometría, el nombre no se da por seguro: se
+     * ofrecen los candidatos y el usuario decide.
+     */
+    fun parse(ocr: OcrResult): BoxFields =
+        parse(ocr.text, ocr.lines, requireGeometry = true)
+
+    internal fun parse(
+        text: String,
+        lines: List<OcrLine>,
+        requireGeometry: Boolean
+    ): BoxFields {
+        val allLines = buildLines(text, lines)
+        val useful = allLines.filterNot { isNoise(it.text) }
+        val usefulText = useful.map { it.text }
+
+        val strengthMatches = useful.flatMap { line ->
+            strength.findAll(line.text).map { match -> StrengthMatch(match, line) }.toList()
         }
+        val concentration = strengthMatches.firstOrNull {
+            !isMillilitre(it.match.groupValues[2])
+        }
+        val volume = strengthMatches.firstOrNull {
+            isMillilitre(it.match.groupValues[2])
+        }
+        val strengthMatch = concentration?.match
+        val strengthLine = concentration?.line?.text
+        val presentationText = volume
+            ?.takeIf { !it.line.text.contains('/') }
+            ?.let { formatPresentation(it.match) }
+
         val formLine = formWords.firstNotNullOfOrNull { word ->
-            useful.firstOrNull { line -> line.contains(word, true) }
+            usefulText.firstOrNull { line -> line.contains(word, true) }
         }
         val form = formLine?.let(::canonicalForm)
 
-        val intakeMatch = useful.firstNotNullOfOrNull { intake.find(it) }
+        val intakeMatch = usefulText.firstNotNullOfOrNull { intake.find(it) }
         val explicitIntake = intakeMatch?.let {
             it.groupValues[1] to mapIntakeUnit(it.groupValues[2])
         }
@@ -83,10 +130,19 @@ object BoxTextParser {
         }
         val intakePair = explicitIntake ?: impliedIntake
 
-        val name = pickName(useful, strengthMatch, formLine, intakeMatch)
+        val nameGuess = pickName(
+            lines = useful,
+            strengthMatch = strengthMatch,
+            strengthValues = strengthMatches.map { it.match.value }.toSet(),
+            formLine = formLine,
+            intakeMatch = intakeMatch,
+            requireGeometry = requireGeometry
+        )
 
         return BoxFields(
-            name = name,
+            name = nameGuess.name,
+            nameCandidates = nameGuess.candidates,
+            nameConfident = nameGuess.confident,
             strengthDoseText = strengthMatch?.groupValues?.get(1),
             strengthUnit = strengthMatch?.groupValues?.get(2)?.let(::normalizeUnit),
             strengthText = when {
@@ -94,10 +150,23 @@ object BoxTextParser {
                 strengthLine?.contains('/') == true -> strengthLine
                 else -> strengthMatch.value
             },
+            presentationText = presentationText,
             form = form,
             intakeDoseText = intakePair?.first,
             intakeUnit = intakePair?.second
         )
+    }
+
+    private fun buildLines(text: String, lines: List<OcrLine>): List<CandidateLine> {
+        if (lines.isNotEmpty()) {
+            return lines
+                .map { CandidateLine(it.text.trim(), it) }
+                .filter { it.text.isNotBlank() }
+        }
+        return text.lines()
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .map { CandidateLine(it, null) }
     }
 
     private fun isNoise(line: String): Boolean {
@@ -107,43 +176,118 @@ object BoxTextParser {
         if (line.startsWith("Cada ", ignoreCase = true)) return true
         if (line.startsWith("Fórmula", ignoreCase = true) ||
             line.startsWith("Formula", ignoreCase = true)
-        ) return true
+        ) {
+            return true
+        }
         return false
     }
 
+    /**
+     * Elige el nombre y calcula si hay suficiente confianza para rellenarlo.
+     *
+     * Con geometría, la altura de la línea es la señal principal: el nombre
+     * comercial suele ser el texto más grande. Un texto pequeño en la franja
+     * superior (marca, logo) se penaliza. Sin geometría se conserva el orden de
+     * aparición.
+     */
     private fun pickName(
-        lines: List<String>,
+        lines: List<CandidateLine>,
         strengthMatch: MatchResult?,
+        strengthValues: Set<String>,
         formLine: String?,
-        intakeMatch: MatchResult?
-    ): String? {
+        intakeMatch: MatchResult?,
+        requireGeometry: Boolean
+    ): NameGuess {
         val candidates = lines.filter { line ->
-            line.length in 3..40 &&
-                line.any(Char::isLetter) &&
-                line.firstOrNull()?.isLowerCase() != true &&
-                !line.trimEnd().endsWith(".") &&
-                line.count(Char::isWhitespace) <= 4 &&
-                (strengthMatch == null || !line.contains(strengthMatch.value, true)) &&
-                (formLine == null || line != formLine) &&
-                (intakeMatch == null || !line.contains(intakeMatch.value, true))
-        }
-
-        val chosen = candidates.firstOrNull { it.contains('®') }
-            ?: candidates.firstOrNull()
-
-        if (chosen != null) return cleanName(chosen).takeIf { it.isNotBlank() }
-
-        // Si toda la información está en la misma línea, usa el texto anterior
-        // a la concentración: "IBUPROFENO 600 MG COMPRIMIDOS".
-        val fallback = strengthMatch?.let { match ->
-            strengthLinePrefix(lines, match.value)
-        }?.takeIf { text ->
+            val text = line.text
             text.length in 3..40 &&
                 text.any(Char::isLetter) &&
-                formWords.none { text.contains(it, true) }
+                text.firstOrNull()?.isLowerCase() != true &&
+                !text.trimEnd().endsWith(".") &&
+                text.count(Char::isWhitespace) <= 4 &&
+                !genericNameNoise.matches(text.trim()) &&
+                strengthValues.none { text.contains(it, true) } &&
+                (formLine == null || text != formLine) &&
+                (intakeMatch == null || !text.contains(intakeMatch.value, true))
         }
 
-        return fallback?.let(::cleanName)?.takeIf { it.isNotBlank() }
+        val hasGeometry = lines.any { it.box != null }
+
+        if (candidates.isEmpty()) {
+            val fallback = strengthMatch
+                ?.let { strengthLinePrefix(lines.map { it.text }, it.value) }
+                ?.takeIf { text ->
+                    text.length in 3..40 &&
+                        text.any(Char::isLetter) &&
+                        formWords.none { text.contains(it, true) }
+                }
+                ?.let(::cleanName)
+                ?.takeIf { it.isNotBlank() }
+            return NameGuess(
+                name = if (requireGeometry) null else fallback,
+                candidates = listOfNotNull(fallback),
+                confident = !requireGeometry && fallback != null
+            )
+        }
+
+        if (!hasGeometry) {
+            val chosen = candidates.firstOrNull { it.text.contains('®') }
+                ?: candidates.first()
+            val names = candidates
+                .mapNotNull { cleanName(it.text).takeIf(String::isNotBlank) }
+                .distinctBy { it.lowercase() }
+                .take(MAX_NAME_CANDIDATES)
+            val name = cleanName(chosen.text).takeIf { it.isNotBlank() }
+            return NameGuess(
+                name = if (requireGeometry) null else name,
+                candidates = names,
+                confident = !requireGeometry && name != null
+            )
+        }
+
+        val scored = candidates
+            .mapNotNull { line ->
+                val name = cleanName(line.text)
+                if (name.isBlank()) null else ScoredName(name, nameScore(line))
+            }
+            .sortedByDescending { it.score }
+            .distinctBy { it.name.lowercase() }
+
+        if (scored.isEmpty()) {
+            return NameGuess(null, emptyList(), confident = false)
+        }
+
+        val best = scored.first()
+        val second = scored.getOrNull(1)
+        val confident = best.score >= MIN_NAME_SCORE &&
+            (second == null || best.score >= second.score * NAME_MARGIN)
+
+        return NameGuess(
+            name = if (confident) best.name else null,
+            candidates = scored.take(MAX_NAME_CANDIDATES).map { it.name },
+            confident = confident
+        )
+    }
+
+    /**
+     * Puntuación orientativa del nombre. La altura manda; el área y la
+     * centralidad desempatan. Los valores son deliberadamente conservadores:
+     * es preferible enseñar candidatos a rellenar un nombre incorrecto.
+     */
+    private fun nameScore(line: CandidateLine): Float {
+        val box = line.box ?: return 0f
+        val height = box.height
+        val area = box.width * height
+        val centrality = 1f - abs(box.centerY - 0.5f)
+        val topPenalty = if (box.top < TOP_BAND && height < TOP_BAND_MAX_HEIGHT) {
+            TOP_PENALTY
+        } else {
+            1f
+        }
+        val trademark = if (line.text.contains('®')) TRADEMARK_BONUS else 1f
+        return (height * 2.5f + area * 0.5f + centrality * 0.2f) *
+            topPenalty *
+            trademark
     }
 
     private fun strengthLinePrefix(lines: List<String>, strengthValue: String): String? {
@@ -156,6 +300,15 @@ object BoxTextParser {
             .replace("®", "")
             .replace(Regex("[\\s\\d().,-]+$"), "")
             .trim()
+
+    private fun formatPresentation(match: MatchResult): String {
+        val dose = match.groupValues[1]
+        val unit = normalizeUnit(match.groupValues[2]) ?: match.groupValues[2]
+        return "$dose $unit"
+    }
+
+    private fun isMillilitre(unit: String): Boolean =
+        unit.lowercase() in setOf("ml", "mililitros", "mililitro")
 
     private fun canonicalForm(line: String): String = when {
         line.contains("comprim", true) -> "comprimidos"
@@ -196,6 +349,36 @@ object BoxTextParser {
         "mcg", "µg", "μg", "microgramos", "microgramo" -> "mcg"
         "ml", "mililitros", "mililitro" -> "ml"
         "ui" -> "UI"
+        "%" -> "%"
         else -> null
     }
+
+    private data class CandidateLine(
+        val text: String,
+        val box: OcrLine?
+    )
+
+    private data class StrengthMatch(
+        val match: MatchResult,
+        val line: CandidateLine
+    )
+
+    private data class ScoredName(
+        val name: String,
+        val score: Float
+    )
+
+    private data class NameGuess(
+        val name: String?,
+        val candidates: List<String>,
+        val confident: Boolean
+    )
+
+    private const val MAX_NAME_CANDIDATES = 3
+    private const val MIN_NAME_SCORE = 0.10f
+    private const val NAME_MARGIN = 1.25f
+    private const val TOP_BAND = 0.18f
+    private const val TOP_BAND_MAX_HEIGHT = 0.09f
+    private const val TOP_PENALTY = 0.4f
+    private const val TRADEMARK_BONUS = 1.2f
 }
