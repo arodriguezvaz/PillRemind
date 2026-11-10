@@ -18,9 +18,11 @@ rutas habituales de cada marca.
 ## Antes de empezar
 
 - Necesitas **Android 8.0 (API 26) o superior**.
-- El APK ocupa unos **15 MB**; deja algo de espacio libre en el móvil.
+- El APK ocupa unos **16 MB**; deja algo de espacio libre en el móvil.
 - No hace falta cuenta ni conexión para usar la app: todos los datos se guardan en el
-  móvil. La aplicación solo usa internet para comprobar si hay actualizaciones.
+  móvil. La aplicación usa internet para comprobar si hay actualizaciones y, solo si
+  escaneas un medicamento y aceptas el consentimiento, para consultar el CN en CIMA.
+  El escaneo necesita Google Play Services; el resto de la app funciona sin conexión.
 
 ## Paso 1. Abre la página de la última versión
 
