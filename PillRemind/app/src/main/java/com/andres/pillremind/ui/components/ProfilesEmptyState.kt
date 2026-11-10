@@ -1,13 +1,19 @@
 package com.andres.pillremind.ui.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -32,27 +39,17 @@ import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
 
-/** Tamaño del FAB de Material 3 usado para colocar el aviso encima. */
-private val FabSize = 56.dp
-
-/** Margen que el Scaffold deja entre el FAB y el borde de la pantalla. */
-private val FabMargin = 16.dp
-
 /** Tamaño de la flecha que señala el FAB. */
-private val HintIconSize = 24.dp
+private val HintIconSize = 48.dp
 
-/** Margen derecho para centrar la flecha con el FAB. */
-private val HintEndPadding = FabMargin + (FabSize - HintIconSize) / 2f
-
-/** Separación entre el aviso y la parte superior del FAB. */
-private val HintBottomPadding = FabMargin + FabSize + AppSpacing.xs
+/** Desplazamiento de la flecha para dirigir la mirada hacia el FAB. */
+private val HintIconAnimation = AppSpacing.xxs
 
 /**
  * Estado vacío de la pantalla de selección de perfiles.
  *
- * Muestra un mensaje para crear el primer perfil y un aviso con una flecha que
- * apunta al FAB de añadir. El aviso se coloca a partir de la geometría del FAB
- * para quedar justo encima de él.
+ * Centra el mensaje para crear el primer perfil y coloca debajo una flecha
+ * grande que lleva la mirada hacia el FAB de añadir.
  *
  * @param modifier Modificador para el estado vacío.
  */
@@ -61,85 +58,102 @@ fun ProfilesEmptyState(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = AppSpacing.md),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = AppSpacing.md),
-            contentAlignment = Alignment.Center,
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = AppElevation),
         ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = AppElevation),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(AppSpacing.xl),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(AppSpacing.xl),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_person_add),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(AppSpacing.md)
-                                .size(32.dp),
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(AppSpacing.sm))
-                    Text(
-                        text = stringResource(R.string.profiles_empty_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(modifier = Modifier.height(AppSpacing.xs))
-                    Text(
-                        text = stringResource(R.string.profiles_empty_body),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_person_add),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(AppSpacing.md)
+                            .size(32.dp),
                     )
                 }
+                Spacer(modifier = Modifier.height(AppSpacing.sm))
+                Text(
+                    text = stringResource(R.string.profiles_empty_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.height(AppSpacing.xs))
+                Text(
+                    text = stringResource(R.string.profiles_empty_body),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
+        Spacer(modifier = Modifier.height(AppSpacing.lg))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    start = AppSpacing.md,
-                    end = HintEndPadding,
-                    bottom = HintBottomPadding,
-                ),
+                .padding(end = AppSpacing.xxs),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(R.string.profiles_empty_hint),
                 modifier = Modifier.weight(1f, fill = false),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.End,
             )
-            Spacer(modifier = Modifier.width(AppSpacing.xxs))
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_downward),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(HintIconSize),
-            )
+            Spacer(modifier = Modifier.width(AppSpacing.xs))
+            ArrowToAddButton()
         }
     }
+}
+
+/**
+ * Flecha hacia abajo que apunta al FAB con un pequeño movimiento repetido.
+ */
+@Composable
+private fun ArrowToAddButton() {
+    val transition = rememberInfiniteTransition(label = "flecha_perfil")
+    val offset by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = HintIconAnimation.value,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 700,
+                easing = FastOutSlowInEasing,
+            ),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "desplazamiento_flecha",
+    )
+
+    Icon(
+        imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_downward),
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.primary,
+        modifier = Modifier
+            .size(HintIconSize)
+            .offset(y = offset.dp),
+    )
 }
 
 @Preview(showBackground = true, name = "Perfiles vacío")

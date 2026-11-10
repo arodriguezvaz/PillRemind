@@ -257,10 +257,10 @@ ProfilesEmptyState(modifier)
 ```
 
 - Estado vacío de la selección de perfiles: card centrada con icono
-  `ic_person_add`, título y descripción, y aviso con flecha `ic_arrow_downward`
-  justo encima del FAB.
-- Calcula la posición del aviso a partir de la geometría del FAB de Material 3
-  para centrar la flecha sobre él.
+  `ic_person_add`, título y descripción; debajo, aviso con flecha
+  `ic_arrow_downward` que apunta al FAB de añadir.
+- La flecha es grande, usa `primary` y tiene un movimiento sutil para dirigir
+  la mirada desde el mensaje central hasta el FAB.
 
 ### `MedicationCard` (`MedicationCard.kt`)
 
