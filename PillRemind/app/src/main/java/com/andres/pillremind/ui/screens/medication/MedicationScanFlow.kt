@@ -983,7 +983,12 @@ private fun ConsentDialog(
     AlertDialog(
         onDismissRequest = onDecline,
         title = { Text(stringResource(R.string.scan_cn_consent_title)) },
-        text = { Text(stringResource(R.string.scan_cn_consent_message)) },
+        text = {
+            Text(
+                text = stringResource(R.string.scan_cn_consent_message),
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            )
+        },
         confirmButton = {
             TextButton(onClick = onGrant) {
                 Text(stringResource(R.string.scan_cn_consent_accept))
