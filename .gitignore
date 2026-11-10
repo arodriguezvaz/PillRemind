@@ -13,3 +13,6 @@ skills-lock.json
 *.p12
 keystore.properties
 google-services.json
+
+# Mockups locales de UI (no versionados)
+/doc/mockups/
