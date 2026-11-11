@@ -30,8 +30,10 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
 import com.andres.pillremind.domain.model.visualState
+import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppEmptyState
 import com.andres.pillremind.ui.components.BlankCard
+import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.IntakeCard
 import com.andres.pillremind.ui.components.history.HistoryDayHeader
 import com.andres.pillremind.ui.components.statistics.StatisticsBanner
@@ -75,11 +77,14 @@ fun homeTopBarTitle(): String {
  *
  * @param modifier Modificador opcional para la pantalla.
  * @param onStatisticsClick Acción ejecutada al pulsar el banner de resumen.
+ * @param onImportMedicationsClick Acción ejecutada al abrir la importación de
+ *   medicamentos desde PDF en el estado vacío.
  */
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onStatisticsClick: () -> Unit = {},
+    onImportMedicationsClick: () -> Unit = {},
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
@@ -141,6 +146,16 @@ fun HomeScreen(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth(),
+                        action = {
+                            AppButton(
+                                text = stringResource(R.string.medication_import_action),
+                                onClick = onImportMedicationsClick,
+                                size = ButtonSize.Large,
+                                leadingIcon = ImageVector.vectorResource(
+                                    R.drawable.ic_picture_as_pdf
+                                ),
+                            )
+                        },
                     )
                 }
 

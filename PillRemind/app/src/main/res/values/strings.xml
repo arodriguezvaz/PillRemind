@@ -295,7 +295,7 @@
     <string name="medication_add_title">Añadir medicamento</string>
     <string name="medication_search_placeholder">Buscar medicamento…</string>
     <string name="medication_empty_title">Aún no tienes medicamentos</string>
-    <string name="medication_empty_body">Crea un medicamento para empezar a organizar tus tomas.</string>
+    <string name="medication_empty_body">Crea un medicamento o importa tu hoja de medicación del SERGAS en PDF para añadirlos todos de una vez.</string>
     <string name="medication_search_no_results">No hay resultados para «%1$s»</string>
     <string name="save_missing_fields">Faltan: %1$s</string>
     <string name="medication_missing_schedule">pauta y al menos una hora</string>
@@ -404,6 +404,7 @@
     <string name="profile_import_medications">Importar desde PDF</string>
     <string name="profile_import_medications_description">Añade varios medicamentos desde la hoja de medicación activa</string>
     <string name="medication_import_title">Importar medicamentos</string>
+    <string name="medication_import_action">Importar desde PDF</string>
     <string name="medication_import_pick_title">Importar desde PDF</string>
     <string name="medication_import_pick_text">Selecciona la hoja de medicación activa. Los datos se reconocerán automáticamente y después podrás revisarlos antes de guardarlos.</string>
     <string name="medication_import_help_row_title">Qué PDF funciona y dónde conseguirlo</string>

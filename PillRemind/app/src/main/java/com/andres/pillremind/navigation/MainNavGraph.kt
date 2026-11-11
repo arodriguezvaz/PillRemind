@@ -66,6 +66,11 @@ fun MainNavigationGraph(
             launchSingleTop = true
         }
     }
+    val openMedicationImport = {
+        navController.navigate(MedicationScreens.MedicationImportScreen.route) {
+            launchSingleTop = true
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -80,7 +85,8 @@ fun MainNavigationGraph(
         //Home screen donde se ven las tomas del día
         composable(BottomBarScreens.Home.route) {
             HomeScreen(
-                onStatisticsClick = openStatistics
+                onStatisticsClick = openStatistics,
+                onImportMedicationsClick = openMedicationImport,
             )
         }
         composable(BottomBarScreens.Medications.route) {
@@ -90,6 +96,7 @@ fun MainNavigationGraph(
                         MedicationScreens.MedicationSeeScreen.createRoute(id)
                     )
                 },
+                onImportMedicationsClick = openMedicationImport,
             )
         }
 
@@ -110,11 +117,7 @@ fun MainNavigationGraph(
                     onTopBarChange
                 ),
                 onStatisticsClick = openStatistics,
-                onImportMedicationsClick = {
-                    navController.navigate(MedicationScreens.MedicationImportScreen.route) {
-                        launchSingleTop = true
-                    }
-                },
+                onImportMedicationsClick = openMedicationImport,
                 onArchivedMedicationsClick = {
                     navController.navigate(MedicationScreens.ArchivedMedicationsScreen.route)
                 },

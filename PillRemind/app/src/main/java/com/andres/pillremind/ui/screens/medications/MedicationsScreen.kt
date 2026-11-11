@@ -22,9 +22,11 @@ import androidx.compose.ui.res.vectorResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
+import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.AppEmptyState
 import com.andres.pillremind.ui.components.AppSearchField
 import com.andres.pillremind.ui.components.BlankCard
+import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.MedicationCard
 import com.andres.pillremind.ui.theme.AppSpacing
 
@@ -36,12 +38,15 @@ import com.andres.pillremind.ui.theme.AppSpacing
  *
  * @param modifier Modificador opcional para la pantalla.
  * @param onMedicationClick Callback que recibe el id del medicamento seleccionado.
+ * @param onImportMedicationsClick Acción ejecutada al abrir la importación de
+ *   medicamentos desde PDF en el estado vacío.
  * @param medicationsViewModel ViewModel que gestiona la lógica de medicamentos.
  */
 @Composable
 fun MedicationsScreen(
     modifier: Modifier = Modifier,
     onMedicationClick: (medicationId: Int) -> Unit,
+    onImportMedicationsClick: () -> Unit,
     medicationsViewModel: MedicationsViewModel = hiltViewModel()
 ) {
 
@@ -98,6 +103,16 @@ fun MedicationsScreen(
                         .weight(1f)
                         .fillMaxWidth()
                         .padding(horizontal = AppSpacing.md),
+                    action = {
+                        AppButton(
+                            text = stringResource(R.string.medication_import_action),
+                            onClick = onImportMedicationsClick,
+                            size = ButtonSize.Large,
+                            leadingIcon = ImageVector.vectorResource(
+                                R.drawable.ic_picture_as_pdf
+                            ),
+                        )
+                    },
                 )
             }
 

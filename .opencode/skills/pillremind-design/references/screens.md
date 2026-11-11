@@ -80,7 +80,7 @@ Column(fillMaxSize + padding(AppSpacing.md), spacedBy = AppSpacing.sm)
 ├── StatisticsBanner(...)  // solo si hay tomas evaluadas en 7 días
 ├── aviso de tomas pendientes de ayer
 └── when
-    ├── sin medicamentos → AppEmptyState (weight(1f))
+    ├── sin medicamentos → AppEmptyState (weight(1f), acción «Importar desde PDF»)
     ├── sin tomas pero con medicamentos → BlankCard(home_empty_today)
     └── LazyColumn(
           contentPadding = PaddingValues(vertical = AppSpacing.sm),
@@ -91,7 +91,10 @@ Column(fillMaxSize + padding(AppSpacing.md), spacedBy = AppSpacing.sm)
 - Título de la top bar: `home_title_today` con la fecha formateada en español;
   `showLogo = true`, resuelto en `MainScreen` a partir de la ruta.
 - El estado vacío distingue un perfil sin medicamentos (`hasActiveMedications`)
-  de un perfil con medicamentos pero sin tomas para hoy.
+  de un perfil con medicamentos pero sin tomas para hoy. El caso sin
+  medicamentos ofrece «Importar desde PDF», que abre
+  `MedicationScreens.MedicationImportScreen`; el FAB sigue creando una ficha
+  manual.
 - Usa `collectAsStateWithLifecycle()` y refresca el resumen con
   `LifecycleEventEffect(ON_RESUME)`.
 - El banner abre `StatisticsScreens.Statistics`; se oculta si no hay ninguna
@@ -112,9 +115,9 @@ Column(fillMaxSize)
         └── MedicationCard(...)
 ```
 
-- Estado vacío: `AppEmptyState` cuando el perfil no tiene medicamentos;
-  `BlankCard(medication_search_no_results)` cuando el filtro no devuelve
-  resultados.
+- Estado vacío: `AppEmptyState` cuando el perfil no tiene medicamentos, con la
+  acción «Importar desde PDF»; `BlankCard(medication_search_no_results)`
+  cuando el filtro no devuelve resultados.
 - El texto de `AppSearchField` es transitorio: se limpia al salir de la
   pantalla (cambio de pestaña o ficha), no al rotar ni al cambiar de tema.
 - Cada item lleva `key = { it.id }`.
