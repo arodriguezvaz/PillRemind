@@ -65,6 +65,7 @@ import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.settings.SettingsCard
 import com.andres.pillremind.ui.components.settings.SettingsLinkItem
 import com.andres.pillremind.ui.components.settings.SettingsRadioItem
+import com.andres.pillremind.ui.components.settings.SettingsToggleItem
 import com.andres.pillremind.ui.screens.main.MainTopBar
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
@@ -88,6 +89,7 @@ fun SettingsScreen(
 ) {
 
     val themeMode by settingsViewModel.themeMode.collectAsStateWithLifecycle()
+    val cimaConsent by settingsViewModel.cimaConsent.collectAsStateWithLifecycle()
     val backupState by settingsViewModel.backupState.collectAsStateWithLifecycle()
     val updateCheckState by settingsViewModel.updateCheckState.collectAsStateWithLifecycle()
 
@@ -394,6 +396,18 @@ fun SettingsScreen(
 
             // Tarjeta legal
             SettingsCard(title = stringResource(R.string.settings_legal_title)) {
+                SettingsToggleItem(
+                    label = stringResource(R.string.settings_cima_title),
+                    checked = cimaConsent,
+                    onCheckedChange = { settingsViewModel.setCimaConsent(it) },
+                )
+                Text(
+                    text = stringResource(R.string.settings_cima_description),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = AppSpacing.xs),
+                )
+                Spacer(Modifier.height(AppSpacing.sm))
                 SettingsLinkItem(
                     label = stringResource(R.string.settings_privacy_policy),
                     onClick = { legalDocument = LegalDocument.PrivacyPolicy }

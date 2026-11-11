@@ -111,6 +111,12 @@ class SettingsViewModel @Inject constructor(
     val themeMode: StateFlow<ThemeMode> = sessionManager.themeMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ThemeMode.SYSTEM)
 
+    /**
+     * Indica si el usuario aceptó consultar CIMA al escanear un medicamento.
+     */
+    val cimaConsent: StateFlow<Boolean> = sessionManager.cimaConsent
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     private val _backupState = MutableStateFlow<BackupUiState>(BackupUiState.Idle)
 
     /**
@@ -143,6 +149,13 @@ class SettingsViewModel @Inject constructor(
      */
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch { sessionManager.setThemeMode(mode) }
+    }
+
+    /**
+     * Guarda el consentimiento para consultar CIMA.
+     */
+    fun setCimaConsent(granted: Boolean) {
+        viewModelScope.launch { sessionManager.setCimaConsent(granted) }
     }
 
     /**

@@ -57,9 +57,11 @@ caja?».
    mano.
 2. Pulsa **Analizar**. La app lee el código, busca el CN en CIMA y, si no hay
    ficha, lee el texto de la caja con OCR.
-3. La primera vez te pedirá permiso para consultar CIMA. Solo se envía el CN a la
-   AEMPS; no se envían perfiles, medicamentos ni tomas, y el CN no se guarda. La
-   AEMPS recibe la IP y datos técnicos de la conexión.
+3. Puedes dar permiso para consultar CIMA en la bienvenida; si no lo haces, te lo
+   pedirá la primera vez que escanees. Solo se envía el CN a la AEMPS; no se
+   envían perfiles, medicamentos ni tomas, y el CN no se guarda. La AEMPS recibe
+   la IP y datos técnicos de la conexión. Puedes retirar el consentimiento en
+   **Ajustes → Legal**.
 4. En **Revisar medicamento**, comprueba el nombre, la dosis y la unidad. Si la
    app no está segura del nombre, el campo aparece vacío y verás varios
    candidatos: elige el correcto o escríbelo. Si detecta un volumen como
@@ -72,6 +74,17 @@ Las fotos se procesan en el móvil y no se suben a ningún servidor. El escaneo 
 los modelos de ML Kit de Google Play Services; en un móvil sin Play Services puede
 no estar disponible. Si CIMA no encuentra el CN, la app usa el texto de la caja; si
 no se puede leer nada, puedes rellenar la ficha a mano.
+
+### Añadir medicamentos desde un PDF
+
+Desde el perfil, pulsa **Importar desde PDF** y elige la hoja de medicación activa.
+La app lee el documento en el móvil, propone los medicamentos que encuentra y los
+muestra para revisarlos: comprueba el nombre, la dosis y la pauta, y descarta los
+que no quieras. Los medicamentos que ya existen no se modifican.
+
+El PDF no se guarda ni se envía a ningún servidor. La lectura es una ayuda: si el
+documento tiene un formato distinto o la pauta no se interpreta bien, corrige los
+datos antes de guardarlos.
 
 ## 4. Inicio: las tomas de hoy
 

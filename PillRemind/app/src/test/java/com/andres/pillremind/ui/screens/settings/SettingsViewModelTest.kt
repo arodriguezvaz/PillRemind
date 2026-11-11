@@ -57,6 +57,7 @@ class SettingsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         every { sessionManager.themeMode } returns flowOf(ThemeMode.SYSTEM)
+        every { sessionManager.cimaConsent } returns flowOf(true)
         every { updateRepository.installedAppInfo() } returns InstalledAppInfo(
             versionCode = 2,
             versionName = "1.1.0",
@@ -83,6 +84,13 @@ class SettingsViewModelTest {
         viewModel.setThemeMode(ThemeMode.DARK)
 
         coVerify { sessionManager.setThemeMode(ThemeMode.DARK) }
+    }
+
+    @Test
+    fun `guarda el consentimiento de CIMA`() {
+        viewModel.setCimaConsent(true)
+
+        coVerify { sessionManager.setCimaConsent(true) }
     }
 
     @Test

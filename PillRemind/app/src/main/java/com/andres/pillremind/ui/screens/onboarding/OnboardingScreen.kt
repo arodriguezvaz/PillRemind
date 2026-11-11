@@ -26,6 +26,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -56,6 +59,7 @@ import com.andres.pillremind.notifications.notificationSettingsIntent
 import com.andres.pillremind.notifications.shouldShowNotificationRationale
 import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.ButtonSize
+import com.andres.pillremind.ui.components.CimaConsentDialog
 import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
@@ -69,6 +73,7 @@ fun OnboardingRoute(viewModel: OnboardingViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val activity = LocalActivity.current
+    var showCimaConsentDialog by rememberSaveable { mutableStateOf(false) }
 
     val notificationLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -105,23 +110,35 @@ fun OnboardingRoute(viewModel: OnboardingViewModel = hiltViewModel()) {
                 }
             }
         },
+        onCimaClick = { showCimaConsentDialog = true },
         onComplete = viewModel::complete,
         onCompleteWithoutExactAlarms = viewModel::completeWithoutExactAlarms,
     )
+
+    if (showCimaConsentDialog) {
+        CimaConsentDialog(
+            onGrant = {
+                showCimaConsentDialog = false
+                viewModel.setCimaConsent(true)
+            },
+            onDecline = { showCimaConsentDialog = false },
+        )
+    }
 }
 
 /**
  * Pantalla de bienvenida del primer arranque.
  *
- * Presenta la marca y solicita los permisos de notificaciones y alarmas
- * exactas. Es una pantalla stateless: todo su estado llega desde
- * [OnboardingUiState].
+ * Presenta la marca, solicita los permisos de notificaciones y alarmas
+ * exactas y ofrece el consentimiento opcional para consultar CIMA. Es una
+ * pantalla stateless: todo su estado llega desde [OnboardingUiState].
  */
 @Composable
 fun OnboardingScreen(
     uiState: OnboardingUiState,
     onNotificationClick: () -> Unit,
     onExactAlarmClick: () -> Unit,
+    onCimaClick: () -> Unit,
     onComplete: () -> Unit,
     onCompleteWithoutExactAlarms: () -> Unit,
     modifier: Modifier = Modifier,
@@ -179,6 +196,24 @@ fun OnboardingScreen(
                     )
 
                     PermissionCard(
+                        icon = ImageVector.vectorResource(R.drawable.ic_medication),
+                        title = stringResource(R.string.onboarding_cima_title),
+                        description = stringResource(R.string.onboarding_cima_description),
+                        status = if (uiState.cimaConsent) {
+                            PermissionStatusUi.GRANTED
+                        } else {
+                            PermissionStatusUi.OPTIONAL
+                        },
+                        actionLabel = if (uiState.cimaConsent) {
+                            null
+                        } else {
+                            stringResource(R.string.onboarding_cima_allow)
+                        },
+                        onAction = onCimaClick,
+                        enabled = !uiState.isCimaSaving,
+                    )
+
+                    PermissionCard(
                         icon = ImageVector.vectorResource(R.drawable.ic_notifications),
                         title = stringResource(R.string.onboarding_notifications_title),
                         description = stringResource(R.string.onboarding_notifications_description),
@@ -214,7 +249,10 @@ fun OnboardingScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
-                    TextButton(onClick = onCompleteWithoutExactAlarms) {
+                    TextButton(
+                        onClick = onCompleteWithoutExactAlarms,
+                        enabled = !uiState.isCimaSaving,
+                    ) {
                         Text(stringResource(R.string.onboarding_exact_alarms_continue))
                     }
                 }
@@ -222,7 +260,7 @@ fun OnboardingScreen(
                 AppButton(
                     text = stringResource(R.string.onboarding_start),
                     onClick = onComplete,
-                    enabled = uiState.canContinue,
+                    enabled = uiState.canContinue && !uiState.isCimaSaving,
                     isLoading = uiState.isSaving,
                     size = ButtonSize.Large,
                 )
@@ -276,6 +314,7 @@ private fun PermissionCard(
     status: PermissionStatusUi,
     actionLabel: String?,
     onAction: () -> Unit,
+    enabled: Boolean = true,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -318,6 +357,7 @@ private fun PermissionCard(
                     text = label,
                     onClick = onAction,
                     size = ButtonSize.Large,
+                    enabled = enabled,
                 )
             }
         }
@@ -337,7 +377,8 @@ private fun PermissionStatusChip(status: PermissionStatusUi) {
         PermissionStatusUi.UNAVAILABLE ->
             MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
 
-        PermissionStatusUi.NOT_REQUIRED ->
+        PermissionStatusUi.NOT_REQUIRED,
+        PermissionStatusUi.OPTIONAL ->
             MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
     }
 
@@ -366,6 +407,7 @@ private enum class PermissionStatusUi {
     BLOCKED,
     UNAVAILABLE,
     NOT_REQUIRED,
+    OPTIONAL,
 }
 
 private fun PermissionStatusUi.labelRes(): Int = when (this) {
@@ -374,6 +416,7 @@ private fun PermissionStatusUi.labelRes(): Int = when (this) {
     PermissionStatusUi.BLOCKED -> R.string.onboarding_status_blocked
     PermissionStatusUi.UNAVAILABLE -> R.string.onboarding_status_unavailable
     PermissionStatusUi.NOT_REQUIRED -> R.string.onboarding_status_not_required
+    PermissionStatusUi.OPTIONAL -> R.string.onboarding_status_optional
 }
 
 private fun NotificationStatus.toUiStatus(): PermissionStatusUi = when (this) {
@@ -402,6 +445,7 @@ private fun OnboardingScreenPendingPreview() {
             ),
             onNotificationClick = {},
             onExactAlarmClick = {},
+            onCimaClick = {},
             onComplete = {},
             onCompleteWithoutExactAlarms = {},
         )
@@ -421,10 +465,12 @@ private fun OnboardingScreenGrantedPreview() {
                 notificationStatus = NotificationStatus.GRANTED,
                 notificationAction = NotificationAction.NONE,
                 exactAlarmStatus = ExactAlarmStatus.GRANTED,
+                cimaConsent = true,
                 canContinue = true,
             ),
             onNotificationClick = {},
             onExactAlarmClick = {},
+            onCimaClick = {},
             onComplete = {},
             onCompleteWithoutExactAlarms = {},
         )

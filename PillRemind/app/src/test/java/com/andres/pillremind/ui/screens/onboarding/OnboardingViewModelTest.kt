@@ -14,6 +14,7 @@ import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -41,6 +42,7 @@ class OnboardingViewModelTest {
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         coEvery { sessionManager.completeOnboarding() } just Runs
+        every { sessionManager.cimaConsent } returns flowOf(false)
     }
 
     @After
@@ -81,6 +83,24 @@ class OnboardingViewModelTest {
 
         assertTrue(viewModel.uiState.value.canContinue)
         assertEquals(NotificationAction.NONE, viewModel.uiState.value.notificationAction)
+    }
+
+    @Test
+    fun `muestra el consentimiento de CIMA guardado`() {
+        every { sessionManager.cimaConsent } returns flowOf(true)
+
+        val viewModel = buildViewModel()
+
+        assertTrue(viewModel.uiState.value.cimaConsent)
+    }
+
+    @Test
+    fun `guarda el consentimiento de CIMA`() {
+        val viewModel = buildViewModel()
+
+        viewModel.setCimaConsent(true)
+
+        coVerify { sessionManager.setCimaConsent(true) }
     }
 
     @Test
