@@ -196,6 +196,24 @@ fun OnboardingScreen(
                     )
 
                     PermissionCard(
+                        icon = ImageVector.vectorResource(R.drawable.ic_medication),
+                        title = stringResource(R.string.onboarding_cima_title),
+                        description = stringResource(R.string.onboarding_cima_description),
+                        status = if (uiState.cimaConsent) {
+                            PermissionStatusUi.GRANTED
+                        } else {
+                            PermissionStatusUi.OPTIONAL
+                        },
+                        actionLabel = if (uiState.cimaConsent) {
+                            null
+                        } else {
+                            stringResource(R.string.onboarding_cima_allow)
+                        },
+                        onAction = onCimaClick,
+                        enabled = !uiState.isCimaSaving,
+                    )
+
+                    PermissionCard(
                         icon = ImageVector.vectorResource(R.drawable.ic_notifications),
                         title = stringResource(R.string.onboarding_notifications_title),
                         description = stringResource(R.string.onboarding_notifications_description),
@@ -214,24 +232,6 @@ fun OnboardingScreen(
                             onAction = onExactAlarmClick,
                         )
                     }
-
-                    PermissionCard(
-                        icon = ImageVector.vectorResource(R.drawable.ic_medication),
-                        title = stringResource(R.string.onboarding_cima_title),
-                        description = stringResource(R.string.onboarding_cima_description),
-                        status = if (uiState.cimaConsent) {
-                            PermissionStatusUi.GRANTED
-                        } else {
-                            PermissionStatusUi.OPTIONAL
-                        },
-                        actionLabel = if (uiState.cimaConsent) {
-                            null
-                        } else {
-                            stringResource(R.string.onboarding_cima_allow)
-                        },
-                        onAction = onCimaClick,
-                        enabled = !uiState.isCimaSaving,
-                    )
                 }
             }
 
