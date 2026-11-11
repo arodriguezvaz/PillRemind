@@ -3,9 +3,14 @@ package com.andres.pillremind.navigation
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -83,13 +88,13 @@ fun MainNavigationGraph(
         popExitTransition = { ExitTransition.None }
     ) {
         //Home screen donde se ven las tomas del día
-        composable(BottomBarScreens.Home.route) {
+        appComposable(BottomBarScreens.Home.route) {
             HomeScreen(
                 onStatisticsClick = openStatistics,
                 onImportMedicationsClick = openMedicationImport,
             )
         }
-        composable(BottomBarScreens.Medications.route) {
+        appComposable(BottomBarScreens.Medications.route) {
             MedicationsScreen(
                 onMedicationClick = { id ->
                     navController.navigate(
@@ -100,7 +105,7 @@ fun MainNavigationGraph(
             )
         }
 
-        composable(BottomBarScreens.Profile.route) {
+        appComposable(BottomBarScreens.Profile.route) {
             ProfileScreen(
                 profileMode = ProfileMode.View,
                 onDeletedClicked = {
@@ -124,10 +129,10 @@ fun MainNavigationGraph(
                 onHistoryClick = openHistory,
             )
         }
-        composable(StatisticsScreens.Statistics.route) {
+        appComposable(StatisticsScreens.Statistics.route) {
             StatisticsScreen()
         }
-        composable(
+        appComposable(
             route = StatisticsScreens.MedicationStatistics.route,
             arguments = listOf(navArgument("medicationId") {
                 type = NavType.IntType
@@ -135,7 +140,7 @@ fun MainNavigationGraph(
         ) {
             StatisticsScreen()
         }
-        composable(
+        appComposable(
             route = HistoryScreens.History.route,
             arguments = listOf(navArgument("medicationId") {
                 type = NavType.IntType
@@ -164,6 +169,47 @@ private fun topBarChangeFor(
 ): (TopBarState) -> Unit = { state -> onTopBarChange(route, state) }
 
 /**
+ * Superficie opaca común a los destinos de los grafos principales.
+ *
+ * Navigation Compose mantiene compuestos el destino actual y el anterior
+ * durante el gesto de retroceso predictivo. Si el destino no pinta su propio
+ * fondo, las cards del anterior se ven a través del actual. El color es el
+ * mismo que usa el `Scaffold` de `MainScreen` como `containerColor`.
+ *
+ * @param content Contenido del destino.
+ */
+@Composable
+private fun DestinationSurface(content: @Composable () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+        content = content,
+    )
+}
+
+/**
+ * Registra un destino envuelto en [DestinationSurface].
+ *
+ * Se usa en lugar de `composable` para que el fondo opaco sea una regla del
+ * grafo y no algo que haya que recordar en cada pantalla.
+ *
+ * @param route Ruta del destino.
+ * @param arguments Argumentos de navegación del destino.
+ * @param content Contenido del destino.
+ */
+private fun NavGraphBuilder.appComposable(
+    route: String,
+    arguments: List<NamedNavArgument> = emptyList(),
+    content: @Composable (NavBackStackEntry) -> Unit,
+) {
+    composable(route = route, arguments = arguments) { backStackEntry ->
+        DestinationSurface {
+            content(backStackEntry)
+        }
+    }
+}
+
+/**
  * Añade al grafo de navegación los destinos relacionados con la gestión
  * de medicamentos.
  *
@@ -187,7 +233,7 @@ fun NavGraphBuilder.medicationNavGraph(
         route = Graph.MEDICATION,
         startDestination = MedicationScreens.MedicationCreateScreen.route
     ) {
-        composable(
+        appComposable(
             route = MedicationScreens.MedicationSeeScreen.route,
             arguments = listOf(navArgument("medicationId") {
                 type = NavType.IntType
@@ -224,7 +270,7 @@ fun NavGraphBuilder.medicationNavGraph(
                 ),
             )
         }
-        composable(route = MedicationScreens.MedicationCreateScreen.route) {
+        appComposable(route = MedicationScreens.MedicationCreateScreen.route) {
             MedicationScreen(
                 onSaveClicked = { navController.popBackStack() },
                 medicationMode = MedicationMode.Create,
@@ -234,7 +280,7 @@ fun NavGraphBuilder.medicationNavGraph(
                 )
             )
         }
-        composable(route = MedicationScreens.MedicationImportScreen.route) {
+        appComposable(route = MedicationScreens.MedicationImportScreen.route) {
             MedicationImportScreen(
                 onSaved = { navController.popBackStack() },
                 onOpenMedication = { id, archived ->
@@ -249,7 +295,7 @@ fun NavGraphBuilder.medicationNavGraph(
                 },
             )
         }
-        composable(route = MedicationScreens.ArchivedMedicationsScreen.route) {
+        appComposable(route = MedicationScreens.ArchivedMedicationsScreen.route) {
             ArchivedMedicationsScreen(
                 onMedicationClick = { id ->
                     navController.navigate(
@@ -258,7 +304,7 @@ fun NavGraphBuilder.medicationNavGraph(
                 },
             )
         }
-        composable(
+        appComposable(
             route = MedicationScreens.ArchivedMedicationSeeScreen.route,
             arguments = listOf(navArgument("medicationId") {
                 type = NavType.IntType
