@@ -38,6 +38,8 @@ import com.andres.pillremind.ui.theme.PillRemindTheme
  * @param title Título del estado vacío.
  * @param description Descripción del estado vacío.
  * @param modifier Modificador para el estado vacío.
+ * @param action Contenido opcional bajo la descripción, normalmente la acción
+ *   principal disponible en ese estado vacío.
  */
 @Composable
 fun AppEmptyState(
@@ -45,6 +47,7 @@ fun AppEmptyState(
     title: String,
     description: String,
     modifier: Modifier = Modifier,
+    action: (@Composable () -> Unit)? = null,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -91,6 +94,10 @@ fun AppEmptyState(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
+                if (action != null) {
+                    Spacer(modifier = Modifier.height(AppSpacing.md))
+                    action()
+                }
             }
         }
     }
@@ -122,6 +129,29 @@ private fun AppEmptyStateDarkPreview() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(AppSpacing.md),
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Estado vacío con acción")
+@Composable
+private fun AppEmptyStateActionPreview() {
+    PillRemindTheme {
+        AppEmptyState(
+            icon = ImageVector.vectorResource(R.drawable.ic_medication),
+            title = stringResource(R.string.medication_empty_title),
+            description = stringResource(R.string.medication_empty_body),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(AppSpacing.md),
+            action = {
+                AppButton(
+                    text = stringResource(R.string.medication_import_action),
+                    onClick = {},
+                    size = ButtonSize.Large,
+                    leadingIcon = ImageVector.vectorResource(R.drawable.ic_picture_as_pdf),
+                )
+            },
         )
     }
 }

@@ -253,10 +253,12 @@ BlankCard(text, modifier)
 ### `AppEmptyState` (`AppEmptyState.kt`)
 
 ```kotlin
-AppEmptyState(icon, title, description, modifier)
+AppEmptyState(icon, title, description, modifier, action = null)
 ```
 
 - Card centrada con icono, título y descripción para estados vacíos.
+- `action` es un slot opcional bajo la descripción para la acción principal
+  del estado vacío; Inicio y Medicamentos muestran ahí «Importar desde PDF».
 - Se usa en Perfiles con `ic_person_add`, en Medicamentos con `ic_medication`
   y en Inicio cuando el perfil no tiene ningún medicamento.
 
