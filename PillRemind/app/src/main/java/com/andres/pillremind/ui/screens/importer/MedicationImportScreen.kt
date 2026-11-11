@@ -1,5 +1,8 @@
 package com.andres.pillremind.ui.screens.importer
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
@@ -43,6 +47,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
@@ -238,6 +243,7 @@ private fun ImportPickFileContent(
 private fun MedicationImportHelpSheet(onDismiss: () -> Unit) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     var openFailed by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
@@ -250,6 +256,7 @@ private fun MedicationImportHelpSheet(onDismiss: () -> Unit) {
             onOpenUrl = { url ->
                 openFailed = runCatching { uriHandler.openUri(url) }.isFailure
             },
+            onOpenSergasMobil = { openFailed = !openSergasMobil(context) },
             onClose = onDismiss
         )
     }
@@ -260,12 +267,14 @@ private fun MedicationImportHelpSheet(onDismiss: () -> Unit) {
  *
  * @param openFailed Indica que el último enlace no se pudo abrir.
  * @param onOpenUrl Abre un enlace en el navegador.
+ * @param onOpenSergasMobil Abre la app Sergas Móbil o su ficha en la tienda.
  * @param onClose Cierra la ayuda.
  */
 @Composable
 private fun ImportHelpContent(
     openFailed: Boolean,
     onOpenUrl: (String) -> Unit,
+    onOpenSergasMobil: () -> Unit,
     onClose: () -> Unit
 ) {
     Column(
@@ -325,7 +334,7 @@ private fun ImportHelpContent(
                     description = stringResource(
                         R.string.medication_import_help_sergas_mobil_description
                     ),
-                    onClick = { onOpenUrl(SERGAS_MOBIL_URL) }
+                    onClick = onOpenSergasMobil
                 )
                 if (openFailed) {
                     Text(
@@ -894,6 +903,7 @@ private fun ImportHelpContentPreview() {
         ImportHelpContent(
             openFailed = false,
             onOpenUrl = {},
+            onOpenSergasMobil = {},
             onClose = {}
         )
     }
@@ -904,6 +914,37 @@ private const val PDF_MIME_TYPE = "application/pdf"
 /** Web pública de É-Saúde, donde se consulta la medicación activa. */
 private const val ESAUDE_URL = "https://esaude.sergas.gal"
 
-/** Página oficial de la app Sergas Móbil. */
-private const val SERGAS_MOBIL_URL =
-    "https://www.sergas.gal/a-nosa-organizacion/aplicacion-mobil-sergas-mobil?idioma=es"
+/** Paquete de la app oficial Sergas Móbil. */
+private const val SERGAS_MOBIL_PACKAGE = "es.sergas.appbox"
+
+/** Ficha de Sergas Móbil en la tienda de aplicaciones del dispositivo. */
+private const val SERGAS_MOBIL_STORE_URI = "market://details?id=$SERGAS_MOBIL_PACKAGE"
+
+/** Alternativa web a la ficha de la tienda, para dispositivos sin tienda. */
+private const val SERGAS_MOBIL_STORE_URL =
+    "https://play.google.com/store/apps/details?id=$SERGAS_MOBIL_PACKAGE"
+
+/**
+ * Abre Sergas Móbil: la app si está instalada y, si no, su ficha en la tienda.
+ *
+ * @param context Contexto desde el que se lanza la intención.
+ * @return `true` si se pudo abrir la app o la tienda.
+ */
+internal fun openSergasMobil(context: Context): Boolean {
+    val launchIntent = context.packageManager.getLaunchIntentForPackage(SERGAS_MOBIL_PACKAGE)
+    if (launchIntent != null && context.tryStartActivity(launchIntent)) return true
+    return context.tryStartActivity(Intent(Intent.ACTION_VIEW, SERGAS_MOBIL_STORE_URI.toUri())) ||
+        context.tryStartActivity(Intent(Intent.ACTION_VIEW, SERGAS_MOBIL_STORE_URL.toUri()))
+}
+
+/**
+ * Lanza una intención sin propagar errores a la interfaz.
+ *
+ * @param intent Intención que se quiere abrir.
+ * @return `true` si el sistema encontró una app para abrirla.
+ */
+private fun Context.tryStartActivity(intent: Intent): Boolean = runCatching {
+    // Fuera de una Activity el sistema exige abrir en una tarea propia.
+    if (this !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    startActivity(intent)
+}.isSuccess

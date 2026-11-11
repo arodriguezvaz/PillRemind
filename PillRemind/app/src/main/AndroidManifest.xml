@@ -25,6 +25,9 @@
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
         </intent>
+        <!-- La ayuda de importación abre la app Sergas Móbil si está instalada;
+             desde Android 11 hay que declararla para poder consultarla. -->
+        <package android:name="es.sergas.appbox" />
     </queries>
 
     <application
