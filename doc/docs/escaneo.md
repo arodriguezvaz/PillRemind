@@ -186,8 +186,9 @@ Comportamiento:
 - Tiempo máximo: **7 segundos**.
 - Cuerpo máximo: **128 KB**.
 
-Antes de la primera consulta se muestra un diálogo de consentimiento
-(`scan_cn_consent_*`). Si el usuario acepta, se guarda la preferencia en
+El consentimiento se puede dar en la bienvenida, en **Ajustes → Legal** o en el
+diálogo (`scan_cn_consent_*`) que aparece antes de la primera consulta si aún no
+se ha concedido. Si el usuario acepta, se guarda la preferencia en
 `SessionManager.cimaConsent` y no se vuelve a preguntar hasta que la desactive en
 **Ajustes → Legal**. Si rechaza, no se envía nada y se usa el OCR o el formulario
 manual.

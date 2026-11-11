@@ -16,6 +16,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -29,16 +30,19 @@ data class OnboardingUiState(
     val notificationStatus: NotificationStatus = NotificationStatus.REQUESTABLE,
     val notificationAction: NotificationAction = NotificationAction.REQUEST,
     val exactAlarmStatus: ExactAlarmStatus = ExactAlarmStatus.NOT_REQUIRED,
+    val cimaConsent: Boolean = false,
     val showExactAlarmFallback: Boolean = false,
     val canContinue: Boolean = false,
     val isSaving: Boolean = false,
+    val isCimaSaving: Boolean = false,
 )
 
 /**
  * ViewModel de la bienvenida de primer arranque.
  *
  * Comprueba el estado real de los permisos cada vez que la pantalla vuelve a
- * primer plano y guarda en [SessionManager] que la bienvenida ya se completó.
+ * primer plano, observa el consentimiento de CIMA y guarda en [SessionManager]
+ * que la bienvenida ya se completó.
  *
  * @property sessionManager Gestor de sesión donde se persiste el flag.
  * @property reminderPermissions Comprobador de los permisos del sistema.
@@ -58,6 +62,11 @@ class OnboardingViewModel @Inject constructor(
 
     init {
         refresh(showNotificationRationale = false)
+        viewModelScope.launch {
+            sessionManager.cimaConsent.collect { granted ->
+                _uiState.update { it.copy(cimaConsent = granted) }
+            }
+        }
     }
 
     /**
@@ -125,10 +134,33 @@ class OnboardingViewModel @Inject constructor(
     }
 
     /**
+     * Guarda el consentimiento para consultar CIMA.
+     *
+     * La tarjeta es opcional: no afecta a si se puede continuar, pero se
+     * espera a que termine la escritura antes de cerrar la bienvenida.
+     */
+    fun setCimaConsent(granted: Boolean) {
+        if (_uiState.value.isCimaSaving) return
+
+        _uiState.update { it.copy(isCimaSaving = true) }
+        viewModelScope.launch {
+            try {
+                sessionManager.setCimaConsent(granted)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Log.e("OnboardingViewModel", "No se pudo guardar el consentimiento de CIMA", error)
+            } finally {
+                _uiState.update { it.copy(isCimaSaving = false) }
+            }
+        }
+    }
+
+    /**
      * Completa la bienvenida si todos los permisos necesarios están resueltos.
      */
     fun complete() {
-        if (!_uiState.value.canContinue) return
+        if (!_uiState.value.canContinue || _uiState.value.isCimaSaving) return
         finish()
     }
 
@@ -139,7 +171,7 @@ class OnboardingViewModel @Inject constructor(
      * que a su vez exige que las notificaciones estén concedidas.
      */
     fun completeWithoutExactAlarms() {
-        if (!_uiState.value.showExactAlarmFallback) return
+        if (!_uiState.value.showExactAlarmFallback || _uiState.value.isCimaSaving) return
         finish()
     }
 

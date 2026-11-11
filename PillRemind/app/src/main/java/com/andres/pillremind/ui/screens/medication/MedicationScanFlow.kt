@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -34,7 +33,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -68,6 +66,7 @@ import com.andres.pillremind.ui.components.AppScrollWithFooter
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
 import com.andres.pillremind.ui.components.ButtonVariant
+import com.andres.pillremind.ui.components.CimaConsentDialog
 import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppSpacing
 import com.andres.pillremind.ui.theme.PillRemindTheme
@@ -224,7 +223,7 @@ fun MedicationScanFlow(
         }
 
         if (state.consentRequired) {
-            ConsentDialog(
+            CimaConsentDialog(
                 onGrant = onGrantConsent,
                 onDecline = onDeclineConsent
             )
@@ -973,33 +972,6 @@ private fun ScanNoticeCard(
             }
         }
     }
-}
-
-@Composable
-private fun ConsentDialog(
-    onGrant: () -> Unit,
-    onDecline: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDecline,
-        title = { Text(stringResource(R.string.scan_cn_consent_title)) },
-        text = {
-            Text(
-                text = stringResource(R.string.scan_cn_consent_message),
-                modifier = Modifier.verticalScroll(rememberScrollState())
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onGrant) {
-                Text(stringResource(R.string.scan_cn_consent_accept))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDecline) {
-                Text(stringResource(R.string.scan_cn_consent_decline))
-            }
-        }
-    )
 }
 
 @Preview(showBackground = true, name = "Tarjeta de escaneo")
