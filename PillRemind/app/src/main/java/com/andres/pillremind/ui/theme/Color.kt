@@ -80,7 +80,7 @@ val DarkOnTertiaryContainer = Color(0xFFD7FFD9)
 
 val DarkBackground = Color(0xFF000000)
 val DarkOnBackground = Color(0xFFF2F2F2)
-val DarkSurface = Color(0xFF121212)
+val DarkSurface = Color(0xFF1E1E1E)
 val DarkOnSurface = Color(0xFFF2F2F2)
 val DarkSurfaceVariant = Color(0xFF242424)
 val DarkOnSurfaceVariant = Color(0xFFBDBDBD)
