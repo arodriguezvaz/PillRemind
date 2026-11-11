@@ -423,9 +423,9 @@
     <string name="medication_import_help_esaude">Abrir É-Saúde</string>
     <string name="medication_import_help_esaude_description">esaude.sergas.gal</string>
     <string name="medication_import_help_sergas_mobil">Sergas Móbil</string>
-    <string name="medication_import_help_sergas_mobil_description">Página oficial de la app del SERGAS</string>
-    <string name="medication_import_help_open_error">No se pudo abrir el navegador.</string>
-    <string name="medication_import_help_links_note">Los enlaces se abren en tu navegador; la app no envía datos.</string>
+    <string name="medication_import_help_sergas_mobil_description">App oficial del SERGAS</string>
+    <string name="medication_import_help_open_error">No se pudo abrir el enlace.</string>
+    <string name="medication_import_help_links_note">Los enlaces se abren fuera de la app; no se envían datos.</string>
     <string name="medication_import_privacy_title">Se procesa en el dispositivo</string>
     <string name="medication_import_privacy_text">El PDF no se guarda ni se envía a ningún servidor. Solo se usan los medicamentos que aceptes en la revisión.</string>
     <string name="medication_import_select_pdf">Seleccionar PDF</string>
