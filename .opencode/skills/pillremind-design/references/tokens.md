@@ -111,7 +111,7 @@ estados de las tomas y a los avisos.
 | `onTertiaryContainer` | `#D7FFD9` |
 | `background` | `#000000` |
 | `onBackground` | `#F2F2F2` |
-| `surface` | `#121212` |
+| `surface` | `#1E1E1E` |
 | `onSurface` | `#F2F2F2` |
 | `surfaceVariant` | `#242424` |
 | `onSurfaceVariant` | `#BDBDBD` |
