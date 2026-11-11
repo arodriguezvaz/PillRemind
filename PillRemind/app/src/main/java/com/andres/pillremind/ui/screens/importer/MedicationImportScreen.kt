@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -56,7 +57,9 @@ import com.andres.pillremind.ui.components.AppDropdownField
 import com.andres.pillremind.ui.components.AppFormActions
 import com.andres.pillremind.ui.components.AppFormField
 import com.andres.pillremind.ui.components.AppFormSection
+import com.andres.pillremind.ui.components.AppNavigationRow
 import com.andres.pillremind.ui.components.AppNoticeBlock
+import com.andres.pillremind.ui.components.AppReadOnlySection
 import com.andres.pillremind.ui.components.AppScrollWithFooter
 import com.andres.pillremind.ui.components.AppTextField
 import com.andres.pillremind.ui.components.ButtonSize
@@ -89,6 +92,7 @@ fun MedicationImportScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     var editingKey by rememberSaveable { mutableStateOf<String?>(null) }
     var pendingForceKey by rememberSaveable { mutableStateOf<String?>(null) }
+    var showHelpSheet by rememberSaveable { mutableStateOf(false) }
 
     val pdfLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -99,7 +103,8 @@ fun MedicationImportScreen(
     when (state.stage) {
         MedicationImportStage.PICK_FILE -> ImportPickFileContent(
             errorRes = state.errorRes,
-            onPickFile = { pdfLauncher.launch(arrayOf(PDF_MIME_TYPE)) }
+            onPickFile = { pdfLauncher.launch(arrayOf(PDF_MIME_TYPE)) },
+            onOpenHelp = { showHelpSheet = true }
         )
 
         MedicationImportStage.READING -> ImportReadingContent()
@@ -118,6 +123,10 @@ fun MedicationImportScreen(
             count = state.savedCount,
             onClose = onSaved
         )
+    }
+
+    if (showHelpSheet) {
+        MedicationImportHelpSheet(onDismiss = { showHelpSheet = false })
     }
 
     val editingItem = state.items.firstOrNull { it.key == editingKey }
@@ -167,11 +176,16 @@ fun MedicationImportScreen(
 
 /**
  * Pantalla inicial: explicación y selector de PDF.
+ *
+ * @param errorRes Error de la última lectura, si lo hay.
+ * @param onPickFile Abre el selector de documentos.
+ * @param onOpenHelp Abre la ayuda con los formatos y los enlaces.
  */
 @Composable
 private fun ImportPickFileContent(
     errorRes: Int?,
-    onPickFile: () -> Unit
+    onPickFile: () -> Unit,
+    onOpenHelp: () -> Unit
 ) {
     AppScrollWithFooter(
         modifier = Modifier.fillMaxSize(),
@@ -193,6 +207,12 @@ private fun ImportPickFileContent(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
+        AppNavigationRow(
+            icon = ImageVector.vectorResource(R.drawable.ic_info),
+            label = stringResource(R.string.medication_import_help_row_title),
+            description = stringResource(R.string.medication_import_help_row_description),
+            onClick = onOpenHelp
+        )
         AppNoticeBlock(
             icon = ImageVector.vectorResource(R.drawable.ic_lock),
             title = stringResource(R.string.medication_import_privacy_title),
@@ -205,6 +225,129 @@ private fun ImportPickFileContent(
                 text = stringResource(messageRes)
             )
         }
+    }
+}
+
+/**
+ * Hoja de ayuda con los formatos compatibles y los enlaces oficiales.
+ *
+ * @param onDismiss Cierra la hoja.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MedicationImportHelpSheet(onDismiss: () -> Unit) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val uriHandler = LocalUriHandler.current
+    var openFailed by remember { mutableStateOf(false) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
+        ImportHelpContent(
+            openFailed = openFailed,
+            onOpenUrl = { url ->
+                openFailed = runCatching { uriHandler.openUri(url) }.isFailure
+            },
+            onClose = onDismiss
+        )
+    }
+}
+
+/**
+ * Contenido de la ayuda, separado de la hoja para poder previsualizarlo.
+ *
+ * @param openFailed Indica que el último enlace no se pudo abrir.
+ * @param onOpenUrl Abre un enlace en el navegador.
+ * @param onClose Cierra la ayuda.
+ */
+@Composable
+private fun ImportHelpContent(
+    openFailed: Boolean,
+    onOpenUrl: (String) -> Unit,
+    onClose: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .navigationBarsPadding()
+            .padding(horizontal = AppSpacing.md)
+            .padding(top = AppSpacing.md, bottom = AppSpacing.xl),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.md)
+    ) {
+        AppReadOnlySection(
+            title = stringResource(R.string.medication_import_help_works_title),
+            action = {
+                IconButton(onClick = onClose) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_close),
+                        contentDescription = stringResource(R.string.common_close)
+                    )
+                }
+            }
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
+                Text(
+                    text = stringResource(R.string.medication_import_help_works_text),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = stringResource(R.string.medication_import_help_works_list),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+
+        AppReadOnlySection(
+            title = stringResource(R.string.medication_import_help_where_title)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
+                Text(
+                    text = stringResource(R.string.medication_import_help_where_text),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                AppNavigationRow(
+                    icon = ImageVector.vectorResource(R.drawable.ic_open_in_new),
+                    label = stringResource(R.string.medication_import_help_esaude),
+                    description = stringResource(
+                        R.string.medication_import_help_esaude_description
+                    ),
+                    onClick = { onOpenUrl(ESAUDE_URL) }
+                )
+                AppNavigationRow(
+                    icon = ImageVector.vectorResource(R.drawable.ic_open_in_new),
+                    label = stringResource(R.string.medication_import_help_sergas_mobil),
+                    description = stringResource(
+                        R.string.medication_import_help_sergas_mobil_description
+                    ),
+                    onClick = { onOpenUrl(SERGAS_MOBIL_URL) }
+                )
+                if (openFailed) {
+                    Text(
+                        text = stringResource(R.string.medication_import_help_open_error),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.medication_import_help_links_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        AppButton(
+            text = stringResource(R.string.common_close),
+            onClick = onClose,
+            size = ButtonSize.Large,
+            variant = ButtonVariant.Tonal
+        )
     }
 }
 
@@ -732,4 +875,35 @@ private fun ImportMedicationCardPreview() {
     }
 }
 
+@Preview(showBackground = true, heightDp = 720, name = "Importar desde PDF")
+@Composable
+private fun ImportPickFileContentPreview() {
+    PillRemindTheme {
+        ImportPickFileContent(
+            errorRes = null,
+            onPickFile = {},
+            onOpenHelp = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, heightDp = 720, name = "Ayuda para importar PDF")
+@Composable
+private fun ImportHelpContentPreview() {
+    PillRemindTheme {
+        ImportHelpContent(
+            openFailed = false,
+            onOpenUrl = {},
+            onClose = {}
+        )
+    }
+}
+
 private const val PDF_MIME_TYPE = "application/pdf"
+
+/** Web pública de É-Saúde, donde se consulta la medicación activa. */
+private const val ESAUDE_URL = "https://esaude.sergas.gal"
+
+/** Página oficial de la app Sergas Móbil. */
+private const val SERGAS_MOBIL_URL =
+    "https://www.sergas.gal/a-nosa-organizacion/aplicacion-mobil-sergas-mobil?idioma=es"
