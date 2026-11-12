@@ -92,6 +92,13 @@ fun MainNavigationGraph(
             HomeScreen(
                 onStatisticsClick = openStatistics,
                 onImportMedicationsClick = openMedicationImport,
+                onMedicationClick = { id ->
+                    navController.navigate(
+                        MedicationScreens.MedicationSeeScreen.createRoute(id)
+                    ) {
+                        launchSingleTop = true
+                    }
+                },
             )
         }
         appComposable(BottomBarScreens.Medications.route) {
@@ -99,7 +106,9 @@ fun MainNavigationGraph(
                 onMedicationClick = { id ->
                     navController.navigate(
                         MedicationScreens.MedicationSeeScreen.createRoute(id)
-                    )
+                    ) {
+                        launchSingleTop = true
+                    }
                 },
                 onImportMedicationsClick = openMedicationImport,
             )
@@ -124,7 +133,9 @@ fun MainNavigationGraph(
                 onStatisticsClick = openStatistics,
                 onImportMedicationsClick = openMedicationImport,
                 onArchivedMedicationsClick = {
-                    navController.navigate(MedicationScreens.ArchivedMedicationsScreen.route)
+                    navController.navigate(MedicationScreens.ArchivedMedicationsScreen.route) {
+                        launchSingleTop = true
+                    }
                 },
                 onHistoryClick = openHistory,
             )
@@ -300,7 +311,9 @@ fun NavGraphBuilder.medicationNavGraph(
                 onMedicationClick = { id ->
                     navController.navigate(
                         MedicationScreens.ArchivedMedicationSeeScreen.createRoute(id)
-                    )
+                    ) {
+                        launchSingleTop = true
+                    }
                 },
             )
         }

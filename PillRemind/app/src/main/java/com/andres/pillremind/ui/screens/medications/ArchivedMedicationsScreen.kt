@@ -82,7 +82,8 @@ private fun ArchivedMedicationsContent(
                     MedicationCard(
                         medication = medication,
                         buttonText = stringResource(R.string.ver),
-                        accion = { onMedicationClick(medication.id) }
+                        accion = { onMedicationClick(medication.id) },
+                        onCardClick = { onMedicationClick(medication.id) }
                     )
                 }
             }

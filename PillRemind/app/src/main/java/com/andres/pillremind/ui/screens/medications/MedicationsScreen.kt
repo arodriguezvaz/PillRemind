@@ -148,6 +148,9 @@ fun MedicationsScreen(
                             buttonText = stringResource(R.string.ver),
                             accion = {
                                 onMedicationClick(medication.id)
+                            },
+                            onCardClick = {
+                                onMedicationClick(medication.id)
                             }
                         )
                     }

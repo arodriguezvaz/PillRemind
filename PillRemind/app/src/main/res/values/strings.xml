@@ -332,6 +332,7 @@
     <string name="medication_delete_permanently">Eliminar definitivamente</string>
     <string name="medication_delete_permanently_title">Eliminar definitivamente</string>
     <string name="medication_delete_permanently_message">Se borrarán el medicamento, su pauta, su imagen y todo su historial de tomas. Esta acción no se puede deshacer.</string>
+    <string name="medication_open_info">Ver información de %1$s</string>
     <string name="medication_photo_description">Foto del medicamento %1$s</string>
     <string name="medication_icon_description">Icono de medicamento</string>
     <string name="medication_tracking_section">Seguimiento</string>

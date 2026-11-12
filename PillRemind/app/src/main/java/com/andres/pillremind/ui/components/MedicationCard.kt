@@ -3,6 +3,7 @@ import com.andres.pillremind.ui.theme.AppElevation
 import com.andres.pillremind.ui.theme.AppImageShape
 import com.andres.pillremind.ui.theme.AppSpacing
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -36,6 +37,8 @@ import java.time.LocalDate
  * @param modifier modificador opcional para personalizar el layout.
  * @param buttonText texto del botón de acción.
  * @param buttonVariant variante visual del botón.
+ * @param onCardClick acción que se ejecuta al pulsar la card completa; si es
+ *   `null`, solo responde el botón.
  */
 @Composable
 fun MedicationCard(
@@ -44,7 +47,16 @@ fun MedicationCard(
     modifier: Modifier = Modifier,
     buttonText: String,
     buttonVariant: ButtonVariant = ButtonVariant.Primary,
+    onCardClick: (() -> Unit)? = null,
 ) {
+    val cardClickModifier = if (onCardClick != null) {
+        Modifier.clickable(
+            onClickLabel = stringResource(R.string.medication_open_info, medication.name),
+            onClick = onCardClick,
+        )
+    } else {
+        Modifier
+    }
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
@@ -56,6 +68,7 @@ fun MedicationCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .then(cardClickModifier)
                 .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -120,6 +133,7 @@ private fun MedicationPreview() {
     MedicationCard(
         medication = medicationFake,
         accion = {},
-        buttonText = ""
+        buttonText = "",
+        onCardClick = {},
     )
 }

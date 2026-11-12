@@ -265,19 +265,23 @@ AppEmptyState(icon, title, description, modifier, action = null)
 ### `MedicationCard` (`MedicationCard.kt`)
 
 ```kotlin
-MedicationCard(medication, accion, modifier, buttonText, buttonVariant)
+MedicationCard(medication, accion, modifier, buttonText, buttonVariant, onCardClick)
 ```
 
 - Imagen de 64dp con `AppImageShape`, nombre `titleMedium` y botón `Small`.
 - Si no hay imagen, `DefaultPill()` con `AppImagePlaceholder`.
+- Si se pasa `onCardClick`, toda la card abre la ficha del medicamento y el
+  botón conserva su acción. Se usa en Medicamentos y en Archivados.
 
 ### `IntakeCard` (`IntakeCard.kt`)
 
 ```kotlin
-IntakeCard(intake, visualState, onTake, modifier)
+IntakeCard(intake, visualState, onTake, modifier, onCardClick)
 ```
 
 - Misma estructura que `MedicationCard`.
+- En Inicio, `onCardClick` abre la ficha del medicamento; el botón «Tomar» solo
+  registra o deshace la toma.
 - Estado `PENDING` → botón `Primary`; `TAKEN` → `Secondary` «Tomado», habilitado
   para deshacer la toma pero con `looksDisabled` para conservar su aspecto
   original (única excepción a la regla de acción secundaria); `DELAYED` →
