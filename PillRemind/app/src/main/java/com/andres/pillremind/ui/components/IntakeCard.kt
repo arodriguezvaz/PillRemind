@@ -1,5 +1,6 @@
 package com.andres.pillremind.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +43,8 @@ import java.time.format.DateTimeFormatter
  * @param onTake Acción ejecutada al pulsar el botón de estado: marca la toma
  * como realizada o la deshace si ya estaba registrada.
  * @param modifier Modificador para personalizar el layout.
+ * @param onCardClick Acción ejecutada al pulsar la card completa para abrir la
+ *   información del medicamento; si es `null`, solo responde el botón.
  */
 @Composable
 fun IntakeCard(
@@ -49,7 +52,19 @@ fun IntakeCard(
     visualState: IntakeVisualState,
     onTake: () -> Unit,
     modifier: Modifier = Modifier,
+    onCardClick: (() -> Unit)? = null,
 ) {
+    val cardClickModifier = if (onCardClick != null) {
+        Modifier.clickable(
+            onClickLabel = stringResource(
+                R.string.medication_open_info,
+                intake.medicationName
+            ),
+            onClick = onCardClick,
+        )
+    } else {
+        Modifier
+    }
     val (buttonText, buttonVariant) = when (visualState) {
         IntakeVisualState.TAKEN -> Pair(stringResource(R.string.tomado), ButtonVariant.Secondary)
         IntakeVisualState.DELAYED -> Pair(stringResource(R.string.tomar), ButtonVariant.Danger)
@@ -68,6 +83,7 @@ fun IntakeCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .then(cardClickModifier)
                 .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,

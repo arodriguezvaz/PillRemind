@@ -11,6 +11,7 @@ import com.andres.pillremind.domain.model.IntakeVisualState
 import com.andres.pillremind.domain.model.IntakeWithMedication
 import com.andres.pillremind.ui.theme.PillRemindTheme
 import java.time.LocalDateTime
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -50,6 +51,59 @@ class IntakeCardTest {
             .performClick()
 
         composeRule.runOnIdle { assertTrue(pulsado) }
+    }
+
+    @Test
+    fun pulsarLaCardAbreLaInformacionYNoRegistraLaToma() {
+        var cardPulsada = false
+        var tomaPulsada = false
+
+        composeRule.setContent {
+            PillRemindTheme {
+                IntakeCard(
+                    intake = intake(takenAt = null),
+                    visualState = IntakeVisualState.PENDING,
+                    onTake = { tomaPulsada = true },
+                    onCardClick = { cardPulsada = true },
+                )
+            }
+        }
+
+        composeRule
+            .onNodeWithText("Ibuprofeno")
+            .performClick()
+
+        composeRule.runOnIdle {
+            assertTrue(cardPulsada)
+            assertFalse(tomaPulsada)
+        }
+    }
+
+    @Test
+    fun pulsarElBotonTomarNoAbreLaInformacion() {
+        var cardPulsada = false
+        var tomaPulsada = false
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        composeRule.setContent {
+            PillRemindTheme {
+                IntakeCard(
+                    intake = intake(takenAt = null),
+                    visualState = IntakeVisualState.PENDING,
+                    onTake = { tomaPulsada = true },
+                    onCardClick = { cardPulsada = true },
+                )
+            }
+        }
+
+        composeRule
+            .onNodeWithText(context.getString(R.string.tomar))
+            .performClick()
+
+        composeRule.runOnIdle {
+            assertTrue(tomaPulsada)
+            assertFalse(cardPulsada)
+        }
     }
 
     private fun intake(takenAt: LocalDateTime?): IntakeWithMedication =

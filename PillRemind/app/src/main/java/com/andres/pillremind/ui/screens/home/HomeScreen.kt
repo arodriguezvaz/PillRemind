@@ -79,12 +79,15 @@ fun homeTopBarTitle(): String {
  * @param onStatisticsClick Acción ejecutada al pulsar el banner de resumen.
  * @param onImportMedicationsClick Acción ejecutada al abrir la importación de
  *   medicamentos desde PDF en el estado vacío.
+ * @param onMedicationClick Acción ejecutada al pulsar una toma para abrir la
+ *   información de su medicamento.
  */
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onStatisticsClick: () -> Unit = {},
     onImportMedicationsClick: () -> Unit = {},
+    onMedicationClick: (medicationId: Int) -> Unit = {},
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
@@ -196,6 +199,9 @@ fun HomeScreen(
                         visualState = intake.visualState(now),
                         onTake = {
                             homeViewModel.tomarIntake(intake)
+                        },
+                        onCardClick = {
+                            onMedicationClick(intake.medicationId)
                         }
                     )
                 }
@@ -217,6 +223,9 @@ fun HomeScreen(
                             visualState = intake.visualState(now),
                             onTake = {
                                 homeViewModel.tomarIntake(intake)
+                            },
+                            onCardClick = {
+                                onMedicationClick(intake.medicationId)
                             }
                         )
                     }
