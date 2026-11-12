@@ -13,11 +13,14 @@ import com.andres.pillremind.R
  * @property route Ruta utilizada por Navigation Compose.
  * @property titleRes Recurso de texto mostrado en la barra de navegación.
  * @property iconRes Recurso drawable del icono representativo de la sección.
+ * @property selectedIconRes Recurso drawable del icono relleno, usado cuando la
+ * sección está seleccionada.
  */
 sealed class BottomBarScreens(
     val route: String,
     @StringRes val titleRes: Int,
-    @DrawableRes val iconRes: Int
+    @DrawableRes val iconRes: Int,
+    @DrawableRes val selectedIconRes: Int
 ) {
     /**
      * Pantalla principal de la aplicación.
@@ -25,7 +28,8 @@ sealed class BottomBarScreens(
     object Home : BottomBarScreens(
         route = "home",
         titleRes = R.string.nav_home,
-        iconRes = R.drawable.ic_home
+        iconRes = R.drawable.ic_home,
+        selectedIconRes = R.drawable.ic_home_filled
     )
 
     /**
@@ -34,7 +38,8 @@ sealed class BottomBarScreens(
     object Medications : BottomBarScreens(
         route = "medications",
         titleRes = R.string.nav_medications,
-        iconRes = R.drawable.ic_medication
+        iconRes = R.drawable.ic_medication,
+        selectedIconRes = R.drawable.ic_medication_filled
     )
 
     /**
@@ -43,6 +48,7 @@ sealed class BottomBarScreens(
     object Profile : BottomBarScreens(
         route = "profile/see",
         titleRes = R.string.nav_profile,
-        iconRes = R.drawable.ic_person
+        iconRes = R.drawable.ic_person,
+        selectedIconRes = R.drawable.ic_person_filled
     )
 }
