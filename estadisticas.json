@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
   "label": "descargas APK",
-  "message": "52",
+  "message": "56",
   "color": "2ea44f",
   "cacheSeconds": 3600,
   "repository": "arodriguezvaz/PillRemind",
   "totals": {
-    "apk": 52,
-    "manifest": 68,
+    "apk": 56,
+    "manifest": 71,
     "releases": 11
   },
   "latestStable": {
     "tag": "v1.6.2",
-    "manifestDownloads": 2
+    "manifestDownloads": 5
   },
   "releases": [
     {
       "tag": "v1.6.2",
       "publishedAt": "2026-11-12T13:26:52Z",
-      "apkDownloads": 1,
-      "manifestDownloads": 2,
+      "apkDownloads": 5,
+      "manifestDownloads": 5,
       "prerelease": false
     },
     {
