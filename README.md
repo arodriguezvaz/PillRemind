@@ -76,7 +76,7 @@ se envían a ningún servidor.
 PillRemind no incluye sus datos en las copias automáticas de Android (Google Drive
 ni transferencia entre dispositivos). Para cambiar de móvil, exporta una copia
 desde Ajustes → Datos. También puedes generar un informe de adherencia en PDF desde
-Estadísticas y guardarlo o compartirlo tú mismo.
+Perfil → Seguimiento y guardarlo o compartirlo tú mismo.
 
 Si rechazas la consulta a CIMA o la red falla, puedes seguir usando el OCR de la
 caja o rellenar el formulario a mano.

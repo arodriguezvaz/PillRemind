@@ -127,6 +127,13 @@
     <string name="profile_history_section">Historial</string>
     <string name="profile_view_history">Ver historial de tomas</string>
     <string name="profile_history_description">Busca y filtra las tomas registradas</string>
+    <string name="profile_export_report">Exportar informe de adherencia</string>
+    <string name="profile_export_report_description">PDF con el resumen y las tomas sin registrar del periodo</string>
+    <string name="profile_report_period_title">Periodo del informe</string>
+    <string name="profile_report_period_description">Elige los días que quieres incluir en el PDF.</string>
+    <string name="profile_report_export_action">Exportar PDF</string>
+    <string name="profile_report_export_success">Informe PDF exportado</string>
+    <string name="profile_report_export_error">No se pudo exportar el informe</string>
     <string name="profile_delete_title">Eliminar perfil</string>
     <string name="profile_delete_message">¿Seguro que quieres eliminar este perfil?</string>
 
@@ -154,9 +161,6 @@
     <string name="statistics_empty_no_intakes">No hay tomas registradas en este periodo.</string>
     <string name="statistics_empty_no_intakes_medication">No hay tomas registradas de este medicamento en este periodo.</string>
     <string name="statistics_footnote">Se calculan con las tomas que registras en la app.</string>
-    <string name="statistics_export_action">Exportar PDF</string>
-    <string name="statistics_export_success">Informe PDF exportado</string>
-    <string name="statistics_export_error">No se pudo exportar el informe</string>
 
     <!-- Informe de adherencia en PDF -->
     <string name="statistics_pdf_title">Informe de adherencia</string>

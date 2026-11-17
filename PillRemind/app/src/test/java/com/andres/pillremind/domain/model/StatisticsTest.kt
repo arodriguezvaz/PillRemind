@@ -2,6 +2,7 @@ package com.andres.pillremind.domain.model
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -262,6 +263,19 @@ class StatisticsTest {
         assertTrue(report.history.isEmpty())
         assertEquals(7, report.dailyStatistics.size)
         assertTrue(report.dailyStatistics.all { it.total == 0 })
+    }
+
+    @Test
+    fun `el rango del periodo incluye el dia de referencia`() {
+        val referenceDate = LocalDate.of(2026, 11, 17)
+
+        val sevenDays = StatisticsPeriod.SEVEN.dateRange(referenceDate)
+        assertEquals(LocalDate.of(2026, 11, 11).atStartOfDay(), sevenDays.from)
+        assertEquals(referenceDate.atTime(LocalTime.MAX), sevenDays.to)
+
+        val thirtyDays = StatisticsPeriod.THIRTY.dateRange(referenceDate)
+        assertEquals(LocalDate.of(2026, 10, 19).atStartOfDay(), thirtyDays.from)
+        assertEquals(referenceDate.atTime(LocalTime.MAX), thirtyDays.to)
     }
 
     private fun intake(
