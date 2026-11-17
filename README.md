@@ -44,7 +44,8 @@ No está publicada en Google Play.
 - **Importación desde PDF**: lee la hoja de medicación y propone los medicamentos
   para revisarlos antes de guardarlos.
 - **Recordatorios**: notificación a la hora de cada toma, con acción para marcarla.
-- **Historial y adherencia**: búsqueda y filtros de tomas, resumen de 7, 30 y 90 días.
+- **Historial y adherencia**: búsqueda y filtros de tomas, resumen de 7, 30 y 90 días
+  e informe de adherencia en PDF.
 - **Copia de seguridad local**: exportación e importación con contraseña opcional.
 
 **Guía de uso, con capturas:** [Manual de uso](doc/docs/manual-uso.md)
@@ -74,7 +75,8 @@ se envían a ningún servidor.
 
 PillRemind no incluye sus datos en las copias automáticas de Android (Google Drive
 ni transferencia entre dispositivos). Para cambiar de móvil, exporta una copia
-desde Ajustes → Datos.
+desde Ajustes → Datos. También puedes generar un informe de adherencia en PDF desde
+Estadísticas y guardarlo o compartirlo tú mismo.
 
 Si rechazas la consulta a CIMA o la red falla, puedes seguir usando el OCR de la
 caja o rellenar el formulario a mano.

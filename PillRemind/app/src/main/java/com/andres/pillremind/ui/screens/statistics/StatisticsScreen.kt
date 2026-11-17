@@ -1,5 +1,7 @@
 package com.andres.pillremind.ui.screens.statistics
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,24 +12,33 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.andres.pillremind.R
+import com.andres.pillremind.data.pdf.AdherencePdfLabels
 import com.andres.pillremind.domain.model.StatisticsIntake
 import com.andres.pillremind.domain.model.StatisticsPeriod
 import com.andres.pillremind.domain.model.toAdherencePoints
 import com.andres.pillremind.domain.model.toStatisticsReport
+import com.andres.pillremind.ui.components.AppButton
 import com.andres.pillremind.ui.components.BlankCard
+import com.andres.pillremind.ui.components.ButtonSize
+import com.andres.pillremind.ui.components.ButtonVariant
 import com.andres.pillremind.ui.components.statistics.AdherenceLineChart
 import com.andres.pillremind.ui.components.statistics.MedicationStatisticsCard
 import com.andres.pillremind.ui.components.statistics.StatisticsPeriodSelector
@@ -58,6 +69,36 @@ fun StatisticsScreen(
 ) {
     val period by statisticsViewModel.period.collectAsStateWithLifecycle()
     val uiState by statisticsViewModel.uiState.collectAsStateWithLifecycle()
+    val exportState by statisticsViewModel.exportState.collectAsStateWithLifecycle()
+
+    val pdfLabels = adherencePdfLabels()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val exportSuccessMessage = stringResource(R.string.statistics_export_success)
+    val exportErrorMessage = stringResource(R.string.statistics_export_error)
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri ->
+        if (uri != null) {
+            statisticsViewModel.exportPdf(uri, pdfLabels)
+        }
+    }
+
+    LaunchedEffect(exportState) {
+        when (exportState) {
+            StatisticsExportState.Exported -> {
+                snackbarHostState.showSnackbar(exportSuccessMessage)
+                statisticsViewModel.consumeExportState()
+            }
+
+            StatisticsExportState.Error -> {
+                snackbarHostState.showSnackbar(exportErrorMessage)
+                statisticsViewModel.consumeExportState()
+            }
+
+            else -> Unit
+        }
+    }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         statisticsViewModel.refreshNow()
@@ -70,12 +111,22 @@ fun StatisticsScreen(
         }
     }
 
-    StatisticsContent(
-        period = period,
-        uiState = uiState,
-        onPeriodSelected = statisticsViewModel::selectPeriod,
-        modifier = modifier
-    )
+    Box(modifier = modifier.fillMaxSize()) {
+        StatisticsContent(
+            period = period,
+            uiState = uiState,
+            onPeriodSelected = statisticsViewModel::selectPeriod,
+            onExportClick = {
+                exportLauncher.launch(statisticsViewModel.suggestedExportFileName())
+            },
+            isExporting = exportState is StatisticsExportState.Working,
+            modifier = Modifier.fillMaxSize()
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
 }
 
 /**
@@ -86,6 +137,8 @@ private fun StatisticsContent(
     period: StatisticsPeriod,
     uiState: StatisticsUiState,
     onPeriodSelected: (StatisticsPeriod) -> Unit,
+    onExportClick: () -> Unit = {},
+    isExporting: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -153,6 +206,17 @@ private fun StatisticsContent(
                     } else {
                         StatisticsSummaryCard(summary = uiState.report.summary)
                     }
+                }
+
+                item(key = "export") {
+                    AppButton(
+                        text = stringResource(R.string.statistics_export_action),
+                        onClick = onExportClick,
+                        variant = ButtonVariant.Tonal,
+                        size = ButtonSize.Large,
+                        isLoading = isExporting,
+                        leadingIcon = ImageVector.vectorResource(R.drawable.ic_picture_as_pdf)
+                    )
                 }
 
                 item(key = "chart") {
@@ -233,6 +297,34 @@ private fun StatisticsFootnote() {
         modifier = Modifier.padding(top = AppSpacing.sm)
     )
 }
+
+/**
+ * Resuelve con recursos de la app los textos del informe en PDF.
+ */
+@Composable
+private fun adherencePdfLabels(): AdherencePdfLabels = AdherencePdfLabels(
+    title = stringResource(R.string.statistics_pdf_title),
+    profileLabel = stringResource(R.string.statistics_pdf_profile),
+    periodLabel = stringResource(R.string.statistics_pdf_period),
+    generatedAtLabel = stringResource(R.string.statistics_pdf_generated_at),
+    adherenceLabel = stringResource(R.string.statistics_adherence_label),
+    evaluatedLabel = stringResource(R.string.statistics_pdf_evaluated),
+    takenLabel = stringResource(R.string.statistics_taken_label),
+    missedLabel = stringResource(R.string.statistics_missed_label),
+    pendingLabel = stringResource(R.string.statistics_pending_label),
+    noDataLabel = stringResource(R.string.statistics_no_data),
+    archivedLabel = stringResource(R.string.statistics_archived),
+    byMedicationTitle = stringResource(R.string.statistics_by_medication_title),
+    medicationColumn = stringResource(R.string.statistics_pdf_column_medication),
+    missedTitle = stringResource(R.string.statistics_pdf_missed_title),
+    missedEmpty = stringResource(R.string.statistics_pdf_missed_empty),
+    disclaimer = stringResource(R.string.statistics_pdf_disclaimer),
+    footer = stringResource(R.string.statistics_pdf_footer),
+    pageFormat = stringResource(R.string.statistics_pdf_page_format),
+    unknownProfile = stringResource(R.string.statistics_pdf_unknown_profile),
+    percentPattern = stringResource(R.string.statistics_percent_value),
+    datePattern = stringResource(R.string.common_date_pattern)
+)
 
 @Preview(showBackground = true)
 @Composable
