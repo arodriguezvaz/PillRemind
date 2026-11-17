@@ -124,7 +124,14 @@ un gráfico semanal y el desglose por medicamento.
 
 <img src="../img/uso/07-estadisticas.png" alt="Pantalla de estadísticas con adherencia y gráfico semanal" width="320"/>
 
-Los porcentajes se calculan con las tomas que vas registrando en la app.
+El informe se exporta desde **Perfil → Seguimiento → Exportar informe de adherencia**.
+Al pulsar, eliges el periodo (7, 30 o 90 días) y se genera un PDF con el perfil, el
+resumen, la tabla por medicamento y las tomas sin registrar. El informe se genera en
+el dispositivo y puedes guardarlo donde quieras o compartirlo, por ejemplo para
+llevarlo a la consulta.
+
+Los porcentajes se calculan con las tomas que vas registrando en la app. Una toma sin
+registrar no implica que no se haya tomado; el propio informe lo indica.
 
 ## 8. Ajustes
 

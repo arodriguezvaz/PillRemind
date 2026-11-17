@@ -155,7 +155,7 @@ fun HomeScreen(
                                 onClick = onImportMedicationsClick,
                                 size = ButtonSize.Large,
                                 leadingIcon = ImageVector.vectorResource(
-                                    R.drawable.ic_picture_as_pdf
+                                    R.drawable.ic_upload
                                 ),
                             )
                         },

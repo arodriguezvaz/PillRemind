@@ -2,7 +2,10 @@ package com.andres.pillremind.ui.screens.profile
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -18,6 +21,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -92,6 +97,7 @@ sealed class ProfileMode {
  * @param onHistoryClick Callback ejecutado al abrir el historial de tomas.
  * @param onTopBarChange Callback para modificar la TopBar.
  * @param profileViewModel ViewModel encargado de la lógica del perfil.
+ * @param profileReportViewModel ViewModel encargado de exportar el informe de adherencia.
  */
 @Composable
 fun ProfileScreen(
@@ -104,7 +110,8 @@ fun ProfileScreen(
     onArchivedMedicationsClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
     onTopBarChange: (TopBarState) -> Unit = {},
-    profileViewModel: ProfileViewModel = hiltViewModel()
+    profileViewModel: ProfileViewModel = hiltViewModel(),
+    profileReportViewModel: ProfileReportViewModel = hiltViewModel()
 ) {
     val name = rememberSaveable { mutableStateOf("") }
     val birthDate = rememberSaveable { mutableStateOf<LocalDate?>(null) }
@@ -119,7 +126,39 @@ fun ProfileScreen(
     var currentImagePath by rememberSaveable { mutableStateOf<String?>(null) }
     var newPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+    var showReportDialog by rememberSaveable { mutableStateOf(false) }
     var formInitialized by rememberSaveable { mutableStateOf(false) }
+
+    val reportPeriod by profileReportViewModel.period.collectAsStateWithLifecycle()
+    val reportExportState by profileReportViewModel.exportState.collectAsStateWithLifecycle()
+    val reportLabels = adherencePdfLabels()
+    val reportSnackbarHostState = remember { SnackbarHostState() }
+    val reportSuccessMessage = stringResource(R.string.profile_report_export_success)
+    val reportErrorMessage = stringResource(R.string.profile_report_export_error)
+
+    val reportExportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri ->
+        if (uri != null) {
+            profileReportViewModel.exportPdf(uri, reportLabels)
+        }
+    }
+
+    LaunchedEffect(reportExportState) {
+        when (reportExportState) {
+            ProfileReportExportState.Exported -> {
+                reportSnackbarHostState.showSnackbar(reportSuccessMessage)
+                profileReportViewModel.consumeExportState()
+            }
+
+            ProfileReportExportState.Error -> {
+                reportSnackbarHostState.showSnackbar(reportErrorMessage)
+                profileReportViewModel.consumeExportState()
+            }
+
+            else -> Unit
+        }
+    }
     val modeSaver = Saver<ProfileMode, String>(
         save = { mode ->
             when (mode) {
@@ -186,125 +225,133 @@ fun ProfileScreen(
         }
     }
 
-    when (currentMode) {
-        ProfileMode.Create -> {
-            ProfileForm(
-                modifier = modifier,
-                name = name.value,
-                onNameChange = { name.value = it },
-                photoUri = selectedPhotoUri,
-                onPhotoSelected = { selectedPhotoUri = it },
-                birthDate = birthDate.value,
-                onBirthDateChange = { birthDate.value = it },
-                sex = sex.value,
-                onSexChange = { sex.value = it },
-                bloodType = bloodType.value,
-                onBloodTypeChange = { bloodType.value = it },
-                allergies = allergies.value,
-                onAllergiesChange = { allergies.value = it },
-                medicalNotes = medicalNotes.value,
-                onMedicalNotesChange = { medicalNotes.value = it },
-                healthCardNumber = healthCardNumber.value,
-                onHealthCardNumberChange = { healthCardNumber.value = it },
-                footer = {
-                    AppFormActions(
-                        primaryText = stringResource(R.string.guardar),
-                        onPrimaryClick = {
-                            profileViewModel.addProfile(
-                                nombre = name.value,
-                                photoUri = selectedPhotoUri,
-                                birthDate = birthDate.value,
-                                sex = sex.value,
-                                bloodType = bloodType.value,
-                                allergies = allergies.value,
-                                medicalNotes = medicalNotes.value,
-                                healthCardNumber = healthCardNumber.value,
-                                onSaved = onSaveClicked
-                            )
-                        },
-                        primaryEnabled = name.value.isNotBlank(),
-                        supportingText = if (name.value.isBlank()) {
-                            stringResource(R.string.profile_save_name_required)
-                        } else {
-                            null
-                        },
-                    )
-                }
-            )
+    Box(modifier = modifier.fillMaxSize()) {
+        when (currentMode) {
+            ProfileMode.Create -> {
+                ProfileForm(
+                    modifier = Modifier.fillMaxSize(),
+                    name = name.value,
+                    onNameChange = { name.value = it },
+                    photoUri = selectedPhotoUri,
+                    onPhotoSelected = { selectedPhotoUri = it },
+                    birthDate = birthDate.value,
+                    onBirthDateChange = { birthDate.value = it },
+                    sex = sex.value,
+                    onSexChange = { sex.value = it },
+                    bloodType = bloodType.value,
+                    onBloodTypeChange = { bloodType.value = it },
+                    allergies = allergies.value,
+                    onAllergiesChange = { allergies.value = it },
+                    medicalNotes = medicalNotes.value,
+                    onMedicalNotesChange = { medicalNotes.value = it },
+                    healthCardNumber = healthCardNumber.value,
+                    onHealthCardNumberChange = { healthCardNumber.value = it },
+                    footer = {
+                        AppFormActions(
+                            primaryText = stringResource(R.string.guardar),
+                            onPrimaryClick = {
+                                profileViewModel.addProfile(
+                                    nombre = name.value,
+                                    photoUri = selectedPhotoUri,
+                                    birthDate = birthDate.value,
+                                    sex = sex.value,
+                                    bloodType = bloodType.value,
+                                    allergies = allergies.value,
+                                    medicalNotes = medicalNotes.value,
+                                    healthCardNumber = healthCardNumber.value,
+                                    onSaved = onSaveClicked
+                                )
+                            },
+                            primaryEnabled = name.value.isNotBlank(),
+                            supportingText = if (name.value.isBlank()) {
+                                stringResource(R.string.profile_save_name_required)
+                            } else {
+                                null
+                            },
+                        )
+                    }
+                )
+            }
+
+            ProfileMode.Edit -> {
+                ProfileForm(
+                    modifier = Modifier.fillMaxSize(),
+                    name = name.value,
+                    onNameChange = { name.value = it },
+                    photoUri = newPhotoUri ?: currentImagePath?.let { Uri.fromFile(File(it)) },
+                    onPhotoSelected = { newPhotoUri = it },
+                    birthDate = birthDate.value,
+                    onBirthDateChange = { birthDate.value = it },
+                    sex = sex.value,
+                    onSexChange = { sex.value = it },
+                    bloodType = bloodType.value,
+                    onBloodTypeChange = { bloodType.value = it },
+                    allergies = allergies.value,
+                    onAllergiesChange = { allergies.value = it },
+                    medicalNotes = medicalNotes.value,
+                    onMedicalNotesChange = { medicalNotes.value = it },
+                    healthCardNumber = healthCardNumber.value,
+                    onHealthCardNumberChange = { healthCardNumber.value = it },
+                    footer = {
+                        AppFormActions(
+                            primaryText = stringResource(R.string.guardar),
+                            onPrimaryClick = {
+                                profileViewModel.updateProfile(
+                                    nombre = name.value,
+                                    newPhotoUri = newPhotoUri,
+                                    currentImagePath = currentImagePath,
+                                    birthDate = birthDate.value,
+                                    sex = sex.value,
+                                    bloodType = bloodType.value,
+                                    allergies = allergies.value,
+                                    medicalNotes = medicalNotes.value,
+                                    healthCardNumber = healthCardNumber.value,
+                                    onSaved = { savedImagePath ->
+                                        selectedPhotoUri = savedImagePath?.let(Uri::parse)
+                                        currentImagePath = savedImagePath
+                                        newPhotoUri = null
+                                        onSaveClicked()
+                                        currentMode = ProfileMode.View
+                                    }
+                                )
+                            },
+                            primaryEnabled = name.value.isNotBlank(),
+                            supportingText = if (name.value.isBlank()) {
+                                stringResource(R.string.profile_save_name_required)
+                            } else {
+                                null
+                            },
+                        )
+                    }
+                )
+            }
+
+            ProfileMode.View -> {
+                ProfileViewContent(
+                    modifier = Modifier.fillMaxSize(),
+                    name = name.value,
+                    photoUri = selectedPhotoUri,
+                    birthDate = birthDate.value,
+                    sex = sex.value,
+                    bloodType = bloodType.value,
+                    allergies = allergies.value,
+                    medicalNotes = medicalNotes.value,
+                    healthCardNumber = healthCardNumber.value,
+                    onEditClick = { currentMode = ProfileMode.Edit },
+                    onDeleteClick = { perfil?.let { showDeleteDialog = true } },
+                    onStatisticsClick = onStatisticsClick,
+                    onImportMedicationsClick = onImportMedicationsClick,
+                    onArchivedMedicationsClick = onArchivedMedicationsClick,
+                    onHistoryClick = onHistoryClick,
+                    onExportReportClick = { showReportDialog = true },
+                )
+            }
         }
 
-        ProfileMode.Edit -> {
-            ProfileForm(
-                modifier = modifier,
-                name = name.value,
-                onNameChange = { name.value = it },
-                photoUri = newPhotoUri ?: currentImagePath?.let { Uri.fromFile(File(it)) },
-                onPhotoSelected = { newPhotoUri = it },
-                birthDate = birthDate.value,
-                onBirthDateChange = { birthDate.value = it },
-                sex = sex.value,
-                onSexChange = { sex.value = it },
-                bloodType = bloodType.value,
-                onBloodTypeChange = { bloodType.value = it },
-                allergies = allergies.value,
-                onAllergiesChange = { allergies.value = it },
-                medicalNotes = medicalNotes.value,
-                onMedicalNotesChange = { medicalNotes.value = it },
-                healthCardNumber = healthCardNumber.value,
-                onHealthCardNumberChange = { healthCardNumber.value = it },
-                footer = {
-                    AppFormActions(
-                        primaryText = stringResource(R.string.guardar),
-                        onPrimaryClick = {
-                            profileViewModel.updateProfile(
-                                nombre = name.value,
-                                newPhotoUri = newPhotoUri,
-                                currentImagePath = currentImagePath,
-                                birthDate = birthDate.value,
-                                sex = sex.value,
-                                bloodType = bloodType.value,
-                                allergies = allergies.value,
-                                medicalNotes = medicalNotes.value,
-                                healthCardNumber = healthCardNumber.value,
-                                onSaved = { savedImagePath ->
-                                    selectedPhotoUri = savedImagePath?.let(Uri::parse)
-                                    currentImagePath = savedImagePath
-                                    newPhotoUri = null
-                                    onSaveClicked()
-                                    currentMode = ProfileMode.View
-                                }
-                            )
-                        },
-                        primaryEnabled = name.value.isNotBlank(),
-                        supportingText = if (name.value.isBlank()) {
-                            stringResource(R.string.profile_save_name_required)
-                        } else {
-                            null
-                        },
-                    )
-                }
-            )
-        }
-
-        ProfileMode.View -> {
-            ProfileViewContent(
-                modifier = modifier,
-                name = name.value,
-                photoUri = selectedPhotoUri,
-                birthDate = birthDate.value,
-                sex = sex.value,
-                bloodType = bloodType.value,
-                allergies = allergies.value,
-                medicalNotes = medicalNotes.value,
-                healthCardNumber = healthCardNumber.value,
-                onEditClick = { currentMode = ProfileMode.Edit },
-                onDeleteClick = { perfil?.let { showDeleteDialog = true } },
-                onStatisticsClick = onStatisticsClick,
-                onImportMedicationsClick = onImportMedicationsClick,
-                onArchivedMedicationsClick = onArchivedMedicationsClick,
-                onHistoryClick = onHistoryClick,
-            )
-        }
+        SnackbarHost(
+            hostState = reportSnackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 
     if (showDeleteDialog) {
@@ -331,6 +378,18 @@ fun ProfileScreen(
                 TextButton(onClick = { showDeleteDialog = false }) {
                     Text(stringResource(R.string.common_cancel))
                 }
+            }
+        )
+    }
+
+    if (showReportDialog) {
+        ProfileReportPeriodDialog(
+            period = reportPeriod,
+            onPeriodSelected = profileReportViewModel::selectPeriod,
+            onDismiss = { showReportDialog = false },
+            onConfirm = {
+                showReportDialog = false
+                reportExportLauncher.launch(profileReportViewModel.suggestedExportFileName())
             }
         )
     }
@@ -542,6 +601,7 @@ private fun ProfileViewContent(
     onImportMedicationsClick: () -> Unit,
     onArchivedMedicationsClick: () -> Unit,
     onHistoryClick: () -> Unit,
+    onExportReportClick: () -> Unit,
 ) {
     val datePattern = stringResource(R.string.common_date_pattern)
     val dateFormatter = remember(datePattern) { DateTimeFormatter.ofPattern(datePattern) }
@@ -628,7 +688,7 @@ private fun ProfileViewContent(
 
         AppReadOnlySection(title = stringResource(R.string.profile_medications_section)) {
             AppNavigationRow(
-                icon = ImageVector.vectorResource(R.drawable.ic_picture_as_pdf),
+                icon = ImageVector.vectorResource(R.drawable.ic_upload),
                 label = stringResource(R.string.profile_import_medications),
                 description = stringResource(R.string.profile_import_medications_description),
                 onClick = onImportMedicationsClick,
@@ -653,6 +713,12 @@ private fun ProfileViewContent(
                 label = stringResource(R.string.profile_view_history),
                 description = stringResource(R.string.profile_history_description),
                 onClick = onHistoryClick,
+            )
+            AppNavigationRow(
+                icon = ImageVector.vectorResource(R.drawable.ic_download),
+                label = stringResource(R.string.profile_export_report),
+                description = stringResource(R.string.profile_export_report_description),
+                onClick = onExportReportClick,
             )
         }
     }
@@ -717,6 +783,7 @@ private fun ProfileViewContentPreview() {
             onImportMedicationsClick = {},
             onArchivedMedicationsClick = {},
             onHistoryClick = {},
+            onExportReportClick = {},
         )
     }
 }

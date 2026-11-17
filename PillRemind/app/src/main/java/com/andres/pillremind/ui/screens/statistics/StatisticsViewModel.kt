@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.andres.pillremind.data.local.session.SessionManager
 import com.andres.pillremind.domain.model.StatisticsPeriod
 import com.andres.pillremind.domain.model.StatisticsReport
+import com.andres.pillremind.domain.model.dateRange
 import com.andres.pillremind.domain.model.toStatisticsReport
 import com.andres.pillremind.domain.repository.IntakeRepository
 import com.andres.pillremind.domain.repository.MedicationRepository
@@ -22,7 +23,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 /**
  * Estado de la pantalla de estadísticas.
@@ -106,9 +106,8 @@ class StatisticsViewModel @Inject constructor(
         _period,
         today
     ) { profileId, selectedPeriod, currentDate ->
-        val to = currentDate.atTime(LocalTime.MAX)
-        val from = currentDate.minusDays(selectedPeriod.days - 1).atStartOfDay()
-        StatisticsRequest(profileId, selectedPeriod, from, to)
+        val range = selectedPeriod.dateRange(currentDate)
+        StatisticsRequest(profileId, selectedPeriod, range.from, range.to)
     }.flatMapLatest { request ->
         combine(
             intakeRepository.observeStatisticsIntakes(

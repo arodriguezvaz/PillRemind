@@ -149,7 +149,7 @@ private fun AppEmptyStateActionPreview() {
                     text = stringResource(R.string.medication_import_action),
                     onClick = {},
                     size = ButtonSize.Large,
-                    leadingIcon = ImageVector.vectorResource(R.drawable.ic_picture_as_pdf),
+                    leadingIcon = ImageVector.vectorResource(R.drawable.ic_upload),
                 )
             },
         )

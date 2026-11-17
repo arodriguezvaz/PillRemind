@@ -2,6 +2,7 @@ package com.andres.pillremind.domain.model
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import kotlin.math.roundToInt
 
 /**
@@ -14,6 +15,28 @@ enum class StatisticsPeriod(val days: Long) {
     THIRTY(30),
     NINETY(90)
 }
+
+/**
+ * Rango de fechas de un periodo de estadísticas.
+ *
+ * @property from Inicio del día más antiguo incluido.
+ * @property to Final del día de referencia.
+ */
+data class StatisticsDateRange(
+    val from: LocalDateTime,
+    val to: LocalDateTime
+)
+
+/**
+ * Calcula el rango que abarca el periodo, contando el día de referencia.
+ *
+ * @param referenceDate Día que se toma como final del periodo.
+ */
+fun StatisticsPeriod.dateRange(referenceDate: LocalDate): StatisticsDateRange =
+    StatisticsDateRange(
+        from = referenceDate.minusDays((days - 1).coerceAtLeast(0)).atStartOfDay(),
+        to = referenceDate.atTime(LocalTime.MAX)
+    )
 
 /**
  * Estado de una toma dentro de las estadísticas.
