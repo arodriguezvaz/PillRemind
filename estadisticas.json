@@ -7,19 +7,19 @@
   "repository": "arodriguezvaz/PillRemind",
   "totals": {
     "apk": 67,
-    "manifest": 89,
+    "manifest": 92,
     "releases": 12
   },
   "latestStable": {
     "tag": "v1.7.0",
-    "manifestDownloads": 9
+    "manifestDownloads": 12
   },
   "releases": [
     {
       "tag": "v1.7.0",
       "publishedAt": "2026-11-18T00:02:10Z",
       "apkDownloads": 6,
-      "manifestDownloads": 9,
+      "manifestDownloads": 12,
       "prerelease": false
     },
     {
