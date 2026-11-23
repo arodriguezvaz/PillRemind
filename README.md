@@ -107,6 +107,10 @@ Consulta el prospecto o a tu médico o farmacéutico ante cualquier duda.
 El código se distribuye bajo licencia MIT y la aplicación se ofrece «tal cual», sin
 garantías de disponibilidad o funcionamiento ininterrumpido.
 
+Consulta los [términos de uso](https://pillremind.arodriguezvaz.duckdns.org/terminos.html)
+y la [política de privacidad](https://pillremind.arodriguezvaz.duckdns.org/privacidad.html)
+publicados en la web del proyecto.
+
 ## Autoría y licencia
 
 Proyecto personal de [Andrés Rodríguez Vázquez](https://github.com/arodriguezvaz),

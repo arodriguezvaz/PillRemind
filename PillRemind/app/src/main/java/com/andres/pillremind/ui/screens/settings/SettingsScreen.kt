@@ -32,11 +32,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -69,6 +71,7 @@ import com.andres.pillremind.ui.components.settings.SettingsToggleItem
 import com.andres.pillremind.ui.screens.main.MainTopBar
 import com.andres.pillremind.ui.screens.main.TopBarState
 import com.andres.pillremind.ui.theme.AppSpacing
+import kotlinx.coroutines.launch
 
 /**
  * Pantalla de ajustes de la aplicación.
@@ -96,6 +99,16 @@ fun SettingsScreen(
     val context = LocalContext.current
     val activity = LocalActivity.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val uriHandler = LocalUriHandler.current
+    val coroutineScope = rememberCoroutineScope()
+    val legalOpenErrorMessage = stringResource(R.string.settings_legal_open_error)
+    val openLegalUrl: (String) -> Unit = { url ->
+        if (runCatching { uriHandler.openUri(url) }.isFailure) {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(legalOpenErrorMessage)
+            }
+        }
+    }
 
     val reminderPermissions = remember(context) { ReminderPermissions(context) }
     var notificationStatus by remember {
@@ -150,7 +163,6 @@ fun SettingsScreen(
     var showImportSuccessDialog by rememberSaveable { mutableStateOf(false) }
     var importIsEncrypted by rememberSaveable { mutableStateOf(false) }
     var pendingImportUri by rememberSaveable { mutableStateOf<String?>(null) }
-    var legalDocument by rememberSaveable { mutableStateOf<LegalDocument?>(null) }
 
     val busy = backupState is BackupUiState.Working ||
             backupState is BackupUiState.Inspecting
@@ -410,11 +422,11 @@ fun SettingsScreen(
                 Spacer(Modifier.height(AppSpacing.sm))
                 SettingsLinkItem(
                     label = stringResource(R.string.settings_privacy_policy),
-                    onClick = { legalDocument = LegalDocument.PrivacyPolicy }
+                    onClick = { openLegalUrl(PRIVACY_POLICY_URL) }
                 )
                 SettingsLinkItem(
-                    label = stringResource(R.string.settings_legal_notice),
-                    onClick = { legalDocument = LegalDocument.LegalNotice }
+                    label = stringResource(R.string.settings_terms_of_use),
+                    onClick = { openLegalUrl(TERMS_OF_USE_URL) }
                 )
             }
         }
@@ -512,61 +524,6 @@ fun SettingsScreen(
             }
         )
     }
-
-    legalDocument?.let { document ->
-        LegalDocumentDialog(
-            title = stringResource(document.titleRes),
-            body = stringResource(document.bodyRes),
-            onDismiss = { legalDocument = null }
-        )
-    }
-}
-
-/**
- * Documentos legales que se muestran dentro de la app.
- *
- * Se mantienen en local para que funcionen sin conexión y no dependan de una
- * página externa.
- *
- * @property titleRes Título del documento.
- * @property bodyRes Texto completo del documento.
- */
-private enum class LegalDocument(
-    @param:StringRes val titleRes: Int,
-    @param:StringRes val bodyRes: Int
-) {
-    PrivacyPolicy(R.string.settings_privacy_policy, R.string.settings_privacy_policy_body),
-    LegalNotice(R.string.settings_legal_notice, R.string.settings_legal_notice_body)
-}
-
-/**
- * Diálogo de lectura para un documento legal.
- *
- * @param title Título mostrado en la cabecera.
- * @param body Texto completo del documento.
- * @param onDismiss Acción al cerrar el diálogo.
- */
-@Composable
-private fun LegalDocumentDialog(
-    title: String,
-    body: String,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(title) },
-        text = {
-            Text(
-                text = body,
-                modifier = Modifier.verticalScroll(rememberScrollState())
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.settings_legal_close))
-            }
-        }
-    )
 }
 
 /**
@@ -799,3 +756,15 @@ private fun ThemeMode.descriptionRes(): Int? = when (this) {
     ThemeMode.LIGHT -> null
     ThemeMode.DARK -> null
 }
+
+/**
+ * Dirección pública de la política de privacidad.
+ */
+private const val PRIVACY_POLICY_URL =
+    "https://pillremind.arodriguezvaz.duckdns.org/privacidad.html"
+
+/**
+ * Dirección pública de los términos de uso.
+ */
+private const val TERMS_OF_USE_URL =
+    "https://pillremind.arodriguezvaz.duckdns.org/terminos.html"
