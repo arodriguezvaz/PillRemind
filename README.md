@@ -20,7 +20,8 @@
 ## Descarga
 
 La aplicación se distribuye como APK desde las
-[releases de GitHub](https://github.com/arodriguezvaz/PillRemind/releases/latest).
+[releases de GitHub](https://github.com/arodriguezvaz/PillRemind/releases/latest)
+y desde la [web oficial](https://pillremind.arodriguezvaz.duckdns.org/descargar.html).
 No está publicada en Google Play.
 
 - Requiere Android 8.0 (API 26) o superior.
@@ -50,37 +51,6 @@ No está publicada en Google Play.
 
 **Guía de uso, con capturas:** [Manual de uso](doc/docs/manual-uso.md)
 
-## Privacidad
-
-Los perfiles, medicamentos, horarios, tomas e imágenes se guardan en una base de
-datos Room del dispositivo. La app no tiene cuentas, sincronización ni servidor
-propio.
-
-La app hace dos peticiones propias a internet:
-
-- **Actualizaciones**: como máximo una vez al día se consulta un fichero público
-  de GitHub Releases. No se envían datos de salud ni datos de la app; como en
-  cualquier conexión, GitHub recibe la IP y datos técnicos.
-- **CIMA**: solo cuando escaneas un medicamento y das tu consentimiento (en el
-  arranque, en Ajustes → Legal o en el diálogo de escaneo). Se envía únicamente el CN a la API pública de la AEMPS; no se
-  envían perfiles, medicamentos, tomas ni fotos. Como en cualquier conexión a
-  internet, la AEMPS recibe la dirección IP y datos técnicos de la conexión. El CN
-  no se guarda en la base de datos ni en las copias de seguridad y el resultado se
-  descarta al terminar la revisión.
-
-Las fotos se procesan en el dispositivo con ML Kit y no se suben a ningún servidor.
-ML Kit forma parte de Google Play Services y puede descargar sus modelos. Los PDF
-de la hoja de medicación se procesan también en el dispositivo, no se guardan y no
-se envían a ningún servidor.
-
-PillRemind no incluye sus datos en las copias automáticas de Android (Google Drive
-ni transferencia entre dispositivos). Para cambiar de móvil, exporta una copia
-desde Ajustes → Datos. También puedes generar un informe de adherencia en PDF desde
-Perfil → Seguimiento y guardarlo o compartirlo tú mismo.
-
-Si rechazas la consulta a CIMA o la red falla, puedes seguir usando el OCR de la
-caja o rellenar el formulario a mano.
-
 **Detalle técnico del escaneo:** [OCR, códigos y CIMA](doc/docs/escaneo.md).
 
 ## Desarrollo
@@ -91,25 +61,24 @@ compila, firma y publica con GitHub Actions.
 **Detalles técnicos, compilación y publicación:**
 [Guía de desarrollo](doc/docs/desarrollo.md)
 
-## Aviso legal
+## Legal
 
 PillRemind es una herramienta de apoyo para recordar la medicación. No es un
 producto sanitario, no emite diagnósticos ni recomendaciones médicas y no sustituye
 la consulta con un profesional sanitario.
 
-El escaneo y el OCR son ayudas: pueden leer mal el nombre, la dosis o la forma
-farmacéutica. La importación desde PDF también es una ayuda: el documento puede
-tener un formato distinto o contener una pauta que no se interprete bien. Revisa
-siempre el nombre, la dosis y las horas antes de guardar. La información de CIMA
-procede de la AEMPS y se ofrece tal cual, sin garantía de exactitud o actualización.
-Consulta el prospecto o a tu médico o farmacéutico ante cualquier duda.
+El escaneo, el OCR y la importación desde PDF son ayudas y pueden fallar. Revisa
+siempre el nombre, la dosis y las horas antes de guardar. Ante cualquier duda,
+consulta el prospecto o a tu médico o farmacéutico.
+
+La información legal completa está publicada en la web:
+
+- [Política de privacidad](https://pillremind.arodriguezvaz.duckdns.org/privacidad.html)
+- [Términos de uso](https://pillremind.arodriguezvaz.duckdns.org/terminos.html)
+- [Sección legal](https://pillremind.arodriguezvaz.duckdns.org/legal.html)
 
 El código se distribuye bajo licencia MIT y la aplicación se ofrece «tal cual», sin
 garantías de disponibilidad o funcionamiento ininterrumpido.
-
-Consulta los [términos de uso](https://pillremind.arodriguezvaz.duckdns.org/terminos.html)
-y la [política de privacidad](https://pillremind.arodriguezvaz.duckdns.org/privacidad.html)
-publicados en la web del proyecto.
 
 ## Autoría y licencia
 

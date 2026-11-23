@@ -71,5 +71,6 @@ cd PillRemind
 
 ## Docs
 
-- Tracked docs are the root `README.md` and `doc/templates/` (academic write-up, historical: it may still describe the removed Supabase version). Verify behavior against code and Gradle config.
+- Tracked docs are the root `README.md` and `doc/docs/` (technical guides); `doc/docs_academicos/` is the historical academic write-up and may still describe the removed Supabase version. Verify behavior against code and Gradle config.
+- La información legal (privacidad y términos) vive en la web pública (`https://pillremind.arodriguezvaz.duckdns.org/legal.html`); la app enlaza allí desde Ajustes → Legal. No dupliques esos textos en el repositorio.
 - `PillRemind/INCIDENCIAS.md` is a local, Git-ignored personal audit: never commit or publish it, and review it separately from implementation changes.

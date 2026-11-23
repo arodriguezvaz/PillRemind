@@ -227,6 +227,10 @@ manual. El análisis se puede cancelar volviendo a las fotos.
 - La otra conexión de red de la app es la comprobación de actualizaciones contra
   GitHub Releases; no envía datos de salud.
 
+La política de privacidad completa, con las dos conexiones a internet y los
+permisos de Android, está en la
+[web de PillRemind](https://pillremind.arodriguezvaz.duckdns.org/privacidad.html).
+
 ## 10. Pruebas
 
 Pruebas unitarias:
