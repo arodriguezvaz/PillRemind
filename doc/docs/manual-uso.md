@@ -59,9 +59,9 @@ caja?».
    ficha, lee el texto de la caja con OCR.
 3. Puedes dar permiso para consultar CIMA en la bienvenida; si no lo haces, te lo
    pedirá la primera vez que escanees. Solo se envía el CN a la AEMPS; no se
-   envían perfiles, medicamentos ni tomas, y el CN no se guarda. La AEMPS recibe
-   la IP y datos técnicos de la conexión. Puedes retirar el consentimiento en
-   **Ajustes → Legal**.
+   envían perfiles, medicamentos ni tomas, y el CN no se guarda. Puedes retirar
+   el consentimiento en **Ajustes → Legal**. El detalle está en la
+   [política de privacidad](https://pillremind.arodriguezvaz.duckdns.org/privacidad.html).
 4. En **Revisar medicamento**, comprueba el nombre, la dosis y la unidad. Si la
    app no está segura del nombre, el campo aparece vacío y verás varios
    candidatos: elige el correcto o escríbelo. Si detecta un volumen como

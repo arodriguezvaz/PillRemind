@@ -281,7 +281,8 @@ Column(fillMaxSize)
   2. Recordatorios: `SettingsCard` con notificaciones y alarmas exactas.
   3. Copia de seguridad: descripción, `SettingsLinkItem` de exportar/importar,
      indicador de progreso y aviso de privacidad.
-  4. Legal: `SettingsLinkItem` de privacidad y aviso legal.
+  4. Legal: toggle de consultas a CIMA y `SettingsLinkItem` de «Política de
+     privacidad» y «Términos de uso»; los enlaces abren la web en el navegador.
 - Los huecos de 10dp entre descripción y enlaces son una excepción puntual.
 
 ## Onboarding
