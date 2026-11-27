@@ -839,7 +839,6 @@ private fun MedicationArchivedContent(
         MedicationHeader(
             name = name,
             photoUri = photoUri,
-            subtitle = doseValue,
         )
 
         if (archivedDate != null) {
@@ -891,7 +890,7 @@ private fun MedicationArchivedContent(
 /**
  * Ficha de solo lectura de un medicamento.
  *
- * Sustituye al formulario deshabilitado: cabecera con foto y dosis, secciones
+ * Sustituye al formulario deshabilitado: cabecera con foto y nombre, secciones
  * planas sin cards y acciones al final del contenido.
  */
 @Composable
@@ -934,7 +933,6 @@ private fun MedicationViewContent(
         MedicationHeader(
             name = name,
             photoUri = photoUri,
-            subtitle = doseValue,
         )
 
         if (hasInvalidData) {
@@ -994,7 +992,6 @@ private fun MedicationViewContent(
 private fun MedicationHeader(
     name: String,
     photoUri: Uri?,
-    subtitle: String,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -1008,23 +1005,14 @@ private fun MedicationHeader(
             photoDescriptionRes = R.string.photo_medication,
         )
         Spacer(modifier = Modifier.width(AppSpacing.md))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-            if (subtitle.isNotBlank()) {
-                Spacer(modifier = Modifier.height(AppSpacing.xxs))
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
+        Text(
+            text = name,
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 
